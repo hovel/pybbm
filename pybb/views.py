@@ -3,11 +3,11 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from board.util import render_to, build_form
-from board.models import Category, Forum, Topic, Post
-from board.forms import AddPostForm
+from pybb.util import render_to, build_form
+from pybb.models import Category, Forum, Topic, Post
+from pybb.forms import AddPostForm
 
-@render_to('board/index.html')
+@render_to('pybb/index.html')
 def index(request):
     cats = Category.objects.all()
     last_created = Topic.objects.all()[:10]
@@ -23,21 +23,21 @@ def index(request):
             }
 
 
-@render_to('board/category.html')
+@render_to('pybb/category.html')
 def show_category(request, category_id):
     category = Category.objects.get(pk=category_id)
     return {'category': category,
             }
 
 
-@render_to('board/forum.html')
+@render_to('pybb/forum.html')
 def show_forum(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
     return {'forum': forum,
             }
 
     
-@render_to('board/topic.html')
+@render_to('pybb/topic.html')
 def show_topic(request, topic_id):
     topic = Topic.objects.get(pk=topic_id)
     form = AddPostForm(topic=topic)
@@ -47,7 +47,7 @@ def show_topic(request, topic_id):
 
 
 @login_required
-@render_to('board/add_post.html')
+@render_to('pybb/add_post.html')
 def add_post(request, forum_id, topic_id):
     forum = None
     topic = None
@@ -69,7 +69,7 @@ def add_post(request, forum_id, topic_id):
             }
 
 
-@render_to('board/user.html')
+@render_to('pybb/user.html')
 def user(request, username):
     user = get_object_or_404(User, username=username)
     return {'profile': user,

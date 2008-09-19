@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 from django.contrib import admin
-from board.models import Category, Forum, Topic, Post
+from pybb.models import Category, Forum, Topic, Post
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'position', 'forum_count']

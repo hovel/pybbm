@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% load board_extras %}
-{% load board_extras %}
+{% load pybb_extras %}
+{% load pybb_extras %}
 
 {% block content %}
 <div class="index">
@@ -44,7 +44,7 @@
                 &rarr;
                 <span class="author">{{ topic.user|profile_link }}</span>
                 &rarr;
-                <span class="time">{{ topic.created|board_time }}</span>
+                <span class="time">{{ topic.created|pybb_time }}</span>
                 </li>
                 {% endfor %}
             </ul>
@@ -55,7 +55,7 @@
                 &rarr;
                 <span class="author">{{ topic.user|profile_link }}</span>
                 &rarr;
-                <span class="time">{{ topic.updated|board_time }}</span>
+                <span class="time">{{ topic.updated|pybb_time }}</span>
                 </li>
                 {% endfor %}
             </ul>

@@ -5,10 +5,10 @@ meta:
       is_active: True
   models:
     User: django.contrib.auth.models
-    Category: board.models
-    Forum: board.models
-    Topic: board.models
-    Post: board.models
+    Category: pybb.models
+    Forum: pybb.models
+    Topic: pybb.models
+    Post: pybb.models
 
 User:
  # Admins

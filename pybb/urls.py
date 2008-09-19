@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-from board import views
+from pybb import views
 
 urlpatterns = patterns('',
     url('^$', views.index, name='index'),
@@ -11,5 +11,5 @@ urlpatterns = patterns('',
         {'topic_id': None}, name='add_topic'),
     url('^topic/(?P<topic_id>\d+)/post/add/$', views.add_post,
         {'forum_id': None}, name='add_post'),
-    url('^user/(?P<username>\w+)/$', views.user, name='board_profile'),
+    url('^user/(?P<username>\w+)/$', views.user, name='pybb_profile'),
 )

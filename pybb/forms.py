@@ -1,6 +1,6 @@
 from django import forms
 
-from board.models import Topic, Post
+from pybb.models import Topic, Post
 
 class AddPostForm(forms.ModelForm):
     name = forms.CharField()

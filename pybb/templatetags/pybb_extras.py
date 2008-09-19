@@ -13,12 +13,12 @@ register = template.Library()
 @register.filter
 def profile_link(user):
     data = u'<a href="%s">%s</a>' % (\
-        reverse('board_profile', args=[user.username]), user.username)
+        reverse('pybb_profile', args=[user.username]), user.username)
     return mark_safe(data)
 
 
 @register.filter
-def board_time(time):
+def pybb_time(time):
     delta = datetime.now() - time
     today = datetime.now().replace(hour=0, minute=0, second=0)
     yesterday = today - timedelta(days=1)
@@ -36,7 +36,7 @@ def board_time(time):
 
 
 # TODO: this old code requires refactoring
-@register.inclusion_tag('board/pagination.html',takes_context=True)
+@register.inclusion_tag('pybb/pagination.html',takes_context=True)
 def pagination(context, adjacent_pages=5):
     """
     Return the list of A tags with links to pages.
