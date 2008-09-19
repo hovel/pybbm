@@ -89,6 +89,9 @@ INSTALLED_APPS = (
     'account',
 )
 
+# Pybb settings
+# Nothing yet
+
 # Account app settings
 ACCOUNT_ACTIVATION = False
 LOGIN_REDIRECT_URL = '/'
@@ -96,6 +99,7 @@ ACCOUNT_CAPTCHA = False
 ACCOUNT_USERNAME_MIN_LENGTH = 2
 ACCOUNT_PASSWORD_MIN_LENGTH = 2
 DOMAIN = 'edit.your.settings.plea.se'
+LOGIN_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',

@@ -1,0 +1,57 @@
+meta:
+  order: [User, Category, Forum, Topic, Post]
+  defaults:
+    User:
+      is_active: True
+  models:
+    User: django.contrib.auth.models
+    Category: board.models
+    Forum: board.models
+    Topic: board.models
+    Post: board.models
+
+User:
+ # Admins
+ - username: lorien
+   is_staff: True
+   is_superuser: True
+   password: test
+   email: lizendir@gmail.com
+   ref: lorien
+
+
+Category:
+ - name: First category
+   ref: first
+ - name: Second category
+   ref: second
+
+Forum:
+ - name: First forum
+   ref: first
+   category: {Category: first}
+ - name: Second forum
+   ref: second
+   category: {Category: second}
+
+
+Topic:
+ - name: First topic
+   ref: first
+   forum: {Forum: first}
+   user: {User: lorien}
+ - name: Second topic
+   ref: second
+   forum: {Forum: second}
+   user: {User: lorien}
+
+Post:
+ - topic: {Topic: first}
+   user: {User: lorien}
+   body: Just some text for first post
+ - topic: {Topic: first}
+   user: {User: lorien}
+   body: Just some text for second post
+ - topic: {Topic: second}
+   user: {User: lorien}
+   body: Just some text for third post

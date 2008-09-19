@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -40,7 +42,8 @@ class Forum(models.Model):
 class Topic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
     name = models.CharField(max_length=255)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(null=True)
+    updated = models.DateTimeField(null=True)
     user = models.ForeignKey(User)
 
     class Meta:
@@ -54,19 +57,27 @@ class Topic(models.Model):
 
     @property
     def head(self):
-        return self.posts.get(head=True)
+        return self.posts.all().order_by('created')[0]
+
+    @property
+    def last_post(self):
+        return self.posts.all().order_by('-created')[0]
 
     def get_absolute_url(self):
         return reverse('topic', args=[self.id])
+
+    def save(self):
+        if self.id is None:
+            self.created = datetime.now()
+        super(Topic, self).save()
 
 
 class Post(models.Model):
     topic = models.ForeignKey(Topic, related_name='posts')
     user = models.ForeignKey(User, related_name='posts')
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(blank=True)
     updated = models.DateTimeField(blank=True, null=True)
     body = models.TextField()
-    head = models.BooleanField(blank=True, default=False)
 
     class Meta:
         ordering = ['created']
@@ -77,3 +88,12 @@ class Post(models.Model):
         return self.body[:LIMIT] + tail
 
     __unicode__ = summary
+
+    def save(self):
+        if self.created is None:
+            self.created = datetime.now()
+            self.updated = datetime.now()
+        if self.id is None and self.topic is not None:
+            self.topic.updated = datetime.now()
+            self.topic.save()
+        super(Post, self).save()

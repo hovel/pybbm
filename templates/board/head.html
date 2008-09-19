@@ -1,9 +1,11 @@
+{% load board_extras %}
 <div class="logo">
     <a href="{% url index %}">PYBB</a>
 </div>
 <ul class="navigation">
     {% if user.is_authenticated %}
     <li><a href="{% url auth_logout %}">Logout</a></li>
+    <li>You have logined as {{ user|profile_link }}</li>
     {% else %}
     <li><a href="{% url registration_register %}">Registration</a></li>
     <li><a href="{% url auth_login %}">Login</a></li>

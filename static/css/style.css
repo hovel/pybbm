@@ -123,6 +123,14 @@ p {
     margin-bottom: 2em;
 }
 
+.tablist li.last {
+    margin-bottom: 0.5em;
+}
+
+.controls {
+    margin-bottom: 1em;
+}
+
 .tablist-inner-row {
     padding: 0.5em;
 }
@@ -161,6 +169,10 @@ p {
     color: #555;
 }
 
+.post .info .time {
+    font-size: 0.9em;
+}
+
 .post .content {
     padding-top: 1em;
     padding-left: 1em;
@@ -182,4 +194,42 @@ p {
 
 .postlist-row .header {
     margin-bottom: 0.3em;
+}
+
+.index .left {
+    float: left;
+    width: 48%;
+}
+
+.index .right {
+    float: right;
+    width: 48%;
+}
+
+.tab-selector {
+    float: left;
+    padding: 0.5em;
+}
+
+.tab-selectors .active {
+    background-color: white;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+}
+
+.tablist .tab-selectors .first {
+    border-left: none;
+}
+
+.tablist h3.tab-selectors {
+    padding: 0;
+}
+
+.quick-access .author a {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.quick-access .time {
+    font-size: 0.8em;
 }

@@ -13,7 +13,9 @@
         {% for post in topic.posts.all %}
             <li class="tablist-inner-row post">
                 <div class="info">
-                    <div class="author">{{ post.user|profile_link }}</div>
+                    <span class="author">{{ post.user|profile_link }}</span>
+                    &rarr;
+                    <span class="time">{{ post.created|board_time }}</span>
                 </div>
                 <div class="content">
                     {{ post.body }}

@@ -12,7 +12,7 @@ class TopicAdmin(admin.ModelAdmin):
     list_display = ['name', 'forum', 'created', 'head', 'post_count']
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['topic', 'user', 'created', 'head', 'summary']
+    list_display = ['topic', 'user', 'created', 'summary']
     search_fields = ['body']
 
 admin.site.register(Category, CategoryAdmin)

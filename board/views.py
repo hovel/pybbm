@@ -11,7 +11,16 @@ from board.forms import AddPostForm
 @render_to('board/index.html')
 def index(request):
     cats = Category.objects.all()
+    last_created = Topic.objects.all()[:10]
+    last_updated = Topic.objects.all().order_by('-updated')[:10]
+    stats = {'posts': Post.objects.all().count(),
+             'topics': Topic.objects.all().count(),
+             'users': User.objects.all().count(),
+             }
     return {'cats': cats,
+            'last_created': last_created,
+            'last_updated': last_updated,
+            'stats': stats,
             }
 
 
