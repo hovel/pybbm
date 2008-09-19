@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load common_extras %}
+
+{% block content %}
+<h1>Информация о пользователе {{ profile.username }}</h1>
+<dl>
+    <dt>Number of posts</dt>
+    <dd>{{ profile.posts.all.count }}</dd>
+    <dt>Date of registration</dt>
+    <dd>{{ profile.join_date }}</dd>
+</dl>
+{% endblock %}

@@ -65,6 +65,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'account.middleware.OneTimeCodeAuthMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -85,4 +86,19 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'board',
     'common',
+    'account',
+)
+
+# Account app settings
+ACCOUNT_ACTIVATION = False
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_CAPTCHA = False
+ACCOUNT_USERNAME_MIN_LENGTH = 2
+ACCOUNT_PASSWORD_MIN_LENGTH = 2
+DOMAIN = 'edit.your.settings.plea.se'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'account.backends.OneTimeCodeBackend',
+    #'openid_auth.backends.OpenIDBackend',
 )

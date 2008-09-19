@@ -1,21 +1,28 @@
 {% extends 'base.html' %}
 {% load common_extras %}
+{% load board_extras %}
 
 {% block content %}
-<h3><a href="{% url index %}">Index</a> / {% link topic.forum.category %} / {% link topic.forum %} / {% link topic %}</h3>
-<ul>
-{% for post in topic.posts.all %}
-    <li>
-        <div style="float: left; width: 200px">
-            Created: {{ post.created }}<br/>
-            Author: {% link post.user %}
-        </div>
-        <div>
-            {{ post.body }}
-        </div>
-        <div style="clear: both"></div>
-        <hr/>
-{% endfor %}
+<div class="crumbs">
+    <a href="{% url index %}">Index</a> / {% link topic.forum.category %} / {% link topic.forum %} / {% link topic %}
+</div>
+<ul class="tablist">
+    <li class="tablist-row postlist-row">
+        <h3 class="header">{{ topic }}</h3>
+        <ul class="tablist-inner">
+        {% for post in topic.posts.all %}
+            <li class="tablist-inner-row post">
+                <div class="info">
+                    <div class="author">{{ post.user|profile_link }}</div>
+                </div>
+                <div class="content">
+                    {{ post.body }}
+                </div>
+                <div style="clear: both"></div>
+            </li>
+        {% endfor %}
+        </ul>
+    </li>
 </ul>
 <form action="{% url add_post topic.id %}" method="post">
     <fieldset>

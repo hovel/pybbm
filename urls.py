@@ -6,7 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^$', redirect_to, {'url': '/forum/'}),
-    (r'^forum/', include('board.urls')),
-    (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/(.*)', admin.site.root),
+    (r'', include('account.urls')),
+    (r'^forum/', include('board.urls')),
+    (r'', include('debug.urls')),
 )

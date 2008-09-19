@@ -11,4 +11,5 @@ urlpatterns = patterns('',
         {'topic_id': None}, name='add_topic'),
     url('^topic/(?P<topic_id>\d+)/post/add/$', views.add_post,
         {'forum_id': None}, name='add_post'),
+    url('^user/(?P<username>\w+)/$', views.user, name='board_profile'),
 )

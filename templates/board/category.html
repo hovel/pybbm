@@ -2,10 +2,17 @@
 {% load common_extras %}
 
 {% block content %}
-<h3><a href="{% url index %}">Начало</a> / {% link category %}</h3>
-<ul>
-{% for forum in category.forums.all %}
-    <li>{% link forum %}</li>
-{% endfor %}
+<div class="crumbs">
+    <a href="{% url index %}">Начало</a> / {% link category %}
+</div>
+<ul class="tablist">
+    <li class="tablist-row">
+        <h3 class="header">{{ category }}</h3>
+        <ul class="tablist-inner">
+        {% for forum in category.forums.all %}
+            <li class="tablist-inner-row">{% link forum %}</li>
+        {% endfor %}
+        </ul>
+    </li>
 </ul>
 {% endblock %}

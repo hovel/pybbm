@@ -2,13 +2,13 @@
 {% load common_extras %}
 
 {% block content %}
-<ul>
+<ul class="tablist">
 {% for cat in cats %}
-    <li>
-        <h3>{% link cat %}</h3>
-        <ul>
+    <li class="tablist-row category">
+        <h3 class="header">{% link cat %}</h3>
+        <ul class="tablist-inner">
             {% for forum in cat.forums.all %}
-            <li>{% link forum %}</li>
+            <li class="tablist-inner-row forum">{% link forum %}</li>
             {% endfor %}
         </ul>
     </li>

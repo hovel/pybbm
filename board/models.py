@@ -62,7 +62,7 @@ class Topic(models.Model):
 
 class Post(models.Model):
     topic = models.ForeignKey(Topic, related_name='posts')
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='posts')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(blank=True, null=True)
     body = models.TextField()

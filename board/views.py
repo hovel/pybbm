@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 from common.decorators import render_to
 from common.forms import build_form
@@ -37,6 +38,7 @@ def show_topic(request, topic_id):
             }
 
 
+@login_required
 @render_to('board/add_post.html')
 def add_post(request, forum_id, topic_id):
     forum = None
@@ -47,10 +49,7 @@ def add_post(request, forum_id, topic_id):
     elif topic_id:
         topic = get_object_or_404(Topic, pk=topic_id)
 
-    # ONLY FOR DEBUG
-    user = User.objects.get()
-
-    form = build_form(AddPostForm, request, topic=topic, forum=forum, user=user)
+    form = build_form(AddPostForm, request, topic=topic, forum=forum, user=request.user)
 
     if form.is_valid():
         post = form.save();
@@ -59,4 +58,11 @@ def add_post(request, forum_id, topic_id):
     return {'form': form,
             'topic': topic,
             'forum': forum,
+            }
+
+
+@render_to('board/user.html')
+def user(request, username):
+    user = get_object_or_404(User, username=username)
+    return {'profile': user,
             }

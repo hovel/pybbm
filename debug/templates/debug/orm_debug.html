@@ -1,0 +1,100 @@
+<style type="text/css">
+{% if pygments_css %}
+{{ pygments_css }}
+{% endif %}
+.explain {
+    display: none;
+}
+.explain table {
+    border-collapse: collapse;
+}
+.explain td {
+    color: #cccc00;
+    border: 1px solid #404040;
+    padding: 0.3em;
+    font-family: Arial, sans-serif;
+}
+.explain th {
+    color: yellow;
+    font-weight: bold;
+}
+#orm-debug-body {
+    display: none;
+    color: #e0e0e0;
+    background-color: #101010;
+    font-size: 15px;
+    line-height: 16px;
+    padding: 1px 1em 1em 1em;
+}
+#orm-debug-body p {
+    margin: 0;
+}
+#orm-debug-body pre {
+    margin: 0;
+}
+#orm-debug-body .query-info {
+    margin-top: 1em;
+    margin-bottom: 0.2em;
+}
+</style>
+<script type="text/javascript">
+function explainQuery(query_id) {
+    if ('undefined' == typeof($)) {
+        alert('It seems that jQuery is not installed');
+        return false;
+    }
+    $.ajax({
+        type: 'POST',
+        url: '/explain_query/',
+        data: {'query': $('#original-sql-' + query_id).html()},
+        dataType: 'json',
+        success: function(data) {
+            html = '<table>';
+            for(i = 0; i < data.explain_rows.length; i++) {
+                html += '<tr>';
+                row = data.explain_rows[i];
+                for(j = 0; j < row.length; j++) {
+                    html += '<td>' + row[j] + '</td>';
+                }
+                html += '</tr>';
+            }
+            html += '</table>';
+            //alert(html);
+            $('#explain-' + query_id).html(html);
+            $('#explain-' + query_id).toggle();
+        },
+        error: function(req, error, ex) {
+            if (ex) {
+                alert(ex);
+            } else {
+                alert(req.statusText);
+            }
+        }
+    });
+    return false;
+}
+
+function showSqlBlock() {
+    document.getElementById('orm-debug-body').style.display = 'block';
+    return false;
+}
+</script>
+<div id="orm-debug-head">
+    <a href="#" onclick="return showSqlBlock()">debug</a>
+    sql count: {{ query_count }}, sql time: {{ query_time }}
+</div>
+<div id="orm-debug-body">
+{% for query in queries %}
+<div class="code">
+    <div class="query-info">
+        time: {{ query.time }}
+        <a href="#" onclick="return explainQuery({{ query.count }})">explain</a>
+        <div class="explain" id="explain-{{ query.count }}"></div>
+    </div>
+    {% if not pygments_installed %}<pre>{% endif %}
+    {{ query.sql|safe|linebreaks }}
+    {% if not pygments_installed %}</pre>{% endif %}
+    <div style="display:none" id="original-sql-{{ query.count }}">{{ query.original_sql }}</div>
+</div>
+{% endfor %}
+</div>

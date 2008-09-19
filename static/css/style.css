@@ -1,0 +1,185 @@
+/* reset.css (thanks to blueprint)*/
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {margin:0;padding:0;border:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;vertical-align:baseline;}
+body {line-height:1.5;}
+table {border-collapse:separate;border-spacing:0;}
+caption, th, td {text-align:left;font-weight:normal;}
+table, td, th {vertical-align:middle;}
+blockquote:before, blockquote:after, q:before, q:after {content:"";}
+blockquote, q {quotes:"" "";}
+a img {border:none;}
+
+/* pybb styles */
+body {
+    font: 0.9em Arial, sans-serif;
+    color: #333;
+    text-align: center;
+}
+
+.main-box {
+    width: 980px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+a {
+    color: black;
+}
+
+a:hover {
+    color: red;
+}
+
+li {
+    margin-left: 1em;
+}
+
+.head_box {
+    margin: 1em;
+}
+
+.logo {
+    float: left;
+}
+
+.logo a {
+    font-size: 2em;
+    text-decoration: none;
+}
+
+.clear {
+    clear: both;
+}
+
+.head_box {
+}
+
+.navigation {
+    margin-left: 5em;
+    padding-top: 0.5em;
+}
+
+.navigation li {
+    list-style-type: none;
+    display: inline;
+}
+
+.navigation a {
+}
+
+a:hover {
+    color: red;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+}
+
+input, textarea {
+    display: block;
+}
+
+h1 {
+    font-size: 1.5em;
+    margin: 1em 0;
+    padding: 0.2em 0.5em;
+    background-color: #eee;
+}
+
+fieldset {
+    border: 1px solid black;
+    padding: 1em;
+}
+
+legend {
+    margin-left: 2em;
+    padding: 0 0.5em;
+}
+
+p {
+    margin-bottom: 1em;
+}
+
+.errorlist li {
+    list-style-type: none;
+    color: red;
+    margin-left: 0;
+    font-weight: bold;
+}
+
+.tablist .header {
+    background-color: #eee;
+    padding: 0.5em;
+    font-size: 1.2em;
+}
+
+.tablist li, .tablist-inner li {
+    list-style-type: none;
+    margin-left: 0;
+}
+
+.tablist-row {
+    border: 1px solid #ccc;
+    margin-bottom: 2em;
+}
+
+.tablist-inner-row {
+    padding: 0.5em;
+}
+
+.tablist a {
+}
+
+.footer {
+    font-size: 0.8em;
+}
+
+.crumbs a {
+    font-size: 0.9em;
+}
+
+.crumbs {
+    margin-bottom: 0.7em;
+}
+
+.post {
+    background-color: #ddd;
+    color: black;
+}
+
+.post .info {
+    float: left;
+    width: 15em;
+    background-color: #f8f8f8;
+    font-size: 0.8em;
+    padding: 1em;
+}
+
+.post .info .author a {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #555;
+}
+
+.post .content {
+    padding-top: 1em;
+    padding-left: 1em;
+    float: left;
+}
+
+.tablist-inner .post {
+    padding: 0;
+}
+
+.post {
+    border: 1px solid #ccc;
+    margin-bottom: 1em;
+}
+
+.postlist-row {
+    border: none;
+}
+
+.postlist-row .header {
+    margin-bottom: 0.3em;
+}
