@@ -1,0 +1,33 @@
+<div class="stat">
+    <div class="view">
+        <ul>
+            <li class="name">Показывать:</li>
+            <li>{% ifnotequal 20 per_page %}<a href="{{ get_params }}per_page=20">{% endifnotequal %}20{% ifnotequal 20 per_page %}</a>{% endifnotequal %}</li>
+            <li>{% ifnotequal 50 per_page %}<a href="{{ get_params }}per_page=50">{% endifnotequal %}50{% ifnotequal 50 per_page %}</a>{% endifnotequal %}</li>
+            <li>{% ifnotequal 10000 per_page %}<a href="{{ get_params }}per_page=10000">{% endifnotequal %}Все{% ifnotequal 10000 per_page %}</a>{% endifnotequal %}</li>
+        </ul>
+    </div>
+    <div class="pager">
+        <ul>
+            <li class="name">Страницы:</li>
+            {% if lower_page %} 
+            <li><a href="{{ get_params }}page={{ lower_page }}&per_page={{ per_page }}">&laquo;</a></li>
+            {% endif %}
+            {% for number in page_list %}
+            {% ifequal number "." %}...
+            {% else %}
+                {% ifequal number page %}
+                <li>{{ number }}</li>
+                {% endifequal %}
+                {% ifnotequal number page %}
+                <li><a href="{{ get_params }}page={{ number }}&per_page={{ per_page }}">{{ number }}</a></li>
+                {% endifnotequal %}
+            {% endifequal %}
+            {% endfor %}
+            {% if higher_page %} 
+            <li><a href="{{ get_params }}page={{ higher_page }}&per_page={{ per_page }}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="clear"></div>
+</div>

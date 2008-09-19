@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load common_extras %}
+
+{% block content %}
+{% if forum %}
+<h3><a href="{% url index %}">Index</a> / {% link forum.category %} / {% link forum %} / New topic</h3>
+{% else %}
+<h3><a href="{% url index %}">Index</a> / {% link topic.forum.category %} / {% link topic.forum %} / {% link topic %} / New reply</h3>
+{% endif %}
+
+<form action="{% if forum %}{% url add_topic forum.id %}{% else %}{% url add_post topic.id %}{% endif %}" method="post">
+    <fieldset>
+        <legend>new reply</lenend>
+            {{ form.as_p }}
+            <p><input type="submit" /></p>
+        </legend>
+    </fieldset>
+</form>
+
+{% endblock %}

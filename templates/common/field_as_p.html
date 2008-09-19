@@ -1,0 +1,10 @@
+{% if errors %}
+<ul class="errorlist">
+    {% for error in errors %}
+    <li>{{ error|escape }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<label>{{ field.label }}</label>
+{{ field }}
+{{ field.help_text }}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load common_extras %}
+
+{% block content %}
+<ul>
+{% for cat in cats %}
+    <li>
+        <h3>{% link cat %}</h3>
+        <ul>
+            {% for forum in cat.forums.all %}
+            <li>{% link forum %}</li>
+            {% endfor %}
+        </ul>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

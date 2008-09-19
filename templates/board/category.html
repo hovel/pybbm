@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load common_extras %}
+
+{% block content %}
+<h3><a href="{% url index %}">Начало</a> / {% link category %}</h3>
+<ul>
+{% for forum in category.forums.all %}
+    <li>{% link forum %}</li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load common_extras %}
+
+{% block content %}
+<h3><a href="{% url index %}">Index</a> / {% link topic.forum.category %} / {% link topic.forum %} / {% link topic %}</h3>
+<ul>
+{% for post in topic.posts.all %}
+    <li>
+        <div style="float: left; width: 200px">
+            Created: {{ post.created }}<br/>
+            Author: {% link post.user %}
+        </div>
+        <div>
+            {{ post.body }}
+        </div>
+        <div style="clear: both"></div>
+        <hr/>
+{% endfor %}
+</ul>
+<form action="{% url add_post topic.id %}" method="post">
+    <fieldset>
+        <legend>new reply</lenend>
+            {{ form.as_p }}
+            <p><input type="submit" /></p>
+        </legend>
+    </fieldset>
+</form>
+{% endblock %}

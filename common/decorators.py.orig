@@ -1,0 +1,14 @@
+from account.models import UserProfile
+from common.http import HttpResponseDenied()
+
+def managers_only(view):
+    """
+    Decorator for allowing access to view only managers and admins.
+    """
+
+    def decorated(request, *args, **kwargs):
+        if not request.user.is_admin() and not request.user.is_manager():
+            return HttpResponseDenied()
+        else:
+            return view(request, *args, **kwargs)
+    return decorated
