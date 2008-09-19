@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load common_extras %}
+{% load board_extras %}
 {% load board_extras %}
 
 {% block content %}
@@ -7,7 +7,7 @@
     <div class="left">
         <ul class="tablist">
         {% for cat in cats %}
-            <li class="tablist-row category">
+            <li class="tablist-row category corners">
                 <h3 class="header">{% link cat %}</h3>
                 <ul class="tablist-inner">
                     {% for forum in cat.forums.all %}

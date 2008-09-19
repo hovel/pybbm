@@ -4,8 +4,12 @@ import random
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.http import HttpResponse
+from django.utils.functional import Promise
+from django.utils.translation import force_unicode
+from django.utils.simplejson import JSONEncoder
+from django import forms
 
-from common.http import HttpResponseJson
 
 def render_to(template_path):
     """
@@ -72,13 +76,59 @@ def paged(paged_list_name, per_page=20, per_page_var='per_page'):
     return decorator
 
 
-def ajax(view):
+def ajax(func):
     """
-    Serialize with JSON the view response.
+    Checks request.method is POST. Return error in JSON in other case.
+
+    If view returned dict, returns JsonResponse with this dict as content.
+    """
+    def wrapper(request, *args, **kwargs):
+        if request.method == 'POST':
+            try:
+                response = func(request, *args, **kwargs)
+            except Exception, ex:
+                response = {'error': traceback.format_exc()}
+        else:
+            response = {'error': {'type': 403, 'message': 'Accepts only POST request'}}
+        if isinstance(response, dict):
+            return JsonResponse(response)
+        else:
+            return response
+    return wrapper
+
+
+class LazyJSONEncoder(JSONEncoder):
+    """
+    This fing need to save django from crashing.
     """
 
-    def decorated(request, *args, **kwargs):
-        data = view(request, *args, **kwargs)
-        return HttpResponseJson(data)
+    def default(self, o):
+        if isinstance(o, Promise):
+            return force_unicode(o)
+        else:
+            return super(LazyJSONEncoder, self).default(o)
 
-    return decorated
+
+class JsonResponse(HttpResponse):
+    """
+    HttpResponse subclass that serialize data into JSON format.
+    """
+
+    def __init__(self, data, mimetype='application/json'):
+        json_data = LazyJSONEncoder().encode(data)
+        super(JsonResponse, self).__init__(
+            content=json_data, mimetype=mimetype)
+
+        
+def build_form(Form, _request, GET=False, *args, **kwargs):
+    """
+    Shorcut for building the form instance of given form class.
+    """
+
+    if not GET and 'POST' == _request.method:
+        form = Form(_request.POST, _request.FILES, *args, **kwargs)
+    elif GET and 'GET' == _request.method:
+        form = Form(_request.GET, _request.FILES, *args, **kwargs)
+    else:
+        form = Form(*args, **kwargs)
+    return form

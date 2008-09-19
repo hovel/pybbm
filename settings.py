@@ -85,7 +85,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'board',
-    'common',
     'account',
 )
 

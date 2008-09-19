@@ -3,8 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from common.decorators import render_to
-from common.forms import build_form
+from board.util import render_to, build_form
 from board.models import Category, Forum, Topic, Post
 from board.forms import AddPostForm
 
