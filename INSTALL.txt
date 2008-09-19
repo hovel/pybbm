@@ -1,0 +1,25 @@
+Guide to installing pybb application.
+
+The main point in development of pybb is to build it so it could be
+*easly* integrated to existing django based site. Before installing pybb
+your should answer the question: do you want to stay with your own application
+for registration/login/logout/password restoring or you want to use that is 
+sheeped with pybb. Firstly let's talk about more easy variant:
+
+Installing with pybb account module
+===================================
+
+* copy account and pybb directories to your project root
+* copy static/pybb to your MEDIA root
+* setup settings.py
+  TODO: describe that should be placed to settings.py
+
+
+Installing only pybb without account application
+=================================================
+If you want to use your own account application then you should add additional
+entries to account application urlconfig. This step required becouse pybb use
+url reversing with predefined names. For example "Registration" link in pybb 
+template points to {% url registration_register %}
+
+Damned English... I'm tired of this writing....
