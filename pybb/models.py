@@ -104,6 +104,8 @@ class Post(models.Model):
     body = models.TextField()
     body_html = models.TextField()
     body_text = models.TextField()
+    user_ip = models.IPAddressField(blank=True, default='')
+
 
     class Meta:
         ordering = ['created']

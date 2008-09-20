@@ -16,20 +16,30 @@
                 <div class="post-inner">
                     <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
                     <div class="info"
+                        {% if post.user.pybb_profile.avatar %}
+                        <div class="avatar">
+                            <a href="{% url pybb_profile post.user %}">
+                            <img src="{{ post.user.pybb_profile.avatar.url }}" />
+                            </a>
+                        </div>
+                        {% endif %}
                         <span class="author">{{ post.user|profile_link }}</span>
                         &rarr;
                         <span class="time">{{ post.created|pybb_time }}</span>
-                    </div>
-                    <div class="content">
-                        {{ post.body_html|safe }}
-                        {% if not user.is_authenticated or user.pybb_profile.show_signatures %}
-                        {% if post.user.pybb_profile.signature %}
-                        <div class="signature">
-                            {{ post.user.pybb_profile.signature|urlize|linebreaks }}
-                        </div>
-                        {% endif %}
+                        {% if user.is_superuser %}
+                        <div class="ip">{{ post.user_ip }}</div>
                         {% endif %}
                     </div>
+                </div>
+                <div class="content">
+                    {{ post.body_html|safe }}
+                    {% if not user.is_authenticated or user.pybb_profile.show_signatures %}
+                    {% if post.user.pybb_profile.signature %}
+                    <div class="signature">
+                        {{ post.user.pybb_profile.signature|urlize|linebreaks }}
+                    </div>
+                    {% endif %}
+                    {% endif %}
                 </div>
                 <div style="clear: both"></div>
             </li>

@@ -176,7 +176,10 @@ p {
 }
 
 .post-inner {
-    background-color: #f8f8f8;
+}
+
+.tablist-inner .post {
+    background-color: #ddd;
 }
 
 .post .info {
@@ -184,6 +187,7 @@ p {
     width: 15em;
     font-size: 0.8em;
     padding: 1em;
+    background-color: #f8f8f8;
 }
 
 .post .info .author a {
@@ -198,8 +202,9 @@ p {
 
 .post .content {
     padding: 1em;
-    margin-left: 15em;
+    margin-left: 13em;
     background-color: #ddd;
+    border-right: 1px solid #ccc;
 }
 
 .tablist-inner .post {
@@ -325,4 +330,19 @@ pre {
 
 .signature a {
     color: #999;
+}
+
+.ip {
+    padding: 0.2em 0;
+    font-size: 0.7em;
+    color: #999;
+}
+
+.avatar {
+    display: block;
+    margin-bottom: 0.5em;
+}
+
+.avatar img {
+    border: 1px solid #aaa;
 }

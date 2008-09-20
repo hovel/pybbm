@@ -16,6 +16,7 @@ class AddPostForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         self.topic = kwargs.pop('topic', None)
         self.forum = kwargs.pop('forum', None)
+        self.ip = kwargs.pop('ip', None)
         super(AddPostForm, self).__init__(*args, **kwargs)
         if self.topic:
             self.fields['name'].widget = forms.HiddenInput()
@@ -31,7 +32,7 @@ class AddPostForm(forms.ModelForm):
         else:
             topic = self.topic
 
-        post = Post(topic=topic, user=self.user,
+        post = Post(topic=topic, user=self.user, user_ip=self.ip,
                     body=self.cleaned_data['body'])
         post.save()
         return post

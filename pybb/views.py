@@ -17,8 +17,8 @@ def index(request):
     quick = {'posts': Post.objects.count(),
              'topics': Topic.objects.count(),
              'users': User.objects.count(),
-             'last_created': Topic.objects.all()[:10],
-             'last_updated': Topic.objects.order_by('-updated')[:10],
+             'last_created': Topic.objects.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_updated': Topic.objects.order_by('-updated')[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'cats': cats,
             'quick': quick,
@@ -30,8 +30,8 @@ def show_category(request, category_id):
     category = Category.objects.get(pk=category_id)
     quick = {'posts': category.posts.count(),
              'topics': category.topics.count(),
-             'last_created': category.topics[:10],
-             'last_updated': category.topics.order_by('-updated')[:10],
+             'last_created': category.topics[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_updated': category.topics.order_by('-updated')[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'category': category,
             'quick': quick,
@@ -45,8 +45,8 @@ def show_forum(request, forum_id):
     topics = forum.topics.all()
     quick = {'posts': forum.posts.count(),
              'topics': forum.topics.count(),
-             'last_created': forum.topics.all()[:10],
-             'last_updated': forum.topics.order_by('-updated')[:10],
+             'last_created': forum.topics.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_updated': forum.topics.order_by('-updated')[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'forum': forum,
             'quick': quick,
@@ -79,7 +79,9 @@ def add_post(request, forum_id, topic_id):
     elif topic_id:
         topic = get_object_or_404(Topic, pk=topic_id)
 
-    form = build_form(AddPostForm, request, topic=topic, forum=forum, user=request.user)
+    ip = request.META.get('REMOTE_ADDR', '')
+    form = build_form(AddPostForm, request, topic=topic, forum=forum,
+                      user=request.user, ip=ip)
 
     if form.is_valid():
         post = form.save();
