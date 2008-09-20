@@ -38,6 +38,7 @@ class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums')
     name = models.CharField(max_length=80)
     position = models.IntegerField(blank=True, default=0)
+    description = models.TextField(blank=True, default='')
 
     class Meta:
         ordering = ['position']
