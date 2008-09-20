@@ -16,4 +16,13 @@ The main point in development of pybb is to build it so it could be
   development. I mean that there are no threaded posts and there is only bbcode
   markup support and there is no multi-level nested categories.
 
-To be continued...
+
+Installation guide:
+===================
+
+* copy pybb directory to you project directory
+* copy static/pybb to you media directory
+* copy templates/pybb to your templates directory
+* add include('pybb.urls')) to the urlpatterns
+* add pybb to the INSTALLED_APPS
+* make syncdb

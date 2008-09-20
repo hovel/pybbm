@@ -1,3 +1,4 @@
 .*\.pyc$
 ^dump\.sql
 ^settings_local\.py$
+^account
