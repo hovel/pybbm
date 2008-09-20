@@ -12,7 +12,7 @@ class CodeTagNoBreak(postmarkup.CodeTag):
 
         contents = self._escape(self.get_contents(parser))
         self.skip_contents(parser)
-        return '<div class="code"><pre>%s</pre></div>' % contents
+        return '<pre><code>%s</code></pre>' % contents
 
     def _escape(self, s):
         return postmarkup.PostMarkup.standard_replace_no_break(s.rstrip('\n'))

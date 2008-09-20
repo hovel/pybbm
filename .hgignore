@@ -2,3 +2,5 @@
 ^dump\.sql
 ^settings_local\.py$
 ^account
+^django/
+^spawn.\sh$

@@ -12,13 +12,15 @@
         <ul class="tablist-inner">
         {% for post in topic.posts.all %}
             <li class="tablist-inner-row post">
-                <div class="info">
-                    <span class="author">{{ post.user|profile_link }}</span>
-                    &rarr;
-                    <span class="time">{{ post.created|pybb_time }}</span>
-                </div>
-                <div class="content">
-                    {{ post.body_html|safe }}
+                <div class="post-inner">
+                    <div class="info"
+                        <span class="author">{{ post.user|profile_link }}</span>
+                        &rarr;
+                        <span class="time">{{ post.created|pybb_time }}</span>
+                    </div>
+                    <div class="content">
+                        {{ post.body_html|safe }}
+                    </div>
                 </div>
                 <div style="clear: both"></div>
             </li>
