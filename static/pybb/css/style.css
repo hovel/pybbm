@@ -34,7 +34,20 @@ li {
 }
 
 .head_box {
-    margin: 1em;
+    background-color: #444;
+    margin-bottom: 1em;
+}
+
+.head_box .head {
+    padding: 1em;
+}
+
+.head {
+    color: #ccc;
+}
+
+.head a {
+    color: #eee;
 }
 
 .logo {
@@ -48,9 +61,6 @@ li {
 
 .clear {
     clear: both;
-}
-
-.head_box {
 }
 
 .navigation {
@@ -232,4 +242,19 @@ p {
 
 .quick-access .time {
     font-size: 0.8em;
+}
+
+.footer_box {
+    margin-top: 2em;
+    color: #444;
+    border-top: 1px solid #ccc;
+    background-color: #fafafa;
+}
+
+.footer_box a {
+    color: #444;
+}
+
+.footer .inner {
+    padding: 1em;
 }

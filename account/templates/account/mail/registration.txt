@@ -1,4 +1,0 @@
-Registration on {{ domain }}
-You have begun registration on {{ domain }}.
-If you want activate you account {{ login }}, follow the link please: {{ url
-}}

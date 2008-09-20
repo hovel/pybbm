@@ -1,4 +1,0 @@
-Successfuly registration on {{ domain }}
-Congratulations!
-You have registered on {{ domain }}.
-Your login is {{ login }}.

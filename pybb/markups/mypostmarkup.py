@@ -1,0 +1,22 @@
+from pybb.markups import postmarkup
+
+markup = postmarkup.create(exclude=['link', 'url', 'code'], use_pygments=False)
+
+class LinkTagNoAnnotate(postmarkup.LinkTag):
+    def annotate_link(self, domain):        
+        return ''
+
+
+class CodeTagNoBreak(postmarkup.CodeTag):
+    def render_open(self, parser, node_index):
+
+        contents = self._escape(self.get_contents(parser))
+        self.skip_contents(parser)
+        return '<div class="code"><pre>%s</pre></div>' % contents
+
+    def _escape(self, s):
+        return postmarkup.PostMarkup.standard_replace_no_break(s.rstrip('\n'))
+                
+
+markup.tag_factory.add_tag(LinkTagNoAnnotate, 'url')
+markup.tag_factory.add_tag(CodeTagNoBreak, 'code')

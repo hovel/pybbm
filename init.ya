@@ -55,3 +55,6 @@ Post:
  - topic: {Topic: second}
    user: {User: lorien}
    body: Just some text for third post
+ - topic: {Topic: first}
+   user: {User: lorien}
+   body: Let's try some markup [b]bold text[/b] and [url=http://ya.ru]this is link to yandex[/url]

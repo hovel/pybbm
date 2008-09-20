@@ -3,6 +3,9 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils.html import strip_tags
+
+from pybb.markups import mypostmarkup
 
 class Category(models.Model):
     name = models.CharField(max_length=80)
@@ -78,6 +81,8 @@ class Post(models.Model):
     created = models.DateTimeField(blank=True)
     updated = models.DateTimeField(blank=True, null=True)
     body = models.TextField()
+    body_html = models.TextField()
+    body_text = models.TextField()
 
     class Meta:
         ordering = ['created']
@@ -96,4 +101,6 @@ class Post(models.Model):
         if self.id is None and self.topic is not None:
             self.topic.updated = datetime.now()
             self.topic.save()
+        self.body_html = mypostmarkup.markup(self.body)
+        self.body_text = strip_tags(self.body_html)
         super(Post, self).save()
