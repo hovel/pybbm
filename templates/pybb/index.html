@@ -3,7 +3,7 @@
 {% load pybb_extras %}
 
 {% block content %}
-<div class="index">
+<div class="splitted">
     <div class="left">
         <ul class="tablist">
         {% for cat in cats %}
@@ -19,56 +19,8 @@
         </ul>
     </div>
 
-    <script type="text/javascript">
-        function openTab(selector, mod) {
-            var cls = '.' + mod;
-            $('.tab-body').hide();
-            $(cls).show();
-            $('.tab-selector').removeClass('active');
-            $(selector).addClass('active');
-        }
-    </script>
-    <div class="right quick-access">
-        <ul class="tablist">
-            <li class="tablist-row last">
-            <h3 class="header tab-selectors">
-                <div class="tab-selector first active" onclick="openTab(this, 'last-topics')">Last topics</div>
-                <div class="tab-selector" onclick="openTab(this, 'last-posts')">Last posts</div>
-                <div class="tab-selector" onclick="openTab(this, 'stats')">Statistics</div>
-                <div class="clear"></div>
-            </h3>
-            <ul class="tablist-inner tab-body last-topics">
-                {% for topic in last_created %}
-                <li class="tablist-inner-row forum">
-                {% link topic %}
-                &rarr;
-                <span class="author">{{ topic.user|profile_link }}</span>
-                &rarr;
-                <span class="time">{{ topic.created|pybb_time }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-            <ul class="tablist-inner tab-body last-posts" style="display: none">
-                {% for topic in last_updated %}
-                <li class="tablist-inner-row forum">
-                {% link topic %}
-                &rarr;
-                <span class="author">{{ topic.user|profile_link }}</span>
-                &rarr;
-                <span class="time">{{ topic.updated|pybb_time }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-            <ul class="tablist-inner tab-body stats" style="display: none">
-                {% for name, value in stats.iteritems %}
-                <li class="tablist-inner-row">
-                    {{ name }}: {{ value }}
-                </li>
-                {% endfor %}
-                </table>
-            </ul>
-            </li>
-        </ul>
+    <div class="right">
+        {% include 'pybb/quick_access.html' %}
     </div>
     <div class="clear"></div>
 </div>

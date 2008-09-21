@@ -1,0 +1,55 @@
+{% load pybb_extras %}
+
+<script type="text/javascript">
+    function openTab(selector, mod) {
+        var cls = '.' + mod;
+        $('.tab-body').hide();
+        $(cls).show();
+        $('.tab-selector').removeClass('active');
+        $(selector).addClass('active');
+    }
+</script>
+<ul class="tablist quick-access">
+    <li class="tablist-row last">
+    <h3 class="header tab-selectors">
+        <div class="tab-selector first active" onclick="openTab(this, 'last-topics')">Last topics</div>
+        <div class="tab-selector" onclick="openTab(this, 'last-posts')">Last posts</div>
+        <div class="tab-selector" onclick="openTab(this, 'stats')">Statistics</div>
+        <div class="clear"></div>
+    </h3>
+    <ul class="tablist-inner tab-body last-topics">
+        {% for topic in quick.last_created %}
+        <li class="tablist-inner-row forum">
+        {% link topic %}
+        &rarr;
+        <span class="author">{{ topic.user|profile_link }}</span>
+        &rarr;
+        <span class="time">{{ topic.created|pybb_time }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <ul class="tablist-inner tab-body last-posts" style="display: none">
+        {% for topic in quick.last_updated %}
+        <li class="tablist-inner-row forum">
+        {% link topic %}
+        &rarr;
+        <span class="author">{{ topic.user|profile_link }}</span>
+        &rarr;
+        <span class="time">{{ topic.updated|pybb_time }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <ul class="tablist-inner tab-body stats" style="display: none">
+        {% if quick.topics %}
+        <li class="tablist-inner-row">Topics: {{ quick.topics }}</li>
+        {% endif %}
+        {% if quick.posts %}
+        <li class="tablist-inner-row">Posts: {{ quick.posts }}</li>
+        {% endif %}
+        {% if quick.users %}
+        <li class="tablist-inner-row">Users: {{ quick.users }}</li>
+        {% endif %}
+        </table>
+    </ul>
+    </li>
+</ul>

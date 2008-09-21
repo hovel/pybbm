@@ -10,30 +10,40 @@ from pybb.forms import AddPostForm
 @render_to('pybb/index.html')
 def index(request):
     cats = Category.objects.all()
-    last_created = Topic.objects.all()[:10]
-    last_updated = Topic.objects.all().order_by('-updated')[:10]
-    stats = {'posts': Post.objects.all().count(),
-             'topics': Topic.objects.all().count(),
-             'users': User.objects.all().count(),
+    quick = {'posts': Post.objects.count(),
+             'topics': Topic.objects.count(),
+             'users': User.objects.count(),
+             'last_created': Topic.objects.all()[:10],
+             'last_updated': Topic.objects.order_by('-updated')[:10],
              }
     return {'cats': cats,
-            'last_created': last_created,
-            'last_updated': last_updated,
-            'stats': stats,
+            'quick': quick,
             }
 
 
 @render_to('pybb/category.html')
 def show_category(request, category_id):
     category = Category.objects.get(pk=category_id)
+    quick = {'posts': category.posts.count(),
+             'topics': category.topics.count(),
+             'last_created': category.topics[:10],
+             'last_updated': category.topics.order_by('-updated')[:10],
+             }
     return {'category': category,
+            'quick': quick,
             }
 
 
 @render_to('pybb/forum.html')
 def show_forum(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
+    quick = {'posts': forum.posts.count(),
+             'topics': forum.topics.count(),
+             'last_created': forum.topics.all()[:10],
+             'last_updated': forum.topics.order_by('-updated')[:10],
+             }
     return {'forum': forum,
+            'quick': quick,
             }
 
     

@@ -2,7 +2,7 @@ What is PYBB?
 =============
 
 The main point in development of pybb is to build it so it could be
-*easly* integrated to existing django based site. This mean:
+*easily* integrated to existing django based site. This mean:
 
 * pybb does not provide features like user registration, password restoring.
   It does not provide authentication page. You should use your favorite

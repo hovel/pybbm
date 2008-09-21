@@ -23,6 +23,14 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('category', args=[self.id])
 
+    @property
+    def topics(self):
+        return Topic.objects.filter(forum__category=self)
+    
+    @property
+    def posts(self):
+        return Post.objects.filter(topic__forum__category=self)
+
 
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums')
@@ -40,6 +48,10 @@ class Forum(models.Model):
 
     def get_absolute_url(self):
         return reverse('forum', args=[self.id])
+    
+    @property
+    def posts(self):
+        return Post.objects.filter(topic__forum=self)
 
 
 class Topic(models.Model):
@@ -104,3 +116,6 @@ class Post(models.Model):
         self.body_html = mypostmarkup.markup(self.body)
         self.body_text = strip_tags(self.body_html)
         super(Post, self).save()
+
+    def get_absolute_url(self):
+        return reverse('topic', args=[self.topic.id])

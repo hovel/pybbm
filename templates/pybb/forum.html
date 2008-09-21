@@ -5,17 +5,25 @@
 <div class="crumbs">
     <a href="{% url index %}">Index</a> / {% link forum.category %} / {% link forum %}
 </div>
-<ul class="tablist">
-    <li class="tablist-row last">
-        <h3 class="header">{{ forum }}</h3>
-        <ul class="tablist-inner">
-        {% for topic in forum.topics.all %}
-            <li class="tablist-inner-row">{% link topic %}</li>
-        {% endfor %}
+<div class="splitted">
+    <div class="left">
+        <ul class="tablist">
+            <li class="tablist-row last">
+                <h3 class="header">{{ forum }}</h3>
+                <ul class="tablist-inner">
+                {% for topic in forum.topics.all %}
+                    <li class="tablist-inner-row">{% link topic %}</li>
+                {% endfor %}
+                </ul>
+            </li>
         </ul>
-    </li>
-</ul>
-<div class="controls">
-    <a href="{% url add_topic forum.id %}">New topic</a>
+        <div class="controls">
+            <a href="{% url add_topic forum.id %}">New topic</a>
+        </div>
+    </div>
+    <div class="right">
+        {% include 'pybb/quick_access.html' %}
+    </div>
+    <div class="clear"></div>
 </div>
 {% endblock %}

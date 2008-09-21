@@ -1,6 +1,11 @@
 from django.conf.urls.defaults import *
 
 from pybb import views
+from pybb.feeds import LastPosts
+
+feeds = {
+    'posts': LastPosts,
+}
 
 urlpatterns = patterns('',
     url('^$', views.index, name='index'),
@@ -12,4 +17,6 @@ urlpatterns = patterns('',
     url('^topic/(?P<topic_id>\d+)/post/add/$', views.add_post,
         {'forum_id': None}, name='add_post'),
     url('^user/(?P<username>\w+)/$', views.user, name='pybb_profile'),
+    url('^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
+        {'feed_dict': feeds}, name='pybb_feed'),
 )

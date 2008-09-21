@@ -5,14 +5,22 @@
 <div class="crumbs">
     <a href="{% url index %}">Начало</a> / {% link category %}
 </div>
-<ul class="tablist">
-    <li class="tablist-row">
-        <h3 class="header">{{ category }}</h3>
-        <ul class="tablist-inner">
-        {% for forum in category.forums.all %}
-            <li class="tablist-inner-row">{% link forum %}</li>
-        {% endfor %}
+<div class="splitted">
+    <div class="left">
+        <ul class="tablist">
+            <li class="tablist-row">
+                <h3 class="header">{{ category }}</h3>
+                <ul class="tablist-inner">
+                {% for forum in category.forums.all %}
+                    <li class="tablist-inner-row">{% link forum %}</li>
+                {% endfor %}
+                </ul>
+            </li>
         </ul>
-    </li>
-</ul>
+    </div>
+    <div class="right">
+        {% include 'pybb/quick_access.html' %}
+    </div>
+    <div class="clear"></div>
+</div>
 {% endblock %}
