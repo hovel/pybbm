@@ -13,12 +13,12 @@ from pybb.forms import AddPostForm, EditProfileForm, EditPostForm
 
 @render_to('pybb/index.html')
 def index(request):
-    cats = Category.objects.all()
+    cats = Category.objects.all().select_related()
     quick = {'posts': Post.objects.count(),
              'topics': Topic.objects.count(),
              'users': User.objects.count(),
-             'last_topics': Topic.objects.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_posts': Post.objects.order_by('-created')[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': Topic.objects.all().select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_posts': Post.objects.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'cats': cats,
             'quick': quick,
@@ -30,8 +30,8 @@ def show_category(request, category_id):
     category = Category.objects.get(pk=category_id)
     quick = {'posts': category.posts.count(),
              'topics': category.topics.count(),
-             'last_topics': category.topics[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_posts': category.posts.order_by('-created')[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': category.topics.select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_posts': category.posts.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'category': category,
             'quick': quick,
@@ -42,11 +42,11 @@ def show_category(request, category_id):
 @paged('topics', settings.PYBB_FORUM_PAGE_SIZE)
 def show_forum(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
-    topics = forum.topics.all()
+    topics = forum.topics.all().select_related()
     quick = {'posts': forum.posts.count(),
              'topics': forum.topics.count(),
-             'last_topics': forum.topics.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_posts': forum.posts.order_by('-created')[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': forum.topics.all().select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_posts': forum.posts.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'forum': forum,
             'quick': quick,
@@ -57,14 +57,14 @@ def show_forum(request, forum_id):
 @render_to('pybb/topic.html')
 @paged('posts', settings.PYBB_TOPIC_PAGE_SIZE)
 def show_topic(request, topic_id):
-    topic = Topic.objects.get(pk=topic_id)
+    topic = Topic.objects.select_related().get(pk=topic_id)
     topic.views += 1
     topic.save()
 
     if request.user.is_authenticated():
         topic.update_read(request.user)
 
-    posts = topic.posts.all()
+    posts = topic.posts.all().select_related()
     form = AddPostForm(topic=topic)
     return {'topic': topic,
             'form': form,
@@ -100,7 +100,9 @@ def add_post(request, forum_id, topic_id):
 @render_to('pybb/user.html')
 def user(request, username):
     user = get_object_or_404(User, username=username)
+    topic_count = Topic.objects.filter(user=user).count()
     return {'profile': user,
+            'topic_count': topic_count,
             }
 
 

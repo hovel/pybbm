@@ -27,11 +27,11 @@ class Category(models.Model):
 
     @property
     def topics(self):
-        return Topic.objects.filter(forum__category=self)
+        return Topic.objects.filter(forum__category=self).select_related()
     
     @property
     def posts(self):
-        return Post.objects.filter(topic__forum__category=self)
+        return Post.objects.filter(topic__forum__category=self).select_related()
 
 
 class Forum(models.Model):
@@ -54,11 +54,11 @@ class Forum(models.Model):
     
     @property
     def posts(self):
-        return Post.objects.filter(topic__forum=self)
+        return Post.objects.filter(topic__forum=self).select_related()
 
     @property
     def last_post(self):
-        posts = self.posts.order_by('-created')
+        posts = self.posts.order_by('-created').select_related()
         if posts.count():
             return posts[0]
 
@@ -82,11 +82,11 @@ class Topic(models.Model):
 
     @property
     def head(self):
-        return self.posts.all().order_by('created')[0]
+        return self.posts.all().order_by('created').select_related()[0]
 
     @property
     def last_post(self):
-        return self.posts.all().order_by('-created')[0]
+        return self.posts.all().order_by('-created').select_related()[0]
 
     def get_absolute_url(self):
         return reverse('topic', args=[self.id])
@@ -194,3 +194,16 @@ class Read(models.Model):
 
     class Meta:
         unique_together = ['user', 'topic']
+
+
+#class Setting(model.Model):
+    #topic_page_size = models.IntegerField(blank=True, default=20)
+    #forum_page_size = models.IntegerField(blank=True, default=20)
+    #default_time_zone = models.FloatField(blank=True, default=3.0, choices=TZ_CHOICES)
+    #signature_max_length = models.integer_field(blank=true, default=1024)
+    #signature_max_lines = models.integer_field(blank=true, default=3)
+    #quick_topics_number = models.integer_field(blank=true, default=10)
+    #quick_posts_number = models.integer_field(blank=true, default=10)
+    #read_timeout = models.integer_field(blank=true, default=3600 * 24 * 7)
+    #header = models.CharField(blank=True, default='pybb')
+    #tagline = models.CharField(blank=True, default='Django based forum engine')

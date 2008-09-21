@@ -450,3 +450,17 @@ pre {
     padding-left: 1em;
     color: #eee;
 }
+
+.userinfo .avatar {
+    float: left;
+    width: 60px;
+    margin-right: 1em;
+}
+
+.userinfo .info {
+    float: left;
+}
+
+.userinfo .label {
+    font-weight: bold;
+}
