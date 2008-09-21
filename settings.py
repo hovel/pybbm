@@ -107,6 +107,8 @@ AUTHENTICATION_BACKENDS = (
     #'openid_auth.backends.OpenIDBackend',
 )
 
+FORCE_SCRIPT_NAME = ''
+
 try:
     from settings_local import *
 except ImportError:
