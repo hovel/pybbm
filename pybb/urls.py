@@ -19,4 +19,5 @@ urlpatterns = patterns('',
     url('^user/(?P<username>\w+)/$', views.user, name='pybb_profile'),
     url('^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
         {'feed_dict': feeds}, name='pybb_feed'),
+    url('^post/(?P<post_id>\d+)/$', views.show_post, name='post'),
 )

@@ -89,15 +89,16 @@ INSTALLED_APPS = (
 )
 
 # Pybb settings
-# Nothing yet
+PYBB_TOPIC_PAGE_SIZE = 10
+PYBB_FORUM_PAGE_SIZE = 20
 
-# Account app settings
+# django-account settings
 ACCOUNT_ACTIVATION = False
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_CAPTCHA = False
-ACCOUNT_USERNAME_MIN_LENGTH = 2
+ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_PASSWORD_MIN_LENGTH = 2
-DOMAIN = 'edit.your.settings.plea.se'
+DOMAIN = 'edit.your.settings.please.com'
 LOGIN_URL = '/login/'
 
 AUTHENTICATION_BACKENDS = (
@@ -105,3 +106,8 @@ AUTHENTICATION_BACKENDS = (
     'account.backends.OneTimeCodeBackend',
     #'openid_auth.backends.OpenIDBackend',
 )
+
+try:
+    from settings_local import *
+except ImportError:
+    pass

@@ -37,7 +37,7 @@ def render_to(template_path):
     return decorator
 
 
-def paged(paged_list_name, per_page=20, per_page_var='per_page'):
+def paged(paged_list_name, per_page):#, per_page_var='per_page'):
     """
     Parse page from GET data and pass it to view. Split the
     query set returned from view.
@@ -55,21 +55,23 @@ def paged(paged_list_name, per_page=20, per_page_var='per_page'):
 
             real_per_page = per_page
 
-            if per_page_var:
-                try:
-                    value = int(request.GET[per_page_var])
-                except (ValueError, KeyError):
-                    pass
-                else:
-                    if value > 0:
-                        real_per_page = value
+            #if per_page_var:
+                #try:
+                    #value = int(request.GET[per_page_var])
+                #except (ValueError, KeyError):
+                    #pass
+                #else:
+                    #if value > 0:
+                        #real_per_page = value
 
             from django.core.paginator import Paginator
             paginator = Paginator(result['paged_qs'], real_per_page)
             result[paged_list_name] = paginator.page(page).object_list
             result['page'] = page
+            result['page_list'] = range(1, paginator.num_pages + 1)
             result['pages'] = paginator.num_pages
             result['per_page'] = real_per_page
+            result['request'] = request
             return result
         return wrapper
 

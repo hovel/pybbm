@@ -10,9 +10,11 @@
     <li class="tablist-row postlist-row">
         <h3 class="header">{{ topic }}</h3>
         <ul class="tablist-inner">
-        {% for post in topic.posts.all %}
+        {% for post in posts %}
+            <a name="post-{{ post.id }}"></a>
             <li class="tablist-inner-row post">
                 <div class="post-inner">
+                    <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
                     <div class="info"
                         <span class="author">{{ post.user|profile_link }}</span>
                         &rarr;
@@ -28,6 +30,9 @@
         </ul>
     </li>
 </ul>
+
+{% pagination %}
+
 <form action="{% url add_post topic.id %}" method="post">
     <fieldset>
         <legend>new reply</lenend>

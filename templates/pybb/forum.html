@@ -11,7 +11,7 @@
             <li class="tablist-row last">
                 <h3 class="header">{{ forum }}</h3>
                 <ul class="tablist-inner">
-                {% for topic in forum.topics.all %}
+                {% for topic in topics %}
                     <li class="tablist-inner-row">{% link topic %}</li>
                 {% endfor %}
                 </ul>

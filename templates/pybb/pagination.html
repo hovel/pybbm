@@ -1,13 +1,16 @@
-<div class="stat">
+<div class="pagination">
+    {% comment %}
     <div class="view">
         <ul>
             <li class="name">Показывать:</li>
-            <li>{% ifnotequal 20 per_page %}<a href="{{ get_params }}per_page=20">{% endifnotequal %}20{% ifnotequal 20 per_page %}</a>{% endifnotequal %}</li>
-            <li>{% ifnotequal 50 per_page %}<a href="{{ get_params }}per_page=50">{% endifnotequal %}50{% ifnotequal 50 per_page %}</a>{% endifnotequal %}</li>
-            <li>{% ifnotequal 10000 per_page %}<a href="{{ get_params }}per_page=10000">{% endifnotequal %}Все{% ifnotequal 10000 per_page %}</a>{% endifnotequal %}</li>
+            <li class="first">{% ifnotequal 10 per_page %}<a href="{{ get_params }}per_page=10">{% endifnotequal %}по 10{% ifnotequal 10 per_page %}</a>{% endifnotequal %}</li>
+            <li>{% ifnotequal 50 per_page %}<a href="{{ get_params }}per_page=50">{% endifnotequal %}по 50{% ifnotequal 50 per_page %}</a>{% endifnotequal %}</li>
+            <li>{% ifnotequal per_page_all per_page %}<a href="{{ get_params }}per_page={{ per_page_all }}">{% endifnotequal %}Все{% ifnotequal per_page_all per_page %}</a>{% endifnotequal %}</li>
         </ul>
     </div>
-    <div class="pager">
+    {% endcomment %}
+    <div class="pages">
+        {% ifnotequal pages 1 %}
         <ul>
             <li class="name">Страницы:</li>
             {% if lower_page %} 
@@ -17,7 +20,7 @@
             {% ifequal number "." %}...
             {% else %}
                 {% ifequal number page %}
-                <li>{{ number }}</li>
+                <li class="active">{{ number }}</li>
                 {% endifequal %}
                 {% ifnotequal number page %}
                 <li><a href="{{ get_params }}page={{ number }}&per_page={{ per_page }}">{{ number }}</a></li>
@@ -28,6 +31,6 @@
             <li><a href="{{ get_params }}page={{ higher_page }}&per_page={{ per_page }}">&raquo;</a></li>
             {% endif %}
         </ul>
+        {% endifnotequal %}
     </div>
-    <div class="clear"></div>
 </div>

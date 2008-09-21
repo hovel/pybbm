@@ -1,9 +1,13 @@
+import math
+
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.core.urlresolvers import reverse
 
-from pybb.util import render_to, build_form
+from pybb.util import render_to, paged, build_form
 from pybb.models import Category, Forum, Topic, Post
 from pybb.forms import AddPostForm
 
@@ -35,8 +39,10 @@ def show_category(request, category_id):
 
 
 @render_to('pybb/forum.html')
+@paged('topics', settings.PYBB_FORUM_PAGE_SIZE)
 def show_forum(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
+    topics = forum.topics.all()
     quick = {'posts': forum.posts.count(),
              'topics': forum.topics.count(),
              'last_created': forum.topics.all()[:10],
@@ -44,17 +50,21 @@ def show_forum(request, forum_id):
              }
     return {'forum': forum,
             'quick': quick,
+            'paged_qs': topics,
             }
 
     
 @render_to('pybb/topic.html')
+@paged('posts', settings.PYBB_TOPIC_PAGE_SIZE)
 def show_topic(request, topic_id):
     topic = Topic.objects.get(pk=topic_id)
     topic.views += 1
     topic.save()
+    posts = topic.posts.all()
     form = AddPostForm(topic=topic)
     return {'topic': topic,
             'form': form,
+            'paged_qs': posts,
             }
 
 
@@ -86,3 +96,11 @@ def user(request, username):
     user = get_object_or_404(User, username=username)
     return {'profile': user,
             }
+
+
+def show_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    count = post.topic.posts.filter(created__lt=post.created).count() + 1
+    page = math.ceil(count / float(settings.PYBB_TOPIC_PAGE_SIZE))
+    url = '%s?page=%d#post-%d' % (reverse('topic', args=[post.topic.id]), page, post.id)
+    return HttpResponseRedirect(url)

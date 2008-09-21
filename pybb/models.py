@@ -119,4 +119,4 @@ class Post(models.Model):
         super(Post, self).save()
 
     def get_absolute_url(self):
-        return reverse('topic', args=[self.topic.id])
+        return reverse('post', args=[self.id])
