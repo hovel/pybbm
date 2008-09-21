@@ -22,7 +22,8 @@ body {
 }
 
 a {
-    color: black;
+    /*color: black;*/
+    color: #33f;
 }
 
 a:hover {
@@ -134,6 +135,14 @@ p {
     font-size: 1.2em;
 }
 
+.tablist a {
+    color: black;
+}
+
+.quick-access .tablist-row a {
+    color: #33f;
+}
+
 .tablist li, .tablist-inner li {
     list-style-type: none;
     margin-left: 0;
@@ -165,6 +174,7 @@ p {
 
 .crumbs a {
     font-size: 0.9em;
+    color: black;
 }
 
 .crumbs {
@@ -345,4 +355,8 @@ pre {
 
 .avatar img {
     border: 1px solid #aaa;
+}
+
+.topic .tablist-inner-row a {
+    color: #33f;
 }

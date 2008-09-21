@@ -14,7 +14,7 @@
                 {% for topic in topics %}
                 <li class="tablist-inner-row">{% link topic %}
                 <span class="post_count">{{ topic.posts.count }}</span>
-                <span class="updated">{{ topic.updated|pybb_time }}</spaN
+                <span class="updated">{{ topic.updated|pybb_time }}</span>
                 </li>
                 {% endfor %}
                 </ul>

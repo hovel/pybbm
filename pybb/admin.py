@@ -10,6 +10,7 @@ class ForumAdmin(admin.ModelAdmin):
 
 class TopicAdmin(admin.ModelAdmin):
     list_display = ['name', 'forum', 'created', 'head', 'post_count']
+    search_fields = ['name']
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'created', 'summary']

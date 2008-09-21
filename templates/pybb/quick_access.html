@@ -18,7 +18,7 @@
         <div class="clear"></div>
     </h3>
     <ul class="tablist-inner tab-body last-topics">
-        {% for topic in quick.last_created %}
+        {% for topic in quick.last_topics %}
         <li class="tablist-inner-row forum">
         {% link topic %}
         &rarr;
@@ -29,13 +29,13 @@
         {% endfor %}
     </ul>
     <ul class="tablist-inner tab-body last-posts" style="display: none">
-        {% for topic in quick.last_updated %}
+        {% for post in quick.last_posts %}
         <li class="tablist-inner-row forum">
-        {% link topic %}
+        {% link post.topic %}
         &rarr;
-        <span class="author">{{ topic.user|profile_link }}</span>
+        <span class="author">{{ post.user|profile_link }}</span>
         &rarr;
-        <span class="time">{{ topic.updated|pybb_time }}</span>
+        <span class="time">{{ post.created|pybb_time }}</span>
         </li>
         {% endfor %}
     </ul>

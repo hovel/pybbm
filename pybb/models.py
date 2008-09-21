@@ -122,11 +122,11 @@ class Post(models.Model):
         if self.created is None:
             self.created = datetime.now()
             self.updated = datetime.now()
+        self.body_html = mypostmarkup.markup(self.body)
+        self.body_text = strip_tags(self.body_html)
         if self.id is None and self.topic is not None:
             self.topic.updated = datetime.now()
             self.topic.save()
-        self.body_html = mypostmarkup.markup(self.body)
-        self.body_text = strip_tags(self.body_html)
         super(Post, self).save()
 
     def get_absolute_url(self):

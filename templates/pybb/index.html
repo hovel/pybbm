@@ -13,7 +13,7 @@
                     {% for forum in cat.forums.all %}
                     <li class="tablist-inner-row forum">{% link forum %}
                     <span class="post_count">{{ forum.posts.count }}</span>
-                    <span class="updated">{{ forum.last_post.created|pybb_time }}</spaN
+                    <span class="updated">{{ forum.last_post.created|pybb_time }}</span>
                     </li>
                     {% endfor %}
                 </ul>

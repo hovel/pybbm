@@ -17,8 +17,8 @@ def index(request):
     quick = {'posts': Post.objects.count(),
              'topics': Topic.objects.count(),
              'users': User.objects.count(),
-             'last_created': Topic.objects.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_updated': Topic.objects.order_by('-updated')[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': Topic.objects.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_posts': Post.objects.order_by('-created')[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'cats': cats,
             'quick': quick,

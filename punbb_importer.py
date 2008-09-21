@@ -31,7 +31,7 @@ posts_table = SA.Table('posts', meta, autoload=True)
 def decode(data):
     if data is None:
         return None
-    return data.decode(ENCODING)
+    return data.decode(ENCODING, 'replace')
 
 # Import begins
 
@@ -39,7 +39,7 @@ print 'Importing users'
 users = {}
 User.objects.all().delete()
 
-for row in conn.execute(sql.select([users_table])):
+for count, row in enumerate(conn.execute(sql.select([users_table]))):
     joined = datetime.fromtimestamp(row['registered'])
     last_login = datetime.fromtimestamp(row['last_visit'])
     user = User(username=decode(row['username']),
@@ -48,12 +48,15 @@ for row in conn.execute(sql.select([users_table])):
                 date_joined=joined,
                 last_login=last_login,
                 )
-    user.set_password(User.objects.make_random_password())
+    if user.username == 'lorien':
+        user.is_superuser = True
+        user.is_staff = True
+        user.set_password('test')
+    else:
+        user.set_password(User.objects.make_random_password())
     user.save()
 
     users[row['id']] = user
-
-    print user.username
 
     profile = user.pybb_profile
     profile.jabber = decode(row['jabber'])
@@ -66,24 +69,29 @@ for row in conn.execute(sql.select([users_table])):
     profile.show_signatures = bool(row['show_sig'])
     profile.time_zone = row['timezone']
 
+print 'Total: %d' % (count + 1)
+print 'Imported: %d' % len(users)
+print
+
 print 'Importing categories'
 cats = {}
 Category.objects.all().delete()
 
-for row in conn.execute(sql.select([cats_table])):
+for count, row in enumerate(conn.execute(sql.select([cats_table]))):
     cat = Category(name=decode(row['cat_name']),
                    position=row['disp_position'])
     cat.save()
     cats[row['id']] = cat
 
-    print cat.name
-
+print 'Total: %d' % (count + 1)
+print 'Imported: %d' % len(cats)
+print
 
 print 'Importing forums'
 forums = {}
 Forum.objects.all().delete()
 
-for row in conn.execute(sql.select([forums_table])):
+for count, row in enumerate(conn.execute(sql.select([forums_table]))):
     forum = Forum(name=decode(row['forum_name']),
                   position=row['disp_position'],
                   description=decode(row['forum_desc']),
@@ -91,14 +99,16 @@ for row in conn.execute(sql.select([forums_table])):
     forum.save()
     forums[row['id']] = forum
 
-    print forum.name
+print 'Total: %d' % (count + 1)
+print 'Imported: %d' % len(forums)
+print
 
 
 print 'Importing topics'
 topics = {}
 Topic.objects.all().delete()
 
-for row in conn.execute(sql.select([topics_table])):
+for count, row in enumerate(conn.execute(sql.select([topics_table]))):
     created = datetime.fromtimestamp(row['posted'])
     updated = datetime.fromtimestamp(row['last_post'])
 
@@ -111,21 +121,26 @@ for row in conn.execute(sql.select([topics_table])):
 
     topic = Topic(name=decode(row['subject']),
                   forum=forums[row['forum_id']],
-                  created=created,
-                  updated=updated,
                   views=row['num_views'],
                   user=user)
     topic.save()
+    topic._pybb_updated = updated
+    topic._pybb_created = created
+    topic._pybb_posts = 0
+    #print topic._pybb_updated
     topics[row['id']] = topic
 
-    print topic.name
+print 'Total: %d' % (count + 1)
+print 'Imported: %d' % len(topics)
+print
 
 
 print 'Importing posts'
 posts = {}
 Post.objects.all().delete()
 
-for row in conn.execute(sql.select([posts_table])):
+imported = 0
+for count, row in enumerate(conn.execute(sql.select([posts_table]))):
     created = datetime.fromtimestamp(row['posted'])
     updated = row['edited'] and datetime.fromtimestamp(row['edited']) or None
 
@@ -135,7 +150,36 @@ for row in conn.execute(sql.select([posts_table])):
                 user=users[row['poster_id']],
                 user_ip=row['poster_ip'],
                 body=decode(row['message']))
-    post.save()
-    #posts[row['id']] = topic
+    
+    # postmarkups feels bad on some posts :-/
+    try:
+        post.save()
+    except Exception, ex:
+        print post.id, ex
+        print decode(row['message'])
+        print
+    else:
+        imported += 1
+        topics[row['topic_id']]._pybb_posts += 1
+        #posts[row['id']] = topic
 
-    print post.id
+print 'Total: %d' % (count + 1)
+print 'Imported: %d' % imported
+print
+
+print 'Restoring topics updated and created values'
+for topic in topics.itervalues():
+    topic.updated = topic._pybb_updated
+    topic.created = topic._pybb_created
+    topic.save()
+
+
+print 'Remove topics without posts (if any)'
+count = 0
+for topic in topics.itervalues():
+    if not topic._pybb_posts:
+        topic.delete()
+        count += 1
+
+print 'Removed: %d' % count
+print

@@ -290,12 +290,7 @@ class LinkTag(TagBase):
 
         #Quote the url
         #self.url="http:"+urlunparse( map(quote, (u"",)+url_parsed[1:]) )
-        try:
-            self.url= unicode( urlunparse([quote(component, safe='/=&?:+') for component in url_parsed]) )
-        except Exception, ex:
-            import logging
-            logging.error(ex)
-            self.url = 'UNPARSABLE'
+        self.url= unicode( urlunparse([quote(component, safe='/=&?:+') for component in url_parsed]) )
 
         if not self.url:
             return u""
