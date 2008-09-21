@@ -53,6 +53,12 @@ class Forum(models.Model):
     def posts(self):
         return Post.objects.filter(topic__forum=self)
 
+    @property
+    def last_post(self):
+        posts = self.posts.order_by('-created')
+        if posts.count():
+            return posts[0]
+
 
 class Topic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')

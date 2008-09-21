@@ -12,9 +12,9 @@
     <div class="pages">
         {% ifnotequal pages 1 %}
         <ul>
-            <li class="name">Страницы:</li>
+            <li class="name">Pages:</li>
             {% if lower_page %} 
-            <li><a href="{{ get_params }}page={{ lower_page }}&per_page={{ per_page }}">&laquo;</a></li>
+            <li><a href="{{ get_params }}page={{ lower_page }}{#&per_page={{ per_page }}#}">&laquo;</a></li>
             {% endif %}
             {% for number in page_list %}
             {% ifequal number "." %}...
@@ -23,12 +23,12 @@
                 <li class="active">{{ number }}</li>
                 {% endifequal %}
                 {% ifnotequal number page %}
-                <li><a href="{{ get_params }}page={{ number }}&per_page={{ per_page }}">{{ number }}</a></li>
+                <li><a href="{{ get_params }}page={{ number }}{#&per_page={{ per_page }}#}">{{ number }}</a></li>
                 {% endifnotequal %}
             {% endifequal %}
             {% endfor %}
             {% if higher_page %} 
-            <li><a href="{{ get_params }}page={{ higher_page }}&per_page={{ per_page }}">&raquo;</a></li>
+            <li><a href="{{ get_params }}page={{ higher_page }}{#&per_page={{ per_page }}#}">&raquo;</a></li>
             {% endif %}
         </ul>
         {% endifnotequal %}

@@ -12,7 +12,10 @@
                 <h3 class="header">{{ category }}</h3>
                 <ul class="tablist-inner">
                 {% for forum in category.forums.all %}
-                    <li class="tablist-inner-row">{% link forum %}</li>
+                <li class="tablist-inner-row">{% link forum %}
+                <span class="post_count">{{ forum.posts.count }}</span>
+                <span class="updated">{{ forum.last_post.created|pybb_time }}</spaN
+                </li>
                 {% endfor %}
                 </ul>
             </li>

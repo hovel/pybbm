@@ -302,3 +302,15 @@ pre {
     padding-right: 0.2em;
     color: #999;
 }
+
+.post_count {
+    padding-left: 1em;
+    color: #337;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.updated {
+    padding-left: 1em;
+    font-size: 0.9em;
+}
