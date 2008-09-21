@@ -153,12 +153,11 @@ class Profile(models.Model):
     aim = models.CharField(max_length=80, blank=True, default='')
     yahoo = models.CharField(max_length=80, blank=True, default='')
     location = models.CharField(max_length=30, blank=True, default='')
-    signature = models.TextField(blank=True, default='')
+    signature = models.TextField(blank=True, default='', max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
     time_zone = models.FloatField(choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(max_length=3, blank=True, default='en', choices=LANGUAGE_CHOICES)
     avatar = ExtendedImageField(blank=True, default='', upload_to=settings.PYBB_AVATARS_UPLOAD_TO, width=settings.PYBB_AVATAR_WIDTH, height=settings.PYBB_AVATAR_HEIGHT)
+    show_signatures = models.BooleanField(blank=True, default=True)
 
     def save(self):
-        #if self.time_zone is None:
-            #self.time_zone = float(settings.PYBB_DEFAULT_TIME_ZONE)
         super(Profile, self).save()

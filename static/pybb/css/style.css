@@ -314,3 +314,15 @@ pre {
     padding-left: 1em;
     font-size: 0.9em;
 }
+
+.signature {
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+    font-size: 0.8em;
+    border-top: 1px dashed #bbb;
+    color: #999;
+}
+
+.signature a {
+    color: #999;
+}

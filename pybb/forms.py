@@ -1,4 +1,7 @@
+import re
+
 from django import forms
+from django.conf import settings
 
 from pybb.models import Topic, Post, Profile
 
@@ -39,8 +42,17 @@ class EditProfileForm(forms.ModelForm):
         model = Profile
         fields = ['site', 'jabber', 'icq', 'msn', 'aim', 'yahoo',
                   'location', 'signature', 'time_zone', 'language',
-                  'avatar']
+                  'avatar', 'show_signatures']
 
 
     #def __init__(self, *args, **kwargs):
         #super(EditProfileForm, self).__init__(*args, **kwargs)
+
+    def clean_signature(self):
+        value = self.cleaned_data['signature'].strip()
+        if len(re.findall(r'\n', value)) > settings.PYBB_SIGNATURE_MAX_LINES:
+            raise forms.ValidationError('Number of lines is limited to %d' % settings.PYBB_SIGNATURE_MAX_LINES)
+        if len(value) > settings.PYBB_SIGNATURE_MAX_LENGTH:
+            raise forms.ValidationError('Length of signature is limited to %d' % settings.PYBB_SIGNATURE_MAX_LENGTH)
+        return value
+
