@@ -16,7 +16,7 @@ body {
 }
 
 .main-box {
-    width: 980px;
+    width: 970px;
     margin: 0 auto;
     text-align: left;
 }
@@ -207,25 +207,28 @@ p {
     vertical-align: top;
 }
 
+
 .post .info .author a {
-    font-size: 1.2em;
+    font-size: 1.0em;
     font-weight: bold;
-    color: #555;
+    text-decoration: none;
 }
 
-.post .info .time {
-    font-size: 0.9em;
+.post .info .updated {
+    padding-left: 0;
 }
 
 .post .content {
     padding: 1em;
     padding-left: 1.5em;
-    background-color: #ddd;
-    border-right: 1px solid #ccc;
+    background-color: #efefef;
+    color: black;
+    font-size: Verdana, sans-serif;
+    font-size: 0.9em;
 }
 
 .post .content br {
-    margin-bottom: 0.5em;
+    margin-bottom: 0.2em;
 }
 
 .tablist-inner .post {
@@ -275,11 +278,6 @@ p {
     padding: 0;
 }
 
-.quick-access .author a {
-    font-size: 0.8em;
-    color: #666;
-}
-
 .quick-access .time {
     font-size: 0.8em;
 }
@@ -324,10 +322,15 @@ pre {
     font-weight: bold;
 }
 
-.permalink {
-    float: right;
-    padding-right: 0.2em;
+.post .permalink {
     color: #999;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding-right: 0.5em;
+}
+
+.post .info .bottom {
+    margin-top: 1em;
 }
 
 .post_count {
@@ -390,7 +393,9 @@ pre {
 }
 
 .post-controls a {
-    color: #333;
+    color: #666;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .updated-message {
@@ -413,9 +418,11 @@ pre {
 
 .topic .title a {
     font-family: Helvetica, sans-serif;
-    font-size: 1.1em;
+    font-size: 1.0em;
+    color: #333;
 }
 
-.quick-access .author a {
+.author a, .quick-access .author a {
     color: #2a2;
+    font-size: 0.9em;
 }

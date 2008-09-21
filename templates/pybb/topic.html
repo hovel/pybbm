@@ -16,7 +16,7 @@
                 <div class="post-inner">
                     <table>
                         <tr>
-                            <td class="info">
+                            <td class="info" width="15%">
                                 {% if post.user.pybb_profile.avatar %}
                                 <div class="avatar">
                                     <a href="{% url pybb_profile post.user %}">
@@ -24,20 +24,21 @@
                                     </a>
                                 </div>
                                 {% endif %}
-                                <span class="author">{{ post.user|profile_link }}</span>
-                                &rarr;
-                                <span class="time">{{ post.created|pybb_time }}</span>
+                                <div class="author">{{ post.user|profile_link }}</div>
                                 {% if user.is_superuser %}
-                                <div class="ip">{{ post.user_ip }}</div>
+                                <!--<div class="updated">{{ post.user_ip }}</div>-->
                                 {% endif %}
+                                <div class="bottom">
+                                    <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
+                                    <span class="updated">{{ post.created|pybb_time }}</span>
+                                </div>
                                 <div class="post-controls">
-                                    <a href="{{ post.get_absolute_url }}">#</a>
                                     {% ifequal post.user user %}
                                     <a href="{% url edit_post post.id %}">Edit</a>
                                     {% endifequal %}
                                 </div>
                             </td>
-                            <td class="content">
+                            <td class="content" width="85%">
                                 {{ post.body_html|safe }}
                                 {% if not user.is_authenticated or user.pybb_profile.show_signatures %}
                                 {% if post.user.pybb_profile.signature %}
