@@ -4,8 +4,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
+from django.conf import settings
 
-from pybb.markups import mypostmarkup
+from pybb.markups import mypostmarkup 
+from pybb.fields import AutoOneToOneField, ExtendedImageField
 
 class Category(models.Model):
     name = models.CharField(max_length=80)
@@ -126,3 +128,37 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post', args=[self.id])
+
+
+LANGUAGE_CHOICES = (
+    ('en', 'English'),
+)
+
+TZ_CHOICES = [(float(x[0]), x[1]) for x in (
+    (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
+    (-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
+    (-5, '-05 EST'), (-4, '-04 AST'), (-3.5, '-03.5'), (-3, '-03 ADT'),
+    (-2, '-02'), (-1, '-01'), (0, '00 GMT'), (1, '+01 CET'), (2, '+02'),
+    (3, '+03'), (3.5, '+03.5'), (4, '+04'), (4.5, '+04.5'), (5, '+05'),
+    (5.5, '+05.5'), (6, '+06'), (6.5, '+06.5'), (7, '+07'), (8, '+08'),
+    (9, '+09'), (9.5, '+09.5'), (10, '+10'), (10.5, '+10.5'), (11, '+11'),
+    (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'))]
+
+class Profile(models.Model):
+    user = AutoOneToOneField(User, related_name='pybb_profile')
+    site = models.URLField(verify_exists=False, blank=True, default='')
+    jabber = models.CharField(max_length=80, blank=True, default='')
+    icq = models.CharField(max_length=12, blank=True, default='')
+    msn = models.CharField(max_length=80, blank=True, default='')
+    aim = models.CharField(max_length=80, blank=True, default='')
+    yahoo = models.CharField(max_length=80, blank=True, default='')
+    location = models.CharField(max_length=30, blank=True, default='')
+    signature = models.TextField(blank=True, default='')
+    time_zone = models.FloatField(choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
+    language = models.CharField(max_length=3, blank=True, default='en', choices=LANGUAGE_CHOICES)
+    avatar = ExtendedImageField(blank=True, default='', upload_to=settings.PYBB_AVATARS_UPLOAD_TO, width=settings.PYBB_AVATAR_WIDTH, height=settings.PYBB_AVATAR_HEIGHT)
+
+    def save(self):
+        #if self.time_zone is None:
+            #self.time_zone = float(settings.PYBB_DEFAULT_TIME_ZONE)
+        super(Profile, self).save()

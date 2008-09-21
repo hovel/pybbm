@@ -20,4 +20,6 @@ urlpatterns = patterns('',
     url('^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
         {'feed_dict': feeds}, name='pybb_feed'),
     url('^post/(?P<post_id>\d+)/$', views.show_post, name='post'),
+    url('^profile/edit/$', views.edit_profile,
+        name='edit_profile'),
 )

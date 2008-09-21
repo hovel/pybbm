@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load pybb_extras %}
+
+{% block content %}
+<h1>Profile editing</h1>
+{% if profile.avatar %}
+<img src="{{ profile.avatar.url }}" />
+{% endif %}
+<form method="post" enctype="multipart/form-data">
+    <fieldset>
+        <legend>Profile editing</lenged>
+        {{ form.as_p }}
+        <p><input type="submit" /></p>
+    </fieldset>
+</form>
+{% endblock %}

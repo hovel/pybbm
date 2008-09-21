@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 from pybb.util import render_to, paged, build_form
 from pybb.models import Category, Forum, Topic, Post
-from pybb.forms import AddPostForm
+from pybb.forms import AddPostForm, EditProfileForm
 
 @render_to('pybb/index.html')
 def index(request):
@@ -104,3 +104,15 @@ def show_post(request, post_id):
     page = math.ceil(count / float(settings.PYBB_TOPIC_PAGE_SIZE))
     url = '%s?page=%d#post-%d' % (reverse('topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
+
+
+@login_required
+@render_to('pybb/edit_profile.html')
+def edit_profile(request):
+    form = build_form(EditProfileForm, request, instance=request.user.pybb_profile)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse('edit_profile'))
+    return {'form': form,
+            'profile': request.user.pybb_profile,
+            }

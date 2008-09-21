@@ -1,6 +1,6 @@
 from django import forms
 
-from pybb.models import Topic, Post
+from pybb.models import Topic, Post, Profile
 
 class AddPostForm(forms.ModelForm):
     name = forms.CharField()
@@ -32,3 +32,15 @@ class AddPostForm(forms.ModelForm):
                     body=self.cleaned_data['body'])
         post.save()
         return post
+
+
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['site', 'jabber', 'icq', 'msn', 'aim', 'yahoo',
+                  'location', 'signature', 'time_zone', 'language',
+                  'avatar']
+
+
+    #def __init__(self, *args, **kwargs):
+        #super(EditProfileForm, self).__init__(*args, **kwargs)

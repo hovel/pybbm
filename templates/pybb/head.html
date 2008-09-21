@@ -5,6 +5,7 @@
 <h2 class="description">Django based forum engine</h2>
 <ul class="navigation">
     {% if user.is_authenticated %}
+    <li><a href="{% url edit_profile %}">Profile</a></li>
     <li><a href="{% url auth_logout %}">Logout</a></li>
     <li>You have logged in as {{ user|profile_link }}</li>
     {% else %}

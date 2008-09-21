@@ -88,9 +88,7 @@ INSTALLED_APPS = (
     'account',
 )
 
-# Pybb settings
-PYBB_TOPIC_PAGE_SIZE = 10
-PYBB_FORUM_PAGE_SIZE = 20
+FORCE_SCRIPT_NAME = ''
 
 # django-account settings
 ACCOUNT_ACTIVATION = False
@@ -101,13 +99,14 @@ ACCOUNT_PASSWORD_MIN_LENGTH = 2
 DOMAIN = 'edit.your.settings.please.com'
 LOGIN_URL = '/login/'
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'account.backends.OneTimeCodeBackend',
-    #'openid_auth.backends.OpenIDBackend',
-)
+# Pybb settings
+PYBB_TOPIC_PAGE_SIZE = 10
+PYBB_FORUM_PAGE_SIZE = 20
+PYBB_AVATARS_UPLOAD_TO = 'pybb/avatars'
+PYBB_AVATAR_WIDTH = 60
+PYBB_AVATAR_HEIGHT = 60
+PYBB_DEFAULT_TIME_ZONE = 3
 
-FORCE_SCRIPT_NAME = ''
 
 try:
     from settings_local import *
