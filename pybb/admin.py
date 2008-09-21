@@ -1,6 +1,6 @@
 # -*- coding: utf-8
 from django.contrib import admin
-from pybb.models import Category, Forum, Topic, Post, Profile
+from pybb.models import Category, Forum, Topic, Post, Profile, Read
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'position', 'forum_count']
@@ -19,8 +19,12 @@ class PostAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'time_zone', 'location', 'language']
 
+class ReadAdmin(admin.ModelAdmin):
+    list_display = ['user', 'topic', 'time']
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Forum, ForumAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Profile, ProfileAdmin)
+admin.site.register(Read, ReadAdmin)

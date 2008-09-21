@@ -12,7 +12,9 @@
                 <h3 class="header">{{ forum }}</h3>
                 <ul class="tablist-inner topic">
                 {% for topic in topics %}
-                <li class="tablist-inner-row">{% link topic %}
+                <li class="tablist-inner-row">
+                {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
+                {% link topic %}
                 <span class="post_count">{{ topic.posts.count }}</span>
                 <span class="updated">{{ topic.updated|pybb_time }}</span>
                 </li>

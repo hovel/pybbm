@@ -8,6 +8,8 @@ from django.utils.encoding import smart_unicode
 from django.db import settings
 from django.utils.html import escape
 
+from pybb.models import Forum, Topic, Read
+
 register = template.Library()
 
 @register.filter
@@ -90,3 +92,29 @@ def link(object, anchor=u''):
     url = hasattr(object,'get_absolute_url') and object.get_absolute_url() or None   
     anchor = anchor or smart_unicode(object)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
+
+
+@register.filter
+def has_unreads(obj, user):
+    """
+    Check if obj (forum|topic) has messages unreaded by the user
+    """
+
+    now = datetime.now()
+    delta = timedelta(seconds=settings.PYBB_READ_TIMEOUT)
+
+    if not user.is_authenticated():
+        return False
+    else:
+        if isinstance(obj, Topic):
+            if (now - delta > obj.updated):
+                return False
+            else:
+                return obj.has_unreads(user)
+        elif isinstance(obj, Forum):
+            cnt1 = obj.topics.filter(updated__gt=(now - delta)).count()
+            cnt2 = Read.objects.filter(user=user, topic__forum=obj,\
+                time__gt=(now - delta)).count()
+            return not (cnt1 == cnt2)
+        else:
+            raise Exception('object should be an topic or forum')

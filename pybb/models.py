@@ -91,10 +91,24 @@ class Topic(models.Model):
     def get_absolute_url(self):
         return reverse('topic', args=[self.id])
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if self.id is None:
             self.created = datetime.now()
-        super(Topic, self).save()
+        super(Topic, self).save(*args, **kwargs)
+
+    def update_read(self, user):
+        read, new = Read.objects.get_or_create(user=user, topic=self)
+        if not new:
+            read.time = datetime.now()
+            read.save()
+
+    def has_unreads(self, user):
+        try:
+            read = Read.objects.get(user=user, topic=self)
+        except Read.DoesNotExist:
+            return True
+        else:
+            return bool(self.posts.filter(created__gt=read.time).count())
 
 
 class Post(models.Model):
@@ -118,7 +132,7 @@ class Post(models.Model):
 
     __unicode__ = summary
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if self.created is None:
             self.created = datetime.now()
             self.updated = datetime.now()
@@ -127,7 +141,7 @@ class Post(models.Model):
         if self.id is None and self.topic is not None:
             self.topic.updated = datetime.now()
             self.topic.save()
-        super(Post, self).save()
+        super(Post, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('post', args=[self.id])
@@ -162,5 +176,22 @@ class Profile(models.Model):
     avatar = ExtendedImageField(blank=True, default='', upload_to=settings.PYBB_AVATARS_UPLOAD_TO, width=settings.PYBB_AVATAR_WIDTH, height=settings.PYBB_AVATAR_HEIGHT)
     show_signatures = models.BooleanField(blank=True, default=True)
 
-    def save(self):
-        super(Profile, self).save()
+
+class Read(models.Model):
+    """
+    For each topic that user has entered the time 
+    is logged to this model.
+    """
+
+    user = models.ForeignKey(User)
+    topic = models.ForeignKey(Topic)
+    #forum = models.ForeignKey(Forum)
+    time = models.DateTimeField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.time is None:
+            self.time = datetime.now()
+        super(Read, self).save(*args, **kwargs)
+
+    class Meta:
+        unique_together = ['user', 'topic']

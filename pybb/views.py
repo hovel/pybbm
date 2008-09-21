@@ -30,8 +30,8 @@ def show_category(request, category_id):
     category = Category.objects.get(pk=category_id)
     quick = {'posts': category.posts.count(),
              'topics': category.topics.count(),
-             'last_created': category.topics[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_updated': category.topics.order_by('-updated')[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': category.topics[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_posts': category.posts.order_by('-created')[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'category': category,
             'quick': quick,
@@ -45,8 +45,8 @@ def show_forum(request, forum_id):
     topics = forum.topics.all()
     quick = {'posts': forum.posts.count(),
              'topics': forum.topics.count(),
-             'last_created': forum.topics.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_updated': forum.topics.order_by('-updated')[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': forum.topics.all()[:settings.PYBB_QUICK_TOPICS_NUMBER],
+             'last_posts': forum.posts.order_by('-created')[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'forum': forum,
             'quick': quick,
@@ -60,6 +60,10 @@ def show_topic(request, topic_id):
     topic = Topic.objects.get(pk=topic_id)
     topic.views += 1
     topic.save()
+
+    if request.user.is_authenticated():
+        topic.update_read(request.user)
+
     posts = topic.posts.all()
     form = AddPostForm(topic=topic)
     return {'topic': topic,

@@ -360,3 +360,12 @@ pre {
 .topic .tablist-inner-row a {
     color: #33f;
 }
+
+.unread {
+    display: list-item;
+    list-style-type: disc;
+    float: left;
+    list-style-position: inside;
+    color: #33f;
+    margin-right: -0.2em;
+}
