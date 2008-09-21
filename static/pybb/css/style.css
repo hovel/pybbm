@@ -268,6 +268,7 @@ p {
     background-color: white;
     border-right: 1px solid #ccc;
     border-left: 1px solid #ccc;
+    color: #444;
 }
 
 .tablist .tab-selectors .first {
@@ -349,7 +350,7 @@ pre {
 }
 
 .signature {
-    margin-top: 0.5em;
+    margin-top: 1em;
     padding-top: 0.5em;
     font-size: 0.8em;
     border-top: 1px dashed #bbb;
@@ -425,4 +426,27 @@ pre {
 .author a, .quick-access .author a {
     color: #2a2;
     font-size: 0.9em;
+}
+
+.search input {
+    display: inline;
+    font-size: 1.3em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.search .query {
+    width: 20em;
+    margin-right: 1em;
+}
+
+.search_box {
+    background-color: #666;
+    margin-top: -1em;
+    margin-bottom: 1em;
+}
+
+.search .comment {
+    padding-left: 1em;
+    color: #eee;
 }

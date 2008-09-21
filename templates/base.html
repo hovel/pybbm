@@ -29,6 +29,26 @@
         </div>
     </div>
 
+    <div class="search_box" style="display: none">
+        <div class="search main-box">
+            <script type="text/javascript">
+                function pybb_search(form) {
+                    var query = $.trim($('.query', form).val());
+                    if (query) {
+                        query = 'site:{{ request.get_host }} ' + query;
+                        location.href = 'http://www.google.com/search?q=' + query;
+                    }
+                    return false;
+                }
+            </script>
+            <form method="get" onsubmit="return pybb_search(this)">
+                <input type="text" class="query" />
+                <input type="submit" value="Search" />
+                <span class="comment">Search powered by Google</span>
+            </form>
+        </div>
+    </div>
+
     <div class="content_box">
         <div class="content main-box">
         {% block content %}{% endblock %}
