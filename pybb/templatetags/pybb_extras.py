@@ -28,16 +28,15 @@ def pybb_time(time):
     if delta.days == 0:
         if delta.seconds < 60:
             return '%s seconds ago' % delta.seconds
-        else:
+        elif delta.seconds < 3600:
             minutes = int(delta.seconds / 60)
             return '%d minutes ago' % minutes
+    if time > today:
+        return 'today, %s' % time.strftime('%H:%M')
+    elif time > yesterday:
+        return 'yesterday, %s' % time.strftime('%H:%M')
     else:
-        if time > today:
-            return 'today, %s' % time.strftime('%H:%M')
-        elif time > yesterday:
-            return 'yesterday, %s' % time.strftime('%H:%M')
-        else:
-            return time.strftime('%d %b, %Y %H:%M')
+        return time.strftime('%d %b, %Y %H:%M')
 
 
 # TODO: this old code requires refactoring
@@ -121,3 +120,8 @@ def has_unreads(obj, user):
             return not (cnt1 == cnt2)
         else:
             raise Exception('object should be an topic or forum')
+
+
+@register.filter
+def pybb_setting(name):
+    return mark_safe(getattr(settings, name, 'NOT DEFINED'))

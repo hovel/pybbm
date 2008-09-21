@@ -25,7 +25,7 @@
         &rarr;
         <span class="author">{{ topic.user|profile_link }}</span>
         &rarr;
-        <span class="time">{{ topic.created|pybb_time }}</span>
+        <span class="updated">{{ topic.created|pybb_time }}</span>
         </li>
         {% endfor %}
     </ul>
@@ -37,7 +37,7 @@
         &rarr;
         <span class="author">{{ post.user|profile_link }}</span>
         &rarr;
-        <span class="time">{{ post.created|pybb_time }}</span>
+        <span class="updated">{{ post.created|pybb_time }}</span>
         </li>
         {% endfor %}
     </ul>
