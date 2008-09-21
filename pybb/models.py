@@ -60,6 +60,7 @@ class Topic(models.Model):
     created = models.DateTimeField(null=True)
     updated = models.DateTimeField(null=True)
     user = models.ForeignKey(User)
+    views = models.IntegerField(blank=True, default=0)
 
     class Meta:
         ordering = ['-created']

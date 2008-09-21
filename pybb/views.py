@@ -50,6 +50,8 @@ def show_forum(request, forum_id):
 @render_to('pybb/topic.html')
 def show_topic(request, topic_id):
     topic = Topic.objects.get(pk=topic_id)
+    topic.views += 1
+    topic.save()
     form = AddPostForm(topic=topic)
     return {'topic': topic,
             'form': form,
