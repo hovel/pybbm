@@ -13,7 +13,7 @@ The main point in development of pybb is to build it so it could be
 
 * all pybb stuff placed in one application which is called pybb
 
-* I'm trying to stay with KISS principle. At least in the begining of pybb 
+* I'm trying to stay with KISS principle. At least in the beginning of pybb 
   development. I mean that there are no threaded posts and there is only bbcode
   markup support and there is no multi-level nested categories.
 
