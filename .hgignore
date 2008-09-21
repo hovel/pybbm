@@ -4,3 +4,4 @@
 ^account
 ^django/
 ^spawn.\sh$
+^update\.sh$
