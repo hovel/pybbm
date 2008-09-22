@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from django import forms
 from django.conf import settings
@@ -57,3 +58,13 @@ class EditProfileForm(forms.ModelForm):
             raise forms.ValidationError('Length of signature is limited to %d' % settings.PYBB_SIGNATURE_MAX_LENGTH)
         return value
 
+class EditPostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['body']
+
+    def save(self):
+        post = super(EditPostForm, self).save(commit=False)
+        post.updated = datetime.now()
+        post.save()
+        return post

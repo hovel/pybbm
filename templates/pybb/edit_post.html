@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load pybb_extras %}
+
+{% block content %}
+<div class="crumbs">
+<a href="{% url index %}">Index</a> / {% link post.topic.forum.category %} / {% link post.topic.forum %} / {% link post.topic %}
+</div>
+
+<h1>Editing the post</h1>
+
+<form method="post">
+    <fieldset>
+        <legend>Editing the post</legend>
+            {{ form.as_p }}
+            <p><input type="submit" /></p>
+        </legend>
+    </fieldset>
+</form>
+
+{% endblock %}

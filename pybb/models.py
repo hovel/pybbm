@@ -135,7 +135,6 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if self.created is None:
             self.created = datetime.now()
-            self.updated = datetime.now()
         self.body_html = mypostmarkup.markup(self.body)
         self.body_text = strip_tags(self.body_html)
         if self.id is None and self.topic is not None:

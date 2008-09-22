@@ -29,6 +29,11 @@
                         {% if user.is_superuser %}
                         <div class="ip">{{ post.user_ip }}</div>
                         {% endif %}
+                        <div class="post-controls">
+                            {% ifequal post.user user %}
+                            <a href="{% url edit_post post.id %}">Edit</a>
+                            {% endifequal %}
+                        </div>
                     </div>
                 </div>
                 <div class="content">
@@ -39,6 +44,9 @@
                         {{ post.user.pybb_profile.signature|urlize|linebreaks }}
                     </div>
                     {% endif %}
+                    {% endif %}
+                    {% if post.updated %}
+                    <div class="updated-message">Edited {{ post.updated|pybb_time }}</div>
                     {% endif %}
                 </div>
                 <div style="clear: both"></div>

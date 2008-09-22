@@ -25,9 +25,12 @@ def pybb_time(time):
     today = datetime.now().replace(hour=0, minute=0, second=0)
     yesterday = today - timedelta(days=1)
 
-    if delta.days == 0 and delta.seconds < 3600:
-        minutes = int(delta.seconds / 60)
-        return '%d minutes ago' % minutes
+    if delta.days == 0:
+        if delta.seconds < 60:
+            return '%s seconds ago' % delta.seconds
+        else:
+            minutes = int(delta.seconds / 60)
+            return '%d minutes ago' % minutes
     else:
         if time > today:
             return 'today, %s' % time.strftime('%H:%M')

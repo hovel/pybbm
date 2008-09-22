@@ -212,6 +212,7 @@ p {
 
 .post .content {
     padding: 1em;
+    padding-left: 1.5em;
     margin-left: 13em;
     background-color: #ddd;
     border-right: 1px solid #ccc;
@@ -368,4 +369,19 @@ pre {
     list-style-position: inside;
     color: #33f;
     margin-right: -0.2em;
+}
+
+.post-controls {
+    margin-top: 1em;
+}
+
+.post-controls a {
+    color: #333;
+}
+
+.updated-message {
+    font-weight: bold;
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 0.5em;
 }

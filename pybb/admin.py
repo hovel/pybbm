@@ -13,7 +13,7 @@ class TopicAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['topic', 'user', 'created', 'summary']
+    list_display = ['topic', 'user', 'created', 'updated', 'summary']
     search_fields = ['body']
 
 class ProfileAdmin(admin.ModelAdmin):
