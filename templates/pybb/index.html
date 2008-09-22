@@ -15,7 +15,9 @@
                     {% if forum|has_unreads:user %}<span class="unread"></span>{% endif %}
                     {% link forum %}
                     <span class="post_count">{{ forum.posts.count }}</span>
+                    {% if forum.posts.count %}
                     <span class="updated">{{ forum.last_post.created|pybb_time }}</span>
+                    {% endif %}
                     </li>
                     {% endfor %}
                 </ul>

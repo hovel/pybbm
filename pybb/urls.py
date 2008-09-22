@@ -16,9 +16,8 @@ urlpatterns = patterns('',
         {'feed_dict': feeds}, name='pybb_feed'),
 
     # User
-    url('^user/(?P<username>[-.\w]+)/$', views.user, name='pybb_profile'),
-    url('^profile/edit/$', views.edit_profile,
-        name='edit_profile'),
+    url('^user/(?P<username>.*)/$', views.user, name='pybb_profile'),
+    url('^profile/edit/$', views.edit_profile, name='edit_profile'),
 
     # Topic
     url('^topic/(?P<topic_id>\d+)/$', views.show_topic, name='topic'),

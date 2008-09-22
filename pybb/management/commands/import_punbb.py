@@ -16,7 +16,9 @@ class Command(BaseCommand):
         make_option('--host', default='localhost', help=u'Punbb DB host'),
         make_option('--port', help=u'Punbb DB port'),
         make_option('--encoding', default='cp1251', help=u'Punbb DB encoding'),
+        make_option('--mysql-encoding', help=u'Punbb DB encoding. I can\'t explain this yet'),
         make_option('--engine', default='mysql', help=u'Punbb DB engine [postgres, mysql etc]'),
+        make_option('--prefix', default='punbb_', help=u'Punbb DB tables prefix'),
     )
     help = u'Imports Punbb database. Attention: old contents of pybb database will be removed'
     args = '<db name>'
@@ -25,7 +27,10 @@ class Command(BaseCommand):
         if len(args) != 1:
             raise CommandError('Punbb database name required')
         else:
-            dbname = args[0]
+            DBNAME = args[0]
+        ENCODING = options['encoding']
+        MYSQL_ENCODING = options['mysql_encoding']
+        PREFIX = options['prefix']
 
         uri = '%s://' % options['engine']
         if options['user'] is not None:
@@ -36,24 +41,30 @@ class Command(BaseCommand):
             uri += '@%s' % options['host']
         if options['port'] is not None:
             uri += ':%s' % options['port']
-        uri += '/%s' % dbname
+        uri += '/%s' % DBNAME
 
-        engine = SA.create_engine(uri, encoding='latin1')
+        if options['engine'] == 'mysql' and not MYSQL_ENCODING:
+            uri += '?charset=%s' % ENCODING.replace('-', '')
+
+        engine = SA.create_engine(uri, convert_unicode=False)
         conn = engine.connect()
 
         meta = SA.MetaData()
         meta.bind = engine
 
-        users_table = SA.Table('users', meta, autoload=True)
-        cats_table = SA.Table('categories', meta, autoload=True)
-        forums_table = SA.Table('forums', meta, autoload=True)
-        topics_table = SA.Table('topics', meta, autoload=True)
-        posts_table = SA.Table('posts', meta, autoload=True)
+        users_table = SA.Table(PREFIX + 'users', meta, autoload=True)
+        cats_table = SA.Table(PREFIX + 'categories', meta, autoload=True)
+        forums_table = SA.Table(PREFIX + 'forums', meta, autoload=True)
+        topics_table = SA.Table(PREFIX + 'topics', meta, autoload=True)
+        posts_table = SA.Table(PREFIX + 'posts', meta, autoload=True)
 
         def decode(data):
             if data is None:
                 return None
-            return data.decode(options['encoding'], 'replace')
+            if options['engine'] != 'mysql' or MYSQL_ENCODING:
+                return data.decode(ENCODING, 'replace')
+            else:
+                return data
 
         # Import begins
 
@@ -78,20 +89,24 @@ class Command(BaseCommand):
             if user.username == 'lorien':
                 user.is_superuser = True
                 user.is_staff = True
-            user.save()
 
-            users[row['id']] = user
+            try:
+                user.save()
+            except Exception, ex:
+                print ex
+            else:
+                users[row['id']] = user
 
-            profile = user.pybb_profile
-            profile.jabber = decode(row['jabber'])
-            profile.icq = decode(row['icq'])
-            profile.yahoo = decode(row['yahoo'])
-            profile.msn = decode(row['msn'])
-            profile.aim = decode(row['aim'])
-            profile.location = decode(row['location'])
-            profile.signature = decode(row['signature'])
-            profile.show_signatures = bool(row['show_sig'])
-            profile.time_zone = row['timezone']
+                profile = user.pybb_profile
+                profile.jabber = decode(row['jabber'])
+                profile.icq = decode(row['icq'])
+                profile.yahoo = decode(row['yahoo'])
+                profile.msn = decode(row['msn'])
+                profile.aim = decode(row['aim'])
+                profile.location = decode(row['location'])
+                profile.signature = decode(row['signature'])
+                profile.show_signatures = bool(row['show_sig'])
+                profile.time_zone = row['timezone']
 
         print 'Total: %d' % (count + 1)
         print 'Imported: %d' % len(users)
@@ -118,7 +133,7 @@ class Command(BaseCommand):
         for count, row in enumerate(conn.execute(sql.select([forums_table]))):
             forum = Forum(name=decode(row['forum_name']),
                           position=row['disp_position'],
-                          description=decode(row['forum_desc']),
+                          description=decode(row['forum_desc'] or ''),
                           category=cats[row['cat_id']])
             forum.save()
             forums[row['id']] = forum
