@@ -42,18 +42,20 @@ User.objects.all().delete()
 for count, row in enumerate(conn.execute(sql.select([users_table]))):
     joined = datetime.fromtimestamp(row['registered'])
     last_login = datetime.fromtimestamp(row['last_visit'])
+    if len(row['password']) == 40:
+        hash = 'sha1$$' + row['password']
+    else:
+        hash = 'md5$$' + row['password']
     user = User(username=decode(row['username']),
                 email=row['email'],
                 first_name=decode((row['realname'] or '')[:30]),
                 date_joined=joined,
                 last_login=last_login,
+                password=hash
                 )
     if user.username == 'lorien':
         user.is_superuser = True
         user.is_staff = True
-        user.set_password('test')
-    else:
-        user.set_password(User.objects.make_random_password())
     user.save()
 
     users[row['id']] = user
