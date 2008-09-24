@@ -15,11 +15,30 @@
     <!--<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/corners_init.js"></script>-->
 
     <!-- Highlightjs goodies -->
-    <script type="text/javascript" src="{{ MEDIA_URL }}/pybb/js/highlight.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/highlight.js"></script>
     <script type="text/javascript">
       hljs.initHighlightingOnLoad();
     </script>
-    <link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}/pybb/css/hljs_styles/idea.css" />
+    <link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}pybb/css/hljs_styles/idea.css" />
+
+    <!-- Markitup goodies -->
+    <!--<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/jquery.markitup.js"></script>-->
+    <!--<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/sets/default/set.js"></script>-->
+    <!--<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/skins/markitup/style.css" />-->
+    <!--<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/sets/default/style.css" />-->
+    <!--<script type="text/javascript">-->
+        <!--mySettings = {	-->
+            <!--onTab: {keepDefault: false, replaceWith:'    '},-->
+            <!--//previewParserPath:  "/~/sets/bbcode/preview.php",-->
+            <!--markupSet:  []-->
+        <!--}-->
+        <!--$(function() {-->
+            <!--$('textarea').markItUp(mySettings);-->
+        <!--});-->
+    <!--</script>-->
+
+
+
     {% block extra_meta %}{% endblock %}
 </head>
 <body>
