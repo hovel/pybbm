@@ -5,9 +5,31 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.contrib.markup.templatetags.markup import markdown
 
 from pybb.markups import mypostmarkup 
 from pybb.fields import AutoOneToOneField, ExtendedImageField
+
+LANGUAGE_CHOICES = (
+    ('en', 'English'),
+)
+
+TZ_CHOICES = [(float(x[0]), x[1]) for x in (
+    (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
+    (-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
+    (-5, '-05 EST'), (-4, '-04 AST'), (-3.5, '-03.5'), (-3, '-03 ADT'),
+    (-2, '-02'), (-1, '-01'), (0, '00 GMT'), (1, '+01 CET'), (2, '+02'),
+    (3, '+03'), (3.5, '+03.5'), (4, '+04'), (4.5, '+04.5'), (5, '+05'),
+    (5.5, '+05.5'), (6, '+06'), (6.5, '+06.5'), (7, '+07'), (8, '+08'),
+    (9, '+09'), (9.5, '+09.5'), (10, '+10'), (10.5, '+10.5'), (11, '+11'),
+    (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
+)]
+
+MARKUP_CHOICES = (
+    ('bbcode', 'bbcode'),
+    ('markdown', 'markdown'),
+)
+
 
 class Category(models.Model):
     name = models.CharField(max_length=80)
@@ -120,6 +142,7 @@ class Post(models.Model):
     body_html = models.TextField()
     body_text = models.TextField()
     user_ip = models.IPAddressField(blank=True, default='')
+    markup = models.CharField(max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
 
 
     class Meta:
@@ -135,7 +158,13 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if self.created is None:
             self.created = datetime.now()
-        self.body_html = mypostmarkup.markup(self.body)
+        if self.markup == 'bbcode':
+            self.body_html = mypostmarkup.markup(self.body)
+        elif self.markup == 'markdown':
+            #import pdb; pdb.set_trace()
+            self.body_html = markdown(self.body, 'safe')
+        else:
+            raise Exception('Invalid markup property: %s' % self.markup)
         self.body_text = strip_tags(self.body_html)
         if self.id is None and self.topic is not None:
             self.topic.updated = datetime.now()
@@ -145,20 +174,6 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post', args=[self.id])
 
-
-LANGUAGE_CHOICES = (
-    ('en', 'English'),
-)
-
-TZ_CHOICES = [(float(x[0]), x[1]) for x in (
-    (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
-    (-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
-    (-5, '-05 EST'), (-4, '-04 AST'), (-3.5, '-03.5'), (-3, '-03 ADT'),
-    (-2, '-02'), (-1, '-01'), (0, '00 GMT'), (1, '+01 CET'), (2, '+02'),
-    (3, '+03'), (3.5, '+03.5'), (4, '+04'), (4.5, '+04.5'), (5, '+05'),
-    (5.5, '+05.5'), (6, '+06'), (6.5, '+06.5'), (7, '+07'), (8, '+08'),
-    (9, '+09'), (9.5, '+09.5'), (10, '+10'), (10.5, '+10.5'), (11, '+11'),
-    (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'))]
 
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile')
@@ -174,6 +189,7 @@ class Profile(models.Model):
     language = models.CharField(max_length=3, blank=True, default='en', choices=LANGUAGE_CHOICES)
     avatar = ExtendedImageField(blank=True, default='', upload_to=settings.PYBB_AVATARS_UPLOAD_TO, width=settings.PYBB_AVATAR_WIDTH, height=settings.PYBB_AVATAR_HEIGHT)
     show_signatures = models.BooleanField(blank=True, default=True)
+    markup = models.CharField(max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
 
 
 class Read(models.Model):

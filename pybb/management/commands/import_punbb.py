@@ -187,6 +187,7 @@ class Command(BaseCommand):
             post = Post(topic=topics[row['topic_id']],
                         created=created,
                         updated=updated,
+                        markup='bbcode',
                         user=users[row['poster_id']],
                         user_ip=row['poster_ip'],
                         body=decode(row['message']))

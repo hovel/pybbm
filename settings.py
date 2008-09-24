@@ -122,6 +122,7 @@ PYBB_QUICK_POSTS_NUMBER = 10
 PYBB_READ_TIMEOUT = 3600 * 24 * 7
 PYBB_HEADER = 'PYBB'
 PYBB_TAGLINE = 'Django based forum engine'
+PYBB_DEFAULT_MARKUP = 'bbcode'
 
 
 try:

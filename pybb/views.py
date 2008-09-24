@@ -84,8 +84,10 @@ def add_post(request, forum_id, topic_id):
         topic = get_object_or_404(Topic, pk=topic_id)
 
     ip = request.META.get('REMOTE_ADDR', '')
+    print 'USER MARKUP', request.user.pybb_profile.markup
     form = build_form(AddPostForm, request, topic=topic, forum=forum,
-                      user=request.user, ip=ip)
+                      user=request.user, ip=ip,
+                      initial={'markup': request.user.pybb_profile.markup})
 
     if form.is_valid():
         post = form.save();

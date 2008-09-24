@@ -11,7 +11,7 @@ class AddPostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['body']
+        fields = ['body', 'markup']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -34,6 +34,7 @@ class AddPostForm(forms.ModelForm):
             topic = self.topic
 
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
+                    markup=self.cleaned_data['markup'],
                     body=self.cleaned_data['body'])
         post.save()
         return post
@@ -44,7 +45,9 @@ class EditProfileForm(forms.ModelForm):
         model = Profile
         fields = ['site', 'jabber', 'icq', 'msn', 'aim', 'yahoo',
                   'location', 'signature', 'time_zone', 'language',
-                  'avatar', 'show_signatures']
+                  'avatar', 'show_signatures',
+                  'markup',
+                  ]
 
 
     #def __init__(self, *args, **kwargs):
@@ -61,7 +64,7 @@ class EditProfileForm(forms.ModelForm):
 class EditPostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['body']
+        fields = ['body', 'markup']
 
     def save(self):
         post = super(EditPostForm, self).save(commit=False)
