@@ -138,11 +138,11 @@ class Post(models.Model):
     user = models.ForeignKey(User, related_name='posts')
     created = models.DateTimeField(blank=True)
     updated = models.DateTimeField(blank=True, null=True)
+    markup = models.CharField(max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     body = models.TextField()
     body_html = models.TextField()
     body_text = models.TextField()
     user_ip = models.IPAddressField(blank=True, default='')
-    markup = models.CharField(max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
 
 
     class Meta:

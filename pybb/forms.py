@@ -11,7 +11,7 @@ class AddPostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['body', 'markup']
+        fields = ['markup', 'body']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -64,7 +64,7 @@ class EditProfileForm(forms.ModelForm):
 class EditPostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['body', 'markup']
+        fields = ['markup', 'body']
 
     def save(self):
         post = super(EditPostForm, self).save(commit=False)

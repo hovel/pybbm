@@ -65,7 +65,11 @@ def show_topic(request, topic_id):
         topic.update_read(request.user)
 
     posts = topic.posts.all().select_related()
-    form = AddPostForm(topic=topic)
+
+    initial = {}
+    if request.user.is_authenticated():
+        initial = {'markup': request.user.pybb_profile.markup}
+    form = AddPostForm(topic=topic, initial=initial)
     return {'topic': topic,
             'form': form,
             'paged_qs': posts,
