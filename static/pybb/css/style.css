@@ -464,3 +464,19 @@ pre {
 .userinfo .label {
     font-weight: bold;
 }
+
+blockquote {
+    /*border-left: 1em solid #ccc;*/
+    color: #666;
+    padding: 0.5em 1em;
+    margin-bottom: 0.5em;
+    background-color: #ddd;
+}
+
+.post blockquote a {
+    color: #666;
+}
+
+em {
+    font-weight: bold;
+}

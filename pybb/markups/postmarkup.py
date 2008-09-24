@@ -5,7 +5,7 @@ Post Markup
 Author: Will McGugan (http://www.willmcgugan.com)
 """
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 import re
 from urllib import quote, unquote, quote_plus
@@ -28,9 +28,7 @@ def annotate_link(domain):
     domain -- Domain parsed from url
 
     """
-    
-    raise Exception('That the fuck???')
-    return u" [%s]"%domain
+    return u" [%s]"%_escape(domain)
 
 
 re_url = re.compile(r"((https?):((//)|(\\\\))+[\w\d:#@%/;$()~_?\+-=\\\.&]*)", re.MULTILINE| re.UNICODE)
@@ -290,7 +288,7 @@ class LinkTag(TagBase):
 
         #Quote the url
         #self.url="http:"+urlunparse( map(quote, (u"",)+url_parsed[1:]) )
-        self.url= unicode( urlunparse([quote(component, safe='/=&?:+') for component in url_parsed]) )
+        self.url= unicode( urlunparse([quote(component.encode("utf-8"), safe='/=&?:+') for component in url_parsed]) )
 
         if not self.url:
             return u""
@@ -403,7 +401,7 @@ class CodeTag(TagBase):
 
     def render_open(self, parser, node_index):
 
-        contents = _escape(self.get_contents(parser))
+        contents = _escape_no_breaks(self.get_contents(parser))
         self.skip_contents(parser)
         return '<div class="code"><pre>%s</pre></div>' % contents
 
@@ -587,6 +585,8 @@ class MultiReplace:
 def _escape(s):
     return PostMarkup.standard_replace(s.rstrip('\n'))
 
+def _escape_no_breaks(s):
+    return PostMarkup.standard_replace_no_break(s.rstrip('\n'))
 
 class TagFactory(object):
 
@@ -740,6 +740,7 @@ class PostMarkup(object):
                         yield PostMarkup.TOKEN_TAG, post[pos:end_pos+1], pos, end_pos+1
                     else:
                         end_pos = find_first(post, end_pos, u'"]')
+
                         if end_pos==-1:
                             return
                         if post[end_pos] == '"':
@@ -1031,8 +1032,8 @@ def _tests():
     tests.append("[link http://www.willmcgugan.com]My homepage[/link]")
     tests.append("[link]http://www.willmcgugan.com[/link]")
 
-    tests.append(u"[b]Hello André[/b]")
-    tests.append(u"[google]André[/google]")
+    tests.append(u"[b]Hello AndrУЉ[/b]")
+    tests.append(u"[google]AndrУЉ[/google]")
     tests.append("[s]Strike through[/s]")
     tests.append("[b]bold [i]bold and italic[/b] italic[/i]")
     tests.append("[google]Will McGugan[/google]")
@@ -1089,7 +1090,7 @@ New lines characters are converted to breaks."""\
 
     tests.append('Nested urls, i.e. [url][url]www.becontrary.com[/url][/url], are condensed in to a single tag.')
 
-    tests.append(u'[google]ɸβfvθðsz[/google]')
+    tests.append(u'[google]ЩИЮВfvЮИУАsz[/google]')
 
     tests.append(u'[size 30]Hello, World![/size]')
 
@@ -1139,6 +1140,12 @@ asdasdasdasdqweqwe
         print u"<hr/>"
         print
 
+    print repr(post_markup('[url=<script>Attack</script>]Attack[/url]'))
+
+    print repr(post_markup('http://www.google.com/search?as_q=bbcode&btnG=%D0%9F%D0%BE%D0%B8%D1%81%D0%BA'))
+
+    p = create(use_pygments=False)
+    print (p('[code]foo\nbar[/code]'))
 
     #print render_bbcode("[b]For the lazy, use the http://www.willmcgugan.com render_bbcode function.[/b]")
 
