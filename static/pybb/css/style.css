@@ -105,6 +105,8 @@ textarea {
     padding-top: 0.1em;
     padding-left: 0.2em;
     font-size: 1.3em;
+    width: 40em;
+    height: 20em;
 }
 
 h1 {
@@ -314,7 +316,7 @@ pre {
 }
 
 .pagination {
-    margin-top: -1em;
+    margin-top: 1em;
     margin-bottom: 1em;
     font-size: 1.1em;
 }
@@ -421,6 +423,10 @@ pre {
     color: #333;
     font-family: Helvetica, sans-serif;
     font-size: 1.1em;
+}
+
+.sticky .title a {
+    font-weight: bold;
 }
 
 .topic .title a {

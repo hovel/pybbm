@@ -6,7 +6,9 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
+
 from pybb.models import Category, Forum, Topic, Post, Profile
+from pybb.lib import phpserialize
 
 class Command(BaseCommand):
 
@@ -57,6 +59,7 @@ class Command(BaseCommand):
         forums_table = SA.Table(PREFIX + 'forums', meta, autoload=True)
         topics_table = SA.Table(PREFIX + 'topics', meta, autoload=True)
         posts_table = SA.Table(PREFIX + 'posts', meta, autoload=True)
+        groups_table = SA.Table(PREFIX + 'groups', meta, autoload=True)
 
         def decode(data):
             if data is None:
@@ -67,6 +70,17 @@ class Command(BaseCommand):
                 return data
 
         # Import begins
+        print 'Searching admin group'
+
+        ADMIN_GROUP = None
+        for count, row in enumerate(conn.execute(sql.select([groups_table]))):
+            if row['g_title'] == 'Administrators':
+                print 'Admin group was found'
+                ADMIN_GROUP = row['g_id']
+
+        if ADMIN_GROUP is None:
+            print 'Admin group was NOT FOUND'
+
 
         print 'Importing users'
         users = {}
@@ -86,7 +100,8 @@ class Command(BaseCommand):
                         last_login=last_login,
                         password=hash
                         )
-            if user.username == 'lorien':
+            if row['group_id'] == ADMIN_GROUP:
+                print u'Admin was found: %s' % row['username']
                 user.is_superuser = True
                 user.is_staff = True
 
@@ -128,6 +143,7 @@ class Command(BaseCommand):
 
         print 'Importing forums'
         forums = {}
+        moderators = {}
         Forum.objects.all().delete()
 
         for count, row in enumerate(conn.execute(sql.select([forums_table]))):
@@ -138,8 +154,15 @@ class Command(BaseCommand):
             forum.save()
             forums[row['id']] = forum
 
+            if row['moderators']:
+                for username in phpserialize.loads(row['moderators']).iterkeys():
+                    user = User.objects.get(username=username)
+                    forum.moderators.add(user)
+                    moderators[user.id] = user
+
         print 'Total: %d' % (count + 1)
         print 'Imported: %d' % len(forums)
+        print 'Total number of moderators: %d' % len(moderators)
         print
 
 
@@ -161,6 +184,7 @@ class Command(BaseCommand):
             topic = Topic(name=decode(row['subject']),
                           forum=forums[row['forum_id']],
                           views=row['num_views'],
+                          sticky=bool(row['sticky']),
                           user=user)
             topic.save()
             topic._pybb_updated = updated
@@ -215,7 +239,7 @@ class Command(BaseCommand):
             topic.save()
 
 
-        print 'Remove topics without posts (if any)'
+        print 'Removing topics without posts (if any)'
         ids = []
         for topic in topics.itervalues():
             if not topic._pybb_posts:

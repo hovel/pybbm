@@ -66,14 +66,18 @@ class ExtendedImageField(models.ImageField):
         image = Image.open(StringIO(rawdata))
         try:
             oldw, oldh = image.size
+
+            # do nothing if width and height are correct
+            #if oldw == width and oldh == height:
+                #print 'image already OK!'
+                #return rawdata
+            
             if oldw >= oldh:
                 x = int(round((oldw - oldh) / 2.0))
                 image = image.crop((x, 0, (x + oldh) - 1, oldh - 1))
             else:
                 y = int(round((oldh - oldw) / 2.0))
                 image = image.crop((0, y, oldw - 1, (y + oldw) - 1))
-            #image.load()
-            #image = image.resize(size, Image.ANTIALIAS)
             image = image.resize((width, height), resample=Image.ANTIALIAS)
         except Exception, err:
             logging.error(err)

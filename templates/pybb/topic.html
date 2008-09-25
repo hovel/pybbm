@@ -33,9 +33,9 @@
                                     <span class="updated">{{ post.created|pybb_time }}</span>
                                 </div>
                                 <div class="post-controls">
-                                    {% ifequal post.user user %}
+                                    {% if moderator or post|pybb_posted_by:user %}
                                     <a href="{% url edit_post post.id %}">Edit</a>
-                                    {% endifequal %}
+                                    {% endif %}
                                 </div>
                             </td>
                             <td class="content" width="85%">
@@ -62,6 +62,16 @@
 </ul>
 
 {% pagination %}
+
+{% if moderator %}
+<div class="controls">
+    {% if topic.sticky %}
+    <a href="{% url unstick_topic topic.id %}">Unstick topic</a>
+    {% else %}
+    <a href="{% url stick_topic topic.id %}">Stick topic</a>
+    {% endif %}
+</div>
+{% endif %}
 
 <form action="{% url add_post topic.id %}" method="post">
     <fieldset>

@@ -61,6 +61,7 @@ class Forum(models.Model):
     name = models.CharField(max_length=80)
     position = models.IntegerField(blank=True, default=0)
     description = models.TextField(blank=True, default='')
+    moderators = models.ManyToManyField(User, blank=True, default=True)
 
     class Meta:
         ordering = ['position']
@@ -92,6 +93,7 @@ class Topic(models.Model):
     updated = models.DateTimeField(null=True)
     user = models.ForeignKey(User)
     views = models.IntegerField(blank=True, default=0)
+    sticky = models.BooleanField(blank=True, default=False)
 
     class Meta:
         ordering = ['-created']

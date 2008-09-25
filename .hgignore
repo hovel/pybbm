@@ -3,6 +3,6 @@
 ^settings_local\.py$
 ^account
 ^django/
-^spawn.\sh$
+^spawn\.sh$
 ^update\.sh$
 ^static/pybb/avatars/

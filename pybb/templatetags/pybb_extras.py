@@ -12,6 +12,9 @@ from pybb.models import Forum, Topic, Read
 
 register = template.Library()
 
+# TODO:
+# * rename all tags with pybb_ prefix
+
 @register.filter
 def profile_link(user):
     data = u'<a href="%s">%s</a>' % (\
@@ -125,3 +128,36 @@ def has_unreads(obj, user):
 @register.filter
 def pybb_setting(name):
     return mark_safe(getattr(settings, name, 'NOT DEFINED'))
+
+
+@register.filter
+def pybb_moderated_by(topic, user):
+    """
+    Check if user is moderator of topic's forum.
+    """
+
+    return user.is_superuser or user in topic.forum.moderators.all()
+
+
+@register.filter
+def pybb_editable_by(post, user):
+    """
+    Check if the post could be edited by the user.
+    """
+
+    if user.is_superuser:
+        return True
+    if post.user == user:
+        return True
+    if user in post.topic.forum.moderators.all():
+        return True
+    return False
+
+
+@register.filter
+def pybb_posted_by(post, user):
+    """
+    Check if the post is writed by the user.
+    """
+
+    return post.user == user

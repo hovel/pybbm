@@ -49,6 +49,7 @@ def show_forum(request, forum_id):
              'last_posts': forum.posts.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
     return {'forum': forum,
+            'sticky_topics': forum.topics.filter(sticky=True),
             'quick': quick,
             'paged_qs': topics,
             }
@@ -70,8 +71,11 @@ def show_topic(request, topic_id):
     if request.user.is_authenticated():
         initial = {'markup': request.user.pybb_profile.markup}
     form = AddPostForm(topic=topic, initial=initial)
+    moderator = request.user.is_superuser or\
+        user in topic.forum.moderators.all()
     return {'topic': topic,
             'form': form,
+            'moderator': moderator,
             'paged_qs': posts,
             }
 
@@ -88,7 +92,6 @@ def add_post(request, forum_id, topic_id):
         topic = get_object_or_404(Topic, pk=topic_id)
 
     ip = request.META.get('REMOTE_ADDR', '')
-    print 'USER MARKUP', request.user.pybb_profile.markup
     form = build_form(AddPostForm, request, topic=topic, forum=forum,
                       user=request.user, ip=ip,
                       initial={'markup': request.user.pybb_profile.markup})
@@ -135,8 +138,10 @@ def edit_profile(request):
 @login_required
 @render_to('pybb/edit_post.html')
 def edit_post(request, post_id):
+    from pybb.templatetags.pybb_extras import pybb_editable_by
+
     post = get_object_or_404(Post, pk=post_id)
-    if post.user != request.user:
+    if not pybb_editable_by(post, request.user):
         return HttpResponseRedirect(post.get_absolute_url())
 
     form = build_form(EditPostForm, request, instance=post)
@@ -148,3 +153,27 @@ def edit_post(request, post_id):
     return {'form': form,
             'post': post,
             }
+
+
+@login_required
+def stick_topic(request, topic_id):
+    from pybb.templatetags.pybb_extras import pybb_moderated_by
+
+    topic = get_object_or_404(Topic, pk=topic_id)
+    if pybb_moderated_by(topic, request.user):
+        if not topic.sticky:
+            topic.sticky = True
+            topic.save()
+    return HttpResponseRedirect(topic.get_absolute_url())
+
+
+@login_required
+def unstick_topic(request, topic_id):
+    from pybb.templatetags.pybb_extras import pybb_moderated_by
+
+    topic = get_object_or_404(Topic, pk=topic_id)
+    if pybb_moderated_by(topic, request.user):
+        if topic.sticky:
+            topic.sticky = False
+            topic.save()
+    return HttpResponseRedirect(topic.get_absolute_url())

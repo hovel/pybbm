@@ -23,6 +23,8 @@ urlpatterns = patterns('',
     url('^topic/(?P<topic_id>\d+)/$', views.show_topic, name='topic'),
     url('^forum/(?P<forum_id>\d+)/topic/add/$', views.add_post,
         {'topic_id': None}, name='add_topic'),
+    url('^topic/(?P<topic_id>\d+)/stick/$', views.stick_topic, name='stick_topic'),
+    url('^topic/(?P<topic_id>\d+)/unstick/$', views.unstick_topic, name='unstick_topic'),
 
     # Post
     url('^topic/(?P<topic_id>\d+)/post/add/$', views.add_post,
