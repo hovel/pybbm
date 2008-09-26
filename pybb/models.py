@@ -94,6 +94,7 @@ class Topic(models.Model):
     user = models.ForeignKey(User)
     views = models.IntegerField(blank=True, default=0)
     sticky = models.BooleanField(blank=True, default=False)
+    closed = models.BooleanField(blank=True, default=False)
 
     class Meta:
         ordering = ['-created']

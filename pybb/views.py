@@ -94,6 +94,9 @@ def add_post(request, forum_id, topic_id):
     elif topic_id:
         topic = get_object_or_404(Topic, pk=topic_id)
 
+    if topic and topic.closed:
+        return HttpResponseRedirect(topic.get_absolute_url())
+
     ip = request.META.get('REMOTE_ADDR', '')
     form = build_form(AddPostForm, request, topic=topic, forum=forum,
                       user=request.user, ip=ip,
@@ -208,3 +211,27 @@ def delete_post(request, post_id):
         return HttpResponseRedirect(forum.get_absolute_url())
     else:
         return HttpResponseRedirect(topic.get_absolute_url())
+
+
+@login_required
+def close_topic(request, topic_id):
+    from pybb.templatetags.pybb_extras import pybb_moderated_by
+
+    topic = get_object_or_404(Topic, pk=topic_id)
+    if pybb_moderated_by(topic, request.user):
+        if not topic.closed:
+            topic.closed = True
+            topic.save()
+    return HttpResponseRedirect(topic.get_absolute_url())
+
+
+@login_required
+def open_topic(request, topic_id):
+    from pybb.templatetags.pybb_extras import pybb_moderated_by
+
+    topic = get_object_or_404(Topic, pk=topic_id)
+    if pybb_moderated_by(topic, request.user):
+        if topic.closed:
+            topic.closed = False
+            topic.save()
+    return HttpResponseRedirect(topic.get_absolute_url())

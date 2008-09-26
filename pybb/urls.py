@@ -25,6 +25,8 @@ urlpatterns = patterns('',
         {'topic_id': None}, name='add_topic'),
     url('^topic/(?P<topic_id>\d+)/stick/$', views.stick_topic, name='stick_topic'),
     url('^topic/(?P<topic_id>\d+)/unstick/$', views.unstick_topic, name='unstick_topic'),
+    url('^topic/(?P<topic_id>\d+)/close/$', views.close_topic, name='close_topic'),
+    url('^topic/(?P<topic_id>\d+)/open/$', views.open_topic, name='open_topic'),
 
     # Post
     url('^topic/(?P<topic_id>\d+)/post/add/$', views.add_post,

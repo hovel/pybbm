@@ -185,6 +185,7 @@ class Command(BaseCommand):
                           forum=forums[row['forum_id']],
                           views=row['num_views'],
                           sticky=bool(row['sticky']),
+                          closed=bool(row['closed']),
                           user=user)
             topic.save()
             topic._pybb_updated = updated
