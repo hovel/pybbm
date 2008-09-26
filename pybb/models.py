@@ -176,6 +176,13 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post', args=[self.id])
 
+    def delete(self, *args, **kwargs):
+        self_id = self.id
+        head_post_id = self.topic.posts.order_by('created')[0].id
+        super(Post, self).delete(*args, **kwargs)
+        if self_id == head_post_id:
+            self.topic.delete()
+
 
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile')

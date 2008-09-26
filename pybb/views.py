@@ -198,10 +198,13 @@ def delete_post(request, post_id):
     if not allowed:
         return HttpResponseRedirect(post.get_absolute_url())
 
+    topic = post.topic
+    forum = post.topic.forum
     post.delete()
-    if not topic.posts.all().count():
-        forum = topic.forum
-        topic.delete()
+
+    try:
+        Topic.objects.get(pk=topic.id)
+    except Topic.DoesNotExist:
         return HttpResponseRedirect(forum.get_absolute_url())
     else:
         return HttpResponseRedirect(topic.get_absolute_url())
