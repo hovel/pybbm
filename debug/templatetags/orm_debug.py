@@ -57,12 +57,12 @@ else:
             #query['sql'] = re.sub(r'((?:[^,]+,))', '\\1\n    ', query['sql'])
             #query['original_sql'] = query['sql']
             query['sql'] = '\n'.join(parts)
-            if pygments_installed:
-                formatter = HtmlFormatter()
-                query['sql'] = highlight(query['sql'], SqlLexer(), formatter)
-                pygments_css = formatter.get_style_defs()
-            else:
-                pygments_css = ''
+        if pygments_installed:
+            formatter = HtmlFormatter()
+            query['sql'] = highlight(query['sql'], SqlLexer(), formatter)
+            pygments_css = formatter.get_style_defs()
+        else:
+            pygments_css = ''
         return {'pygments_css': pygments_css,
                 'pygments_installed': pygments_installed,
                 'query_time': query_time,
