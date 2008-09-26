@@ -62,6 +62,8 @@ def show_topic(request, topic_id):
     topic.views += 1
     topic.save()
 
+    last_post = topic.posts.order_by('-created')[0]
+
     if request.user.is_authenticated():
         topic.update_read(request.user)
 
@@ -74,6 +76,7 @@ def show_topic(request, topic_id):
     moderator = request.user.is_superuser or\
         user in topic.forum.moderators.all()
     return {'topic': topic,
+            'last_post': last_post,
             'form': form,
             'moderator': moderator,
             'paged_qs': posts,
@@ -177,3 +180,28 @@ def unstick_topic(request, topic_id):
             topic.sticky = False
             topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
+
+
+@login_required
+@render_to('pybb/delete_post.html')
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    last_post = post.topic.posts.order_by('-created')[0]
+    topic = post.topic
+
+    allowed = False
+    if request.user.is_superuser or\
+        request.user in post.topic.forum.moderators.all() or \
+        (post.user == request.user and post == last_post):
+        allowed = True
+
+    if not allowed:
+        return HttpResponseRedirect(post.get_absolute_url())
+
+    post.delete()
+    if not topic.posts.all().count():
+        forum = topic.forum
+        topic.delete()
+        return HttpResponseRedirect(forum.get_absolute_url())
+    else:
+        return HttpResponseRedirect(topic.get_absolute_url())

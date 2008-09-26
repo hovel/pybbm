@@ -31,4 +31,5 @@ urlpatterns = patterns('',
         {'forum_id': None}, name='add_post'),
     url('^post/(?P<post_id>\d+)/$', views.show_post, name='post'),
     url('^post/(?P<post_id>\d+)/edit/$', views.edit_post, name='edit_post'),
+    url('^post/(?P<post_id>\d+)/delete/$', views.delete_post, name='delete_post'),
 )

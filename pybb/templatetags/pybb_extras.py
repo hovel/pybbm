@@ -161,3 +161,12 @@ def pybb_posted_by(post, user):
     """
 
     return post.user == user
+
+
+@register.filter
+def pybb_equal_to(obj1, obj2):
+    """
+    Check if objects are equal.
+    """
+
+    return obj1 == obj2
