@@ -168,11 +168,17 @@ class Command(BaseCommand):
 
         print 'Importing topics'
         topics = {}
+        moved_count = 0
         Topic.objects.all().delete()
 
         for count, row in enumerate(conn.execute(sql.select([topics_table]))):
             created = datetime.fromtimestamp(row['posted'])
             updated = datetime.fromtimestamp(row['last_post'])
+
+            # Skip moved topics
+            if row['moved_to']:
+                moved_count += 1
+                continue
 
             username = row['poster']
             testuser = users.values()[0]
@@ -197,6 +203,7 @@ class Command(BaseCommand):
 
         print 'Total: %d' % (count + 1)
         print 'Imported: %d' % len(topics)
+        print 'Moved: %d' % moved_count
         print
 
 
@@ -238,15 +245,3 @@ class Command(BaseCommand):
             topic.updated = topic._pybb_updated
             topic.created = topic._pybb_created
             topic.save()
-
-
-        print 'Removing topics without posts (if any)'
-        ids = []
-        for topic in topics.itervalues():
-            if not topic._pybb_posts:
-                ids.append(topic._pybb_punbb_id)
-                topic.delete()
-
-        print 'Removed: %d' % len(ids)
-        print ','.join(map(str, ids))
-        print
