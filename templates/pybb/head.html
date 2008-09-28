@@ -1,19 +1,53 @@
 {% load pybb_extras %}
 
-<div class="logo">
-    <a href="{% url index %}">{{ "PYBB_HEADER"|pybb_setting }}</a>
+<div class="head_box">
+    <div class="head main-box">
+        <div class="logo">
+            <a href="{% url index %}">{{ "PYBB_HEADER"|pybb_setting }}</a>
+        </div>
+        <h2 class="description">{{ "PYBB_TAGLINE"|pybb_setting|safe }}</h2>
+        <ul class="navigation">
+            <li><a href="#" onclick="$('.search_box').toggle(); return false;"/>Search</a></li>
+            {% if user.is_authenticated %}
+            <li><a href="{% url edit_profile %}">Profile</a></li>
+            <li><a href="{% url auth_logout %}">Logout</a></li>
+            <li>You have logged in as {{ user|profile_link }}</li>
+            {% else %}
+            <li><a href="{% url registration_register %}">Registration</a></li>
+            <li><a href="{% url auth_login %}">Login</a></li>
+            {% endif %}
+            <li><a href="{% url pybb_feed "posts" %}" /><img src="{{ MEDIA_URL }}/pybb/img/feed-icon-small.png" /></a></li>
+        </ul>
+        <div class="clear"></div>
+    </div>
 </div>
-<h2 class="description">{{ "PYBB_TAGLINE"|pybb_setting|safe }}</h2>
-<ul class="navigation">
-    <li><a href="#" onclick="$('.search_box').toggle(); return false;"/>Search</a></li>
-    {% if user.is_authenticated %}
-    <li><a href="{% url edit_profile %}">Profile</a></li>
-    <li><a href="{% url auth_logout %}">Logout</a></li>
-    <li>You have logged in as {{ user|profile_link }}</li>
-    {% else %}
-    <li><a href="{% url registration_register %}">Registration</a></li>
-    <li><a href="{% url auth_login %}">Login</a></li>
-    {% endif %}
-    <li><a href="{% url pybb_feed "posts" %}" /><img src="{{ MEDIA_URL }}/pybb/img/feed-icon-small.png" /></a></li>
-</ul>
-<div class="clear"></div>
+
+<div class="search_box" style="display: none">
+    <div class="search main-box">
+        <script type="text/javascript">
+            function pybb_search(form) {
+                var query = $.trim($('.query', form).val());
+                if (query) {
+                    query = 'site:{{ request.get_host }} ' + query;
+                    location.href = 'http://www.google.com/search?q=' + query;
+                }
+                return false;
+            }
+        </script>
+        <form method="get" onsubmit="return pybb_search(this)">
+            <input type="text" class="query" />
+            <input type="submit" value="Search" />
+            <span class="comment">Search powered by Google</span>
+        </form>
+    </div>
+</div>
+
+{% if "PYBB_NOTICE"|pybb_setting %}
+<div class="notice_box">
+    <div class="notice main-box">
+        <div class="inner">
+            {{ "PYBB_NOTICE"|pybb_setting }}
+        </div>
+    </div>
+</div>
+{% endif %}

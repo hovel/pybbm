@@ -60,6 +60,7 @@ class Command(BaseCommand):
         topics_table = SA.Table(PREFIX + 'topics', meta, autoload=True)
         posts_table = SA.Table(PREFIX + 'posts', meta, autoload=True)
         groups_table = SA.Table(PREFIX + 'groups', meta, autoload=True)
+        config_table = SA.Table(PREFIX + 'config', meta, autoload=True)
 
         def decode(data):
             if data is None:
@@ -245,3 +246,15 @@ class Command(BaseCommand):
             topic.updated = topic._pybb_updated
             topic.created = topic._pybb_created
             topic.save()
+
+        print
+
+
+        print 'Importing config'
+        for row in conn.execute(sql.select([config_table])):
+            if row['conf_name'] == 'o_announcement_message':
+                value = row['conf_value']
+                if value:
+                    open('pybb_announcement.txt', 'w').write(value.encode('utf-8'))
+                    print 'Not empty announcement found and saved to pybb_announcement.txt'
+                    print 'If you need announcement write PYBB_NOTICE = " ... text ... " to settings file'

@@ -1,4 +1,4 @@
-# Django settings for pybb project.
+# -*- coding: utf-8 -*-
 import os.path
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -123,6 +123,7 @@ PYBB_READ_TIMEOUT = 3600 * 24 * 7
 PYBB_HEADER = 'PYBB'
 PYBB_TAGLINE = 'Django based forum engine'
 PYBB_DEFAULT_MARKUP = 'bbcode'
+PYBB_NOTICE = u'Мой знакомый открыл <a href="http://www.wildmagic.ru">омский сервер lineage</a>. Кто любит играть - welcome.'
 
 
 try:
