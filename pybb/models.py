@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, strip_tags
 from django.conf import settings
+#from django.contrib.markup.templatetags.markup import markdown
 from markdown import Markdown
 
 from pybb.markups import mypostmarkup 
@@ -166,7 +167,8 @@ class Post(models.Model):
         if self.markup == 'bbcode':
             self.body_html = mypostmarkup.markup(self.body)
         elif self.markup == 'markdown':
-            self.body_html = unicode(Markdown(escape(self.body)))
+            self.body_html = unicode(Markdown(self.body, safe_mode=True))
+            #self.body_html = markdown(self.body, 'safe')
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
         self.body_text = strip_tags(self.body_html)
