@@ -8,14 +8,15 @@ def notify_subscribers(post):
     topic = post.topic
     if post != topic.head:
         for user in topic.subscribers.all():
-            subject = u'RE: %s' % topic.name
-            from_email = settings.DEFAULT_FROM_EMAIL
-            to_email = user.email
-            text_content = text_version(post)
-            #html_content = html_version(post)
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
-            #msg.attach_alternative(html_content, "text/html")
-            msg.send(fail_silently=True)
+            if user != post.user:
+                subject = u'RE: %s' % topic.name
+                from_email = settings.DEFAULT_FROM_EMAIL
+                to_email = user.email
+                text_content = text_version(post)
+                #html_content = html_version(post)
+                msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
+                #msg.attach_alternative(html_content, "text/html")
+                msg.send(fail_silently=True)
 
 
 TEXT_TEMPLATE = u"""New reply from %s to topic that you have subscribed on.
