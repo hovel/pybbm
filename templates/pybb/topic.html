@@ -68,8 +68,8 @@
 
 {% pagination %}
 
-{% if moderator %}
 <div class="controls">
+    {% if moderator %}
     {% if topic.sticky %}
     <a href="{% url unstick_topic topic.id %}">Unstick topic</a>
     {% else %}
@@ -81,8 +81,16 @@
     {% else %}
     <a href="{% url close_topic topic.id %}">Close topic</a>
     {% endif %}
+    /
+    {% endif %}
+    {% if user.is_authenticated %}
+    {% if subscribed %}
+    <a href="{% url pybb_delete_subscription topic.id %}">Unsubscribe</a>
+    {% else %}
+    <a href="{% url pybb_add_subscription topic.id %}">Subscribe</a>
+    {% endif %}
+    {% endif %}
 </div>
-{% endif %}
 
 {% if not topic.closed %}
 <form action="{% url add_post topic.id %}" method="post">

@@ -125,6 +125,7 @@ PYBB_HEADER = 'PYBB'
 PYBB_TAGLINE = 'Django based forum engine'
 PYBB_DEFAULT_MARKUP = 'bbcode'
 PYBB_NOTICE = ''
+PYBB_HOST = 'localhost:8000'
 
 
 try:

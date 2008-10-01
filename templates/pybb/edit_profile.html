@@ -13,4 +13,16 @@
         <p><input type="submit" /></p>
     </fieldset>
 </form>
+<h1>Topic subscriptions</h1>
+<ul>
+{% for sub in user.subscriptions.all %}
+<li>
+{% link sub %}
+&mdash;
+<strong>
+    <a href="{% url pybb_delete_subscription sub.id %}">delete</a>
+</strong>
+</li>
+{% endfor %}
+</ul>
 {% endblock %}

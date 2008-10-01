@@ -61,6 +61,7 @@ class Command(BaseCommand):
         posts_table = SA.Table(PREFIX + 'posts', meta, autoload=True)
         groups_table = SA.Table(PREFIX + 'groups', meta, autoload=True)
         config_table = SA.Table(PREFIX + 'config', meta, autoload=True)
+        subscriptions_table = SA.Table(PREFIX + 'subscriptions', meta, autoload=True)
 
         def decode(data):
             if data is None:
@@ -87,6 +88,7 @@ class Command(BaseCommand):
         users = {}
         User.objects.all().delete()
 
+        count = 0
         for count, row in enumerate(conn.execute(sql.select([users_table]))):
             joined = datetime.fromtimestamp(row['registered'])
             last_login = datetime.fromtimestamp(row['last_visit'])
@@ -132,6 +134,7 @@ class Command(BaseCommand):
         cats = {}
         Category.objects.all().delete()
 
+        count = 0
         for count, row in enumerate(conn.execute(sql.select([cats_table]))):
             cat = Category(name=decode(row['cat_name']),
                            position=row['disp_position'])
@@ -147,6 +150,7 @@ class Command(BaseCommand):
         moderators = {}
         Forum.objects.all().delete()
 
+        count = 0
         for count, row in enumerate(conn.execute(sql.select([forums_table]))):
             forum = Forum(name=decode(row['forum_name']),
                           position=row['disp_position'],
@@ -172,6 +176,7 @@ class Command(BaseCommand):
         moved_count = 0
         Topic.objects.all().delete()
 
+        count = 0
         for count, row in enumerate(conn.execute(sql.select([topics_table]))):
             created = datetime.fromtimestamp(row['posted'])
             updated = datetime.fromtimestamp(row['last_post'])
@@ -213,6 +218,7 @@ class Command(BaseCommand):
         Post.objects.all().delete()
 
         imported = 0
+        count = 0
         for count, row in enumerate(conn.execute(sql.select([posts_table]))):
             created = datetime.fromtimestamp(row['posted'])
             updated = row['edited'] and datetime.fromtimestamp(row['edited']) or None
@@ -240,6 +246,18 @@ class Command(BaseCommand):
         print 'Total: %d' % (count + 1)
         print 'Imported: %d' % imported
         print
+
+
+        print 'Importing subscriptions'
+
+        count = 0
+        for count, row in enumerate(conn.execute(sql.select([subscriptions_table]))):
+            user = users[row['user_id']]
+            topic = topics[row['topic_id']]
+            topic.subscribers.add(user)
+
+        print 'Imported: %d' % count
+
 
         print 'Restoring topics updated and created values'
         for topic in topics.itervalues():

@@ -9,6 +9,7 @@ from django.contrib.markup.templatetags.markup import markdown
 
 from pybb.markups import mypostmarkup 
 from pybb.fields import AutoOneToOneField, ExtendedImageField
+from pybb.subscription import notify_subscribers
 
 LANGUAGE_CHOICES = (
     ('en', 'English'),
@@ -95,6 +96,7 @@ class Topic(models.Model):
     views = models.IntegerField(blank=True, default=0)
     sticky = models.BooleanField(blank=True, default=False)
     closed = models.BooleanField(blank=True, default=False)
+    subscribers = models.ManyToManyField(User, related_name='subscriptions')
 
     class Meta:
         ordering = ['-created']
@@ -172,7 +174,12 @@ class Post(models.Model):
         if self.id is None and self.topic is not None:
             self.topic.updated = datetime.now()
             self.topic.save()
+
+        new = self.id is None
         super(Post, self).save(*args, **kwargs)
+
+        if new:
+            notify_subscribers(self)
 
     def get_absolute_url(self):
         return reverse('post', args=[self.id])

@@ -75,10 +75,15 @@ def show_topic(request, topic_id):
     form = AddPostForm(topic=topic, initial=initial)
     moderator = request.user.is_superuser or\
         user in topic.forum.moderators.all()
+    if request.user.is_authenticated() and request.user in topic.subscribers.all():
+        subscribed = True
+    else:
+        subscribed = False
     return {'topic': topic,
             'last_post': last_post,
             'form': form,
             'moderator': moderator,
+            'subscribed': subscribed,
             'paged_qs': posts,
             }
 
@@ -246,3 +251,17 @@ def users(request):
     return {'paged_qs': users,
             'form': form,
             }
+
+
+@login_required
+def delete_subscription(request, topic_id):
+    topic = get_object_or_404(Topic, pk=topic_id)
+    topic.subscribers.remove(request.user)
+    return HttpResponseRedirect(reverse('edit_profile'))
+
+
+@login_required
+def add_subscription(request, topic_id):
+    topic = get_object_or_404(Topic, pk=topic_id)
+    topic.subscribers.add(request.user)
+    return HttpResponseRedirect(reverse('topic', args=[topic.id]))
