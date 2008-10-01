@@ -21,9 +21,9 @@ The main point in development of pybb is to build it so it could be
 How to install PYBB?
 ====================
 
-* copy pybb directory to you project directory
-* copy static/pybb to you media directory
-* copy templates/pybb to your templates directory
+* copy or symlink pybb directory to you project directory
+* copy or symlink pybb/static/pybb to you media/pybb" directory
+* write {% extends 'pybb/base.html' %} to templates of other modules which you want to use the forum design
 * add include('pybb.urls')) to the urlpatterns
 * add pybb to the INSTALLED_APPS
 * make syncdb
