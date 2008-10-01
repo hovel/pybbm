@@ -5,4 +5,5 @@
 ^django/
 ^spawn\.sh$
 ^update\.sh$
-^static/pybb/avatars/
+^pybb/static/pybb/avatars
+^static/pybb/avatars
