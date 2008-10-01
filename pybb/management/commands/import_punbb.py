@@ -186,8 +186,8 @@ class Command(BaseCommand):
                 moved_count += 1
                 continue
 
-            username = row['poster']
-            testuser = users.values()[0]
+            username = decode(row['poster'])
+            #testuser = users.values()[0]
             for id, testuser in users.iteritems():
                 if testuser.username == username:
                     user = testuser
@@ -223,6 +223,10 @@ class Command(BaseCommand):
             created = datetime.fromtimestamp(row['posted'])
             updated = row['edited'] and datetime.fromtimestamp(row['edited']) or None
 
+            if not row['poster_id'] in users:
+                print 'post #%d, poster_id #%d does not exist' % (row['id'], row['poster_id'])
+                continue
+
             post = Post(topic=topics[row['topic_id']],
                         created=created,
                         updated=updated,
@@ -231,17 +235,22 @@ class Command(BaseCommand):
                         user_ip=row['poster_ip'],
                         body=decode(row['message']))
             
-            # postmarkups feels bad on some posts :-/
-            try:
-                post.save()
-            except Exception, ex:
-                print post.id, ex
-                print decode(row['message'])
-                print
-            else:
-                imported += 1
-                topics[row['topic_id']]._pybb_posts += 1
-                #posts[row['id']] = topic
+            post.save()
+            imported += 1
+            topics[row['topic_id']]._pybb_posts += 1
+
+            # Not actual hack
+            ## postmarkups feels bad on some posts :-/
+            #try:
+                #post.save()
+            #except Exception, ex:
+                #print post.id, ex
+                #print decode(row['message'])
+                #print
+            #else:
+                #imported += 1
+                #topics[row['topic_id']]._pybb_posts += 1
+                ##posts[row['id']] = topic
 
         print 'Total: %d' % (count + 1)
         print 'Imported: %d' % imported
@@ -271,7 +280,7 @@ class Command(BaseCommand):
         print 'Importing config'
         for row in conn.execute(sql.select([config_table])):
             if row['conf_name'] == 'o_announcement_message':
-                value = row['conf_value']
+                value = decode(row['conf_value'])
                 if value:
                     open('pybb_announcement.txt', 'w').write(value.encode('utf-8'))
                     print 'Not empty announcement found and saved to pybb_announcement.txt'
