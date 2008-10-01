@@ -187,6 +187,17 @@ p {
     font-size: 0.8em;
 }
 
+.footer .left {
+    float: left;
+    width: 50%;
+}
+
+.footer .right {
+    float: right;
+    width: 50%;
+    text-align: right;
+}
+
 .crumbs a {
     font-size: 0.9em;
     color: black;
