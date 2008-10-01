@@ -27,6 +27,7 @@ How to install PYBB?
 * add include('pybb.urls')) to the urlpatterns
 * add pybb to the INSTALLED_APPS
 * add pybb settings to main settings file (take pybb settings from the settings file of the example project from the repo)
+* create media/pybb/avatars directory
 * make syncdb
 
 How to glue PYBB with account application?
