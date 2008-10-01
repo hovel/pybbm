@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     # User
     url('^user/(?P<username>.*)/$', views.user, name='pybb_profile'),
     url('^profile/edit/$', views.edit_profile, name='edit_profile'),
+    url('^users/$', views.users, name='pybb_users'),
 
     # Topic
     url('^topic/(?P<topic_id>\d+)/$', views.show_topic, name='topic'),

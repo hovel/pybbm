@@ -353,7 +353,7 @@ pre {
 
 .updated {
     padding-left: 0.5em;
-    font-size: 0.9em;
+    font-size: 0.8em;
     color: #666;
 }
 
@@ -499,4 +499,23 @@ em {
     padding: 0.8em;
     margin-bottom: 1em;
     font-size: 1em;
+}
+
+.users .user {
+    list-style-type: none;
+    list-style-position: inside;
+    margin-bottom: 0.5em;
+}
+
+.users .user .author {
+    font-size: 1.2em;
+}
+
+.filter_form {
+    display: inline;
+    padding-left: 1em;
+}
+
+.filter_form input {
+    display: inline;
 }

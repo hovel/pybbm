@@ -71,3 +71,14 @@ class EditPostForm(forms.ModelForm):
         post.updated = datetime.now()
         post.save()
         return post
+
+
+class UserSearchForm(forms.Form):
+    query = forms.CharField(required=False, label='')
+
+    def filter(self, qs):
+        if self.is_valid():
+            query = self.cleaned_data['query']
+            return qs.filter(username__contains=query)
+        else:
+            return qs

@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 from pybb.util import render_to, paged, build_form
 from pybb.models import Category, Forum, Topic, Post
-from pybb.forms import AddPostForm, EditProfileForm, EditPostForm
+from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm
 
 @render_to('pybb/index.html')
 def index(request):
@@ -235,3 +235,14 @@ def open_topic(request, topic_id):
             topic.closed = False
             topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
+
+
+@render_to('pybb/users.html')
+@paged('users', settings.PYBB_USERS_PAGE_SIZE)
+def users(request):
+    users = User.objects.order_by('username')
+    form = UserSearchForm(request.GET)
+    users = form.filter(users)
+    return {'paged_qs': users,
+            'form': form,
+            }
