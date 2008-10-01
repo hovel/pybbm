@@ -26,6 +26,7 @@ How to install PYBB?
 * write {% extends 'pybb/base.html' %} to templates of other modules which you want to use the forum design
 * add include('pybb.urls')) to the urlpatterns
 * add pybb to the INSTALLED_APPS
+* add pybb settings to main settings file (take pybb settings from the settings file of the example project from the repo)
 * make syncdb
 
 How to glue PYBB with account application?
