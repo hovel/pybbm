@@ -6,6 +6,9 @@
 {% if profile.avatar %}
 <img src="{{ profile.avatar.url }}" />
 {% endif %}
+<p>
+    <a href="{% url auth_password_change %}">Смена пароля</a>
+</p>
 <form method="post" enctype="multipart/form-data">
     <fieldset>
         <legend>Profile editing</lenged>
