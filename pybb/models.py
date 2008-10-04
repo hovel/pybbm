@@ -1,10 +1,12 @@
 from datetime import datetime
+from BeautifulSoup import BeautifulSoup
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, strip_tags
 from django.conf import settings
+from django.template.defaultfilters import urlize
 #from django.contrib.markup.templatetags.markup import markdown
 from markdown import Markdown
 
@@ -165,13 +167,16 @@ class Post(models.Model):
         if self.created is None:
             self.created = datetime.now()
         if self.markup == 'bbcode':
-            self.body_html = mypostmarkup.markup(self.body)
+            self.body_html = mypostmarkup.markup(self.body, auto_urls=False)
         elif self.markup == 'markdown':
-            self.body_html = unicode(Markdown(self.body, safe_mode=True))
+            self.body_html = unicode(Markdown(self.body, safe_mode='escape'))
             #self.body_html = markdown(self.body, 'safe')
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
         self.body_text = strip_tags(self.body_html)
+
+        self.body_html = self.urlize(self.body_html)
+
         if self.id is None and self.topic is not None:
             self.topic.updated = datetime.now()
             self.topic.save()
@@ -181,6 +186,32 @@ class Post(models.Model):
 
         if new:
             notify_subscribers(self)
+
+
+    def urlize(self, data):
+        """
+        Urlize plain text links in the HTML contents.
+       
+        Do not urlize content of A and CODE tags.
+        """
+
+        soup = BeautifulSoup(data)
+        for chunk in soup.findAll(text=True):
+            print 'CHUNK:', chunk
+            islink = False
+            ptr = chunk.parent
+            while ptr.parent:
+                if ptr.name == 'a' or ptr.name == 'code':
+                    print 'ISLINK!'
+                    islink = True
+                    break
+                ptr = ptr.parent
+
+            if not islink:
+                chunk = chunk.replaceWith(urlize(unicode(chunk)))
+
+        return unicode(soup)
+
 
     def get_absolute_url(self):
         return reverse('post', args=[self.id])
