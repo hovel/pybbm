@@ -1,10 +1,11 @@
 from django.conf.urls.defaults import *
 
 from pybb import views
-from pybb.feeds import LastPosts
+from pybb.feeds import LastPosts, LastTopics
 
 feeds = {
     'posts': LastPosts,
+    'topics': LastTopics,
 }
 
 urlpatterns = patterns('',
