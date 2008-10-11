@@ -67,6 +67,7 @@ class Forum(models.Model):
     description = models.TextField(blank=True, default='')
     moderators = models.ManyToManyField(User, blank=True, default=True)
     updated = models.DateTimeField(null=True)
+    post_count = models.IntegerField(blank=True, default=0)
 
     class Meta:
         ordering = ['position']
@@ -101,6 +102,7 @@ class Topic(models.Model):
     sticky = models.BooleanField(blank=True, default=False)
     closed = models.BooleanField(blank=True, default=False)
     subscribers = models.ManyToManyField(User, related_name='subscriptions')
+    post_count = models.IntegerField(blank=True, default=0)
 
     class Meta:
         ordering = ['-created']
@@ -108,9 +110,6 @@ class Topic(models.Model):
     def __unicode__(self):
         return self.name
     
-    def post_count(self):
-        return self.posts.all().count()
-
     @property
     def head(self):
         return self.posts.all().order_by('created').select_related()[0]
@@ -175,16 +174,18 @@ class Post(models.Model):
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
         self.body_text = strip_tags(self.body_html)
-
         self.body_html = self.urlize(self.body_html)
 
-        if self.id is None and self.topic is not None:
+        new = self.id is None
+
+        if new:
             self.topic.updated = datetime.now()
-            self.topic.forum.updated = self.topic.updated
+            self.topic.post_count += 1
             self.topic.save()
+            self.topic.forum.updated = self.topic.updated
+            self.topic.forum.post_count += 1
             self.topic.forum.save()
 
-        new = self.id is None
         super(Post, self).save(*args, **kwargs)
 
         if new:

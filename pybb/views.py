@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 
 from pybb.util import render_to, paged, build_form
-from pybb.models import Category, Forum, Topic, Post
+from pybb.models import Category, Forum, Topic, Post, Profile
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm
 
 @render_to('pybb/index.html')
@@ -81,6 +81,12 @@ def show_topic(request, topic_id):
         topic.update_read(request.user)
 
     posts = topic.posts.all().select_related()
+
+    profiles = Profile.objects.filter(user__pk__in=set(x.user.id for x in posts))
+    profiles = dict((x.id, x) for x in profiles)
+    
+    for post in posts:
+        post.user.pybb_profile = profiles[post.user.id]
 
     initial = {}
     if request.user.is_authenticated():

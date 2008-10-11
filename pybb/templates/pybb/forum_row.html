@@ -1,8 +1,8 @@
 {% load pybb_extras %}
 
-{% if forum|has_unreads:user %}<span class="unread"></span>{% endif %}
+{#{% if forum|has_unreads:user %}<span class="unread"></span>{% endif %}#}
 <span class="title">{% link forum %}</span>
-<span class="post_count">{{ forum.posts.count }}</span>
+<span class="post_count">{{ forum.post_count }}</span>
 {% if forum.updated %}
 <span class="updated">{{ forum.updated|pybb_time }}</span>
 {% endif %}

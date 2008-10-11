@@ -102,7 +102,7 @@ def link(object, anchor=u''):
 @register.filter
 def has_unreads(obj, user):
     """
-    Check if obj (forum|topic) has messages unreaded by the user
+    Check if obj topic has messages which user didn't read.
     """
 
     now = datetime.now()
@@ -116,13 +116,14 @@ def has_unreads(obj, user):
                 return False
             else:
                 return obj.has_unreads(user)
-        elif isinstance(obj, Forum):
-            cnt1 = obj.topics.filter(updated__gt=(now - delta)).count()
-            cnt2 = Read.objects.filter(user=user, topic__forum=obj,\
-                time__gt=(now - delta)).count()
-            return not (cnt1 == cnt2)
+        # Disabled because of big number of DB queries
+        #elif isinstance(obj, Forum):
+            #cnt1 = obj.topics.filter(updated__gt=(now - delta)).count()
+            #cnt2 = Read.objects.filter(user=user, topic__forum=obj,\
+                #time__gt=(now - delta)).count()
+            #return not (cnt1 == cnt2)
         else:
-            raise Exception('object should be an topic or forum')
+            raise Exception('Object should be a topic')
 
 
 @register.filter

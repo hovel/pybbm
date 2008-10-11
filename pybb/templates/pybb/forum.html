@@ -17,7 +17,7 @@
                 {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
                 Important:
                 <span class="title">{% link topic %}</span>
-                <span class="post_count">{{ topic.posts.count }}</span>
+                <span class="post_count">{{ topic.post_count }}</span>
                 <span class="updated">{{ topic.updated|pybb_time }}</span>
                 </li>
                 {% endfor %}
@@ -27,7 +27,7 @@
                 {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
                 {% if topic.closed %}Closed{% endif %}
                 <span class="title">{% link topic %}</span>
-                <span class="post_count">{{ topic.posts.count }}</span>
+                <span class="post_count">{{ topic.post_count }}</span>
                 <span class="updated">{{ topic.updated|pybb_time }}</span>
                 </li>
                 {% endfor %}
