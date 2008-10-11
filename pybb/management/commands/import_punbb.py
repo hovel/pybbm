@@ -152,12 +152,19 @@ class Command(BaseCommand):
 
         count = 0
         for count, row in enumerate(conn.execute(sql.select([forums_table]))):
+            if row['last_post']:
+                updated = datetime.fromtimestamp(row['last_post'])
+            else:
+                updated = None
+
             forum = Forum(name=decode(row['forum_name']),
                           position=row['disp_position'],
                           description=decode(row['forum_desc'] or ''),
                           category=cats[row['cat_id']])
             forum.save()
             forums[row['id']] = forum
+
+            forum._pybb_updated = updated
 
             if row['moderators']:
                 for username in phpserialize.loads(row['moderators']).iterkeys():
@@ -273,7 +280,13 @@ class Command(BaseCommand):
             topic.updated = topic._pybb_updated
             topic.created = topic._pybb_created
             topic.save()
+        print
 
+
+        print 'Restoring forums updated and created values'
+        for forum in forums.itervalues():
+            forum.updated = forum._pybb_updated
+            forum.save()
         print
 
 

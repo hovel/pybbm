@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.db import connection
 
 from pybb.util import render_to, paged, build_form
 from pybb.models import Category, Forum, Topic, Post
@@ -13,13 +14,25 @@ from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchFor
 
 @render_to('pybb/index.html')
 def index(request):
-    cats = Category.objects.all().select_related()
     quick = {'posts': Post.objects.count(),
              'topics': Topic.objects.count(),
              'users': User.objects.count(),
              'last_topics': Topic.objects.all().select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
              'last_posts': Post.objects.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
+
+    cats = {}
+    forums = {}
+
+    for forum in Forum.objects.all().select_related():
+        cat = cats.setdefault(forum.category.id,
+            {'cat': forum.category, 'forums': []})
+        cat['forums'].append(forum)
+        forums[forum.id] = forum
+
+    cmpdef = lambda a, b: cmp(a['cat'].position, b['cat'].position)
+    cats = sorted(cats.values(), cmpdef)
+
     return {'cats': cats,
             'quick': quick,
             }

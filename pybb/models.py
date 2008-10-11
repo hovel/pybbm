@@ -66,6 +66,7 @@ class Forum(models.Model):
     position = models.IntegerField(blank=True, default=0)
     description = models.TextField(blank=True, default='')
     moderators = models.ManyToManyField(User, blank=True, default=True)
+    updated = models.DateTimeField(null=True)
 
     class Meta:
         ordering = ['position']
@@ -179,7 +180,9 @@ class Post(models.Model):
 
         if self.id is None and self.topic is not None:
             self.topic.updated = datetime.now()
+            self.topic.forum.updated = self.topic.updated
             self.topic.save()
+            self.topic.forum.save()
 
         new = self.id is None
         super(Post, self).save(*args, **kwargs)
@@ -197,12 +200,10 @@ class Post(models.Model):
 
         soup = BeautifulSoup(data)
         for chunk in soup.findAll(text=True):
-            print 'CHUNK:', chunk
             islink = False
             ptr = chunk.parent
             while ptr.parent:
                 if ptr.name == 'a' or ptr.name == 'code':
-                    print 'ISLINK!'
                     islink = True
                     break
                 ptr = ptr.parent
