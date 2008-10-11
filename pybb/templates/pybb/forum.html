@@ -12,7 +12,7 @@
                 <h3 class="header">{{ forum }}</h3>
                 <ul class="tablist-inner topic">
 
-                {% for topic in sticky_topics %}
+                {% for topic in sticky_topics|pybb_unreads:user %}
                 <li class="tablist-inner-row topic sticky">
                 {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
                 Important:
@@ -22,7 +22,7 @@
                 </li>
                 {% endfor %}
 
-                {% for topic in topics %}
+                {% for topic in topics|pybb_unreads:user %}
                 <li class="tablist-inner-row topic">
                 {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
                 {% if topic.closed %}Closed{% endif %}

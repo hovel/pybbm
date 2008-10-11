@@ -61,7 +61,9 @@ def show_forum(request, forum_id):
              'last_topics': forum.topics.all().select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
              'last_posts': forum.posts.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
              }
+
     return {'forum': forum,
+            'topics': topics,
             'sticky_topics': forum.topics.filter(sticky=True),
             'quick': quick,
             'paged_qs': topics,
@@ -83,7 +85,7 @@ def show_topic(request, topic_id):
     posts = topic.posts.all().select_related()
 
     profiles = Profile.objects.filter(user__pk__in=set(x.user.id for x in posts))
-    profiles = dict((x.id, x) for x in profiles)
+    profiles = dict((x.user_id, x) for x in profiles)
     
     for post in posts:
         post.user.pybb_profile = profiles[post.user.id]

@@ -18,7 +18,7 @@
         <div class="clear"></div>
     </h3>
     <ul class="tablist-inner tab-body last-topics">
-        {% for topic in quick.last_topics %}
+        {% for topic in quick.last_topics|pybb_unreads:user %}
         <li class="tablist-inner-row forum">
         {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
         {% link topic %}
@@ -30,7 +30,7 @@
         {% endfor %}
     </ul>
     <ul class="tablist-inner tab-body last-posts" style="display: none">
-        {% for post in quick.last_posts %}
+        {% for post in quick.last_posts|pybb_unreads:user %}
         <li class="tablist-inner-row forum">
         {% if post.topic|has_unreads:user %}<span class="unread"></span>{% endif %}
         {% link post.topic %}

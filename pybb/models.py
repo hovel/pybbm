@@ -132,13 +132,13 @@ class Topic(models.Model):
             read.time = datetime.now()
             read.save()
 
-    def has_unreads(self, user):
-        try:
-            read = Read.objects.get(user=user, topic=self)
-        except Read.DoesNotExist:
-            return True
-        else:
-            return bool(self.posts.filter(created__gt=read.time).count())
+    #def has_unreads(self, user):
+        #try:
+            #read = Read.objects.get(user=user, topic=self)
+        #except Read.DoesNotExist:
+            #return True
+        #else:
+            #return self.updated > read.time
 
 
 class Post(models.Model):
@@ -261,6 +261,9 @@ class Read(models.Model):
 
     class Meta:
         unique_together = ['user', 'topic']
+
+    def __unicode__(self):
+        return u'T[%d], U[%d]: %s' % (self.topic.id, self.user.id, unicode(self.time))
 
 
 #class Setting(model.Model):

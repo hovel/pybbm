@@ -9,6 +9,7 @@ from django.db import settings
 from django.utils.html import escape
 
 from pybb.models import Forum, Topic, Read
+from pybb.unread import cache_unreads
 
 register = template.Library()
 
@@ -100,9 +101,9 @@ def link(object, anchor=u''):
 
 
 @register.filter
-def has_unreads(obj, user):
+def has_unreads(topic, user):
     """
-    Check if obj topic has messages which user didn't read.
+    Check if topic has messages which user didn't read.
     """
 
     now = datetime.now()
@@ -111,17 +112,22 @@ def has_unreads(obj, user):
     if not user.is_authenticated():
         return False
     else:
-        if isinstance(obj, Topic):
-            if (now - delta > obj.updated):
+        if isinstance(topic, Topic):
+            if (now - delta > topic.updated):
                 return False
             else:
-                return obj.has_unreads(user)
-        # Disabled because of big number of DB queries
-        #elif isinstance(obj, Forum):
-            #cnt1 = obj.topics.filter(updated__gt=(now - delta)).count()
-            #cnt2 = Read.objects.filter(user=user, topic__forum=obj,\
-                #time__gt=(now - delta)).count()
-            #return not (cnt1 == cnt2)
+                if hasattr(topic, '_read'):
+                    read = topic._read
+                else:
+                    try:
+                        read = Read.objects.get(user=user, topic=topic)
+                    except Read.DoesNotExist:
+                        read = None
+
+                if read is None:
+                    return True
+                else:
+                    return topic.updated > read.time
         else:
             raise Exception('Object should be a topic')
 
@@ -171,3 +177,8 @@ def pybb_equal_to(obj1, obj2):
     """
 
     return obj1 == obj2
+
+
+@register.filter
+def pybb_unreads(qs, user):
+    return cache_unreads(qs, user)
