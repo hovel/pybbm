@@ -20,4 +20,4 @@ def cache_unreads(qs, user):
             post.topic._read = read_map.get(post.topic.id, None)
         return qs
     else:
-        raise Exception('cache_unreads could process only Post or Topic queryset')
+        raise Exception('cache_unreads could process only Post or Topic querysets')

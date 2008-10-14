@@ -30,6 +30,14 @@ How to install PYBB?
 * create media/pybb/avatars directory
 * make syncdb
 
+
+i18n support
+============
+PYBB support only english and russian translations now.
+You should enable django.middleware.locale.LocaleMiddleware to activate
+django locale autodetecting.
+
+
 How to glue PYBB with account application?
 ==========================================
 * For registration, login, logout links PYBB uses reverse and url template tag
@@ -40,3 +48,4 @@ How to glue PYBB with account application?
   you have two ways:
   * edit PYBB sources and write correct urls
   * add required url names to account application urlpatterns
+??? * Don't forget to write valid LOGIN_URL to the settings

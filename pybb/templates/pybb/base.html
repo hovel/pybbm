@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
@@ -8,8 +9,8 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         
     <link href="{{ MEDIA_URL }}pybb/css/style.css" type="text/css" rel="stylesheet">
-    <link rel="alternate" type="application/atom+xml" href="{% url pybb_feed "posts" %}" title="Last posts on forum" />
-    <link rel="alternate" type="application/atom+xml" href="{% url pybb_feed "topics" %}" title="Last topics on forum" />
+    <link rel="alternate" type="application/atom+xml" href="{% url pybb_feed "posts" %}" title="{% trans "Latest posts on forum" %}" />
+    <link rel="alternate" type="application/atom+xml" href="{% url pybb_feed "topics" %}" title="{% trans "Latest topics on forum" %}" />
     <!--<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />-->
     <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/jquery.js"></script>
     <!--<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/rounded_corners.inc.js"></script>-->
@@ -54,7 +55,7 @@
     <div class="footer_box">
         <div class="footer main-box">
             <div class="inner">
-                <div class="left copyright">&copy; <a href="http://pybb.org" title="PYBB - django forum engine">pybb.org</a>
+                <div class="left copyright">&copy; <a href="http://pybb.org" title="{% trans "PYBB - django forum engine" %}">pybb.org</a>
                 {% load orm_debug %}
                 {% orm_debug %}
             </div>    
@@ -66,8 +67,8 @@
                 ";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
                 screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
                 ";"+Math.random()+
-                "' alt='' title='LiveInternet: показано число посетителей за"+
-                " сегодня' "+
+                "' alt='' title='LiveInternet: number of visitors"+
+                " today' "+
                 "border=0 width=88 height=15><\/a>")//--></script><!--/LiveInternet-->
             </div>
             <div class="clear"></div>

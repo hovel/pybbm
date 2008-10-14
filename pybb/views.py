@@ -278,7 +278,10 @@ def users(request):
 def delete_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.remove(request.user)
-    return HttpResponseRedirect(reverse('edit_profile'))
+    if 'from_topic' in request.GET:
+        return HttpResponseRedirect(reverse('topic', args=[topic.id]))
+    else:
+        return HttpResponseRedirect(reverse('edit_profile'))
 
 
 @login_required

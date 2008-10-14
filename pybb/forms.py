@@ -3,11 +3,12 @@ from datetime import datetime
 
 from django import forms
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from pybb.models import Topic, Post, Profile
 
 class AddPostForm(forms.ModelForm):
-    name = forms.CharField()
+    name = forms.CharField(label=_('Subject'))
 
     class Meta:
         model = Post

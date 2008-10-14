@@ -1,4 +1,5 @@
 {% load pybb_extras %}
+{% load i18n %}
 
 <div class="head_box">
     <div class="head main-box">
@@ -7,15 +8,15 @@
         </div>
         <h2 class="description">{{ "PYBB_TAGLINE"|pybb_setting|safe }}</h2>
         <ul class="navigation">
-            <li><a href="#" onclick="$('.search_box').toggle(); return false;"/>Search</a></li>
-            <li><a href="{% url pybb_users %}">Users</a></li>
+            <li><a href="#" onclick="$('.search_box').toggle(); return false;"/>{% trans "Search" %}</a></li>
+            <li><a href="{% url pybb_users %}">{% trans "Users" %}</a></li>
             {% if user.is_authenticated %}
-            <li><a href="{% url edit_profile %}">Profile</a></li>
-            <li><a href="{% url auth_logout %}">Logout</a></li>
-            <li>You have logged in as {{ user|profile_link }}</li>
+            <li><a href="{% url edit_profile %}">{% trans "My profile" %}</a></li>
+            <li><a href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
+            <li>{% trans "Logged in as " %} {{ user|profile_link }}</li>
             {% else %}
-            <li><a href="{% url registration_register %}">Registration</a></li>
-            <li><a href="{% url auth_login %}">Login</a></li>
+            <li><a href="{% url registration_register %}">{% trans "Sign up" %}</a></li>
+            <li><a href="{% url auth_login %}">{% trans "Log in" %}</a></li>
             {% endif %}
             <li><a href="{% url pybb_feed "posts" %}" /><img src="{{ MEDIA_URL }}/pybb/img/feed-icon-small.png" /></a></li>
         </ul>
@@ -37,8 +38,8 @@
         </script>
         <form method="get" onsubmit="return pybb_search(this)">
             <input type="text" class="query" />
-            <input type="submit" value="Search" />
-            <span class="comment">Search powered by Google</span>
+            <input type="submit" value="{% trans "Search" %}" />
+            <span class="comment">{% trans "Search powered by Google" %}</span>
         </form>
     </div>
 </div>

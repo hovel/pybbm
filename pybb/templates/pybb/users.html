@@ -1,11 +1,12 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_extras %}
+{% load i18n %}
 
 {% block content %}
-<h1>Forum users
+<h1>{% trans "Users" %}
     <form method="get" class="filter_form">
         {{ form.query }}
-        <input type="submit" value="Search" />
+        <input type="submit" value="{% trans "Search" %}" />
     </form>
 </h1>
 <ul class="users">

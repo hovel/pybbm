@@ -1,4 +1,5 @@
 {% load pybb_extras %}
+{% load i18n %}
 
 <script type="text/javascript">
     function openTab(selector, mod) {
@@ -12,9 +13,9 @@
 <ul class="tablist quick-access">
     <li class="tablist-row last">
     <h3 class="header tab-selectors">
-        <div class="tab-selector first active" onclick="openTab(this, 'last-topics')">Last topics</div>
-        <div class="tab-selector" onclick="openTab(this, 'last-posts')">Last posts</div>
-        <div class="tab-selector" onclick="openTab(this, 'stats')">Statistics</div>
+        <div class="tab-selector first active" onclick="openTab(this, 'last-topics')">{% trans "Last topics" %}</div>
+        <div class="tab-selector" onclick="openTab(this, 'last-posts')">{% trans "Last posts" %}</div>
+        <div class="tab-selector" onclick="openTab(this, 'stats')">{% trans "Statistics" %}</div>
         <div class="clear"></div>
     </h3>
     <ul class="tablist-inner tab-body last-topics">
@@ -43,13 +44,13 @@
     </ul>
     <ul class="tablist-inner tab-body stats" style="display: none">
         {% if quick.topics %}
-        <li class="tablist-inner-row">Topics: {{ quick.topics }}</li>
+        <li class="tablist-inner-row">{% trans "Topics" %}: {{ quick.topics }}</li>
         {% endif %}
         {% if quick.posts %}
-        <li class="tablist-inner-row">Posts: {{ quick.posts }}</li>
+        <li class="tablist-inner-row">{% trans "Posts" %}: {{ quick.posts }}</li>
         {% endif %}
         {% if quick.users %}
-        <li class="tablist-inner-row">Users: {{ quick.users }}</li>
+        <li class="tablist-inner-row">{% trans "Users" %}: {{ quick.users }}</li>
         {% endif %}
         </table>
     </ul>

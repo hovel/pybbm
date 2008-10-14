@@ -1,29 +1,28 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_extras %}
+{% load i18n %}
 
 {% block content %}
-<h1>Profile editing</h1>
+<h1>{% trans "Profile editing" %}</h1>
 {% if profile.avatar %}
 <img src="{{ profile.avatar.url }}" />
 {% endif %}
-<p>
-    <a href="{% url auth_password_change %}">Смена пароля</a>
-</p>
+<p><a href="{% url auth_password_change %}">{% trans "Change the password" %}</a></p>
 <form method="post" enctype="multipart/form-data">
     <fieldset>
-        <legend>Profile editing</lenged>
+        <legend>{% trans "Profile editing" %}</lenged>
         {{ form.as_p }}
-        <p><input type="submit" /></p>
+        <p><input type="submit" value="{% trans "Save" %}" /></p>
     </fieldset>
 </form>
-<h1>Topic subscriptions</h1>
+<h1>{% trans "Subscriptions on topics" %}</h1>
 <ul>
 {% for sub in user.subscriptions.all %}
 <li>
 {% link sub %}
 &mdash;
 <strong>
-    <a href="{% url pybb_delete_subscription sub.id %}">delete</a>
+    <a href="{% url pybb_delete_subscription sub.id %}">{% trans "delete" %}</a>
 </strong>
 </li>
 {% endfor %}

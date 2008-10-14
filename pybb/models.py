@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape, strip_tags
 from django.conf import settings
 from django.template.defaultfilters import urlize
+from django.utils.translation import ugettext_lazy as _
 #from django.contrib.markup.templatetags.markup import markdown
 from markdown import Markdown
 
@@ -16,6 +17,7 @@ from pybb.subscription import notify_subscribers
 
 LANGUAGE_CHOICES = (
     ('en', 'English'),
+    ('ru', _('Russian')),
 )
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
@@ -36,11 +38,13 @@ MARKUP_CHOICES = (
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=80)
-    position = models.IntegerField(blank=True, default=0)
+    name = models.CharField(_('Name'), max_length=80)
+    position = models.IntegerField(_('Position'), blank=True, default=0)
 
     class Meta:
         ordering = ['position']
+        verbose_name = _('Category')
+        verbose_name_plural = _('Categories')
 
     def __unicode__(self):
         return self.name
@@ -61,16 +65,18 @@ class Category(models.Model):
 
 
 class Forum(models.Model):
-    category = models.ForeignKey(Category, related_name='forums')
-    name = models.CharField(max_length=80)
-    position = models.IntegerField(blank=True, default=0)
-    description = models.TextField(blank=True, default='')
-    moderators = models.ManyToManyField(User, blank=True, default=True)
-    updated = models.DateTimeField(null=True)
-    post_count = models.IntegerField(blank=True, default=0)
+    category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
+    name = models.CharField(_('Name'), max_length=80)
+    position = models.IntegerField(_('Position'), blank=True, default=0)
+    description = models.TextField(_('Description'), blank=True, default='')
+    moderators = models.ManyToManyField(User, blank=True, default=True, verbose_name=_('Moderators'))
+    updated = models.DateTimeField(_('Updated'), null=True)
+    post_count = models.IntegerField(_('Post count'), blank=True, default=0)
 
     class Meta:
         ordering = ['position']
+        verbose_name = _('Forum')
+        verbose_name_plural = _('Forums')
 
     def __unicode__(self):
         return self.name
@@ -93,19 +99,21 @@ class Forum(models.Model):
 
 
 class Topic(models.Model):
-    forum = models.ForeignKey(Forum, related_name='topics')
-    name = models.CharField(max_length=255)
-    created = models.DateTimeField(null=True)
-    updated = models.DateTimeField(null=True)
-    user = models.ForeignKey(User)
-    views = models.IntegerField(blank=True, default=0)
-    sticky = models.BooleanField(blank=True, default=False)
-    closed = models.BooleanField(blank=True, default=False)
-    subscribers = models.ManyToManyField(User, related_name='subscriptions')
-    post_count = models.IntegerField(blank=True, default=0)
+    forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
+    name = models.CharField(_('Subject'), max_length=255)
+    created = models.DateTimeField(_('Created'), null=True)
+    updated = models.DateTimeField(_('Updated'), null=True)
+    user = models.ForeignKey(User, verbose_name=_('User'))
+    views = models.IntegerField(_('Views count'), blank=True, default=0)
+    sticky = models.BooleanField(_('Sticky'), blank=True, default=False)
+    closed = models.BooleanField(_('Closed'), blank=True, default=False)
+    subscribers = models.ManyToManyField(User, related_name='subscriptions', verbose_name=_('Subscribers'))
+    post_count = models.IntegerField(_('Post count'), blank=True, default=0)
 
     class Meta:
         ordering = ['-created']
+        verbose_name = _('Topic')
+        verbose_name_plural = _('Topics')
 
     def __unicode__(self):
         return self.name
@@ -142,19 +150,21 @@ class Topic(models.Model):
 
 
 class Post(models.Model):
-    topic = models.ForeignKey(Topic, related_name='posts')
-    user = models.ForeignKey(User, related_name='posts')
-    created = models.DateTimeField(blank=True)
-    updated = models.DateTimeField(blank=True, null=True)
-    markup = models.CharField(max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
-    body = models.TextField()
-    body_html = models.TextField()
-    body_text = models.TextField()
-    user_ip = models.IPAddressField(blank=True, default='')
+    topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
+    user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
+    created = models.DateTimeField(_('Created'), blank=True)
+    updated = models.DateTimeField(_('Updated'), blank=True, null=True)
+    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    body = models.TextField(_('Message'))
+    body_html = models.TextField(_('HTML version'))
+    body_text = models.TextField(_('Text version'))
+    user_ip = models.IPAddressField(_('User IP'), blank=True, default='')
 
 
     class Meta:
         ordering = ['created']
+        verbose_name = _('Post')
+        verbose_name_plural = _('Posts')
 
     def summary(self):
         LIMIT = 50
@@ -227,20 +237,24 @@ class Post(models.Model):
 
 
 class Profile(models.Model):
-    user = AutoOneToOneField(User, related_name='pybb_profile')
-    site = models.URLField(verify_exists=False, blank=True, default='')
-    jabber = models.CharField(max_length=80, blank=True, default='')
-    icq = models.CharField(max_length=12, blank=True, default='')
-    msn = models.CharField(max_length=80, blank=True, default='')
-    aim = models.CharField(max_length=80, blank=True, default='')
-    yahoo = models.CharField(max_length=80, blank=True, default='')
-    location = models.CharField(max_length=30, blank=True, default='')
-    signature = models.TextField(blank=True, default='', max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
-    time_zone = models.FloatField(choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
-    language = models.CharField(max_length=3, blank=True, default='en', choices=LANGUAGE_CHOICES)
-    avatar = ExtendedImageField(blank=True, default='', upload_to=settings.PYBB_AVATARS_UPLOAD_TO, width=settings.PYBB_AVATAR_WIDTH, height=settings.PYBB_AVATAR_HEIGHT)
-    show_signatures = models.BooleanField(blank=True, default=True)
-    markup = models.CharField(max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
+    site = models.URLField(_('Site'), verify_exists=False, blank=True, default='')
+    jabber = models.CharField(_('Jabber'), max_length=80, blank=True, default='')
+    icq = models.CharField(_('ICQ'), max_length=12, blank=True, default='')
+    msn = models.CharField(_('MSN'), max_length=80, blank=True, default='')
+    aim = models.CharField(_('AIM'), max_length=80, blank=True, default='')
+    yahoo = models.CharField(_('Yahoo'), max_length=80, blank=True, default='')
+    location = models.CharField(_('Location'), max_length=30, blank=True, default='')
+    signature = models.TextField(_('Signature'), blank=True, default='', max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
+    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
+    language = models.CharField(_('Language'), max_length=3, blank=True, default='en', choices=LANGUAGE_CHOICES)
+    avatar = ExtendedImageField(_('Avatar'), blank=True, default='', upload_to=settings.PYBB_AVATARS_UPLOAD_TO, width=settings.PYBB_AVATAR_WIDTH, height=settings.PYBB_AVATAR_HEIGHT)
+    show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
+    markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+
+    class Meta:
+        verbose_name = _('Profile')
+        verbose_name_plural = _('Profiles')
 
 
 class Read(models.Model):
@@ -249,31 +263,20 @@ class Read(models.Model):
     is logged to this model.
     """
 
-    user = models.ForeignKey(User)
-    topic = models.ForeignKey(Topic)
-    #forum = models.ForeignKey(Forum)
-    time = models.DateTimeField(blank=True)
+    user = models.ForeignKey(User, verbose_name=_('User'))
+    topic = models.ForeignKey(Topic, verbose_name=_('Topic'))
+    time = models.DateTimeField(_('Time'), blank=True)
+
+    class Meta:
+        unique_together = ['user', 'topic']
+        verbose_name = _('Read')
+        verbose_name_plural = _('Reads')
 
     def save(self, *args, **kwargs):
         if self.time is None:
             self.time = datetime.now()
         super(Read, self).save(*args, **kwargs)
 
-    class Meta:
-        unique_together = ['user', 'topic']
 
     def __unicode__(self):
         return u'T[%d], U[%d]: %s' % (self.topic.id, self.user.id, unicode(self.time))
-
-
-#class Setting(model.Model):
-    #topic_page_size = models.IntegerField(blank=True, default=20)
-    #forum_page_size = models.IntegerField(blank=True, default=20)
-    #default_time_zone = models.FloatField(blank=True, default=3.0, choices=TZ_CHOICES)
-    #signature_max_length = models.integer_field(blank=true, default=1024)
-    #signature_max_lines = models.integer_field(blank=true, default=3)
-    #quick_topics_number = models.integer_field(blank=true, default=10)
-    #quick_posts_number = models.integer_field(blank=true, default=10)
-    #read_timeout = models.integer_field(blank=true, default=3600 * 24 * 7)
-    #header = models.CharField(blank=True, default='pybb')
-    #tagline = models.CharField(blank=True, default='Django based forum engine')

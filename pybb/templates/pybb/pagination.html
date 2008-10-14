@@ -1,18 +1,9 @@
+{% load i18n %}
 <div class="pagination">
-    {% comment %}
-    <div class="view">
-        <ul>
-            <li class="name">Показывать:</li>
-            <li class="first">{% ifnotequal 10 per_page %}<a href="{{ get_params }}per_page=10">{% endifnotequal %}по 10{% ifnotequal 10 per_page %}</a>{% endifnotequal %}</li>
-            <li>{% ifnotequal 50 per_page %}<a href="{{ get_params }}per_page=50">{% endifnotequal %}по 50{% ifnotequal 50 per_page %}</a>{% endifnotequal %}</li>
-            <li>{% ifnotequal per_page_all per_page %}<a href="{{ get_params }}per_page={{ per_page_all }}">{% endifnotequal %}Все{% ifnotequal per_page_all per_page %}</a>{% endifnotequal %}</li>
-        </ul>
-    </div>
-    {% endcomment %}
     <div class="pages">
         {% ifnotequal pages 1 %}
         <ul>
-            <li class="name">Pages:</li>
+            <li class="name">{% trans "Pages" %}:</li>
             {% if lower_page %} 
             <li><a href="{{ get_params }}page={{ lower_page }}{#&per_page={{ per_page }}#}">&laquo;</a></li>
             {% endif %}

@@ -1,6 +1,7 @@
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 
 def notify_subscribers(post):
     from pybb.models import Post
@@ -19,20 +20,20 @@ def notify_subscribers(post):
                 msg.send(fail_silently=True)
 
 
-TEXT_TEMPLATE = u"""New reply from %s to topic that you have subscribed on.
+TEXT_TEMPLATE = _(u"""New reply from %(username)s to topic that you have subscribed on.
 ---
-%s
+%(message)s
 ---
-See topic: %s
-Unsubscribe %s"""
+See topic: %(post_url)s
+Unsubscribe %(unsubscribe_url)s""")
 
 def text_version(post):
-    data = TEXT_TEMPLATE % (
-        post.user.username,
-        post.body_text,
-        absolute_url(post.get_absolute_url()),
-        absolute_url(reverse('pybb_delete_subscription', args=[post.topic.id])),
-    )
+    data = TEXT_TEMPLATE % {
+        'username': post.user.username,
+        'message': post.body_text,
+        'post_url': absolute_url(post.get_absolute_url()),
+        'unsubscribe_url': absolute_url(reverse('pybb_delete_subscription', args=[post.topic.id])),
+    }
     return data
 
 def absolute_url(uri):

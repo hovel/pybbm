@@ -1,8 +1,9 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_extras %}
+{% load i18n %}
 
 {% block content %}
-<h1>Информация о пользователе {{ profile.username }}</h1>
+<h1>{{ profile.username }}</h1>
 <div class="userinfo">
     {% if profile.pybb_profile.avatar %}
     <div class="avatar">
@@ -10,16 +11,16 @@
     </div>
     {% endif %}
     <div class="info">
-        <div class="label">Statistics</div>
-        <div>Number of posts: {{ profile.posts.all.count }}</div>
-        <div>Number of topics: {{ topic_count }}</div>
-        <div>Date of registration: {{ profile.date_joined|pybb_time }}</div>
-        <div class="label">Contacts</div>
+        <div class="label">{% trans "Statistics" %}</div>
+        <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}</div>
+        <div>{% trans "Number of topics" %}: {{ topic_count }}</div>
+        <div>{% trans "Date of registration" %}: {{ profile.date_joined|pybb_time }}</div>
+        <div class="label">{% trans "Contacts" %}</div>
         {% if profile.pybb_profile.location %}
-        <div>Location: {{ profile.pybb_profile.location }}</div>
+        <div>{% trans "Location" %}: {{ profile.pybb_profile.location }}</div>
         {% endif %}
         {% if profile.pybb_profile.site %}
-        <div>Site: {{ profile.pybb_profile.site|urlize }}</div>
+        <div>{% trans "Site" %}: {{ profile.pybb_profile.site|urlize }}</div>
         {% endif %}
         {% if profile.pybb_profile.icq %}
         <div>ICQ: {{ profile.pybb_profile.icq }}</div>

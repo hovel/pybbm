@@ -1,6 +1,7 @@
 from django.contrib.syndication.feeds import Feed
 from django.utils.feedgenerator import Atom1Feed
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from pybb.models import Post, Topic
 
@@ -14,8 +15,8 @@ class PybbFeed(Feed):
         return str(obj.id)
 
 class LastPosts(PybbFeed):
-    title = 'Latest posts on forum'
-    description = 'Latest posts on forum'
+    title = _('Latest posts on forum')
+    description = _('Latest posts on forum')
     title_template = 'pybb/feeds/posts_title.html'
     description_template = 'pybb/feeds/posts_description.html'
 
@@ -24,8 +25,8 @@ class LastPosts(PybbFeed):
 
 
 class LastTopics(PybbFeed):
-    title = 'Latest topics on forum'
-    description = 'Latest topics on forum'
+    title = _('Latest topics on forum')
+    description = _('Latest topics on forum')
     title_template = 'pybb/feeds/topics_title.html'
     description_template = 'pybb/feeds/topics_description.html'
 

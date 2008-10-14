@@ -1,22 +1,23 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_extras %}
+{% load i18n %}
 
 {% block content %}
 <div class="crumbs">
 {% if forum %}
-    <a href="{% url index %}">Index</a> / {% link forum.category %} / {% link forum %}
+    <a href="{% url index %}">{% trans "Root" %}</a> / {% link forum.category %} / {% link forum %}
 {% else %}
-    <a href="{% url index %}">Index</a> / {% link topic.forum.category %} / {% link topic.forum %} / {% link topic %}
+    <a href="{% url index %}">{% trans "Root" %}</a> / {% link topic.forum.category %} / {% link topic.forum %} / {% link topic %}
 {% endif %}
 </div>
 
-<h1>{% if forum %}New topic{% else %}New reply{% endif %}</h1>
+<h1>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</h1>
 
 <form action="{% if forum %}{% url add_topic forum.id %}{% else %}{% url add_post topic.id %}{% endif %}" method="post">
     <fieldset>
-        <legend>new reply</lenend>
+        <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</lenend>
             {{ form.as_p }}
-            <p><input type="submit" /></p>
+            <p><input type="submit" value="{% trans "Submit" %}" /></p>
         </legend>
     </fieldset>
 </form>

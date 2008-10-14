@@ -1,9 +1,10 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_extras %}
+{% load i18n %}
 
 {% block content %}
 <div class="crumbs">
-    <a href="{% url index %}">Начало</a> / {% link category %}
+    <a href="{% url index %}">{% trans "Root" %}</a> / {% link category %}
 </div>
 <div class="splitted">
     <div class="left">
