@@ -94,8 +94,9 @@ def show_topic(request, topic_id):
     if request.user.is_authenticated():
         initial = {'markup': request.user.pybb_profile.markup}
     form = AddPostForm(topic=topic, initial=initial)
+
     moderator = request.user.is_superuser or\
-        user in topic.forum.moderators.all()
+        request.user in topic.forum.moderators.all()
     if request.user.is_authenticated() and request.user in topic.subscribers.all():
         subscribed = True
     else:
