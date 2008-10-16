@@ -55,7 +55,7 @@ def show_category(request, category_id):
 @paged('topics', settings.PYBB_FORUM_PAGE_SIZE)
 def show_forum(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
-    topics = forum.topics.all().select_related()
+    topics = forum.topics.filter(sticky=False).select_related()
     quick = {'posts': forum.posts.count(),
              'topics': forum.topics.count(),
              'last_topics': forum.topics.all().select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
