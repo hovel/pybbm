@@ -207,8 +207,17 @@ p {
     margin-bottom: 0.7em;
 }
 
+.crumbs strong a {
+    font-size: 1.2em;
+    color: #666;
+}
+
 .post {
     color: black;
+    margin-bottom: 1em;
+    list-style-type: none;
+    margin-left: 0;
+    border: 1px solid #ccc;
 }
 
 .post-inner {
@@ -240,11 +249,21 @@ p {
 .post .content {
     padding: 1em;
     padding-left: 1.5em;
-    background-color: #efefef;
     color: black;
     font-size: Verdana, sans-serif;
     font-size: 0.9em;
+    background-color: #efefef;
 }
+
+.post-odd .content {
+    /*background-color: #D7F4DB;*/
+}
+
+.post-even .content {
+    /*background-color: #E6EBF6;*/
+}
+
+
 
 .post .content br {
     margin-bottom: 0.2em;
@@ -254,10 +273,6 @@ p {
     padding: 0;
 }
 
-.post {
-    border: 1px solid #ccc;
-    margin-bottom: 1em;
-}
 
 .postlist-row {
     border: none;
