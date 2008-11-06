@@ -14,6 +14,9 @@ class PybbFeed(Feed):
     def item_guid(self, obj):
         return str(obj.id)
 
+    def item_pubdate(self, obj):
+        return obj.created
+
 class LastPosts(PybbFeed):
     title = _('Latest posts on forum')
     description = _('Latest posts on forum')
