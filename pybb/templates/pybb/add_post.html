@@ -15,10 +15,9 @@
 
 <form action="{% if forum %}{% url add_topic forum.id %}{% else %}{% url add_post topic.id %}{% endif %}" method="post">
     <fieldset>
-        <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</lenend>
-            {{ form.as_p }}
-            <p><input type="submit" value="{% trans "Submit" %}" /></p>
-        </legend>
+        <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</legend>
+        {{ form.as_p }}
+        <p><input type="submit" value="{% trans "Submit" %}" /></p>
     </fieldset>
 </form>
 

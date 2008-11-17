@@ -90,10 +90,9 @@
 {% if not topic.closed %}
 <form action="{% url add_post topic.id %}" method="post">
     <fieldset>
-        <legend>{% trans "New reply" %}</lenend>
-            {{ form.as_p }}
-            <p><input type="submit" value="{% trans "Submit" %}" /></p>
-        </legend>
+        <legend>{% trans "New reply" %}</legend>
+        {{ form.as_p }}
+        <p><input type="submit" value="{% trans "Submit" %}" /></p>
     </fieldset>
 </form>
 {% endif %}
