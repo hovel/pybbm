@@ -71,7 +71,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'account.middleware.OneTimeCodeAuthMiddleware',
+    'account.middleware.AuthKeyMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -106,12 +106,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 # django-account settings
-ACCOUNT_ACTIVATION = False
+ACCOUNT_ACTIVATION = True
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_CAPTCHA = False
 ACCOUNT_USERNAME_MIN_LENGTH = 3
 ACCOUNT_PASSWORD_MIN_LENGTH = 2
-DOMAIN = 'edit.your.settings.please.com'
+#ACCOUNT_DEBUG_MAIL_DIR = '/tmp/account'
+ACCOUNT_DOMAIN = 'edit.your.settings.please.com'
 LOGIN_URL = '/login/'
 
 # Pybb settings
