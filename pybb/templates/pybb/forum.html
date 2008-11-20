@@ -19,7 +19,7 @@
                 {% trans "Important" %}:
                 <span class="title">{% link topic %}</span>
                 <span class="post_count">{{ topic.post_count }}</span>
-                <span class="updated">{{ topic.updated|pybb_time }}</span>
+                <span class="updated">{% pybb_time topic.updated %}</span>
                 </li>
                 {% endfor %}
 
@@ -29,7 +29,7 @@
                 {% if topic.closed %}{% trans "Closed" %}{% endif %}
                 <span class="title">{% link topic %}</span>
                 <span class="post_count">{{ topic.post_count }}</span>
-                <span class="updated">{{ topic.updated|pybb_time }}</span>
+                <span class="updated">{% pybb_time topic.updated %}</span>
                 </li>
                 {% endfor %}
 

@@ -14,7 +14,7 @@
         <div class="label">{% trans "Statistics" %}</div>
         <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}</div>
         <div>{% trans "Number of topics" %}: {{ topic_count }}</div>
-        <div>{% trans "Date of registration" %}: {{ profile.date_joined|pybb_time }}</div>
+        <div>{% trans "Date of registration" %}: {% pybb_time profile.date_joined %}</div>
         <div class="label">{% trans "Contacts" %}</div>
         {% if profile.pybb_profile.location %}
         <div>{% trans "Location" %}: {{ profile.pybb_profile.location }}</div>

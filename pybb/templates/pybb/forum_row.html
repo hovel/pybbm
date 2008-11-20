@@ -4,6 +4,6 @@
 <span class="title">{% link forum %}</span>
 <span class="post_count">{{ forum.post_count }}</span>
 {% if forum.updated %}
-<span class="updated">{{ forum.updated|pybb_time }}</span>
+<span class="updated">{% pybb_time forum.updated %}</span>
 {% endif %}
 <div class="description">{{ forum.description|safe }}</div>

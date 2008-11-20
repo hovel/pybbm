@@ -7,6 +7,8 @@ from django.template import RequestContext
 from django.utils.encoding import smart_unicode
 from django.db import settings
 from django.utils.html import escape
+from django.utils.translation import ugettext as _
+from django.utils import dateformat
 
 from pybb.models import Forum, Topic, Read
 from pybb.unread import cache_unreads
@@ -23,24 +25,52 @@ def profile_link(user):
     return mark_safe(data)
 
 
-@register.filter
-def pybb_time(time):
-    delta = datetime.now() - time
-    today = datetime.now().replace(hour=0, minute=0, second=0)
-    yesterday = today - timedelta(days=1)
-
-    if delta.days == 0:
-        if delta.seconds < 60:
-            return '%s seconds ago' % delta.seconds
-        elif delta.seconds < 3600:
-            minutes = int(delta.seconds / 60)
-            return '%d minutes ago' % minutes
-    if time > today:
-        return 'today, %s' % time.strftime('%H:%M')
-    elif time > yesterday:
-        return 'yesterday, %s' % time.strftime('%H:%M')
+@register.tag
+def pybb_time(parser, token):
+    try:
+        tag, time = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError('pybb_time requires single argument')
     else:
-        return time.strftime('%d %b, %Y %H:%M')
+        return PybbTimeNode(time)
+
+
+class PybbTimeNode(template.Node):
+    def __init__(self, time):
+        self.time = template.Variable(time)
+
+    def render(self, context):
+        time = self.time.resolve(context)
+
+        delta = datetime.now() - time
+        today = datetime.now().replace(hour=0, minute=0, second=0)
+        yesterday = today - timedelta(days=1)
+
+        if delta.days == 0:
+            if delta.seconds < 60:
+                if context['LANGUAGE_CODE'].startswith('ru'):
+                    msg = _('seconds ago,seconds ago,seconds ago')
+                    import pytils
+                    msg = pytils.numeral.choose_plural(delta.seconds, msg)
+                else:
+                    msg = _('seconds ago')
+                return u'%d %s' % (delta.seconds, msg)
+
+            elif delta.seconds < 3600:
+                minutes = int(delta.seconds / 60)
+                if context['LANGUAGE_CODE'].startswith('ru'):
+                    msg = _('minutes ago,minutes ago,minutes ago')
+                    import pytils
+                    msg = pytils.numeral.choose_plural(minutes, msg)
+                else:
+                    msg = _('minutes ago')
+                return u'%d %s' % (minutes, msg)
+        if time > today:
+            return _('today, %s') % time.strftime('%H:%M')
+        elif time > yesterday:
+            return _('yesterday, %s') % time.strftime('%H:%M')
+        else:
+            return dateformat.format(time, 'd M, Y H:i')
 
 
 # TODO: this old code requires refactoring
