@@ -12,8 +12,7 @@ from pybb.util import render_to, paged, build_form
 from pybb.models import Category, Forum, Topic, Post, Profile
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm
 
-@render_to('pybb/index.html')
-def index(request):
+def index_ctx(request):
     quick = {'posts': Post.objects.count(),
              'topics': Topic.objects.count(),
              'users': User.objects.count(),
@@ -36,10 +35,10 @@ def index(request):
     return {'cats': cats,
             'quick': quick,
             }
+index = render_to('pybb/index.html')(index_ctx)
 
 
-@render_to('pybb/category.html')
-def show_category(request, category_id):
+def show_category_ctx(request, category_id):
     category = Category.objects.get(pk=category_id)
     quick = {'posts': category.posts.count(),
              'topics': category.topics.count(),
@@ -49,11 +48,11 @@ def show_category(request, category_id):
     return {'category': category,
             'quick': quick,
             }
+show_category = render_to('pybb/category.html')(show_category_ctx)
 
 
-@render_to('pybb/forum.html')
 @paged('topics', settings.PYBB_FORUM_PAGE_SIZE)
-def show_forum(request, forum_id):
+def show_forum_ctx(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
     topics = forum.topics.filter(sticky=False).select_related()
     quick = {'posts': forum.posts.count(),
@@ -68,11 +67,11 @@ def show_forum(request, forum_id):
             'quick': quick,
             'paged_qs': topics,
             }
+show_forum = render_to('pybb/forum.html')(show_forum_ctx)
 
     
-@render_to('pybb/topic.html')
 @paged('posts', settings.PYBB_TOPIC_PAGE_SIZE)
-def show_topic(request, topic_id):
+def show_topic_ctx(request, topic_id):
     topic = Topic.objects.select_related().get(pk=topic_id)
     topic.views += 1
     topic.save()
@@ -108,11 +107,11 @@ def show_topic(request, topic_id):
             'subscribed': subscribed,
             'paged_qs': posts,
             }
+show_topic = render_to('pybb/topic.html')(show_topic_ctx)
 
 
 @login_required
-@render_to('pybb/add_post.html')
-def add_post(request, forum_id, topic_id):
+def add_post_ctx(request, forum_id, topic_id):
     forum = None
     topic = None
 
@@ -137,15 +136,16 @@ def add_post(request, forum_id, topic_id):
             'topic': topic,
             'forum': forum,
             }
+add_post = render_to('pybb/add_post.html')(add_post_ctx)
 
 
-@render_to('pybb/user.html')
-def user(request, username):
+def user_ctx(request, username):
     user = get_object_or_404(User, username=username)
     topic_count = Topic.objects.filter(user=user).count()
     return {'profile': user,
             'topic_count': topic_count,
             }
+user = render_to('pybb/user.html')(user_ctx)
 
 
 def show_post(request, post_id):
@@ -157,8 +157,7 @@ def show_post(request, post_id):
 
 
 @login_required
-@render_to('pybb/edit_profile.html')
-def edit_profile(request):
+def edit_profile_ctx(request):
     form = build_form(EditProfileForm, request, instance=request.user.pybb_profile)
     if form.is_valid():
         form.save()
@@ -166,11 +165,11 @@ def edit_profile(request):
     return {'form': form,
             'profile': request.user.pybb_profile,
             }
+edit_profile = render_to('pybb/edit_profile.html')(edit_profile_ctx)
 
     
 @login_required
-@render_to('pybb/edit_post.html')
-def edit_post(request, post_id):
+def edit_post_ctx(request, post_id):
     from pybb.templatetags.pybb_extras import pybb_editable_by
 
     post = get_object_or_404(Post, pk=post_id)
@@ -186,6 +185,7 @@ def edit_post(request, post_id):
     return {'form': form,
             'post': post,
             }
+edit_post = render_to('pybb/edit_post.html')(edit_post_ctx)
 
 
 @login_required
@@ -213,8 +213,7 @@ def unstick_topic(request, topic_id):
 
 
 @login_required
-@render_to('pybb/delete_post.html')
-def delete_post(request, post_id):
+def delete_post_ctx(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     last_post = post.topic.posts.order_by('-created')[0]
     topic = post.topic
@@ -238,6 +237,7 @@ def delete_post(request, post_id):
         return HttpResponseRedirect(forum.get_absolute_url())
     else:
         return HttpResponseRedirect(topic.get_absolute_url())
+delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
 
 
 @login_required
@@ -265,14 +265,14 @@ def open_topic(request, topic_id):
 
 
 @render_to('pybb/users.html')
-@paged('users', settings.PYBB_USERS_PAGE_SIZE)
-def users(request):
+def users_ctx(request):
     users = User.objects.order_by('username')
     form = UserSearchForm(request.GET)
     users = form.filter(users)
     return {'paged_qs': users,
             'form': form,
             }
+users = paged('users', settings.PYBB_USERS_PAGE_SIZE)(users_ctx)
 
 
 @login_required
