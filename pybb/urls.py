@@ -40,4 +40,9 @@ urlpatterns = patterns('',
     # Subscription
     url('^subscription/topic/(?P<topic_id>\d+)/delete/$', views.delete_subscription, name='pybb_delete_subscription'),
     url('^subscription/topic/(?P<topic_id>\d+)/add/$', views.add_subscription, name='pybb_add_subscription'),
+
+    # Private messages
+    url('^pm/new/$', views.create_pm, name='pybb_create_pm'),
+    url('^pm/outbox/$', views.pm_outbox, name='pybb_pm_outbox'),
+    url('^pm/inbox/$', views.pm_inbox, name='pybb_pm_inbox'),
 )

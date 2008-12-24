@@ -1,0 +1,19 @@
+{% extends 'pybb/base.html' %}
+{% load common_extras %}
+{% load i18n %}
+{% load pybb_extras %}
+
+{% block content %}
+<h1>{% trans "Outbox" %}</h1>
+<ul>
+    {% for msg in messages %}
+    <li>
+        <a href="#">{{ msg.subject }}</a> {% trans "to" %}
+        <span class="author">
+            <a href="{% pybb_profile msg.dst_user.username }">{{ msg.dst_user }}</a>
+        </span>
+        <span class="date">@ {% pybb_time msg.created %}</span>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

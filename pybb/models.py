@@ -1,12 +1,10 @@
 from datetime import datetime
-from BeautifulSoup import BeautifulSoup
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, strip_tags
 from django.conf import settings
-from django.template.defaultfilters import urlize
 from django.utils.translation import ugettext_lazy as _
 #from django.contrib.markup.templatetags.markup import markdown
 from markdown import Markdown
@@ -14,6 +12,7 @@ from markdown import Markdown
 from pybb.markups import mypostmarkup 
 from pybb.fields import AutoOneToOneField, ExtendedImageField
 from pybb.subscription import notify_subscribers
+from pybb.util import urlize
 
 LANGUAGE_CHOICES = (
     ('en', 'English'),
@@ -149,7 +148,26 @@ class Topic(models.Model):
             #return self.updated > read.time
 
 
-class Post(models.Model):
+class RenderableItem(models.Model):
+    """
+    Base class for models that has markup, body, body_text and body_html fields.
+    """
+
+    class Meta:
+        abstract = True
+
+    def render(self):
+        if self.markup == 'bbcode':
+            self.body_html = mypostmarkup.markup(self.body, auto_urls=False)
+        elif self.markup == 'markdown':
+            self.body_html = unicode(Markdown(self.body, safe_mode='escape'))
+        else:
+            raise Exception('Invalid markup property: %s' % self.markup)
+        self.body_text = strip_tags(self.body_html)
+        self.body_html = urlize(self.body_html)
+
+
+class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True)
@@ -176,15 +194,7 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if self.created is None:
             self.created = datetime.now()
-        if self.markup == 'bbcode':
-            self.body_html = mypostmarkup.markup(self.body, auto_urls=False)
-        elif self.markup == 'markdown':
-            self.body_html = unicode(Markdown(self.body, safe_mode='escape'))
-            #self.body_html = markdown(self.body, 'safe')
-        else:
-            raise Exception('Invalid markup property: %s' % self.markup)
-        self.body_text = strip_tags(self.body_html)
-        self.body_html = self.urlize(self.body_html)
+        self.render()
 
         new = self.id is None
 
@@ -202,27 +212,6 @@ class Post(models.Model):
             notify_subscribers(self)
 
 
-    def urlize(self, data):
-        """
-        Urlize plain text links in the HTML contents.
-       
-        Do not urlize content of A and CODE tags.
-        """
-
-        soup = BeautifulSoup(data)
-        for chunk in soup.findAll(text=True):
-            islink = False
-            ptr = chunk.parent
-            while ptr.parent:
-                if ptr.name == 'a' or ptr.name == 'code':
-                    islink = True
-                    break
-                ptr = ptr.parent
-
-            if not islink:
-                chunk = chunk.replaceWith(urlize(unicode(chunk)))
-
-        return unicode(soup)
 
 
     def get_absolute_url(self):
@@ -280,3 +269,44 @@ class Read(models.Model):
 
     def __unicode__(self):
         return u'T[%d], U[%d]: %s' % (self.topic.id, self.user.id, unicode(self.time))
+
+
+class PrivateMessage(RenderableItem):
+
+    dst_user = models.ForeignKey(User, verbose_name=_('Recipient'), related_name='dst_users')
+    src_user = models.ForeignKey(User, verbose_name=_('Author'), related_name='src_users')
+    read = models.BooleanField(_('Read'), blank=True, default=False)
+    created = models.DateTimeField(_('Created'), blank=True)
+    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    subject = models.CharField(_('Subject'), max_length=255)
+    body = models.TextField(_('Message'))
+    body_html = models.TextField(_('HTML version'))
+    body_text = models.TextField(_('Text version'))
+
+    class Meta:
+        ordering = ['-created']
+        verbose_name = _('Private message')
+        verbose_name_plural = _('Private messages')
+
+    # TODO: summary and part of the save methid is the same as in the Post model
+    # move to common functions
+    def summary(self):
+        LIMIT = 50
+        tail = len(self.body) > LIMIT and '...' or '' 
+        return self.body[:LIMIT] + tail
+
+    def __unicode__(self):
+        return self.subject
+
+    def save(self, *args, **kwargs):
+        if self.created is None:
+            self.created = datetime.now()
+        self.render()
+
+        new = self.id is None
+        super(PrivateMessage, self).save(*args, **kwargs)
+        # TODO: make email notifications
+        #if new:
+            #notify_subscribers(self)
+
+

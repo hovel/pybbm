@@ -545,3 +545,11 @@ em {
 .filter_form input {
     display: inline;
 }
+
+.pm-link {
+    margin-top: 0.5em;
+}
+
+.pm-link a {
+    color: #666;
+}

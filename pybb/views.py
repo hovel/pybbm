@@ -9,8 +9,8 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 
 from pybb.util import render_to, paged, build_form
-from pybb.models import Category, Forum, Topic, Post, Profile
-from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm
+from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage
+from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 
 def index_ctx(request):
     quick = {'posts': Post.objects.count(),
@@ -265,6 +265,7 @@ def open_topic(request, topic_id):
 
 
 @render_to('pybb/users.html')
+@paged('users', settings.PYBB_USERS_PAGE_SIZE)
 def users_ctx(request):
     users = User.objects.order_by('username')
     form = UserSearchForm(request.GET)
@@ -290,3 +291,35 @@ def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(reverse('topic', args=[topic.id]))
+
+
+@login_required
+def create_pm_ctx(request):
+    recipient = request.GET.get('recipient', '')
+    form = build_form(CreatePMForm, request, user=request.user,
+                      initial={'markup': request.user.pybb_profile.markup,
+                               'recipient': recipient})
+
+    if form.is_valid():
+        post = form.save();
+        return HttpResponseRedirect(reverse('pybb_pm_outbox'))
+
+    return {'form': form,
+            }
+create_pm = render_to('pybb/pm/create_pm.html')(create_pm_ctx)
+
+
+@login_required
+def pm_outbox_ctx(request):
+    messages = PrivateMessage.objects.filter(src_user=request.user)
+    return {'messages': messages,
+            }
+pm_outbox = render_to('pybb/pm/outbox.html')(pm_outbox_ctx)
+
+
+@login_required
+def pm_inbox_ctx(request):
+    messages = PrivateMessage.objects.filter(src_user=request.user)
+    return {'messages': messages,
+            }
+pm_inbox = render_to('pybb/pm/inbox.html')(pm_inbox_ctx)

@@ -39,5 +39,10 @@
         {% endif %}
     </div>
     <div class="clear"></div>
+    {% if user.is_authenticated %}
+    <div class="pm-link">
+        <a href="{% url pybb_create_pm %}?recipient={{ profile.username }}">{% trans "Send PM" %}</a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

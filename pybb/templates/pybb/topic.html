@@ -29,6 +29,11 @@
                             <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
                             <span class="updated">{% pybb_time post.created %}</span>
                         </div>
+                        {% if user.is_authenticated %}
+                        <div class="pm-link">
+                            <a href="{% url pybb_create_pm %}?recipient={{ post.user.username }}">{% trans "Send PM" %}</a>
+                        </div>
+                        {% endif %}
                         <div class="post-controls">
                             {% if moderator or post|pybb_posted_by:user %}
                             <a href="{% url edit_post post.id %}">{% trans "Edit" %}</a>

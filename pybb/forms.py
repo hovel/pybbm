@@ -4,8 +4,9 @@ from datetime import datetime
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 
-from pybb.models import Topic, Post, Profile
+from pybb.models import Topic, Post, Profile, PrivateMessage
 
 class AddPostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
@@ -87,3 +88,30 @@ class UserSearchForm(forms.Form):
             return qs.filter(username__contains=query)
         else:
             return qs
+
+
+class CreatePMForm(forms.ModelForm):
+    recipient = forms.CharField(label=_('Recipient'))
+
+    class Meta:
+        model = PrivateMessage
+        fields = ['subject', 'body', 'markup']
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(CreatePMForm, self).__init__(*args, **kwargs)
+        self.fields.keyOrder = ['recipient', 'subject', 'body', 'markup']
+
+
+    def clean_recipient(self):
+        name = self.cleaned_data['recipient']
+        try:
+            user = User.objects.get(username=name)
+        except User.DoesNotExist:
+            raise forms.ValidationError(_('User with login %s does not exist') % name)
+        else:
+            return user
+    def save(self):
+        pm = PrivateMessage(src_user=self.user, dst_user=self.cleaned_data['recipient'])
+        pm = forms.save_instance(self, pm)
+        return pm
