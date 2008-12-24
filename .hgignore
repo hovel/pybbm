@@ -7,3 +7,4 @@
 ^update\.sh$
 ^pybb/static/pybb/avatars
 ^static/pybb/avatars
+.*\.swp$
