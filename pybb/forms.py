@@ -24,6 +24,10 @@ class AddPostForm(forms.ModelForm):
             self.fields['name'].widget = forms.HiddenInput()
             self.fields['name'].required = False
 
+        self.fields.keyOrder = ['body', 'markup']
+        if not self.topic:
+            self.fields.keyOrder.insert(0, 'name')
+
 
     def save(self):
         if self.forum:
