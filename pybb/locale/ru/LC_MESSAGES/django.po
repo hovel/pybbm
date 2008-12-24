@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybb\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-20 03:20+0300\n"
+"POT-Creation-Date: 2008-12-24 08:45+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -235,19 +235,15 @@ msgstr "Новый ответ"
 msgid "Submit"
 msgstr "Отправить"
 
-#: templates/pybb/base.html:58
-msgid "PYBB - django forum engine"
-msgstr "PYBB - движок форума на django"
-
 #: templates/pybb/edit_post.html:10 templates/pybb/edit_post.html.py:14
 msgid "Editing the post"
 msgstr "Редактирование поста"
 
-#: templates/pybb/edit_post.html:16 templates/pybb/edit_profile.html:15
+#: templates/pybb/edit_post.html:16 templates/pybb/edit_profile.html:16
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/pybb/edit_profile.html:6 templates/pybb/edit_profile.html:13
+#: templates/pybb/edit_profile.html:6 templates/pybb/edit_profile.html:14
 msgid "Profile editing"
 msgstr "Изменение профиля"
 
@@ -255,13 +251,22 @@ msgstr "Изменение профиля"
 msgid "Change the password"
 msgstr "Изменить пароль"
 
-#: templates/pybb/edit_profile.html:18
+#: templates/pybb/edit_profile.html:11
+#, fuzzy
+msgid "Change the email"
+msgstr "Изменить пароль"
+
+#: templates/pybb/edit_profile.html:19
 msgid "Subscriptions on topics"
 msgstr "Уведомления"
 
-#: templates/pybb/edit_profile.html:25
+#: templates/pybb/edit_profile.html:26
 msgid "delete"
 msgstr "удалить"
+
+#: templates/pybb/footer.html:6
+msgid "PYBB - django forum engine"
+msgstr "PYBB - движок форума на django"
 
 #: templates/pybb/forum.html:19
 msgid "Important"
@@ -373,28 +378,28 @@ msgstr "Дата регистрации"
 msgid "Contacts"
 msgstr "Контакты"
 
-#: templatetags/pybb_extras.py:51
+#: templatetags/pybb_extras.py:52
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "секунду назад,секунды назад,секунд назад"
 
-#: templatetags/pybb_extras.py:55
+#: templatetags/pybb_extras.py:56
 msgid "seconds ago"
 msgstr "seconds ago"
 
-#: templatetags/pybb_extras.py:61
+#: templatetags/pybb_extras.py:62
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "минуту назад,минуты назад,минут назад"
 
-#: templatetags/pybb_extras.py:64
+#: templatetags/pybb_extras.py:66
 msgid "minutes ago"
 msgstr "minutes ago"
 
-#: templatetags/pybb_extras.py:67
+#: templatetags/pybb_extras.py:69
 #, python-format
 msgid "today, %s"
 msgstr "сегодня, %s"
 
-#: templatetags/pybb_extras.py:69
+#: templatetags/pybb_extras.py:71
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"
