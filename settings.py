@@ -92,7 +92,6 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'pybb',
     'account',
-    'debug',
 )
 
 FORCE_SCRIPT_NAME = ''

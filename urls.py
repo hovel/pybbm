@@ -11,7 +11,6 @@ urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
     (r'', include('account.urls')),
     (r'^forum/', include('pybb.urls')),
-    (r'', include('debug.urls')),
 )
 
 if (settings.DEBUG):
