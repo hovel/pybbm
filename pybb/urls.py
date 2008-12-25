@@ -45,4 +45,5 @@ urlpatterns = patterns('',
     url('^pm/new/$', views.create_pm, name='pybb_create_pm'),
     url('^pm/outbox/$', views.pm_outbox, name='pybb_pm_outbox'),
     url('^pm/inbox/$', views.pm_inbox, name='pybb_pm_inbox'),
+    url('^pm/show/(?P<pm_id>\d+)/$', views.show_pm, name='pybb_show_pm'),
 )

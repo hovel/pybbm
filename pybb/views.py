@@ -319,7 +319,25 @@ pm_outbox = render_to('pybb/pm/outbox.html')(pm_outbox_ctx)
 
 @login_required
 def pm_inbox_ctx(request):
-    messages = PrivateMessage.objects.filter(src_user=request.user)
+    messages = PrivateMessage.objects.filter(dst_user=request.user)
     return {'messages': messages,
             }
 pm_inbox = render_to('pybb/pm/inbox.html')(pm_inbox_ctx)
+
+
+@login_required
+def show_pm_ctx(request, pm_id):
+    msg = get_object_or_404(PrivateMessage, pk=pm_id)
+    if not request.user in [msg.dst_user, msg.src_user]:
+        return HttpRedirectException('/')
+    if request.user == msg.dst_user:
+        inbox = True
+        post_user = msg.src_user
+    else:
+        inbox = False
+        post_user = msg.dst_user
+    return {'msg': msg,
+            'inbox': inbox,
+            'post_user': post_user,
+            }
+show_pm = render_to('pybb/pm/message.html')(show_pm_ctx)
