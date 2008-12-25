@@ -31,6 +31,16 @@ How to install PYBB?
 * make syncdb
 
 
+Dependencies
+============
+
+* BeautifulSoup
+* PIL
+* python-markdown
+* pytils
+* SQLAlchemy (optional) - required for punbb importer 
+
+
 i18n support
 ============
 PYBB support only english and russian translations now.
