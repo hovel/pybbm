@@ -34,7 +34,7 @@
         {% for post in quick.last_posts|pybb_unreads:user %}
         <li class="tablist-inner-row forum">
         {% if post.topic|has_unreads:user %}<span class="unread"></span>{% endif %}
-        {% link post.topic %}
+        <a href="{{ post.get_absolute_url }}">{{ post.topic }}</a>
         &rarr;
         <span class="author">{{ post.user|profile_link }}</span>
         &rarr;
