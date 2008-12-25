@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="crumbs">
-    <a href="{% url index %}">{% trans "Root" %}</a> / {% link topic.forum.category %} / {% link topic.forum %} / <strong>{% link topic %}</strong>
+    <a href="{% url index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
 </div>
 <ul class="posts">
 {% for post in posts %}
@@ -21,7 +21,7 @@
                             </a>
                         </div>
                         {% endif %}
-                        <div class="author">{{ post.user|profile_link }}</div>
+                        <div class="author">{{ post.user|pybb_profile_link }}</div>
                         {% if user.is_superuser %}
                         <!--<div class="updated">{{ post.user_ip }}</div>-->
                         {% endif %}
@@ -66,7 +66,7 @@
 {% endfor %}
 </ul>
 
-{% pagination %}
+{% pybb_pagination %}
 
 <div class="controls">
     {% if moderator %}

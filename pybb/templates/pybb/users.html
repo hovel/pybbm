@@ -12,10 +12,10 @@
 <ul class="users">
     {% for profile in users %}
     <li class="user">
-    <span class="author">{{ profile|profile_link }}</span>
+    <span class="author">{{ profile|pybb_profile_link }}</span>
     <span class="post_count">{{ profile.posts.count }}</span>
     <span class="updated">{{ profile.date_joined|date:"d M Y" }}</span>
     {% endfor %}
 </u>
-{% pagination %}
+{% pybb_pagination %}
 {% endblock %}

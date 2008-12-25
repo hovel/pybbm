@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="crumbs">
-    <a href="{% url index %}">{% trans "Root" %}</a> / {% link forum.category %} / {% link forum %}
+    <a href="{% url index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
 </div>
 <div class="splitted">
     <div class="left">
@@ -15,9 +15,9 @@
 
                 {% for topic in sticky_topics|pybb_unreads:user %}
                 <li class="tablist-inner-row topic sticky">
-                {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
+                {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
                 {% trans "Important" %}:
-                <span class="title">{% link topic %}</span>
+                <span class="title">{% pybb_link topic %}</span>
                 <span class="post_count">{{ topic.post_count }}</span>
                 <span class="updated">{% pybb_time topic.updated %}</span>
                 </li>
@@ -25,9 +25,9 @@
 
                 {% for topic in topics|pybb_unreads:user %}
                 <li class="tablist-inner-row topic">
-                {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
+                {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
                 {% if topic.closed %}{% trans "Closed" %}{% endif %}
-                <span class="title">{% link topic %}</span>
+                <span class="title">{% pybb_link topic %}</span>
                 <span class="post_count">{{ topic.post_count }}</span>
                 <span class="updated">{% pybb_time topic.updated %}</span>
                 </li>
@@ -36,7 +36,7 @@
                 </ul>
             </li>
         </ul>
-        {% pagination %}
+        {% pybb_pagination %}
         <div class="controls">
             <a href="{% url add_topic forum.id %}">{% trans "New topic" %}</a>
         </div>

@@ -13,7 +13,7 @@
             {% if user.is_authenticated %}
             <li><a href="{% url edit_profile %}">{% trans "My profile" %}</a></li>
             <li><a href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
-            <li>{% trans "Logged in as " %} {{ user|profile_link }}</li>
+            <li>{% trans "Logged in as " %} {{ user|pybb_profile_link }}</li>
             {% else %}
             <li><a href="{% url registration_register %}">{% trans "Sign up" %}</a></li>
             <li><a href="{% url auth_login %}">{% trans "Log in" %}</a></li>

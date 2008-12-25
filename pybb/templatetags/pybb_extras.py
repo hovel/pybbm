@@ -15,11 +15,8 @@ from pybb.unread import cache_unreads
 
 register = template.Library()
 
-# TODO:
-# * rename all tags with pybb_ prefix
-
 @register.filter
-def profile_link(user):
+def pybb_profile_link(user):
     data = u'<a href="%s">%s</a>' % (\
         reverse('pybb_profile', args=[user.username]), user.username)
     return mark_safe(data)
@@ -75,7 +72,7 @@ class PybbTimeNode(template.Node):
 
 # TODO: this old code requires refactoring
 @register.inclusion_tag('pybb/pagination.html',takes_context=True)
-def pagination(context, adjacent_pages=5):
+def pybb_pagination(context, adjacent_pages=5):
     """
     Return the list of A tags with links to pages.
     """
@@ -120,7 +117,7 @@ def pagination(context, adjacent_pages=5):
 
 
 @register.simple_tag
-def link(object, anchor=u''):
+def pybb_link(object, anchor=u''):
     """
     Return A tag with link to object.
     """
@@ -131,7 +128,7 @@ def link(object, anchor=u''):
 
 
 @register.filter
-def has_unreads(topic, user):
+def pybb_has_unreads(topic, user):
     """
     Check if topic has messages which user didn't read.
     """

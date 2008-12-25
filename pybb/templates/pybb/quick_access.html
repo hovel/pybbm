@@ -21,10 +21,10 @@
     <ul class="tablist-inner tab-body last-topics">
         {% for topic in quick.last_topics|pybb_unreads:user %}
         <li class="tablist-inner-row forum">
-        {% if topic|has_unreads:user %}<span class="unread"></span>{% endif %}
-        {% link topic %}
+        {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
+        {% pybb_link topic %}
         &rarr;
-        <span class="author">{{ topic.user|profile_link }}</span>
+        <span class="author">{{ topic.user|pybb_profile_link }}</span>
         &rarr;
         <span class="updated">{% pybb_time topic.created %}</span>
         </li>
@@ -33,10 +33,10 @@
     <ul class="tablist-inner tab-body last-posts" style="display: none">
         {% for post in quick.last_posts|pybb_unreads:user %}
         <li class="tablist-inner-row forum">
-        {% if post.topic|has_unreads:user %}<span class="unread"></span>{% endif %}
+        {% if post.topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
         <a href="{{ post.get_absolute_url }}">{{ post.topic }}</a>
         &rarr;
-        <span class="author">{{ post.user|profile_link }}</span>
+        <span class="author">{{ post.user|pybb_profile_link }}</span>
         &rarr;
         <span class="updated">{% pybb_time post.created %}</span>
         </li>

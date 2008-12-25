@@ -8,7 +8,7 @@
         <ul class="tablist">
         {% for iter in cats %}
             <li class="tablist-row category corners">
-                <h3 class="header">{% link iter.cat %}</h3>
+                <h3 class="header">{% pybb_link iter.cat %}</h3>
                 <ul class="tablist-inner">
                     {% for forum in iter.forums %}
                     <li class="tablist-inner-row forum">

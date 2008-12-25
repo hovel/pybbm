@@ -22,7 +22,7 @@
 <ul>
 {% for sub in user.subscriptions.all %}
 <li>
-{% link sub %}
+{% pybb_link sub %}
 &mdash;
 <strong>
     <a href="{% url pybb_delete_subscription sub.id %}">{% trans "delete" %}</a>
