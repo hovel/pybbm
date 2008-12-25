@@ -93,8 +93,10 @@ class Forum(models.Model):
     @property
     def last_post(self):
         posts = self.posts.order_by('-created').select_related()
-        if posts.count():
+        try:
             return posts[0]
+        except IndexError:
+            return None
 
 
 class Topic(models.Model):
