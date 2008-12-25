@@ -185,12 +185,14 @@ p {
 
 .footer {
     font-size: 0.8em;
+    padding-top: 0.5em;
 }
 
 .footer .left {
     float: left;
-    width: 50%;
+    width: 49%;
 }
+
 
 .footer .right {
     float: right;
@@ -552,4 +554,9 @@ em {
 
 .pm-link a {
     color: #666;
+}
+
+.sape li {
+    display: inline;
+    list-style-type: none;
 }
