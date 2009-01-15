@@ -223,6 +223,12 @@ class Post(RenderableItem):
         self_id = self.id
         head_post_id = self.topic.posts.order_by('created')[0].id
         super(Post, self).delete(*args, **kwargs)
+
+        self.topic.post_count -= 1
+        self.topic.save()
+        self.topic.forum.post_count -= 1
+        self.topic.forum.save()
+
         if self_id == head_post_id:
             self.topic.delete()
 
