@@ -109,12 +109,34 @@ textarea {
     height: 20em;
 }
 
-h1 {
+h1 { 
     font-size: 1.5em;
     margin: 1em 0;
     padding: 0.2em 0.5em;
     background-color: #eee;
 }
+
+td.content h1, td.content h2, td.content h3, td.content h4 { 
+    margin: 0.5em 0;
+    padding: 0.2em 0.5em;
+}
+
+td.content h1 {
+    font-size: 1.7em;
+}
+
+td.content h2 { 
+    font-size: 1.5em;
+}
+
+td.content h3 {
+   font-size: 1.3em;
+}
+
+td.content h4 { 
+   font-size: 1.1em;
+}
+
 
 fieldset {
     border: 1px solid black;
@@ -128,6 +150,18 @@ legend {
 
 p {
     margin-bottom: 1em;
+}
+
+td.content p {
+    text-indent: 1.5em;
+}
+
+td.content ul { 
+   padding: 1em;
+}
+
+td.content ol { 
+   padding: 1em;
 }
 
 .errorlist li {
