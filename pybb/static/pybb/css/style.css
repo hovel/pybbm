@@ -595,3 +595,12 @@ em {
     display: inline;
     list-style-type: none;
 }
+
+.post-related {
+    text-align: right;
+    width: 100%;
+}
+
+.post-related a {
+    color: #666;
+}

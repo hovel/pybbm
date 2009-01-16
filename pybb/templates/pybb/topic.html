@@ -57,6 +57,11 @@
                         {% if post.updated %}
                         <div class="updated-message">{% trans "Edited" %} {% pybb_time post.updated %}</div>
                         {% endif %}
+
+                        <div class="post-related">
+                            <a href="{% url add_post topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
+                        </div>
+
                     </td>
                 </tr>
             </table>

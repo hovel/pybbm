@@ -159,3 +159,16 @@ def urlize(data):
                 chunk = chunk.replaceWith(django_urlize(unicode(chunk)))
 
         return unicode(soup)
+
+
+def quote_text(text, markup):
+    """
+    Quote message using selected markup.
+    """
+
+    if markup == 'markdown':
+        return '>' + '\n>'.join(text.split('\n')) + '\n'
+    elif markup == 'bbcode':
+        return '[quote]%s[/quote]\n' % text
+    else:
+        return text

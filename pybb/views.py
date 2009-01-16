@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import connection
 
-from pybb.util import render_to, paged, build_form
+from pybb.util import render_to, paged, build_form, quote_text
 from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 
@@ -123,10 +123,18 @@ def add_post_ctx(request, forum_id, topic_id):
     if topic and topic.closed:
         return HttpResponseRedirect(topic.get_absolute_url())
 
+    try:
+        quote_id = int(request.GET.get('quote_id'))
+    except TypeError:
+        quote = ''
+    else:
+        post = get_object_or_404(Post, pk=quote_id)
+        quote = quote_text(post.body_text, request.user.pybb_profile.markup)
+
     ip = request.META.get('REMOTE_ADDR', '')
     form = build_form(AddPostForm, request, topic=topic, forum=forum,
                       user=request.user, ip=ip,
-                      initial={'markup': request.user.pybb_profile.markup})
+                      initial={'markup': request.user.pybb_profile.markup, 'body': quote})
 
     if form.is_valid():
         post = form.save();
