@@ -132,6 +132,7 @@ PYBB_TAGLINE = 'Django based forum engine'
 PYBB_DEFAULT_MARKUP = 'bbcode'
 PYBB_NOTICE = ''
 PYBB_HOST = 'localhost:8000'
+PYBB_FREEZE_FIRST_POST = True
 
 
 try:

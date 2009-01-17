@@ -76,12 +76,16 @@ def show_topic_ctx(request, topic_id):
     topic.views += 1
     topic.save()
 
-    last_post = topic.posts.order_by('-created')[0]
 
     if request.user.is_authenticated():
         topic.update_read(request.user)
 
     posts = topic.posts.all().select_related()
+    if settings.PYBB_FREEZE_FIRST_POST:
+        first_post = topic.posts.order_by('created')[0]
+    else:
+        first_post = None
+    last_post = topic.posts.order_by('-created')[0]
 
     profiles = Profile.objects.filter(user__pk__in=set(x.user.id for x in posts))
     profiles = dict((x.user_id, x) for x in profiles)
@@ -100,8 +104,10 @@ def show_topic_ctx(request, topic_id):
         subscribed = True
     else:
         subscribed = False
+
     return {'topic': topic,
             'last_post': last_post,
+            'first_post': first_post,
             'form': form,
             'moderator': moderator,
             'subscribed': subscribed,

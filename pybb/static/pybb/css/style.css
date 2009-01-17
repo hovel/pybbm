@@ -249,12 +249,20 @@ td.content ol {
     color: #666;
 }
 
+.posts li {
+    list-style-type: none;
+    margin-left: 0;
+}
+
 .post {
     color: black;
     margin-bottom: 1em;
-    list-style-type: none;
-    margin-left: 0;
     border: 1px solid #ccc;
+}
+.first_post .post {
+    color: black;
+    margin-bottom: 1em;
+    border: 5px solid #ccc;
 }
 
 .post-inner {
