@@ -1,4 +1,5 @@
-.*\.pyc$
+\.pyc$
+\.swp$
 ^dump\.sql
 ^settings_local\.py$
 ^account
@@ -9,3 +10,4 @@
 ^pybb/static/pybb/avatars
 ^static/pybb/avatars
 .*\.swp$
+^registration$
