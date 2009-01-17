@@ -6,6 +6,9 @@
 <div class="crumbs">
     <a href="{% url index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
 </div>
+
+{% pybb_pagination %}
+
 <ul class="posts">
     {% if first_post %}{% ifnotequal first_post posts.0 %}
         {% with first_post as post %}
