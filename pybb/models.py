@@ -52,7 +52,7 @@ class Category(models.Model):
         return self.forums.all().count()
 
     def get_absolute_url(self):
-        return reverse('category', args=[self.id])
+        return reverse('pybb_category', args=[self.id])
 
     @property
     def topics(self):
@@ -84,7 +84,7 @@ class Forum(models.Model):
         return self.topics.all().count()
 
     def get_absolute_url(self):
-        return reverse('forum', args=[self.id])
+        return reverse('pybb_forum', args=[self.id])
     
     @property
     def posts(self):
@@ -128,7 +128,7 @@ class Topic(models.Model):
         return self.posts.all().order_by('-created').select_related()[0]
 
     def get_absolute_url(self):
-        return reverse('topic', args=[self.id])
+        return reverse('pybb_topic', args=[self.id])
 
     def save(self, *args, **kwargs):
         if self.id is None:
@@ -217,7 +217,7 @@ class Post(RenderableItem):
 
 
     def get_absolute_url(self):
-        return reverse('post', args=[self.id])
+        return reverse('pybb_post', args=[self.id])
 
     def delete(self, *args, **kwargs):
         self_id = self.id

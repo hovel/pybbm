@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="crumbs">
-    <a href="{% url index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
+    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
 </div>
 <div class="splitted">
     <div class="left">
@@ -38,7 +38,7 @@
         </ul>
         {% pybb_pagination %}
         <div class="controls">
-            <a href="{% url add_topic forum.id %}">{% trans "New topic" %}</a>
+            <a href="{% url pybb_add_topic forum.id %}">{% trans "New topic" %}</a>
         </div>
     </div>
     <div class="right">

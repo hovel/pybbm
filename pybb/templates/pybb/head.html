@@ -4,14 +4,14 @@
 <div class="head_box">
     <div class="head main-box">
         <div class="logo">
-            <a href="{% url index %}">{{ "PYBB_HEADER"|pybb_setting }}</a>
+            <a href="{% url pybb_index %}">{{ "PYBB_HEADER"|pybb_setting }}</a>
         </div>
         <h2 class="description">{{ "PYBB_TAGLINE"|pybb_setting|safe }}</h2>
         <ul class="navigation">
             <li><a href="#" onclick="$('.search_box').toggle(); return false;"/>{% trans "Search" %}</a></li>
             <li><a href="{% url pybb_users %}">{% trans "Users" %}</a></li>
             {% if user.is_authenticated %}
-            <li><a href="{% url edit_profile %}">{% trans "My profile" %}</a></li>
+            <li><a href="{% url pybb_edit_profile %}">{% trans "My profile" %}</a></li>
             <li><a href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
             <li>{% trans "Logged in as " %} {{ user|pybb_profile_link }}</li>
             {% else %}

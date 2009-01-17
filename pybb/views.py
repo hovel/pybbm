@@ -166,7 +166,7 @@ def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     count = post.topic.posts.filter(created__lt=post.created).count() + 1
     page = math.ceil(count / float(settings.PYBB_TOPIC_PAGE_SIZE))
-    url = '%s?page=%d#post-%d' % (reverse('topic', args=[post.topic.id]), page, post.id)
+    url = '%s?page=%d#post-%d' % (reverse('pybb_topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
 
 
@@ -175,7 +175,7 @@ def edit_profile_ctx(request):
     form = build_form(EditProfileForm, request, instance=request.user.pybb_profile)
     if form.is_valid():
         form.save()
-        return HttpResponseRedirect(reverse('edit_profile'))
+        return HttpResponseRedirect(reverse('pybb_edit_profile'))
     return {'form': form,
             'profile': request.user.pybb_profile,
             }
@@ -295,16 +295,16 @@ def delete_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.remove(request.user)
     if 'from_topic' in request.GET:
-        return HttpResponseRedirect(reverse('topic', args=[topic.id]))
+        return HttpResponseRedirect(reverse('pybb_topic', args=[topic.id]))
     else:
-        return HttpResponseRedirect(reverse('edit_profile'))
+        return HttpResponseRedirect(reverse('pybb_edit_profile'))
 
 
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
-    return HttpResponseRedirect(reverse('topic', args=[topic.id]))
+    return HttpResponseRedirect(reverse('pybb_topic', args=[topic.id]))
 
 
 @login_required

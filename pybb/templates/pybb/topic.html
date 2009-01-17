@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="crumbs">
-    <a href="{% url index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
+    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
 </div>
 
 {% pybb_pagination %}
@@ -25,15 +25,15 @@
 <div class="controls">
     {% if moderator %}
     {% if topic.sticky %}
-    <a href="{% url unstick_topic topic.id %}">{% trans "Unstick topic" %}</a>
+    <a href="{% url pybb_unstick_topic topic.id %}">{% trans "Unstick topic" %}</a>
     {% else %}
-    <a href="{% url stick_topic topic.id %}">{% trans "Stick topic" %}</a>
+    <a href="{% url pybb_stick_topic topic.id %}">{% trans "Stick topic" %}</a>
     {% endif %}
     /
     {% if topic.closed %}
-    <a href="{% url open_topic topic.id %}">{% trans "Open topic" %}</a>
+    <a href="{% url pybb_open_topic topic.id %}">{% trans "Open topic" %}</a>
     {% else %}
-    <a href="{% url close_topic topic.id %}">{% trans "Close topic" %}</a>
+    <a href="{% url pybb_close_topic topic.id %}">{% trans "Close topic" %}</a>
     {% endif %}
     /
     {% endif %}
@@ -47,7 +47,7 @@
 </div>
 
 {% if not topic.closed %}
-<form action="{% url add_post topic.id %}" method="post">
+<form action="{% url pybb_add_post topic.id %}" method="post">
     <fieldset>
         <legend>{% trans "New reply" %}</legend>
         {{ form.as_p }}
