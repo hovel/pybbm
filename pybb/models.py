@@ -13,6 +13,7 @@ from pybb.markups import mypostmarkup
 from pybb.fields import AutoOneToOneField, ExtendedImageField
 from pybb.subscription import notify_subscribers
 from pybb.util import urlize
+from pybb import settings as pybb_settings
 
 LANGUAGE_CHOICES = (
     ('en', 'English'),
@@ -174,7 +175,7 @@ class Post(RenderableItem):
     user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
-    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    markup = models.CharField(_('Markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     body = models.TextField(_('Message'))
     body_html = models.TextField(_('HTML version'))
     body_text = models.TextField(_('Text version'))
@@ -242,12 +243,12 @@ class Profile(models.Model):
     aim = models.CharField(_('AIM'), max_length=80, blank=True, default='')
     yahoo = models.CharField(_('Yahoo'), max_length=80, blank=True, default='')
     location = models.CharField(_('Location'), max_length=30, blank=True, default='')
-    signature = models.TextField(_('Signature'), blank=True, default='', max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
-    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
+    signature = models.TextField(_('Signature'), blank=True, default='', max_length=pybb_settings.SIGNATURE_MAX_LENGTH)
+    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(pybb_settings.DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=3, blank=True, default='en', choices=LANGUAGE_CHOICES)
-    avatar = ExtendedImageField(_('Avatar'), blank=True, default='', upload_to=settings.PYBB_AVATARS_UPLOAD_TO, width=settings.PYBB_AVATAR_WIDTH, height=settings.PYBB_AVATAR_HEIGHT)
+    avatar = ExtendedImageField(_('Avatar'), blank=True, default='', upload_to=pybb_settings.AVATARS_UPLOAD_TO, width=pybb_settings.AVATAR_WIDTH, height=pybb_settings.AVATAR_HEIGHT)
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
-    markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    markup = models.CharField(_('Default markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
 
     class Meta:
         verbose_name = _('Profile')
@@ -285,7 +286,7 @@ class PrivateMessage(RenderableItem):
     src_user = models.ForeignKey(User, verbose_name=_('Author'), related_name='src_users')
     read = models.BooleanField(_('Read'), blank=True, default=False)
     created = models.DateTimeField(_('Created'), blank=True)
-    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    markup = models.CharField(_('Markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     subject = models.CharField(_('Subject'), max_length=255)
     body = models.TextField(_('Message'))
     body_html = models.TextField(_('HTML version'))

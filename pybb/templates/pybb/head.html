@@ -4,9 +4,9 @@
 <div class="head_box">
     <div class="head main-box">
         <div class="logo">
-            <a href="{% url pybb_index %}">{{ "PYBB_HEADER"|pybb_setting }}</a>
+            <a href="{% url pybb_index %}">{{ "HEADER"|pybb_setting }}</a>
         </div>
-        <h2 class="description">{{ "PYBB_TAGLINE"|pybb_setting|safe }}</h2>
+        <h2 class="description">{{ "TAGLINE"|pybb_setting|safe }}</h2>
         <ul class="navigation">
             <li><a href="#" onclick="$('.search_box').toggle(); return false;"/>{% trans "Search" %}</a></li>
             <li><a href="{% url pybb_users %}">{% trans "Users" %}</a></li>
@@ -44,11 +44,11 @@
     </div>
 </div>
 
-{% if "PYBB_NOTICE"|pybb_setting %}
+{% if "NOTICE"|pybb_setting %}
 <div class="notice_box">
     <div class="notice main-box">
         <div class="inner">
-            {{ "PYBB_NOTICE"|pybb_setting }}
+            {{ "NOTICE"|pybb_setting }}
         </div>
     </div>
 </div>

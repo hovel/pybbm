@@ -11,13 +11,14 @@ from django.db import connection
 from pybb.util import render_to, paged, build_form, quote_text
 from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
+from pybb import settings as pybb_settings
 
 def index_ctx(request):
     quick = {'posts': Post.objects.count(),
              'topics': Topic.objects.count(),
              'users': User.objects.count(),
-             'last_topics': Topic.objects.all().select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_posts': Post.objects.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': Topic.objects.all().select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
+             'last_posts': Post.objects.order_by('-created').select_related()[:pybb_settings.QUICK_POSTS_NUMBER],
              }
 
     cats = {}
@@ -42,8 +43,8 @@ def show_category_ctx(request, category_id):
     category = Category.objects.get(pk=category_id)
     quick = {'posts': category.posts.count(),
              'topics': category.topics.count(),
-             'last_topics': category.topics.select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_posts': category.posts.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': category.topics.select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
+             'last_posts': category.posts.order_by('-created').select_related()[:pybb_settings.QUICK_POSTS_NUMBER],
              }
     return {'category': category,
             'quick': quick,
@@ -51,14 +52,14 @@ def show_category_ctx(request, category_id):
 show_category = render_to('pybb/category.html')(show_category_ctx)
 
 
-@paged('topics', settings.PYBB_FORUM_PAGE_SIZE)
+@paged('topics', pybb_settings.FORUM_PAGE_SIZE)
 def show_forum_ctx(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
     topics = forum.topics.filter(sticky=False).select_related()
     quick = {'posts': forum.posts.count(),
              'topics': forum.topics.count(),
-             'last_topics': forum.topics.all().select_related()[:settings.PYBB_QUICK_TOPICS_NUMBER],
-             'last_posts': forum.posts.order_by('-created').select_related()[:settings.PYBB_QUICK_POSTS_NUMBER],
+             'last_topics': forum.topics.all().select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
+             'last_posts': forum.posts.order_by('-created').select_related()[:pybb_settings.QUICK_POSTS_NUMBER],
              }
 
     return {'forum': forum,
@@ -70,7 +71,7 @@ def show_forum_ctx(request, forum_id):
 show_forum = render_to('pybb/forum.html')(show_forum_ctx)
 
     
-@paged('posts', settings.PYBB_TOPIC_PAGE_SIZE)
+@paged('posts', pybb_settings.TOPIC_PAGE_SIZE)
 def show_topic_ctx(request, topic_id):
     topic = Topic.objects.select_related().get(pk=topic_id)
     topic.views += 1
@@ -81,7 +82,7 @@ def show_topic_ctx(request, topic_id):
         topic.update_read(request.user)
 
     posts = topic.posts.all().select_related()
-    if settings.PYBB_FREEZE_FIRST_POST:
+    if pybb_settings.FREEZE_FIRST_POST:
         first_post = topic.posts.order_by('created')[0]
     else:
         first_post = None
@@ -165,7 +166,7 @@ user = render_to('pybb/user.html')(user_ctx)
 def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     count = post.topic.posts.filter(created__lt=post.created).count() + 1
-    page = math.ceil(count / float(settings.PYBB_TOPIC_PAGE_SIZE))
+    page = math.ceil(count / float(pybb_settings.TOPIC_PAGE_SIZE))
     url = '%s?page=%d#post-%d' % (reverse('pybb_topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
 
@@ -279,7 +280,7 @@ def open_topic(request, topic_id):
 
 
 @render_to('pybb/users.html')
-@paged('users', settings.PYBB_USERS_PAGE_SIZE)
+@paged('users', pybb_settings.USERS_PAGE_SIZE)
 def users_ctx(request):
     users = User.objects.order_by('username')
     form = UserSearchForm(request.GET)
@@ -287,7 +288,7 @@ def users_ctx(request):
     return {'paged_qs': users,
             'form': form,
             }
-users = paged('users', settings.PYBB_USERS_PAGE_SIZE)(users_ctx)
+users = paged('users', pybb_settings.USERS_PAGE_SIZE)(users_ctx)
 
 
 @login_required

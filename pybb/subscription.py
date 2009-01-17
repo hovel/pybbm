@@ -3,6 +3,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from pybb import settings as pybb_settings
+
 def notify_subscribers(post):
     from pybb.models import Post
 
@@ -37,4 +39,4 @@ def text_version(post):
     return data
 
 def absolute_url(uri):
-    return 'http://%s%s' % (settings.PYBB_HOST, uri)
+    return 'http://%s%s' % (pybb_settings.HOST, uri)

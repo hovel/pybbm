@@ -12,6 +12,7 @@ from django.utils import dateformat
 
 from pybb.models import Forum, Topic, Read
 from pybb.unread import cache_unreads
+from pybb import settings as pybb_settings
 
 register = template.Library()
 
@@ -134,7 +135,7 @@ def pybb_has_unreads(topic, user):
     """
 
     now = datetime.now()
-    delta = timedelta(seconds=settings.PYBB_READ_TIMEOUT)
+    delta = timedelta(seconds=pybb_settings.READ_TIMEOUT)
 
     if not user.is_authenticated():
         return False
@@ -161,7 +162,7 @@ def pybb_has_unreads(topic, user):
 
 @register.filter
 def pybb_setting(name):
-    return mark_safe(getattr(settings, name, 'NOT DEFINED'))
+    return mark_safe(getattr(pybb_settings, name, 'NOT DEFINED'))
 
 
 @register.filter

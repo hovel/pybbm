@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 
 from pybb.models import Topic, Post, Profile, PrivateMessage
+from pybb import settings as pybb_settings
 
 class AddPostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
@@ -61,10 +62,10 @@ class EditProfileForm(forms.ModelForm):
 
     def clean_signature(self):
         value = self.cleaned_data['signature'].strip()
-        if len(re.findall(r'\n', value)) > settings.PYBB_SIGNATURE_MAX_LINES:
-            raise forms.ValidationError('Number of lines is limited to %d' % settings.PYBB_SIGNATURE_MAX_LINES)
-        if len(value) > settings.PYBB_SIGNATURE_MAX_LENGTH:
-            raise forms.ValidationError('Length of signature is limited to %d' % settings.PYBB_SIGNATURE_MAX_LENGTH)
+        if len(re.findall(r'\n', value)) > pybb_settings.SIGNATURE_MAX_LINES:
+            raise forms.ValidationError('Number of lines is limited to %d' % pybb_settings.SIGNATURE_MAX_LINES)
+        if len(value) > pybb_settings.SIGNATURE_MAX_LENGTH:
+            raise forms.ValidationError('Length of signature is limited to %d' % pybb_settings.SIGNATURE_MAX_LENGTH)
         return value
 
 class EditPostForm(forms.ModelForm):
