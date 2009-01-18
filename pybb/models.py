@@ -319,3 +319,4 @@ class PrivateMessage(RenderableItem):
             #notify_subscribers(self)
 
 
+import pybb.signals

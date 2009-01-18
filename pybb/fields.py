@@ -49,6 +49,7 @@ class ExtendedImageField(models.ImageField):
     def save_form_data(self, instance, data):
         if data and self.width and self.height:
             content = self.resize_image(data.read(), width=self.width, height=self.height)
+            print data.name
             data = SimpleUploadedFile(data.name, content, data.content_type)
         super(ExtendedImageField, self).save_form_data(instance, data)
 
