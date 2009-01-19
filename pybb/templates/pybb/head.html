@@ -6,12 +6,14 @@
         <div class="logo">
             <a href="{% url pybb_index %}">{{ "HEADER"|pybb_setting }}</a>
         </div>
-        <h2 class="description">{{ "TAGLINE"|pybb_setting|safe }}</h2>
         <ul class="navigation">
             <li><a href="#" onclick="$('.search_box').toggle(); return false;"/>{% trans "Search" %}</a></li>
             <li><a href="{% url pybb_users %}">{% trans "Users" %}</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url pybb_edit_profile %}">{% trans "My profile" %}</a></li>
+                {% if user.is_superuser %}
+                <li><a href="{{ "ADMIN_URL"|pybb_setting }}">{% trans "Admincp" %}</a></li>
+                {% endif %}
             <li><a href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
             <li>{% trans "Logged in as " %} {{ user|pybb_profile_link }}</li>
             {% else %}
@@ -20,6 +22,8 @@
             {% endif %}
             <li><a href="{% url pybb_feed "posts" %}" /><img src="{{ MEDIA_URL }}/pybb/img/feed-icon-small.png" /></a></li>
         </ul>
+        <div class="clear"></div>
+        <h2 class="description">{{ "TAGLINE"|pybb_setting|safe }}</h2>
         <div class="clear"></div>
     </div>
 </div>
