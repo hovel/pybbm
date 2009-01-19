@@ -12,6 +12,8 @@ from django.utils.simplejson import JSONEncoder
 from django import forms
 from django.template.defaultfilters import urlize as django_urlize
 
+from pybb import settings as pybb_settings
+
 
 def render_to(template_path):
     """
@@ -172,3 +174,7 @@ def quote_text(text, markup):
         return '[quote]%s[/quote]\n' % text
     else:
         return text
+
+
+def absolute_url(path):
+    return 'http://%s%s' % (pybb_settings.HOST, path)

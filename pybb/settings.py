@@ -1,7 +1,7 @@
 from django.conf import settings
 
 def get(key, default):
-    return getattr(settings, 'PYBB_%s' % key, default)
+    return getattr(settings, key, default)
 
 
 TOPIC_PAGE_SIZE = get('PYBB_TOPIC_PAGE_SIZE', 10)
@@ -23,3 +23,4 @@ NOTICE = get('PYBB_NOTICE', '')
 HOST = get('PYBB_HOST', 'localhost:8000')
 FREEZE_FIRST_POST = get('PYBB_FREEZE_FIRST_POST', True)
 ADMIN_URL = get('PYBB_ADMIN_URL', '/admin/')
+EMAIL_DEBUG = get('PYBB_EMAIL_DEBUG', False)

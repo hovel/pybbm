@@ -11,7 +11,6 @@ from markdown import Markdown
 
 from pybb.markups import mypostmarkup 
 from pybb.fields import AutoOneToOneField, ExtendedImageField
-from pybb.subscription import notify_subscribers
 from pybb.util import urlize
 from pybb import settings as pybb_settings
 
@@ -211,9 +210,6 @@ class Post(RenderableItem):
 
         super(Post, self).save(*args, **kwargs)
 
-        if new:
-            notify_subscribers(self)
-
 
 
 
@@ -297,7 +293,7 @@ class PrivateMessage(RenderableItem):
         verbose_name = _('Private message')
         verbose_name_plural = _('Private messages')
 
-    # TODO: summary and part of the save methid is the same as in the Post model
+    # TODO: summary and part of the save method is the same as in the Post model
     # move to common functions
     def summary(self):
         LIMIT = 50
@@ -314,9 +310,9 @@ class PrivateMessage(RenderableItem):
 
         new = self.id is None
         super(PrivateMessage, self).save(*args, **kwargs)
-        # TODO: make email notifications
-        #if new:
-            #notify_subscribers(self)
+
+    def get_absolute_url(self):
+        return  reverse('pybb_show_pm', args=[self.id])
 
 
 import pybb.signals
