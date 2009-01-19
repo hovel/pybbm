@@ -3,14 +3,15 @@
 {% load pybb_extras %}
 
 {% block content %}
+{% include "pybb/pm/common.html" %}
 <h1>{% trans "Inbox" %}</h1>
 <ul>
     {% for msg in messages %}
     <li>
-        <a href="{% url pybb_show_pm msg.id %}">{{ msg.subject }}</a> {% trans "from" %}
-        <span class="author">
-            <a href="{% pybb_profile msg.dst_user.username %}">{{ msg.src_user }}</a>
-        </span>
+        <a href="{% url pybb_show_pm msg.id %}" {% if not msg.read %}class="selected"{% endif %}>{{ msg.subject }}</a>
+        {% trans "from" %}
+        <span class="author"> {{ msg.src_user|pybb_profile_link }} </span>
+
         <span class="date">@ {% pybb_time msg.created %}</span>
     </li>
     {% endfor %}

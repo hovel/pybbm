@@ -6,8 +6,10 @@
 {% with msg as post %}
 
 <div class="crumbs">
-    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% if inbox %}<a href="{% url pybb_pm_inbox %}">{% trans "Inbox" %}</a>{% else %}<a href="{% url pybb_pm_outbox %}">{% trans "Outbox" %}</a>{% endif %} / <strong>{{ post.subject }}</strong>
+    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% ifequal pm_mode "inbox" %}<a href="{% url pybb_pm_inbox %}">{% trans "Inbox" %}</a>{% else %}<a href="{% url pybb_pm_outbox %}">{% trans "Outbox" %}</a>{% endifequal %} / <strong>{{ post.subject }}</strong>
 </div>
+
+{% include "pybb/pm/common.html" %}
 
 <ul class="posts">
     <a name="post-0"></a>
@@ -16,11 +18,11 @@
             <table>
                 <tr>
                     <td class="info" width="15%">
-                        {% if inbox %}
+                        {% ifequal pm_mode "inbox" %}
                         {% trans "Message from" %}
                         {% else %}
                         {% trans "Message for" %}
-                        {% endif %}
+                        {% endifequal %}
                         {% if post_user.pybb_profile.avatar %}
                         <div class="avatar">
                             <a href="{% url pybb_profile post_user %}">
@@ -68,9 +70,9 @@
 </ul>
 
 <div class="controls">
-    {% if inbox %}
+    {% ifequal pm_mode "inbox" %}
     <a href="{% url pybb_create_pm %}?recipient={{ post.src_user.username }}">{% trans "Reply" %}</a>
-    {% endif %}
+    {% endifequal %}
 </div>
 
 {% endwith %}

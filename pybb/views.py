@@ -320,6 +320,7 @@ def create_pm_ctx(request):
         return HttpResponseRedirect(reverse('pybb_pm_outbox'))
 
     return {'form': form,
+            'pm_mode': 'create',
             }
 create_pm = render_to('pybb/pm/create_pm.html')(create_pm_ctx)
 
@@ -328,6 +329,7 @@ create_pm = render_to('pybb/pm/create_pm.html')(create_pm_ctx)
 def pm_outbox_ctx(request):
     messages = PrivateMessage.objects.filter(src_user=request.user)
     return {'messages': messages,
+            'pm_mode': 'outbox',
             }
 pm_outbox = render_to('pybb/pm/outbox.html')(pm_outbox_ctx)
 
@@ -336,6 +338,7 @@ pm_outbox = render_to('pybb/pm/outbox.html')(pm_outbox_ctx)
 def pm_inbox_ctx(request):
     messages = PrivateMessage.objects.filter(dst_user=request.user)
     return {'messages': messages,
+            'pm_mode': 'inbox',
             }
 pm_inbox = render_to('pybb/pm/inbox.html')(pm_inbox_ctx)
 
@@ -346,13 +349,15 @@ def show_pm_ctx(request, pm_id):
     if not request.user in [msg.dst_user, msg.src_user]:
         return HttpRedirectException('/')
     if request.user == msg.dst_user:
-        inbox = True
+        pm_mode = 'inbox'
+        msg.read = True
+        msg.save()
         post_user = msg.src_user
     else:
-        inbox = False
+        pm_mode = 'outbox'
         post_user = msg.dst_user
     return {'msg': msg,
-            'inbox': inbox,
+            'pm_mode': pm_mode,
             'post_user': post_user,
             }
 show_pm = render_to('pybb/pm/message.html')(show_pm_ctx)

@@ -3,14 +3,13 @@
 {% load pybb_extras %}
 
 {% block content %}
+{% include "pybb/pm/common.html" %}
 <h1>{% trans "Outbox" %}</h1>
 <ul>
     {% for msg in messages %}
     <li>
         <a href="{% url pybb_show_pm msg.id %}">{{ msg.subject }}</a> {% trans "to" %}
-        <span class="author">
-            <a href="{% pybb_profile msg.dst_user.username }">{{ msg.dst_user }}</a>
-        </span>
+        <span class="author"> {{ msg.dst_user|pybb_profile_link }} </span>
         <span class="date">@ {% pybb_time msg.created %}</span>
     </li>
     {% endfor %}

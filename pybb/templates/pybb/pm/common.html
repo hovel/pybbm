@@ -1,0 +1,8 @@
+{% load i18n %}
+{% load pybb_extras %}
+
+<div>
+    <a class="{% ifequal pm_mode "inbox" %}selected{% endifequal %}" href="{% url pybb_pm_inbox %}">{% trans "Inbox" %}</a>
+    / <a class="{% ifequal pm_mode "outbox" %}selected{% endifequal %}" href="{% url pybb_pm_outbox %}">{% trans "Outbox" %}</a>
+    / <a class="{% ifequal pm_mode "create" %}selected{% endifequal %}" href="{% url pybb_create_pm %}">{% trans "Send PM" %}</a>
+</div>

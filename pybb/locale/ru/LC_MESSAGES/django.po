@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybb\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-19 07:44+0600\n"
+"POT-Creation-Date: 2009-01-19 12:36+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -305,7 +305,7 @@ msgstr "PYBB - движок форума на django"
 msgid "Important"
 msgstr "Важно"
 
-#: templates/pybb/head.html:10 templates/pybb/head.html.py:45
+#: templates/pybb/head.html:10 templates/pybb/head.html.py:49
 #: templates/pybb/users.html:9
 msgid "Search"
 msgstr "Поиск"
@@ -319,27 +319,31 @@ msgstr "Пользователи"
 msgid "My profile"
 msgstr "Мой профиль"
 
-#: templates/pybb/head.html:14
-msgid "Log out"
-msgstr "Выйти"
+#: templates/pybb/head.html:15
+msgid "PM"
+msgstr "ЛС"
 
-#: templates/pybb/head.html:16
+#: templates/pybb/head.html:19
 msgid "Admincp"
 msgstr "Админка"
 
-#: templates/pybb/head.html:18
+#: templates/pybb/head.html:21
+msgid "Log out"
+msgstr "Выйти"
+
+#: templates/pybb/head.html:22
 msgid "Logged in as "
 msgstr "Ваш логин"
 
-#: templates/pybb/head.html:20
+#: templates/pybb/head.html:24
 msgid "Sign up"
 msgstr "Регистрация"
 
-#: templates/pybb/head.html:21
+#: templates/pybb/head.html:25
 msgid "Log in"
 msgstr "Войти"
 
-#: templates/pybb/head.html:46
+#: templates/pybb/head.html:50
 msgid "Search powered by Google"
 msgstr "Поиск осуществляется через Google"
 
@@ -423,7 +427,7 @@ msgstr "Дата регистрации"
 msgid "Contacts"
 msgstr "Контакты"
 
-#: templates/pybb/pm/inbox.html:10
+#: templates/pybb/pm/inbox.html:11
 msgid "from"
 msgstr "от"
 

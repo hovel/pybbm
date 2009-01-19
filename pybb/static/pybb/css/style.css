@@ -608,3 +608,9 @@ em {
 .post-related a {
     color: #666;
 }
+
+.selected {
+    font-weight: bold;
+    font-size: larger;
+}
+

@@ -11,9 +11,14 @@
             <li><a href="{% url pybb_users %}">{% trans "Users" %}</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url pybb_edit_profile %}">{% trans "My profile" %}</a></li>
-                {% if user.is_superuser %}
-                <li><a href="{{ "ADMIN_URL"|pybb_setting }}">{% trans "Admincp" %}</a></li>
-                {% endif %}
+            {% with user|pybb_inbox_unread_count as count %}
+            <li class="{% if count %}unread-pm{% endif %}">
+                <a href="{% url pybb_pm_inbox %}">{% trans "PM" %}{% if count %}({{count}}){% endif %}</a>
+            </li>
+            {% endwith %}
+            {% if user.is_superuser %}
+            <li><a href="{{ "ADMIN_URL"|pybb_setting }}">{% trans "Admincp" %}</a></li>
+            {% endif %}
             <li><a href="{% url auth_logout %}">{% trans "Log out" %}</a></li>
             <li>{% trans "Logged in as " %} {{ user|pybb_profile_link }}</li>
             {% else %}
