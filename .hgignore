@@ -11,3 +11,4 @@
 ^static/pybb/avatars
 .*\.swp$
 ^registration$
+^debug_toolbar
