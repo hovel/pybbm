@@ -62,13 +62,14 @@ def notify_topic_subscribers(post):
 
 
 def notify_pm_recipients(pm):
-    from pybb.models import PrivateMessage
+    if not pm.read:
+        from pybb.models import PrivateMessage
 
-    subject = (u'New private message for you')
-    to_email = pm.dst_user.email
-    text_content = PM_RECIPIENT_TEXT_TEMPLATE % {
-        'username': pm.src_user.username,
-        'message': pm.body_text,
-        'pm_url': absolute_url(pm.get_absolute_url()),
-    }
-    send_mail([to_email], subject, text_content)
+        subject = (u'New private message for you')
+        to_email = pm.dst_user.email
+        text_content = PM_RECIPIENT_TEXT_TEMPLATE % {
+            'username': pm.src_user.username,
+            'message': pm.body_text,
+            'pm_url': absolute_url(pm.get_absolute_url()),
+        }
+        send_mail([to_email], subject, text_content)
