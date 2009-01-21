@@ -104,6 +104,16 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
 )
 
+try:
+    import debug_toolbar
+except ImportError:
+    pass
+else:
+    MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    INSTALLED_APPS += ('debug_toolbar',)
+
+INTERNAL_IPS = ('127.0.0.1',)
+
 # django-account settings
 ACCOUNT_ACTIVATION = True
 LOGIN_REDIRECT_URL = '/'
