@@ -178,3 +178,22 @@ def quote_text(text, markup):
 
 def absolute_url(path):
     return 'http://%s%s' % (pybb_settings.HOST, path)
+
+
+def memoize_method(func):
+    """
+    Cached result of function call.
+    """
+
+    def wrapper(self, *args, **kwargs):
+        CACHE_NAME = '__memcache'
+        try:
+            cache = getattr(self, CACHE_NAME)
+        except AttributeError:
+            cache = {}
+            setattr(self, CACHE_NAME, cache)
+        key = (func, tuple(args), frozenset(kwargs.items()))
+        if key not in cache:
+            cache[key] = func(self, *args, **kwargs)
+        return cache[key]
+    return wrapper

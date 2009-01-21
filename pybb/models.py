@@ -6,12 +6,11 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape, strip_tags
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-#from django.contrib.markup.templatetags.markup import markdown
 from markdown import Markdown
 
 from pybb.markups import mypostmarkup 
 from pybb.fields import AutoOneToOneField, ExtendedImageField
-from pybb.util import urlize
+from pybb.util import urlize, memoize_method
 from pybb import settings as pybb_settings
 
 LANGUAGE_CHOICES = (
@@ -249,6 +248,11 @@ class Profile(models.Model):
     class Meta:
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
+
+
+    @memoize_method
+    def unread_pm_count(self):
+        return PrivateMessage.objects.filter(dst_user=self, read=False).count()
 
 
 class Read(models.Model):

@@ -210,8 +210,3 @@ def pybb_equal_to(obj1, obj2):
 @register.filter
 def pybb_unreads(qs, user):
     return cache_unreads(qs, user)
-
-
-@register.filter
-def pybb_inbox_unread_count(user):
-    return PrivateMessage.objects.filter(dst_user=user, read=False).count()
