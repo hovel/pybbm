@@ -350,8 +350,9 @@ def show_pm_ctx(request, pm_id):
         return HttpRedirectException('/')
     if request.user == msg.dst_user:
         pm_mode = 'inbox'
-        msg.read = True
-        msg.save()
+        if not msg.read:
+            msg.read = True
+            msg.save()
         post_user = msg.src_user
     else:
         pm_mode = 'outbox'
