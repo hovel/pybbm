@@ -13,20 +13,11 @@
                 <h3 class="header">{{ forum }}</h3>
                 <ul class="tablist-inner topic">
 
-                {% for topic in sticky_topics|pybb_unreads:user %}
-                <li class="tablist-inner-row topic sticky">
-                {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
-                {% trans "Important" %}:
-                <span class="title">{% pybb_link topic %}</span>
-                <span class="post_count">{{ topic.post_count }}</span>
-                <span class="updated">{% pybb_time topic.updated %}</span>
-                </li>
-                {% endfor %}
-
                 {% for topic in topics|pybb_unreads:user %}
-                <li class="tablist-inner-row topic">
+                <li class="tablist-inner-row topic {% if topic.sticky %}sticky{% endif %}">
                 {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
-                {% if topic.closed %}{% trans "Closed" %}{% endif %}
+                {% if topic.closed %}{% trans "Closed" %}:{% endif %}
+                {% if topic.sticky %}{% trans "Important" %}:{% endif %}
                 <span class="title">{% pybb_link topic %}</span>
                 <span class="post_count">{{ topic.post_count }}</span>
                 <span class="updated">{% pybb_time topic.updated %}</span>

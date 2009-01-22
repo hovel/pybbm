@@ -55,7 +55,7 @@ show_category = render_to('pybb/category.html')(show_category_ctx)
 @paged('topics', pybb_settings.FORUM_PAGE_SIZE)
 def show_forum_ctx(request, forum_id):
     forum = Forum.objects.get(pk=forum_id)
-    topics = forum.topics.filter(sticky=False).select_related()
+    topics = forum.topics.order_by('-sticky').select_related()
     quick = {'posts': forum.posts.count(),
              'topics': forum.topics.count(),
              'last_topics': forum.topics.all().select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
@@ -64,7 +64,6 @@ def show_forum_ctx(request, forum_id):
 
     return {'forum': forum,
             'topics': topics,
-            'sticky_topics': forum.topics.filter(sticky=True),
             'quick': quick,
             'paged_qs': topics,
             }
