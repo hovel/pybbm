@@ -21,6 +21,10 @@ class ProfileAdmin(admin.ModelAdmin):
 
 class ReadAdmin(admin.ModelAdmin):
     list_display = ['user', 'topic', 'time']
+    list_per_page = 20
+    ordering = ['-time']
+    date_hierarchy = 'time'
+    search_fields = ['user__username', 'topic__name']
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Forum, ForumAdmin)
