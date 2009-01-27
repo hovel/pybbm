@@ -8,13 +8,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybb\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-19 17:28+0600\n"
+"POT-Creation-Date: 2009-01-27 10:20+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: admin.py:22 admin.py:40 admin.py:58 admin.py:84
+msgid "Additional options"
+msgstr "Дополнительные свойства"
+
+#: admin.py:63 models.py:177 models.py:291
+msgid "Message"
+msgstr "Сообщение"
+
+#: admin.py:79
+msgid "IM"
+msgstr ""
 
 #: feeds.py:21 feeds.py:22 templates/pybb/base.html:12
 msgid "Latest posts on forum"
@@ -24,11 +36,11 @@ msgstr "Последние сообщения на форуме"
 msgid "Latest topics on forum"
 msgstr "Последние темы на форуме"
 
-#: forms.py:13 models.py:104 models.py:286
+#: forms.py:13 models.py:103 models.py:290
 msgid "Subject"
 msgstr "Заголовок"
 
-#: forms.py:95 models.py:281
+#: forms.py:95 models.py:285
 msgid "Recipient"
 msgstr "Получатель"
 
@@ -37,229 +49,189 @@ msgstr "Получатель"
 msgid "User with login %s does not exist"
 msgstr "Пользователь с логином %s не существует"
 
-#: models.py:19
+#: models.py:18
 msgid "Russian"
 msgstr "Русский"
 
-#: models.py:40 models.py:68
+#: models.py:39 models.py:67
 msgid "Name"
 msgstr "Имя"
 
-#: models.py:41 models.py:69
+#: models.py:40 models.py:68
 msgid "Position"
 msgstr "Позиция"
 
-#: models.py:45 models.py:67
+#: models.py:44 models.py:66
 msgid "Category"
 msgstr "Категория"
 
-#: models.py:46
+#: models.py:45
 msgid "Categories"
 msgstr "Категории"
 
-#: models.py:70
+#: models.py:69
 msgid "Description"
 msgstr "Описание"
 
-#: models.py:71
+#: models.py:70
 msgid "Moderators"
 msgstr "Модераторы"
 
-#: models.py:72 models.py:106 models.py:176
+#: models.py:71 models.py:105 models.py:175
 msgid "Updated"
 msgstr "Дата обновления"
 
-#: models.py:73 models.py:112
+#: models.py:72 models.py:111
 msgid "Post count"
 msgstr "Количество сообщений"
 
-#: models.py:77 models.py:103
+#: models.py:76 models.py:102
 msgid "Forum"
 msgstr "Форум"
 
-#: models.py:78
+#: models.py:77
 msgid "Forums"
 msgstr "Форумы"
 
-#: models.py:105 models.py:175 models.py:284
+#: models.py:104 models.py:174 models.py:288
 msgid "Created"
 msgstr "Дата создания"
 
-#: models.py:107 models.py:174 models.py:234 models.py:260
+#: models.py:106 models.py:173 models.py:233 models.py:264
 msgid "User"
 msgstr "Пользователь"
 
-#: models.py:108
+#: models.py:107
 msgid "Views count"
 msgstr "Количество просмотров"
 
-#: models.py:109
+#: models.py:108
 msgid "Sticky"
 msgstr "Закреплено"
 
-#: models.py:110 templates/pybb/forum.html:29
+#: models.py:109 templates/pybb/forum.html:19
 msgid "Closed"
 msgstr "Закрыто"
 
-#: models.py:111
+#: models.py:110
 msgid "Subscribers"
 msgstr "Подписчики"
 
-#: models.py:116 models.py:173 models.py:261
+#: models.py:115 models.py:172 models.py:265
 msgid "Topic"
 msgstr "Тема"
 
-#: models.py:117 templates/pybb/quick_access.html:47
+#: models.py:116 templates/pybb/quick_access.html:47
 msgid "Topics"
 msgstr "Темы"
 
-#: models.py:177 models.py:285
+#: models.py:176 models.py:289
 msgid "Markup"
 msgstr "Разметка"
 
-#: models.py:178 models.py:287
-msgid "Message"
-msgstr "Сообщение"
-
-#: models.py:179 models.py:288
+#: models.py:178 models.py:292
 msgid "HTML version"
 msgstr "HTML версия"
 
-#: models.py:180 models.py:289
+#: models.py:179 models.py:293
 msgid "Text version"
 msgstr "Текстовая версия"
 
-#: models.py:181
+#: models.py:180
 msgid "User IP"
 msgstr "IP автора"
 
-#: models.py:186
+#: models.py:185
 msgid "Post"
 msgstr "Сообщение"
 
-#: models.py:187 templates/pybb/quick_access.html:50
+#: models.py:186 templates/pybb/quick_access.html:50
 msgid "Posts"
 msgstr "Сообщения"
 
-#: models.py:235 templates/pybb/user.html:23
+#: models.py:234 templates/pybb/user.html:23
 msgid "Site"
 msgstr "Сайт"
 
-#: models.py:236
+#: models.py:235
 msgid "Jabber"
 msgstr ""
 
-#: models.py:237
+#: models.py:236
 msgid "ICQ"
 msgstr ""
 
-#: models.py:238
+#: models.py:237
 msgid "MSN"
 msgstr ""
 
-#: models.py:239
+#: models.py:238
 msgid "AIM"
 msgstr ""
 
-#: models.py:240
+#: models.py:239
 msgid "Yahoo"
 msgstr ""
 
-#: models.py:241 templates/pybb/user.html:20
+#: models.py:240 templates/pybb/user.html:20
 msgid "Location"
 msgstr "Откуда"
 
-#: models.py:242
+#: models.py:241
 msgid "Signature"
 msgstr "Подпись"
 
-#: models.py:243
+#: models.py:242
 msgid "Time zone"
 msgstr "Временная зона"
 
-#: models.py:244
+#: models.py:243
 msgid "Language"
 msgstr "Язык"
 
-#: models.py:245
+#: models.py:244
 msgid "Avatar"
 msgstr "Аватар"
 
-#: models.py:246
+#: models.py:245
 msgid "Show signatures"
 msgstr "Показывать подписи"
 
-#: models.py:247
+#: models.py:246
 msgid "Default markup"
 msgstr "Разметка по умолчанию"
 
-#: models.py:250
+#: models.py:249
 msgid "Profile"
 msgstr "Профиль"
 
-#: models.py:251
+#: models.py:250
 msgid "Profiles"
 msgstr "Профили"
 
-#: models.py:262
+#: models.py:266
 msgid "Time"
 msgstr "Время"
 
-#: models.py:266 models.py:283
+#: models.py:270 models.py:287
 msgid "Read"
 msgstr "Просмотр"
 
-#: models.py:267
+#: models.py:271
 msgid "Reads"
 msgstr "Просмотры"
 
-#: models.py:282
+#: models.py:286
 msgid "Author"
 msgstr "Автор"
 
-#: models.py:293
+#: models.py:297
 msgid "Private message"
 msgstr "Личное сообщение"
 
-#: models.py:294
+#: models.py:298
 msgid "Private messages"
 msgstr "Личные сообщения"
-
-#: subscription.py:9
-#, python-format
-msgid ""
-"New reply from %(username)s to topic that you have subscribed on.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"See topic: %(post_url)s\n"
-"Unsubscribe %(unsubscribe_url)s"
-msgstr ""
-"Новый ответ от %(username)s в тему, на которую вы подписаны.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"Посмотреть тему: %(post_url)s\n"
-"Отписаться %(unsubscribe_url)s"
-
-#: subscription.py:16
-#, python-format
-msgid ""
-"User %(username)s have sent your the new private message.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"See message online: %(pm_url)s"
-msgstr ""
-"Пользователь %(username)s послал вам новое личное сообщение.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"Посмотреть сообщение online: %(pm_url)s"
-
-#: subscription.py:65
-msgid "New private message for you"
-msgstr "Новое личное сообщение для вас"
 
 #: templates/pybb/add_post.html:8 templates/pybb/add_post.html.py:10
 #: templates/pybb/category.html:7 templates/pybb/create_pm.html:7
@@ -270,7 +242,7 @@ msgid "Root"
 msgstr "Начало"
 
 #: templates/pybb/add_post.html:14 templates/pybb/add_post.html.py:18
-#: templates/pybb/forum.html:41
+#: templates/pybb/forum.html:32
 msgid "New topic"
 msgstr "Новая тема"
 
@@ -327,7 +299,7 @@ msgstr "удалить"
 msgid "PYBB - django forum engine"
 msgstr "PYBB - движок форума на django"
 
-#: templates/pybb/forum.html:19
+#: templates/pybb/forum.html:20
 msgid "Important"
 msgstr "Важно"
 
@@ -504,6 +476,37 @@ msgstr "сегодня, %s"
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"
+
+#~ msgid ""
+#~ "New reply from %(username)s to topic that you have subscribed on.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "See topic: %(post_url)s\n"
+#~ "Unsubscribe %(unsubscribe_url)s"
+#~ msgstr ""
+#~ "Новый ответ от %(username)s в тему, на которую вы подписаны.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "Посмотреть тему: %(post_url)s\n"
+#~ "Отписаться %(unsubscribe_url)s"
+
+#~ msgid ""
+#~ "User %(username)s have sent your the new private message.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "See message online: %(pm_url)s"
+#~ msgstr ""
+#~ "Пользователь %(username)s послал вам новое личное сообщение.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "Посмотреть сообщение online: %(pm_url)s"
+
+#~ msgid "New private message for you"
+#~ msgstr "Новое личное сообщение для вас"
 
 #~ msgid "Change the email"
 #~ msgstr "Изменить email"
