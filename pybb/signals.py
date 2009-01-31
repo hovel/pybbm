@@ -14,6 +14,8 @@ def post_saved(instance, **kwargs):
 def pm_saved(instance, **kwargs):
     notify_pm_recipients(instance)
 
-post_save.connect(user_saved, sender=User)
-post_save.connect(post_saved, sender=Post)
-post_save.connect(pm_saved, sender=PrivateMessage)
+
+def setup_signals():
+    post_save.connect(user_saved, sender=User)
+    post_save.connect(post_saved, sender=Post)
+    post_save.connect(pm_saved, sender=PrivateMessage)

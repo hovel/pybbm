@@ -3,8 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.utils.html import escape, strip_tags
-from django.conf import settings
+from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from markdown import Markdown
 
@@ -319,4 +318,5 @@ class PrivateMessage(RenderableItem):
         return  reverse('pybb_show_pm', args=[self.id])
 
 
-import pybb.signals
+from pybb import signals
+signals.setup_signals()
