@@ -33,7 +33,7 @@
                         {% endif %}
                         {% if moderator or post|pybb_equal_to:last_post %}
                         {% if moderator or post.user|pybb_equal_to:user %}
-                        / <a onclick="return confirm('{% trans "Are you sure you want to delete this post?" %}')" href="{% url pybb_delete_post post.id %}">{% trans "Delete" %}</a>
+                        / <a href="{% url pybb_delete_post post.id %}">{% trans "Delete" %}</a>
                         {% endif %}
                         {% endif %}
                     </div>

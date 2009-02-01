@@ -617,3 +617,9 @@ em {
 .pm-common {
     margin-bottom: 1em;
 }
+
+.post-preview {
+    background-color: #f5f5f5;
+    border: 1px dashed #ccc;
+    padding: 1em;
+}

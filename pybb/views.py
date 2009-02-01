@@ -241,16 +241,20 @@ def delete_post_ctx(request, post_id):
     if not allowed:
         return HttpResponseRedirect(post.get_absolute_url())
 
-    topic = post.topic
-    forum = post.topic.forum
-    post.delete()
+    if 'POST' == request.method:
+        topic = post.topic
+        forum = post.topic.forum
+        post.delete()
 
-    try:
-        Topic.objects.get(pk=topic.id)
-    except Topic.DoesNotExist:
-        return HttpResponseRedirect(forum.get_absolute_url())
+        try:
+            Topic.objects.get(pk=topic.id)
+        except Topic.DoesNotExist:
+            return HttpResponseRedirect(forum.get_absolute_url())
+        else:
+            return HttpResponseRedirect(topic.get_absolute_url())
     else:
-        return HttpResponseRedirect(topic.get_absolute_url())
+        return {'post': post,
+                }
 delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
 
 
