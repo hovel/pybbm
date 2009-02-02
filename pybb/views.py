@@ -2,7 +2,7 @@ import math
 import datetime
 
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -42,7 +42,7 @@ index = render_to('pybb/index.html')(index_ctx)
 
 
 def show_category_ctx(request, category_id):
-    category = Category.objects.get(pk=category_id)
+    category = get_object_or_404(Category, pk=category_id)
     quick = {'posts': category.posts.count(),
              'topics': category.topics.count(),
              'last_topics': category.topics.select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
@@ -56,7 +56,7 @@ show_category = render_to('pybb/category.html')(show_category_ctx)
 
 @paged('topics', pybb_settings.FORUM_PAGE_SIZE)
 def show_forum_ctx(request, forum_id):
-    forum = Forum.objects.get(pk=forum_id)
+    forum = get_object_or_404(Forum, pk=forum_id)
     topics = forum.topics.order_by('-sticky', '-updated').select_related()
     quick = {'posts': forum.post_count,
              'topics': forum.topics.count(),
@@ -74,7 +74,10 @@ show_forum = render_to('pybb/forum.html')(show_forum_ctx)
     
 @paged('posts', pybb_settings.TOPIC_PAGE_SIZE)
 def show_topic_ctx(request, topic_id):
-    topic = Topic.objects.select_related().get(pk=topic_id)
+    try:
+        topic = Topic.objects.select_related().get(pk=topic_id)
+    except Topic.DoesNotExist:
+        raise Http404()
     topic.views += 1
     topic.save()
 
