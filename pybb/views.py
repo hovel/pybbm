@@ -1,4 +1,5 @@
 import math
+import datetime
 
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
@@ -9,9 +10,10 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 
 from pybb.util import render_to, paged, build_form, quote_text
-from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage
+from pybb.models import Category, Forum, Topic, AnonymousPost, Post, Profile, PrivateMessage
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
+from pybb.anonymous_post import handle_anonymous_post, load_anonymous_post, delete_anonymous_post
 
 def index_ctx(request):
     quick = {'posts': Post.objects.count(),
@@ -94,8 +96,17 @@ def show_topic_ctx(request, topic_id):
         post.user.pybb_profile = profiles[post.user.id]
 
     initial = {}
+    try:
+        id = request.COOKIES.get(pybb_settings.ANONYMOUS_POST_COOKIE_NAME)
+        apost = AnonymousPost.objects.get(session_key=id, topic=topic)
+    except AnonymousPost.DoesNotExist:
+        pass
+    else:
+        initial = {'markup': apost.markup, 'body': apost.body}
+
     if request.user.is_authenticated():
         initial = {'markup': request.user.pybb_profile.markup}
+
     form = AddPostForm(topic=topic, initial=initial)
 
     moderator = request.user.is_superuser or\
@@ -116,7 +127,6 @@ def show_topic_ctx(request, topic_id):
 show_topic = render_to('pybb/topic.html')(show_topic_ctx)
 
 
-@login_required
 def add_post_ctx(request, forum_id, topic_id):
     forum = None
     topic = None
@@ -129,22 +139,42 @@ def add_post_ctx(request, forum_id, topic_id):
     if topic and topic.closed:
         return HttpResponseRedirect(topic.get_absolute_url())
 
-    try:
-        quote_id = int(request.GET.get('quote_id'))
-    except TypeError:
-        quote = ''
+    if not request.user.is_authenticated():
+        return handle_anonymous_post(request, topic_id) 
+
+    # GET request
+    if 'GET' == request.method:
+        try:
+            quote_id = int(request.GET.get('quote_id'))
+        except TypeError:
+            quote = ''
+        else:
+            qpost = get_object_or_404(Post, pk=quote_id)
+            quote = quote_text(qpost.body_text, request.user.pybb_profile.markup)
+
+        apost = load_anonymous_post(request, topic)
+        if apost:
+            markup = apost.markup
+            body = apost.body
+        else:
+            markup = request.user.pybb_profile.markup
+            body = quote
+
+        form = build_form(AddPostForm, request, topic=topic, forum=forum,
+                          user=request.user, initial={'markup': markup, 'body': body})
+
+    # POST request
     else:
-        post = get_object_or_404(Post, pk=quote_id)
-        quote = quote_text(post.body_text, request.user.pybb_profile.markup)
+        delete_anonymous_post(request, topic)
 
-    ip = request.META.get('REMOTE_ADDR', '')
-    form = build_form(AddPostForm, request, topic=topic, forum=forum,
-                      user=request.user, ip=ip,
-                      initial={'markup': request.user.pybb_profile.markup, 'body': quote})
+        ip = request.META.get('REMOTE_ADDR', '')
+        form = build_form(AddPostForm, request, topic=topic, forum=forum,
+                          user=request.user, ip=ip)
 
-    if form.is_valid():
-        post = form.save();
-        return HttpResponseRedirect(post.get_absolute_url())
+        if form.is_valid():
+            post = form.save();
+            return HttpResponseRedirect(post.get_absolute_url())
+            
 
     return {'form': form,
             'topic': topic,
