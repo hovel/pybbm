@@ -99,12 +99,8 @@ def show_topic_ctx(request, topic_id):
         post.user.pybb_profile = profiles[post.user.id]
 
     initial = {}
-    try:
-        id = request.COOKIES.get(pybb_settings.ANONYMOUS_POST_COOKIE_NAME)
-        apost = AnonymousPost.objects.get(session_key=id, topic=topic)
-    except AnonymousPost.DoesNotExist:
-        pass
-    else:
+    apost = load_anonymous_post(request, topic)
+    if apost:
         initial = {'markup': apost.markup, 'body': apost.body}
 
     if request.user.is_authenticated():

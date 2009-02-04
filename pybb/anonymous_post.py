@@ -38,8 +38,8 @@ def load_anonymous_post(request, topic):
 
     try:
         key = request.COOKIES.get(pybb_settings.ANONYMOUS_POST_COOKIE_NAME, None)
-        apost = AnonymousPost.objects.get(topic=topic, session_key=key)
-    except AnonymousPost.DoesNotExist:
+        apost = AnonymousPost.objects.filter(topic=topic, session_key=key).order_by('-created')[0]
+    except IndexError:
         apost = None
     return apost
 
