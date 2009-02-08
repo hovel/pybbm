@@ -51,8 +51,8 @@
                     <div class="updated-message">{% trans "Edited" %} {% pybb_time post.updated %}</div>
                     {% endif %}
 
-                    {% if post.attachments.all %}
-                    {% for attach in post.attachments.all %}
+                    {% if post.attachment_cache %}
+                    {% for attach in post.attachment_cache %}
                     {% trans "Attachment" %}: <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
                     {% endfor %}
                     {% endif %}

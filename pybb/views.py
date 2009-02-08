@@ -12,6 +12,7 @@ from pybb.util import render_to, paged, build_form, quote_text, paginate
 from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
+from pybb.orm import load_related
 
 def index_ctx(request):
     quick = {'posts': Post.objects.count(),
@@ -110,6 +111,7 @@ def show_topic_ctx(request, topic_id):
         subscribed = False
 
     page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE)
+    load_related(page.object_list, Attachment.objects.all(), 'post')
 
     return {'topic': topic,
             'last_post': last_post,
