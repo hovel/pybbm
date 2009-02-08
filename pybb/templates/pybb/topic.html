@@ -7,7 +7,7 @@
     <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
 </div>
 
-{% pybb_pagination %}
+{% pybb_pagination _('Posts') %}
 
 <ul class="posts">
     {% if first_post %}{% ifnotequal first_post posts.0 %}
@@ -20,7 +20,7 @@
     {% endfor %}
 </ul>
 
-{% pybb_pagination %}
+{% pybb_pagination _('Posts') %}
 
 <div class="controls">
     {% if moderator %}

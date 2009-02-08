@@ -1,27 +1,16 @@
 {% load i18n %}
 <div class="pagination">
-    <div class="pages">
-        {% ifnotequal pages 1 %}
-        <ul>
-            <li class="name">{% trans "Pages" %}:</li>
-            {% if lower_page %} 
-            <li><a href="{{ get_params }}page={{ lower_page }}{#&per_page={{ per_page }}#}">&laquo;</a></li>
-            {% endif %}
-            {% for number in page_list %}
-            {% ifequal number "." %}...
-            {% else %}
-                {% ifequal number page %}
-                <li class="active">{{ number }}</li>
-                {% endifequal %}
-                {% ifnotequal number page %}
-                <li><a href="{{ get_params }}page={{ number }}{#&per_page={{ per_page }}#}">{{ number }}</a></li>
-                {% endifnotequal %}
-            {% endifequal %}
-            {% endfor %}
-            {% if higher_page %} 
-            <li><a href="{{ get_params }}page={{ higher_page }}{#&per_page={{ per_page }}#}">&raquo;</a></li>
-            {% endif %}
-        </ul>
-        {% endifnotequal %}
-    </div>
+
+    {% if page.has_previous %}
+    <a href="{{ page.previous_link }}">&lt;{% trans "Back" %}</a>
+    {% endif %}
+
+    <span class="summary">{{ label }} <strong>{{ page.start_index }}</strong>&mdash;<strong>{{ page.end_index }}</strong> {% trans "of" %} <strong>{{ paginator.count }}</strong>
+    </span>
+
+    {% if page.has_next %}
+    <a href="{{ page.next_link }}">{% trans "Forward" %}&gt;</a>
+    {% endif %}
+
+
 </div>

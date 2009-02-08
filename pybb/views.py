@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import connection
 
-from pybb.util import render_to, paged, build_form, quote_text
+from pybb.util import render_to, paged, build_form, quote_text, paginate
 from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
@@ -52,7 +52,6 @@ def show_category_ctx(request, category_id):
 show_category = render_to('pybb/category.html')(show_category_ctx)
 
 
-@paged('topics', pybb_settings.FORUM_PAGE_SIZE)
 def show_forum_ctx(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
     topics = forum.topics.order_by('-sticky', '-updated').select_related()
@@ -62,15 +61,17 @@ def show_forum_ctx(request, forum_id):
              'last_posts': forum.posts.order_by('-created').select_related()[:pybb_settings.QUICK_POSTS_NUMBER],
              }
 
+    page, paginator = paginate(topics, request, pybb_settings.FORUM_PAGE_SIZE)
+
     return {'forum': forum,
-            'topics': topics,
+            'topics': page.object_list,
             'quick': quick,
-            'paged_qs': topics,
+            'page': page,
+            'paginator': paginator,
             }
 show_forum = render_to('pybb/forum.html')(show_forum_ctx)
 
     
-@paged('posts', pybb_settings.TOPIC_PAGE_SIZE)
 def show_topic_ctx(request, topic_id):
     try:
         topic = Topic.objects.select_related().get(pk=topic_id)
@@ -108,13 +109,17 @@ def show_topic_ctx(request, topic_id):
     else:
         subscribed = False
 
+    page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE)
+
     return {'topic': topic,
             'last_post': last_post,
             'first_post': first_post,
             'form': form,
             'moderator': moderator,
             'subscribed': subscribed,
-            'paged_qs': posts,
+            'posts': page.object_list,
+            'page': page,
+            'paginator': paginator,
             }
 show_topic = render_to('pybb/topic.html')(show_topic_ctx)
 
@@ -285,15 +290,19 @@ def open_topic(request, topic_id):
 
 
 @render_to('pybb/users.html')
-@paged('users', pybb_settings.USERS_PAGE_SIZE)
 def users_ctx(request):
     users = User.objects.order_by('username')
     form = UserSearchForm(request.GET)
     users = form.filter(users)
-    return {'paged_qs': users,
+
+    page, paginator = paginate(users, request, pybb_settings.USERS_PAGE_SIZE)
+
+    return {'users': page.object_list,
+            'page': page,
+            'paginator': paginator,
             'form': form,
             }
-users = paged('users', pybb_settings.USERS_PAGE_SIZE)(users_ctx)
+users = render_to('pybb/users.html')(users_ctx)
 
 
 @login_required

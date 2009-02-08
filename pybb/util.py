@@ -11,6 +11,7 @@ from django.utils.translation import force_unicode
 from django.utils.simplejson import JSONEncoder
 from django import forms
 from django.template.defaultfilters import urlize as django_urlize
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from pybb import settings as pybb_settings
 
@@ -197,3 +198,34 @@ def memoize_method(func):
             cache[key] = func(self, *args, **kwargs)
         return cache[key]
     return wrapper
+
+
+def paginate(items, request, per_page):
+    try:
+        page_number = int(request.GET.get('page', 1))
+    except ValueError:
+        page_number = 1
+
+    paginator = Paginator(items, per_page)
+    try:
+        page = paginator.page(page_number)
+    except (EmptyPage, InvalidPage):
+        page = paginator.page(1)
+
+    if page.has_previous:
+        get = request.GET.copy()
+        get['page'] = page.number - 1
+        page.previous_link = '?%s' % get.urlencode()
+    else:
+        page.previous_link = None
+
+    if page.has_next:
+        get = request.GET.copy()
+        get['page'] = page.number + 1
+        page.next_link = '?%s' % get.urlencode()
+    else:
+        page.next_link = None
+
+    #import pdb; pdb.set_trace()
+    
+    return page, paginator
