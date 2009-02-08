@@ -46,6 +46,7 @@
     {% endif %}
 </div>
 
+{% if user.is_authorized %}
 {% if not topic.closed %}
 <form action="{% url pybb_add_post topic.id %}" method="post">
     <fieldset>
@@ -54,6 +55,7 @@
         <p><input type="submit" value="{% trans "Submit" %}" /></p>
     </fieldset>
 </form>
+{% endif %}
 {% endif %}
 
 {% endblock %}
