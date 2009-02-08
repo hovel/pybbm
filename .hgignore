@@ -8,6 +8,7 @@
 ^update\.sh$
 ^update_pydev\.sh$
 ^pybb/static/pybb/avatars
+^pybb/static/pybb/attachments
 ^static/pybb/avatars
 .*\.swp$
 ^registration$

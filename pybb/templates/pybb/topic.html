@@ -48,7 +48,7 @@
 
 {% if user.is_authenticated %}
 {% if not topic.closed %}
-<form action="{% url pybb_add_post topic.id %}" method="post">
+<form action="{% url pybb_add_post topic.id %}" method="post" enctype="multipart/form-data">
     <fieldset>
         <legend>{% trans "New reply" %}</legend>
         {{ form.as_p }}

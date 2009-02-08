@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 
 from pybb.util import render_to, paged, build_form, quote_text
-from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage
+from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
 
@@ -233,7 +233,6 @@ def unstick_topic(request, topic_id):
 def delete_post_ctx(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     last_post = post.topic.posts.order_by('-created')[0]
-    topic = post.topic
 
     allowed = False
     if request.user.is_superuser or\
@@ -368,3 +367,10 @@ def show_pm_ctx(request, pm_id):
             'post_user': post_user,
             }
 show_pm = render_to('pybb/pm/message.html')(show_pm_ctx)
+
+
+@login_required
+def show_attachment(request, hash):
+    attachment = get_object_or_404(Attachment, hash=hash)
+    file_obj = file(attachment.get_absolute_path())
+    return HttpResponse(file_obj, content_type=attachment.content_type)

@@ -51,6 +51,12 @@
                     <div class="updated-message">{% trans "Edited" %} {% pybb_time post.updated %}</div>
                     {% endif %}
 
+                    {% if post.attachments.all %}
+                    {% for attach in post.attachments.all %}
+                    {% trans "Attachment" %}: <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
+                    {% endfor %}
+                    {% endif %}
+
                     <div class="post-related">
                         <a href="{% url pybb_add_post topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
                     </div>

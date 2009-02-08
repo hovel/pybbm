@@ -37,6 +37,9 @@ urlpatterns = patterns('',
     url('^post/(?P<post_id>\d+)/edit/$', views.edit_post, name='pybb_edit_post'),
     url('^post/(?P<post_id>\d+)/delete/$', views.delete_post, name='pybb_delete_post'),
 
+    # Attachment
+    url('^attachment/(?P<hash>\w+)/$', views.show_attachment, name='pybb_attachment'),
+
     # Subscription
     url('^subscription/topic/(?P<topic_id>\d+)/delete/$', views.delete_subscription, name='pybb_delete_subscription'),
     url('^subscription/topic/(?P<topic_id>\d+)/add/$', views.add_subscription, name='pybb_add_subscription'),

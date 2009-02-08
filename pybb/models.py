@@ -1,11 +1,14 @@
 from datetime import datetime
+from markdown import Markdown
+import os.path
+import sha
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
-from markdown import Markdown
+from django.conf import settings
 
 from pybb.markups import mypostmarkup 
 from pybb.fields import AutoOneToOneField, ExtendedImageField
@@ -316,6 +319,41 @@ class PrivateMessage(RenderableItem):
 
     def get_absolute_url(self):
         return  reverse('pybb_show_pm', args=[self.id])
+
+
+class Attachment(models.Model):
+    post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
+    size = models.IntegerField(_('Size'))
+    content_type = models.CharField(_('Content type'), max_length=255)
+    path = models.CharField(_('Path'), max_length=255)
+    name = models.TextField(_('Name'))
+    hash = models.CharField(_('Hash'), max_length=40, blank=True, default='', db_index=True)
+
+    def save(self, *args, **kwargs):
+        super(Attachment, self).save(*args, **kwargs)
+        if not self.hash:
+            self.hash = sha.new(str(self.id) + settings.SECRET_KEY).hexdigest()
+        super(Attachment, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('pybb_attachment', args=[self.hash])
+
+    def size_display(self):
+        size = self.size
+        if size < 1024:
+            return '%b' % size
+        elif size < 1024 * 1024:
+            return '%dKb' % int(size / 1024)
+        else:
+            return '%.2fMb' % (size / float(1024 * 1024))
+
+
+    def get_absolute_path(self):
+        return os.path.join(settings.MEDIA_ROOT, pybb_settings.ATTACHMENT_UPLOAD_TO,
+                            self.path)
 
 
 from pybb import signals
