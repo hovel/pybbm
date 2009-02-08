@@ -167,19 +167,6 @@ class RenderableItem(models.Model):
         self.body_html = urlize(self.body_html)
 
 
-class AnonymousPost(models.Model):
-    session_key = models.CharField(_('Session key'), max_length=40)
-    topic = models.ForeignKey(Topic, verbose_name=_('Topic'), blank=True)
-    created = models.DateTimeField(_('Created'), auto_now_add=True)
-
-    markup = models.CharField(_('Markup'), max_length=15, blank=True, default='')
-    body = models.TextField(_('Message'), blank=True, default='')
-
-    class Meta:
-        verbose_name = _('Anonymous post')
-        verbose_name_plural = _('Anonymous posts')
-
-
 class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
