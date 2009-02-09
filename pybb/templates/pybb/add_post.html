@@ -13,12 +13,6 @@
 
 <h1>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</h1>
 
-<form action="{% if forum %}{% url pybb_add_topic forum.id %}{% else %}{% url pybb_add_post topic.id %}{% endif %}" method="post" enctype="multipart/form-data">
-    <fieldset>
-        <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</legend>
-        {{ form.as_p }}
-        <p><input type="submit" value="{% trans "Submit" %}" /></p>
-    </fieldset>
-</form>
+{% include "pybb/add_post_form.html" %}
 
 {% endblock %}

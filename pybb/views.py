@@ -1,4 +1,6 @@
 import math
+from markdown import Markdown
+from pybb.markups import mypostmarkup 
 
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
@@ -9,8 +11,9 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.utils import translation
 
-from pybb.util import render_to, paged, build_form, quote_text, paginate, set_language
-from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment
+from pybb.util import render_to, paged, build_form, quote_text, paginate, set_language, ajax, urlize
+from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment,\
+                        MARKUP_CHOICES
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
 from pybb.orm import load_related
@@ -127,6 +130,7 @@ def show_topic_ctx(request, topic_id):
             'posts': page.object_list,
             'page': page,
             'paginator': paginator,
+            'form_url': reverse('pybb_add_post', args=[topic.id]),
             }
 show_topic = render_to('pybb/topic.html')(show_topic_ctx)
 
@@ -161,9 +165,15 @@ def add_post_ctx(request, forum_id, topic_id):
         post = form.save();
         return HttpResponseRedirect(post.get_absolute_url())
 
+    if topic:
+        form_url = reverse('pybb_add_post', args=[topic.id])
+    else:
+        form_url = reverse('pybb_add_topic', args=[forum.id])
+
     return {'form': form,
             'topic': topic,
             'forum': forum,
+            'form_url': form_url,
             }
 add_post = render_to('pybb/add_post.html')(add_post_ctx)
 
@@ -391,3 +401,24 @@ def show_attachment(request, hash):
     attachment = get_object_or_404(Attachment, hash=hash)
     file_obj = file(attachment.get_absolute_path())
     return HttpResponse(file_obj, content_type=attachment.content_type)
+
+
+@login_required
+@ajax
+def post_ajax_preview(request):
+    content = request.POST.get('content')
+    markup = request.POST.get('markup')
+
+    if not markup in dict(MARKUP_CHOICES).keys():
+        return {'error': 'Invalid markup'}
+
+    if not content:
+        return {'content': ''}
+
+    if markup == 'bbcode':
+        html = mypostmarkup.markup(content, auto_urls=False)
+    elif markup == 'markdown':
+        html = unicode(Markdown(content, safe_mode='escape'))
+
+    html = urlize(html)
+    return {'content': html}

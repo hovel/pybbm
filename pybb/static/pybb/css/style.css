@@ -612,8 +612,27 @@ em {
     margin-bottom: 1em;
 }
 
-.post-preview {
+.post-preview, .preview-box .content {
     background-color: #f5f5f5;
     border: 1px dashed #ccc;
     padding: 1em;
+}
+
+.preview-box .header {
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-bottom: 0.3em;
+}
+
+.preview-box {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    /*background-color: #f9f9f9;*/
+    border: 1px solid #ccc;
+    padding: 1em;
+}
+
+.submit input {
+    display: inline;
+    margin-right: 1em;
 }
