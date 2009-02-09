@@ -7,8 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import connection
+from django.utils import translation
 
-from pybb.util import render_to, paged, build_form, quote_text, paginate
+from pybb.util import render_to, paged, build_form, quote_text, paginate, set_language
 from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
@@ -184,7 +185,8 @@ def show_post(request, post_id):
 def edit_profile_ctx(request):
     form = build_form(EditProfileForm, request, instance=request.user.pybb_profile)
     if form.is_valid():
-        form.save()
+        profile = form.save()
+        set_language(request, profile.language)
         return HttpResponseRedirect(reverse('pybb_edit_profile'))
     return {'form': form,
             'profile': request.user.pybb_profile,

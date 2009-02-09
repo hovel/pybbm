@@ -15,11 +15,6 @@ from pybb.fields import AutoOneToOneField, ExtendedImageField
 from pybb.util import urlize, memoize_method
 from pybb import settings as pybb_settings
 
-LANGUAGE_CHOICES = (
-    ('en', 'English'),
-    ('ru', _('Russian')),
-)
-
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
     (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
     (-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
@@ -242,7 +237,8 @@ class Profile(models.Model):
     location = models.CharField(_('Location'), max_length=30, blank=True, default='')
     signature = models.TextField(_('Signature'), blank=True, default='', max_length=pybb_settings.SIGNATURE_MAX_LENGTH)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(pybb_settings.DEFAULT_TIME_ZONE))
-    language = models.CharField(_('Language'), max_length=3, blank=True, default='en', choices=LANGUAGE_CHOICES)
+    language = models.CharField(_('Language'), max_length=3, blank=True, default='',
+                                choices=settings.LANGUAGES)
     avatar = ExtendedImageField(_('Avatar'), blank=True, default='', upload_to=pybb_settings.AVATARS_UPLOAD_TO, width=pybb_settings.AVATAR_WIDTH, height=pybb_settings.AVATAR_HEIGHT)
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
     markup = models.CharField(_('Default markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)

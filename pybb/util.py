@@ -7,11 +7,12 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
 from django.utils.functional import Promise
-from django.utils.translation import force_unicode
+from django.utils.translation import force_unicode, check_for_language
 from django.utils.simplejson import JSONEncoder
 from django import forms
 from django.template.defaultfilters import urlize as django_urlize
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
+from django.conf import settings
 
 from pybb import settings as pybb_settings
 
@@ -229,3 +230,15 @@ def paginate(items, request, per_page):
     #import pdb; pdb.set_trace()
     
     return page, paginator
+
+
+def set_language(request, language):
+    """
+    Change the language of session of authenticated user.
+    """
+
+    if language and check_for_language(language):
+        if hasattr(request, 'session'):
+            request.session['django_language'] = language
+        else:
+            response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language)
