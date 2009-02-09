@@ -46,7 +46,8 @@ def show_category_ctx(request, category_id):
     quick = {'posts': category.posts.count(),
              'topics': category.topics.count(),
              'last_topics': category.topics.select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
-             'last_posts': category.posts.order_by('-created').select_related()[:pybb_settings.QUICK_POSTS_NUMBER],
+             'last_posts': category.posts.order_by('-created').select_related()\
+                [:pybb_settings.QUICK_POSTS_NUMBER],
              }
     return {'category': category,
             'quick': quick,
@@ -56,13 +57,15 @@ show_category = render_to('pybb/category.html')(show_category_ctx)
 
 def show_forum_ctx(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
-    topics = forum.topics.order_by('-sticky', '-updated').select_related()
+
     quick = {'posts': forum.post_count,
              'topics': forum.topics.count(),
              'last_topics': forum.topics.all().select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
-             'last_posts': forum.posts.order_by('-created').select_related()[:pybb_settings.QUICK_POSTS_NUMBER],
+             'last_posts': forum.posts.order_by('-created').select_related()\
+                [:pybb_settings.QUICK_POSTS_NUMBER],
              }
 
+    topics = forum.topics.order_by('-sticky', '-updated').select_related()
     page, paginator = paginate(topics, request, pybb_settings.FORUM_PAGE_SIZE)
 
     return {'forum': forum,
@@ -86,32 +89,33 @@ def show_topic_ctx(request, topic_id):
     if request.user.is_authenticated():
         topic.update_read(request.user)
 
-    posts = topic.posts.all().select_related()
     if pybb_settings.FREEZE_FIRST_POST:
         first_post = topic.posts.order_by('created')[0]
     else:
         first_post = None
     last_post = topic.posts.order_by('-created')[0]
 
-    profiles = Profile.objects.filter(user__pk__in=set(x.user.id for x in posts))
-    profiles = dict((x.user_id, x) for x in profiles)
-    
-    for post in posts:
-        post.user.pybb_profile = profiles[post.user.id]
-
     initial = {}
     if request.user.is_authenticated():
         initial = {'markup': request.user.pybb_profile.markup}
     form = AddPostForm(topic=topic, initial=initial)
 
-    moderator = request.user.is_superuser or\
-        request.user in topic.forum.moderators.all()
-    if request.user.is_authenticated() and request.user in topic.subscribers.all():
-        subscribed = True
-    else:
-        subscribed = False
+    moderator = (request.user.is_superuser or
+                 request.user in topic.forum.moderators.all())
+    subscribed = (request.user.is_authenticated() and
+                  request.user in topic.subscribers.all())
 
-    page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE)
+    posts = topic.posts.all().select_related()
+    page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE,
+                               total_count=topic.post_count)
+
+    profiles = Profile.objects.filter(user__pk__in=
+        set(x.user.id for x in page.object_list))
+    profiles = dict((x.user_id, x) for x in profiles)
+    
+    for post in page.object_list:
+        post.user.pybb_profile = profiles[post.user.id]
+
     load_related(page.object_list, Attachment.objects.all(), 'post')
 
     return {'topic': topic,

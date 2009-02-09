@@ -201,13 +201,16 @@ def memoize_method(func):
     return wrapper
 
 
-def paginate(items, request, per_page):
+def paginate(items, request, per_page, total_count=None):
     try:
         page_number = int(request.GET.get('page', 1))
     except ValueError:
         page_number = 1
 
     paginator = Paginator(items, per_page)
+    if total_count:
+        paginator._count = total_count
+
     try:
         page = paginator.page(page_number)
     except (EmptyPage, InvalidPage):
