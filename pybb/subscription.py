@@ -2,20 +2,21 @@ from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.utils import translation
 
 from pybb import settings as pybb_settings
 from pybb.util import absolute_url
 
 # i18n features disabled. See ticket #47
 
-TOPIC_SUBSCRIPTION_TEXT_TEMPLATE = (u"""New reply from %(username)s to topic that you have subscribed on.
+TOPIC_SUBSCRIPTION_TEXT_TEMPLATE = lambda: _(u"""New reply from %(username)s to topic that you have subscribed on.
 ---
 %(message)s
 ---
 See topic: %(post_url)s
 Unsubscribe %(unsubscribe_url)s""")
 
-PM_RECIPIENT_TEXT_TEMPLATE = (u"""User %(username)s have sent your the new private message.
+PM_RECIPIENT_TEXT_TEMPLATE = lambda: _(u"""User %(username)s have sent your the new private message.
 ---
 %(message)s
 ---
@@ -52,9 +53,13 @@ def notify_topic_subscribers(post):
     if post != topic.head:
         for user in topic.subscribers.all():
             if user != post.user:
+                old_lang = translation.get_language()
+                lang = user.pybb_profile.language or 'en'
+                translation.activate(lang)
+
                 subject = u'RE: %s' % topic.name
                 to_email = user.email
-                text_content = TOPIC_SUBSCRIPTION_TEXT_TEMPLATE % {
+                text_content = TOPIC_SUBSCRIPTION_TEXT_TEMPLATE() % {
                     'username': post.user.username,
                     'message': post.body_text,
                     'post_url': absolute_url(post.get_absolute_url()),
@@ -62,6 +67,8 @@ def notify_topic_subscribers(post):
                 }
                 #html_content = html_version(post)
                 send_mail([to_email], subject, text_content)
+
+                translation.activate(old_lang)
 
 
 def notify_pm_recipients(pm):
@@ -71,11 +78,19 @@ def notify_pm_recipients(pm):
     if not pm.read:
         from pybb.models import PrivateMessage
 
-        subject = (u'New private message for you')
+        old_lang = translation.get_language()
+        lang = pm.dst_user.pybb_profile.language or 'en'
+        translation.activate(lang)
+
+        print 'LANG', lang
+
+        subject = _(u'New private message for you')
         to_email = pm.dst_user.email
-        text_content = PM_RECIPIENT_TEXT_TEMPLATE % {
+        text_content = PM_RECIPIENT_TEXT_TEMPLATE() % {
             'username': pm.src_user.username,
             'message': pm.body_text,
             'pm_url': absolute_url(pm.get_absolute_url()),
         }
         send_mail([to_email], subject, text_content)
+
+        translation.activate(old_lang)
