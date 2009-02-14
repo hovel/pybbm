@@ -45,6 +45,9 @@ def send_mail(rec_list, subject, text, html=None):
 def notify_topic_subscribers(post):
     from pybb.models import Post
 
+    if pybb_settings.DISABLE_NOTIFICATION:
+        return
+
     topic = post.topic
     if post != topic.head:
         for user in topic.subscribers.all():
@@ -62,6 +65,9 @@ def notify_topic_subscribers(post):
 
 
 def notify_pm_recipients(pm):
+    if pybb_settings.DISABLE_NOTIFICATION:
+        return
+
     if not pm.read:
         from pybb.models import PrivateMessage
 

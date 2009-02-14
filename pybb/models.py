@@ -12,7 +12,7 @@ from django.conf import settings
 
 from pybb.markups import mypostmarkup 
 from pybb.fields import AutoOneToOneField, ExtendedImageField
-from pybb.util import urlize, memoize_method
+from pybb.util import urlize, memoize_method, unescape
 from pybb import settings as pybb_settings
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
@@ -161,7 +161,13 @@ class RenderableItem(models.Model):
             self.body_html = unicode(Markdown(self.body, safe_mode='escape'))
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
-        self.body_text = strip_tags(self.body_html)
+
+        # Remove tags which was generated with the markup processor
+        text = strip_tags(self.body_html)
+
+        # Unescape entities which was generated with the markup processor
+        self.body_text = unescape(text)
+
         self.body_html = urlize(self.body_html)
 
 
@@ -207,10 +213,9 @@ class Post(RenderableItem):
         super(Post, self).save(*args, **kwargs)
 
 
-
-
     def get_absolute_url(self):
         return reverse('pybb_post', args=[self.id])
+
 
     def delete(self, *args, **kwargs):
         self_id = self.id

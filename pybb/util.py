@@ -246,3 +246,16 @@ def set_language(request, language):
             request.session['django_language'] = language
         else:
             response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language)
+
+
+def unescape(text):
+    """
+    Do reverse escaping.
+    """
+
+    text = text.replace('&amp;', '&')
+    text = text.replace('&lt;', '<')
+    text = text.replace('&gt;', '>')
+    text = text.replace('&quot;', '"')
+    text = text.replace('&#39;', '\'')
+    return text
