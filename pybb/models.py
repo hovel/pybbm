@@ -242,7 +242,7 @@ class Profile(models.Model):
     location = models.CharField(_('Location'), max_length=30, blank=True, default='')
     signature = models.TextField(_('Signature'), blank=True, default='', max_length=pybb_settings.SIGNATURE_MAX_LENGTH)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(pybb_settings.DEFAULT_TIME_ZONE))
-    language = models.CharField(_('Language'), max_length=3, blank=True, default='',
+    language = models.CharField(_('Language'), max_length=10, blank=True, default='',
                                 choices=settings.LANGUAGES)
     avatar = ExtendedImageField(_('Avatar'), blank=True, default='', upload_to=pybb_settings.AVATARS_UPLOAD_TO, width=pybb_settings.AVATAR_WIDTH, height=pybb_settings.AVATAR_HEIGHT)
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
