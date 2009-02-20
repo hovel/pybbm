@@ -34,6 +34,7 @@ LANGUAGE_CODE = 'ru-ru'
 LANGUAGES = (
     ('ru', 'Russian'),
     ('en', 'English'),
+    ('pt_BR', 'Portuguese-Brazilian'),
 )
 
 SITE_ID = 1
