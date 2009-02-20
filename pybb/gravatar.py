@@ -1,4 +1,7 @@
-import md5
+try:
+	from hashlib import md5
+except ImportError:
+	from md5 import md5
 import os
 import os.path
 import warnings
@@ -22,7 +25,7 @@ def fetch_gravatar(email):
     Return None if avatar was not found.
     """
 
-    hash = md5.new(email).hexdigest()
+    hash = md5(email).hexdigest()
     size = max(pybb_settings.AVATAR_WIDTH, pybb_settings.AVATAR_HEIGHT)
     default = urllib.quote('http://spam.egg/')
 
