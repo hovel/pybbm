@@ -1,7 +1,10 @@
 from datetime import datetime
 from markdown import Markdown
 import os.path
-import sha
+try:
+    from hashlib import sha1
+except ImportError:
+    from sha import sha as sha1
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -335,7 +338,7 @@ class Attachment(models.Model):
     def save(self, *args, **kwargs):
         super(Attachment, self).save(*args, **kwargs)
         if not self.hash:
-            self.hash = sha.new(str(self.id) + settings.SECRET_KEY).hexdigest()
+            self.hash = sha1(str(self.id) + settings.SECRET_KEY).hexdigest()
         super(Attachment, self).save(*args, **kwargs)
 
     def __unicode__(self):
