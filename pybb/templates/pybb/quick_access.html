@@ -12,12 +12,12 @@
 </script>
 <ul class="tablist quick-access">
     <li class="tablist-row last">
-    <h3 class="header tab-selectors">
+    <div class="header tab-selectors">
         <div class="tab-selector first active" onclick="openTab(this, 'last-topics')">{% trans "Last topics" %}</div>
         <div class="tab-selector" onclick="openTab(this, 'last-posts')">{% trans "Last posts" %}</div>
         <div class="tab-selector" onclick="openTab(this, 'stats')">{% trans "Statistics" %}</div>
         <div class="clear"></div>
-    </h3>
+    </div>
     <ul class="tablist-inner tab-body last-topics">
         {% for topic in quick.last_topics|pybb_unreads:user %}
         <li class="tablist-inner-row forum">
@@ -52,7 +52,6 @@
         {% if quick.users %}
         <li class="tablist-inner-row">{% trans "Users" %}: {{ quick.users }}</li>
         {% endif %}
-        </table>
     </ul>
     </li>
 </ul>
