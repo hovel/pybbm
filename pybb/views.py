@@ -18,6 +18,7 @@ from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchFor
 from pybb import settings as pybb_settings
 from pybb.orm import load_related
 
+
 def index_ctx(request):
     quick = {'posts': Post.objects.count(),
              'topics': Topic.objects.count(),
@@ -44,6 +45,7 @@ def index_ctx(request):
 index = render_to('pybb/index.html')(index_ctx)
 
 
+
 def show_category_ctx(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
     quick = {'posts': category.posts.count(),
@@ -56,6 +58,7 @@ def show_category_ctx(request, category_id):
             'quick': quick,
             }
 show_category = render_to('pybb/category.html')(show_category_ctx)
+
 
 
 def show_forum_ctx(request, forum_id):
@@ -79,7 +82,8 @@ def show_forum_ctx(request, forum_id):
             }
 show_forum = render_to('pybb/forum.html')(show_forum_ctx)
 
-    
+
+
 def show_topic_ctx(request, topic_id):
     try:
         topic = Topic.objects.select_related().get(pk=topic_id)
@@ -135,6 +139,7 @@ def show_topic_ctx(request, topic_id):
 show_topic = render_to('pybb/topic.html')(show_topic_ctx)
 
 
+
 @login_required
 def add_post_ctx(request, forum_id, topic_id):
     forum = None
@@ -178,6 +183,7 @@ def add_post_ctx(request, forum_id, topic_id):
 add_post = render_to('pybb/add_post.html')(add_post_ctx)
 
 
+
 def user_ctx(request, username):
     user = get_object_or_404(User, username=username)
     topic_count = Topic.objects.filter(user=user).count()
@@ -187,12 +193,46 @@ def user_ctx(request, username):
 user = render_to('pybb/user.html')(user_ctx)
 
 
+
+def user_topics_ctx(request, username):
+    user = get_object_or_404(User, username=username) 
+    
+    topics = Topic.objects.filter(user=user).order_by('-created')
+
+    page, paginator = paginate(topics, request, pybb_settings.TOPIC_PAGE_SIZE)
+    return {'profile': user,
+            'page': page,
+            'paginator': paginator,
+            'list': page.object_list,
+            }
+user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
+
+
+# TODO: create template for that view
+# which should be looking like topic template
+#
+#def user_posts_ctx(request, username): 
+    #user = get_object_or_404(User, username=username) 
+    
+    #posts = Post.objects.filter(user=user).order_by('-created')
+    
+    #page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE)
+    #return {'profile': user,
+            #'page': page,
+            #'paginator': paginator,
+            #'list': page.object_list,
+            #}
+#user_posts = render_to('pybb/user_posts.html')(user_posts_ctx)
+
+
+
 def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     count = post.topic.posts.filter(created__lt=post.created).count() + 1
     page = math.ceil(count / float(pybb_settings.TOPIC_PAGE_SIZE))
     url = '%s?page=%d#post-%d' % (reverse('pybb_topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
+
 
 
 @login_required
@@ -207,7 +247,8 @@ def edit_profile_ctx(request):
             }
 edit_profile = render_to('pybb/edit_profile.html')(edit_profile_ctx)
 
-    
+
+
 @login_required
 def edit_post_ctx(request, post_id):
     from pybb.templatetags.pybb_extras import pybb_editable_by
@@ -228,6 +269,7 @@ def edit_post_ctx(request, post_id):
 edit_post = render_to('pybb/edit_post.html')(edit_post_ctx)
 
 
+
 @login_required
 def stick_topic(request, topic_id):
     from pybb.templatetags.pybb_extras import pybb_moderated_by
@@ -240,6 +282,7 @@ def stick_topic(request, topic_id):
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
+
 @login_required
 def unstick_topic(request, topic_id):
     from pybb.templatetags.pybb_extras import pybb_moderated_by
@@ -250,6 +293,7 @@ def unstick_topic(request, topic_id):
             topic.sticky = False
             topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
+
 
 
 @login_required
@@ -283,6 +327,7 @@ def delete_post_ctx(request, post_id):
 delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
 
 
+
 @login_required
 def close_topic(request, topic_id):
     from pybb.templatetags.pybb_extras import pybb_moderated_by
@@ -295,6 +340,7 @@ def close_topic(request, topic_id):
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
+
 @login_required
 def open_topic(request, topic_id):
     from pybb.templatetags.pybb_extras import pybb_moderated_by
@@ -305,6 +351,7 @@ def open_topic(request, topic_id):
             topic.closed = False
             topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
+
 
 
 @render_to('pybb/users.html')
@@ -323,6 +370,7 @@ def users_ctx(request):
 users = render_to('pybb/users.html')(users_ctx)
 
 
+
 @login_required
 def delete_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
@@ -333,11 +381,13 @@ def delete_subscription(request, topic_id):
         return HttpResponseRedirect(reverse('pybb_edit_profile'))
 
 
+
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(reverse('pybb_topic', args=[topic.id]))
+
 
 
 @login_required
@@ -357,6 +407,7 @@ def create_pm_ctx(request):
 create_pm = render_to('pybb/pm/create_pm.html')(create_pm_ctx)
 
 
+
 @login_required
 def pm_outbox_ctx(request):
     messages = PrivateMessage.objects.filter(src_user=request.user)
@@ -366,6 +417,7 @@ def pm_outbox_ctx(request):
 pm_outbox = render_to('pybb/pm/outbox.html')(pm_outbox_ctx)
 
 
+
 @login_required
 def pm_inbox_ctx(request):
     messages = PrivateMessage.objects.filter(dst_user=request.user)
@@ -373,6 +425,7 @@ def pm_inbox_ctx(request):
             'pm_mode': 'inbox',
             }
 pm_inbox = render_to('pybb/pm/inbox.html')(pm_inbox_ctx)
+
 
 
 @login_required
@@ -396,11 +449,13 @@ def show_pm_ctx(request, pm_id):
 show_pm = render_to('pybb/pm/message.html')(show_pm_ctx)
 
 
+
 @login_required
 def show_attachment(request, hash):
     attachment = get_object_or_404(Attachment, hash=hash)
     file_obj = file(attachment.get_absolute_path())
     return HttpResponse(file_obj, content_type=attachment.content_type)
+
 
 
 @login_required

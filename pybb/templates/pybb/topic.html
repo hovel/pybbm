@@ -2,6 +2,11 @@
 {% load pybb_extras %}
 {% load i18n %}
 
+{% block title %}
+{{ topic }}
+{% endblock %}
+
+
 {% block content %}
 <div class="crumbs">
     <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>

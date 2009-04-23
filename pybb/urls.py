@@ -17,6 +17,8 @@ urlpatterns = patterns('',
         {'feed_dict': feeds}, name='pybb_feed'),
 
     # User
+    #url('^user/(?P<username>.*)/posts/$', views.user_posts, name='pybb_profile_posts'),
+    url('^user/(?P<username>.*)/topics/$', views.user_topics, name='pybb_profile_topics'),
     url('^user/(?P<username>.*)/$', views.user, name='pybb_profile'),
     url('^profile/edit/$', views.edit_profile, name='pybb_edit_profile'),
     url('^users/$', views.users, name='pybb_users'),

@@ -1,0 +1,23 @@
+{% extends 'pybb/base.html' %}
+{% load pybb_extras %}
+{% load i18n %}
+
+{% block content %}
+<h1><a href="{% url pybb_profile profile.username %}">{{ profile.username }}</a></h1>
+<div class="userinfo">
+    {% if profile.pybb_profile.avatar %}
+    <div class="avatar">
+        <img src="{{ profile.pybb_profile.avatar.url }}" />
+    </div>
+    {% endif %}
+    {% for topic in list %}
+    <li class="user">
+    
+    <span class="post_count">{{ topic.posts.count }}</span>
+    <span class="updated">{{ topic.created|date:"d M Y h:i" }}</span>
+    <a href={% url pybb_post topic.id %}>{{ topic.body_text }}</a>
+    </li>
+    {% endfor %}
+    {% pybb_pagination _("Topics") %}
+</div>
+{% endblock %}

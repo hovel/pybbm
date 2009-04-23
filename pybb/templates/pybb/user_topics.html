@@ -1,0 +1,26 @@
+{% extends 'pybb/base.html' %}
+{% load pybb_extras %}
+{% load i18n %}
+
+{% block title %}
+{% trans "All topics created by" %} {{ profile }}
+{% endblock %}
+
+
+{% block content %}
+<ul class="tablist">
+    <li class="tablist-row last">
+        <ul class="tablist-inner topic">
+            {% for topic in list %}
+            <li class="tablist-inner-row topic">
+                <span class="title"><a href={% url pybb_topic topic.id %}>{{ topic }}</a></span>
+                <span class="post_count">{{ topic.posts.count }}</span>
+                <span class="updated">{{ topic.created|date:"d M Y h:i" }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </li>
+</ul>
+{% pybb_pagination _("Topics") %}
+</div>
+{% endblock %}

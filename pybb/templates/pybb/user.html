@@ -2,6 +2,11 @@
 {% load pybb_extras %}
 {% load i18n %}
 
+{% block title %}
+<h1>{{ profile.username }}</h1>
+{% endblock %}
+
+
 {% block content %}
 <h1>{{ profile.username }}</h1>
 <div class="userinfo">
@@ -12,8 +17,20 @@
     {% endif %}
     <div class="info">
         <div class="label">{% trans "Statistics" %}</div>
-        <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}</div>
-        <div>{% trans "Number of topics" %}: {{ topic_count }}</div>
+        <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}.
+            {% comment %}
+            &nbsp;
+            <a href="{% url pybb_profile_posts profile.username %}">
+                {% trans "Find all posts" %}
+            </a>
+            {% endcomment %}
+        </div>
+        <div>{% trans "Number of topics" %}: {{ topic_count }}.
+            &nbsp;
+            <a href="{% url pybb_profile_topics profile.username %}">
+                {% trans "Find all topics" %}
+            </a>
+        </div>
         <div>{% trans "Date of registration" %}: {% pybb_time profile.date_joined %}</div>
         <div class="label">{% trans "Contacts" %}</div>
         {% if profile.pybb_profile.location %}
