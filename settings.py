@@ -35,6 +35,7 @@ LANGUAGES = (
     ('ru', 'Russian'),
     ('en', 'English'),
     ('pt_BR', 'Portuguese-Brazilian'),
+    ('he', 'Hebrew'),
 )
 
 SITE_ID = 1
