@@ -47,6 +47,8 @@ class ExtendedImageField(models.ImageField):
 
     
     def save_form_data(self, instance, data):
+        if data.tell(): # fix bug http://pybb.org/ticket/75
+            return      # double run save_form_data => double run .read()
         if data and self.width and self.height:
             content = self.resize_image(data.read(), width=self.width, height=self.height)
             data = SimpleUploadedFile(data.name, content, data.content_type)
