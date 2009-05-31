@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybb\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-25 08:17+0700\n"
+"POT-Creation-Date: 2009-05-31 21:55+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -415,17 +415,21 @@ msgstr "Войти"
 msgid "Search powered by Google"
 msgstr "Поиск осуществляется через Google"
 
-#: templates/pybb/pagination.html:5
-msgid "Back"
-msgstr "Назад"
+#: templates/pybb/pagination.html:6
+msgid "Enter page number"
+msgstr "Введите номер страницы"
 
-#: templates/pybb/pagination.html:8
+#: templates/pybb/pagination.html:13 templates/pybb/pagination.html.py:21
 msgid "of"
 msgstr "из"
 
-#: templates/pybb/pagination.html:12
-msgid "Forward"
-msgstr "Вперёд"
+#: templates/pybb/pagination.html:19
+msgid "Go to page..."
+msgstr "Перейти к странице..."
+
+#: templates/pybb/pagination.html:20
+msgid "Page"
+msgstr "Страница"
 
 #: templates/pybb/post_template.html:27 templates/pybb/user.html:61
 #: templates/pybb/pm/common.html:7
@@ -563,6 +567,12 @@ msgstr "сегодня, %s"
 msgid "yesterday, %s"
 msgstr "вчера, %s"
 
+#~ msgid "Back"
+#~ msgstr "Назад"
+
+#~ msgid "Forward"
+#~ msgstr "Вперёд"
+
 #~ msgid "Russian"
 #~ msgstr "Русский"
 
@@ -571,9 +581,6 @@ msgstr "вчера, %s"
 
 #~ msgid "Older"
 #~ msgstr "Старее"
-
-#~ msgid "Pages"
-#~ msgstr "Страницы"
 
 #~ msgid "Change the email"
 #~ msgstr "Изменить email"

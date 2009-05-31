@@ -388,8 +388,25 @@ pre {
     text-align: right;
 }
 
-.pagination a, .pagination .summary {
-    padding-right: 0.5em;
+.pagination a, .pagination span {
+    padding: 0 0.2em;
+}
+
+.pagination a {
+    background-color: #efefef;
+    border: 1px solid #ccc;
+    color: #5c758c;
+}
+
+.pagination .current {
+    background-color: #999;
+    border: 1px solid #4692bf;
+    color: #ffffff;
+}
+
+.pagination .pages-of {
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .post .permalink {

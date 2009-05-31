@@ -49,7 +49,7 @@ def paged(paged_list_name, per_page):#, per_page_var='per_page'):
     Parse page from GET data and pass it to view. Split the
     query set returned from view.
     """
-    
+
     def decorator(func):
         def wrapper(request, *args, **kwargs):
             result = func(request, *args, **kwargs)
@@ -128,7 +128,7 @@ class JsonResponse(HttpResponse):
         super(JsonResponse, self).__init__(
             content=json_data, mimetype=mimetype)
 
-        
+
 def build_form(Form, _request, GET=False, *args, **kwargs):
     """
     Shorcut for building the form instance of given form class.
@@ -141,12 +141,12 @@ def build_form(Form, _request, GET=False, *args, **kwargs):
     else:
         form = Form(*args, **kwargs)
     return form
-    
+
 
 def urlize(data):
         """
         Urlize plain text links in the HTML contents.
-       
+
         Do not urlize content of A and CODE tags.
         """
 
@@ -217,22 +217,42 @@ def paginate(items, request, per_page, total_count=None):
     except (EmptyPage, InvalidPage):
         page = paginator.page(1)
 
-    if page.has_previous:
-        get = request.GET.copy()
-        get['page'] = page.number - 1
-        page.previous_link = '?%s' % get.urlencode()
-    else:
-        page.previous_link = None
+    # generate 1 ... 6 7 8 *9* 10 11 12 ... 16
+    #                ^    middle      ^
+    # maximum 4 items for left and right position,
+    # first and last show forever
+    # '...' show if (1, last) not in middle
 
-    if page.has_next:
-        get = request.GET.copy()
-        get['page'] = page.number + 1
-        page.next_link = '?%s' % get.urlencode()
-    else:
-        page.next_link = None
+    page.middle_begin = page.number - 3
+    if  page.middle_begin < 1:
+        page.middle_begin = 1
+    page.middle_end = page.number + 3
+    if  page.middle_end > paginator.num_pages:
+        page.middle_end = paginator.num_pages
 
-    #import pdb; pdb.set_trace()
-    
+    get = request.GET.copy()
+
+    def new_get(page):
+        get['page'] = page
+        return page, '?%s' % get.urlencode()
+
+    if  page.middle_begin == 2:
+        page.middle_begin = 1 # == add "<a>1</a>", not "..."
+    if  page.middle_begin > 2: # add "<a>1</a> ... "
+        page.first = new_get(1)[1]
+    else:
+        page.first = None
+
+    if  page.middle_end == paginator.num_pages - 1:
+        page.middle_end = paginator.num_pages # == add "<a>last</a>", not "..."
+    if  page.middle_end < paginator.num_pages - 1: # add " ... <a>last</a>"
+        page.last = new_get(paginator.num_pages)[1]
+    else:
+        page.last = None
+
+    middle = xrange(page.middle_begin, page.middle_end + 1)
+    page.middle = map(new_get, middle)
+
     return page, paginator
 
 
