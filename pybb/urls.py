@@ -43,15 +43,19 @@ urlpatterns = patterns('',
     url('^attachment/(?P<hash>\w+)/$', views.show_attachment, name='pybb_attachment'),
 
     # Subscription
-    url('^subscription/topic/(?P<topic_id>\d+)/delete/$', views.delete_subscription, name='pybb_delete_subscription'),
-    url('^subscription/topic/(?P<topic_id>\d+)/add/$', views.add_subscription, name='pybb_add_subscription'),
+    url('^subscription/topic/(?P<topic_id>\d+)/delete/$',
+        views.delete_subscription, name='pybb_delete_subscription'),
+    url('^subscription/topic/(?P<topic_id>\d+)/add/$',
+        views.add_subscription, name='pybb_add_subscription'),
 
     # Private messages
     url('^pm/new/(?P<thread_id>\d+)/$', views.create_pm, name='pybb_add_pm'),
     url('^pm/new/$', views.create_pm, name='pybb_create_pm'),
     url('^pm/(?P<box>inbox|outbox|trash)/$', views.pm_messagebox, name='pybb_pm_messagebox'),
-    url('^pm/(?P<box>inbox|outbox|trash)/thread/(?P<thread_id>\d+)/$', views.pm_show_thread, name='pybb_pm_show_thread'),
-    url('^pm/(?P<box>inbox|outbox|trash)/unread/(?P<thread_id>\d+)/$', views.pm_show_unread, name='pybb_pm_show_unread'),
+    url('^pm/(?P<box>inbox|outbox|trash)/thread/(?P<thread_id>\d+)/$',
+        views.pm_show_thread, name='pybb_pm_show_thread'),
+    url('^pm/(?P<box>inbox|outbox|trash)/unread/(?P<thread_id>\d+)/$',
+        views.pm_show_unread, name='pybb_pm_show_unread'),
     url('^pm/message/(?P<pm_id>\d+)/$', views.pm_show_message, name='pybb_pm_show_message'),
 
     # API 

@@ -1,4 +1,5 @@
-import math, re
+import math
+import re
 from markdown import Markdown
 from pybb.markups import mypostmarkup 
 
@@ -42,8 +43,9 @@ def index_ctx(request):
     return {'cats': cats,
             'quick': quick,
             }
-index = render_to('pybb/index.html')(index_ctx)
 
+
+index = render_to('pybb/index.html')(index_ctx)
 
 
 def show_category_ctx(request, category_id):
@@ -57,8 +59,9 @@ def show_category_ctx(request, category_id):
     return {'category': category,
             'quick': quick,
             }
-show_category = render_to('pybb/category.html')(show_category_ctx)
 
+
+show_category = render_to('pybb/category.html')(show_category_ctx)
 
 
 def show_forum_ctx(request, forum_id):
@@ -80,8 +83,9 @@ def show_forum_ctx(request, forum_id):
             'page': page,
             'paginator': paginator,
             }
-show_forum = render_to('pybb/forum.html')(show_forum_ctx)
 
+
+show_forum = render_to('pybb/forum.html')(show_forum_ctx)
 
 
 def show_topic_ctx(request, topic_id):
@@ -136,8 +140,9 @@ def show_topic_ctx(request, topic_id):
             'paginator': paginator,
             'form_url': reverse('pybb_add_post', args=[topic.id]),
             }
-show_topic = render_to('pybb/topic.html')(show_topic_ctx)
 
+
+show_topic = render_to('pybb/topic.html')(show_topic_ctx)
 
 
 @login_required
@@ -180,8 +185,9 @@ def add_post_ctx(request, forum_id, topic_id):
             'forum': forum,
             'form_url': form_url,
             }
-add_post = render_to('pybb/add_post.html')(add_post_ctx)
 
+
+add_post = render_to('pybb/add_post.html')(add_post_ctx)
 
 
 def user_ctx(request, username):
@@ -190,8 +196,9 @@ def user_ctx(request, username):
     return {'profile': user,
             'topic_count': topic_count,
             }
-user = render_to('pybb/user.html')(user_ctx)
 
+
+user = render_to('pybb/user.html')(user_ctx)
 
 
 def user_topics_ctx(request, username):
@@ -205,6 +212,8 @@ def user_topics_ctx(request, username):
             'paginator': paginator,
             'list': page.object_list,
             }
+
+
 user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
 
 
@@ -222,8 +231,9 @@ user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
             #'paginator': paginator,
             #'list': page.object_list,
             #}
-#user_posts = render_to('pybb/user_posts.html')(user_posts_ctx)
 
+
+#user_posts = render_to('pybb/user_posts.html')(user_posts_ctx)
 
 
 def show_post(request, post_id):
@@ -232,7 +242,6 @@ def show_post(request, post_id):
     page = math.ceil(count / float(pybb_settings.TOPIC_PAGE_SIZE))
     url = '%s?page=%d#post-%d' % (reverse('pybb_topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
-
 
 
 @login_required
@@ -245,8 +254,9 @@ def edit_profile_ctx(request):
     return {'form': form,
             'profile': request.user.pybb_profile,
             }
-edit_profile = render_to('pybb/edit_profile.html')(edit_profile_ctx)
 
+
+edit_profile = render_to('pybb/edit_profile.html')(edit_profile_ctx)
 
 
 @login_required
@@ -266,8 +276,9 @@ def edit_post_ctx(request, post_id):
     return {'form': form,
             'post': post,
             }
-edit_post = render_to('pybb/edit_post.html')(edit_post_ctx)
 
+
+edit_post = render_to('pybb/edit_post.html')(edit_post_ctx)
 
 
 @login_required
@@ -282,7 +293,6 @@ def stick_topic(request, topic_id):
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
-
 @login_required
 def unstick_topic(request, topic_id):
     from pybb.templatetags.pybb_extras import pybb_moderated_by
@@ -293,7 +303,6 @@ def unstick_topic(request, topic_id):
             topic.sticky = False
             topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
-
 
 
 @login_required
@@ -324,8 +333,9 @@ def delete_post_ctx(request, post_id):
     else:
         return {'post': post,
                 }
-delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
 
+
+delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
 
 
 @login_required
@@ -367,8 +377,9 @@ def users_ctx(request):
             'paginator': paginator,
             'form': form,
             }
-users = render_to('pybb/users.html')(users_ctx)
 
+
+users = render_to('pybb/users.html')(users_ctx)
 
 
 @login_required
@@ -381,13 +392,11 @@ def delete_subscription(request, topic_id):
         return HttpResponseRedirect(reverse('pybb_edit_profile'))
 
 
-
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(reverse('pybb_topic', args=[topic.id]))
-
 
 
 @login_required
@@ -404,7 +413,10 @@ def create_pm_ctx(request):
     return {'form': form,
             'pm_mode': 'create',
             }
+
+
 create_pm = render_to('pybb/pm/create_pm.html')(create_pm_ctx)
+
 
 @login_required
 def pm_messagebox_ctx(request, box):
@@ -439,7 +451,9 @@ def pm_messagebox_ctx(request, box):
             'paginator': paginator,
             }
 
+
 pm_messagebox = render_to('pybb/pm/messagebox.html')(pm_messagebox_ctx)
+
 
 @login_required
 def pm_show_thread_ctx(request, box, thread_id):
@@ -499,11 +513,17 @@ def pm_show_thread_ctx(request, box, thread_id):
             'paginator': paginator,
             'form_url': reverse('pybb_add_pm', args=[thread_id]),
             }
+
+
 pm_show_thread = render_to('pybb/pm/thread.html')(pm_show_thread_ctx)
 
-# jump to first unread PM in thread
+
 @login_required
 def pm_show_unread(request, box, thread_id):
+    """
+    Jump to first unread PM in thread.
+    """
+
     thread_message = get_object_or_404(PrivateMessage, pk=thread_id)
     if not request.user in [thread_message.dst_user, thread_message.src_user]:
         return HttpResponseRedirect(reverse('pybb_index'))
@@ -517,6 +537,7 @@ def pm_show_unread(request, box, thread_id):
     page = math.ceil(message_count / float(pybb_settings.TOPIC_PAGE_SIZE))
     url = '%s?page=%d#message-%d' % (reverse('pybb_pm_show_thread', args=[box, thread_id]), page, first_unread.id)
     return HttpResponseRedirect(url)
+
 
 @login_required
 def pm_show_message_ctx(request, pm_id):
@@ -532,18 +553,21 @@ def pm_show_message_ctx(request, pm_id):
     else:
         pm_mode = 'sent'
         post_user = msg.dst_user
+
     return {'msg': msg,
             'pm_mode': pm_mode,
             'post_user': post_user,
             }
+
+
 pm_show_message = render_to('pybb/pm/message.html')(pm_show_message_ctx)
+
 
 @login_required
 def show_attachment(request, hash):
     attachment = get_object_or_404(Attachment, hash=hash)
     file_obj = file(attachment.get_absolute_path())
     return HttpResponse(file_obj, content_type=attachment.content_type)
-
 
 
 @login_required
@@ -564,4 +588,6 @@ def post_ajax_preview(request):
         html = unicode(Markdown(content, safe_mode='escape'))
 
     html = urlize(html)
-    return {'content': html}
+
+    return {'content': html,
+            }

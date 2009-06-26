@@ -334,10 +334,12 @@ class PrivateMessage(RenderableItem):
 class MessageBox(models.Model):
     """
     Each private message may belong to one or more message boxes.
+
     This m2m relationship also defines which message is first
         in any given message thread (first message has head=True)
         and if the thread has unread messages (thread_read)
     """
+
     message = models.ForeignKey(PrivateMessage)
     user = models.ForeignKey(User)
 
