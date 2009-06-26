@@ -1,11 +1,11 @@
 {% extends "pybb/base.html" %}
-{% load i18n filters pybb_extras %}
+{% load i18n pybb_extras %}
 
 {% block content %}
 {% with msg as post %}
 
 <div id="breadcrumbs">
-    {% if inbox %}<a href="{% url pm_inbox %}">{% trans "Inbox" %}</a>{% else %}<a href="{% url pm_outbox %}">{% trans "Outbox" %}</a>{% endif %} / <strong>{{ post.subject }}</strong>
+    {% if inbox %}<a href="{% url pm_inbox %}">{% trans "Inbox" %}</a>{% else %}<a href="{% url pybb_pm_messagebox "outbox" %}">{% trans "Outbox" %}</a>{% endif %} / <strong>{{ post.subject }}</strong>
 </div>
 
 <ul class="posts">
