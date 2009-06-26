@@ -328,7 +328,7 @@ class PrivateMessage(RenderableItem):
         super(PrivateMessage, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return  reverse('pybb_show_pm', args=[self.id])
+        return reverse('pybb_pm_show_message', args=[self.id])
 
 
 class MessageBox(models.Model):
