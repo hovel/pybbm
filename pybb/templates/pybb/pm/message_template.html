@@ -1,0 +1,46 @@
+{% load i18n %}
+{% load pybb_extras %}
+
+{% with mb.message as message %}
+<div class="post post-{% cycle "odd" "even" %}">
+    <div class="inner" id="message-{{message.id}}">
+        <table>
+            <tr>
+                <td class="info" width="15%">
+                    {% ifequal messagebox "inbox" %}
+                        {% if message.src_user.pybb_profile.avatar %}
+                        <div class="avatar">
+                            <a href="{% url pybb_profile message.src_user %}">
+                            <img src="{{ message.src_user.pybb_profile.avatar.url }}" />
+                            </a>
+                        </div>
+                        {% endif %}
+                        <div class="author">{{ message.src_user|pybb_profile_link }}</div>
+                    {% else %}
+                        {% if message.dst_user.pybb_profile.avatar %}
+                        <div class="avatar">
+                            <a href="{% url pybb_profile message.dst_user %}">
+                            <img src="{{ message.dst_user.pybb_profile.avatar.url }}" />
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% trans "to" %} <div class="author">{{ message.dst_user|pybb_profile_link }}</div>
+                    {% endifequal %}
+
+                    {% if user.is_superuser %}
+                    <!--<div class="updated">{{ message.user_ip }}</div>-->
+                    {% endif %}
+                    <div class="bottom">
+                        <a class="permalink" href="{{ message.get_absolute_url }}">#</a>
+                        <span class="updated">{% pybb_time message.created %}</span>
+                    </div>
+                </td>
+                <td class="content{% if not mb.read %} new{% endif %}" width="85%">
+                    {% ifchanged message.subject %}<div class="subject">{{ message.subject }}</div>{% endifchanged %}
+                    {{ message.body_html|safe }}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endwith %}

@@ -1,8 +1,11 @@
 {% load i18n %}
 {% load pybb_extras %}
 
+{% with user.pybb_profile.unread_pm_count as inbox_count %}
 <div class="pm-common">
-    <a class="{% ifequal pm_mode "inbox" %}selected{% endifequal %}" href="{% url pybb_pm_inbox %}">{% trans "Inbox" %}</a>
-    / <a class="{% ifequal pm_mode "outbox" %}selected{% endifequal %}" href="{% url pybb_pm_outbox %}">{% trans "Outbox" %}</a>
+    <a href="{% url pybb_index %}">{% trans "Root" %}</a> /
+    <a class="{% ifequal messagebox "inbox" %}selected{% endifequal %}" href="{% url pybb_pm_messagebox "inbox" %}">{% trans "Inbox" %}{% if inbox_count %} ({{ inbox_count }}){% endif %}</a>
+    / <a class="{% ifequal messagebox "outbox" %}selected{% endifequal %}" href="{% url pybb_pm_messagebox "outbox" %}">{% trans "Outbox" %}</a>
     / <a class="{% ifequal pm_mode "create" %}selected{% endifequal %}" href="{% url pybb_create_pm %}">{% trans "Send PM" %}</a>
 </div>
+{% endwith %}

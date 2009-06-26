@@ -1,4 +1,4 @@
-import math
+import math, re
 from markdown import Markdown
 from pybb.markups import mypostmarkup 
 
@@ -9,11 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import connection
-from django.utils import translation
+from django.utils.translation import ugettext_lazy as _
 
 from pybb.util import render_to, paged, build_form, quote_text, paginate, set_language, ajax, urlize
 from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment,\
-                        MARKUP_CHOICES
+                        MessageBox, MARKUP_CHOICES
 from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
 from pybb.orm import load_related
@@ -399,40 +399,130 @@ def create_pm_ctx(request):
 
     if form.is_valid():
         post = form.save();
-        return HttpResponseRedirect(reverse('pybb_pm_outbox'))
+        return HttpResponseRedirect(reverse('pybb_pm_messagebox', args=['inbox']))
 
     return {'form': form,
             'pm_mode': 'create',
             }
 create_pm = render_to('pybb/pm/create_pm.html')(create_pm_ctx)
 
-
-
 @login_required
-def pm_outbox_ctx(request):
-    messages = PrivateMessage.objects.filter(src_user=request.user)
-    return {'messages': messages,
-            'pm_mode': 'outbox',
+def pm_messagebox_ctx(request, box):
+    if request.method == 'POST':
+        action = request.POST.get('action', '')
+        thread_ids = []
+        for k in request.POST.keys():
+            m = re.match('^thread(\d+)', k)
+            if m: thread_ids.append(int(m.groups()[0]))
+
+        if len(thread_ids):
+            messages = MessageBox.objects.filter(message__thread__id__in=thread_ids, user=request.user, box=box)
+            if action == 'delete':
+                messages.update(box='trash')
+            elif action == 'mark_read':
+                messages.update(read=True)
+                messages.filter(head=True).update(thread_read=True)
+            elif action == 'mark_unread':
+                messages.update(read=False)
+                messages.filter(head=True).update(thread_read=False)
+
+        return HttpResponseRedirect(reverse('pybb_pm_messagebox', args=[box]))
+
+    messages = MessageBox.objects.filter(box=box, user=request.user,
+        head=True).order_by('thread_read', '-message__created').select_related()
+    page, paginator = paginate(messages, request, pybb_settings.FORUM_PAGE_SIZE,
+                               total_count=messages.count())
+    return {'messagebox': box,
+            'messagebox_name': _(box.capitalize()),
+            'messages': page.object_list,
+            'page': page,
+            'paginator': paginator,
             }
-pm_outbox = render_to('pybb/pm/outbox.html')(pm_outbox_ctx)
 
-
+pm_messagebox = render_to('pybb/pm/messagebox.html')(pm_messagebox_ctx)
 
 @login_required
-def pm_inbox_ctx(request):
-    messages = PrivateMessage.objects.filter(dst_user=request.user)
-    return {'messages': messages,
-            'pm_mode': 'inbox',
+def pm_show_thread_ctx(request, box, thread_id):
+    thread_message = get_object_or_404(PrivateMessage, pk=thread_id)
+    mb_messages = MessageBox.objects.filter(box=box,
+        user=request.user, message__thread=thread_message).order_by('message__created').select_related()
+
+    try:
+        head = mb_messages.filter(head=True)[0]
+        last = mb_messages[:1][0]
+    except IndexError:
+        # thread entirely deleted
+        raise Http404
+
+    if request.user not in [head.message.src_user, head.message.dst_user]:
+        raise Http404
+
+    initial = {
+        'thread': thread_id,
+        'subject': last.message.subject,
+        'markup': request.user.pybb_profile.markup,
+        'recipient': head.message.src_user.username
+    }
+
+    if request.user == head.message.src_user:
+        initial['recipient'] = head.message.dst_user.username
+
+    form = CreatePMForm(initial=initial)
+
+    page, paginator = paginate(mb_messages, request, pybb_settings.TOPIC_PAGE_SIZE,
+                               total_count=mb_messages.count())
+
+    profiles = Profile.objects.filter(user__pk__in=
+        set(x.message.src_user.id for x in page.object_list))
+    profiles = dict((x.user_id, x) for x in profiles)
+
+    update_read_thread = False
+    for mb in page.object_list:
+        mb.message.src_user.pybb_profile = profiles[mb.message.src_user.id]
+        # update read
+        # TODO: move this to template so we can show unread messages in different style
+        if mb.message.dst_user == request.user and not mb.read:
+            update_read_thread = True
+            mb.read = True
+            mb.save()
+
+    thread_messages = MessageBox.objects.filter(box=box,
+            user=request.user, message__thread__id=thread_id)
+    if update_read_thread and thread_messages.filter(read=False).count() == 0:
+        thread_messages.filter(head=True).update(thread_read=True)
+
+    return {'messagebox': box,
+            'head': head,
+            'form': form,
+            'messages': page.object_list,
+            'page': page,
+            'paginator': paginator,
+            'form_url': reverse('pybb_add_pm', args=[thread_id]),
             }
-pm_inbox = render_to('pybb/pm/inbox.html')(pm_inbox_ctx)
+pm_show_thread = render_to('pybb/pm/thread.html')(pm_show_thread_ctx)
 
+# jump to first unread PM in thread
+@login_required
+def pm_show_unread(request, box, thread_id):
+    thread_message = get_object_or_404(PrivateMessage, pk=thread_id)
+    if not request.user in [thread_message.dst_user, thread_message.src_user]:
+        return HttpResponseRedirect(reverse('pybb_index'))
+    try:
+        first_unread = MessageBox.objects.filter(message__thread=thread_message,
+            box=box, user=request.user, read=False).order_by('message__created')[0].message
+    except IndexError:
+        return HttpResponseRedirect(reverse('pybb_pm_show_thread', args=[box, thread_id]))
 
+    message_count = PrivateMessage.objects.filter(thread=thread_message, created__lt=first_unread.created).count() + 1
+    page = math.ceil(message_count / float(pybb_settings.TOPIC_PAGE_SIZE))
+    url = '%s?page=%d#message-%d' % (reverse('pybb_pm_show_thread', args=[box, thread_id]), page, first_unread.id)
+    return HttpResponseRedirect(url)
 
 @login_required
-def show_pm_ctx(request, pm_id):
+def pm_show_message_ctx(request, pm_id):
     msg = get_object_or_404(PrivateMessage, pk=pm_id)
     if not request.user in [msg.dst_user, msg.src_user]:
-        return HttpRedirectException('/')
+        return HttpResponseRedirect(reverse('pybb_index'))
     if request.user == msg.dst_user:
         pm_mode = 'inbox'
         if not msg.read:
@@ -440,15 +530,13 @@ def show_pm_ctx(request, pm_id):
             msg.save()
         post_user = msg.src_user
     else:
-        pm_mode = 'outbox'
+        pm_mode = 'sent'
         post_user = msg.dst_user
     return {'msg': msg,
             'pm_mode': pm_mode,
             'post_user': post_user,
             }
-show_pm = render_to('pybb/pm/message.html')(show_pm_ctx)
-
-
+pm_show_message = render_to('pybb/pm/message.html')(pm_show_message_ctx)
 
 @login_required
 def show_attachment(request, hash):

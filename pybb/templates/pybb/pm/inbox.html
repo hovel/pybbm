@@ -5,15 +5,35 @@
 {% block content %}
 {% include "pybb/pm/common.html" %}
 <h1>{% trans "Inbox" %}</h1>
-<ul>
-    {% for msg in messages %}
-    <li>
-        <a href="{% url pybb_show_pm msg.id %}" {% if not msg.read %}class="selected"{% endif %}>{{ msg.subject }}</a>
-        {% trans "from" %}
-        <span class="author"> {{ msg.src_user|pybb_profile_link }} </span>
 
-        <span class="date">@ {% pybb_time msg.created %}</span>
-    </li>
+{% if threads %}
+<form action="." method="post" class="pm">
+<p>{% trans "Select messages:" %}
+<a href="javascript://">{% trans "All" %}</a> |
+<a href="javascript://">{% trans "None" %}</a> |
+<a href="javascript://">{% trans "Read messages" %}</a> |
+<a href="javascript://">{% trans "Unread messages" %}</a>
+
+<label>{% trans "With selected:" %} <select name="action" id="actionselect">
+<option value=""></option>
+<option value="delete">{% trans "Delete" %}</option>
+<option value="delete">{% trans "Mark as read" %}</option>
+<option value="delete">{% trans "Mark as unread" %}</option>
+</select></label>
+</p>
+<table class="pm">    
+    {% for thread in threads %}    
+    <tr{% if not thread.read %} class="new"{% endif %}>
+        <td><input type="checkbox" name="id{{thread.id}}" value="1" /></td>
+        <td class="author">{{ thread.started_by|pybb_profile_link }}</td>
+        <td class="subject"><a href="{{thread.get_absolute_url}}" >{{ thread.subject }}</a></td>
+        <td class="date">{% pybb_time thread.created %}</td>    
+    </tr>
     {% endfor %}
-</ul>
+</table>
+</form>
+{% else %}
+<p>{% trans "Inbox is empty" %}</p>
+{% endif %}
+
 {% endblock %}

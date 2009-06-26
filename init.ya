@@ -18,6 +18,13 @@ User:
    password: test
    email: lizendir@gmail.com
    ref: lorien
+ # Users
+ - username: user
+   is_staff: False
+   is_superuser: True
+   password: test
+   email: test@example.com
+   ref: user
 
 
 Category:

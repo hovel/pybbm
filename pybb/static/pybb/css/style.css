@@ -630,6 +630,41 @@ em {
     margin-bottom: 1em;
 }
 
+table.pm {
+    width: 100%;
+}
+
+table.pm .cb {
+    width:1em;
+}
+
+table.pm td, table.pm th {
+    margin:0;
+    border:0;
+    padding: 5px;
+    background: #eee;
+    border-bottom:1px solid #ccc;
+}
+
+table.pm .new td, table.pm th {
+    background:#fff;
+    font-weight:bold;
+}
+
+table.pm tr.chosen td {
+    background-color: #ffd;
+}
+
+form.pm p {
+    font-size:75%;
+}
+
+form.pm label {
+    display: inline;
+    font-weight: normal;
+}
+
+
 .post-preview, .preview-box .content {
     background-color: #f5f5f5;
     border: 1px dashed #ccc;

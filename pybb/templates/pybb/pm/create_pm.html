@@ -3,12 +3,10 @@
 {% load i18n %}
 
 {% block content %}
-<div class="crumbs">
-    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% trans "New private message" %}
-</div>
+
 {% include "pybb/pm/common.html" %}
 
-<form method="post">
+<form method="post" action=".">
     <fieldset>
         <legend>{% trans "New private message" %}</legend>
         {{ form.as_p }}

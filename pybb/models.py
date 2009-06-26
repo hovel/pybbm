@@ -34,6 +34,11 @@ MARKUP_CHOICES = (
     ('markdown', 'markdown'),
 )
 
+MESSAGEBOX_CHOICES = (
+    ('inbox', _('Inbox')),
+    ('outbox', _('Outbox')),
+    ('trash', _('Trash')),
+)
 
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
@@ -84,7 +89,7 @@ class Forum(models.Model):
 
     def get_absolute_url(self):
         return reverse('pybb_forum', args=[self.id])
-    
+
     @property
     def posts(self):
         return Post.objects.filter(topic__forum=self).select_related()
@@ -117,7 +122,7 @@ class Topic(models.Model):
 
     def __unicode__(self):
         return self.name
-    
+
     @property
     def head(self):
         return self.posts.all().order_by('created').select_related()[0]
@@ -260,8 +265,7 @@ class Profile(models.Model):
 
     @memoize_method
     def unread_pm_count(self):
-        return PrivateMessage.objects.filter(dst_user=self, read=False).count()
-
+        return MessageBox.objects.filter(user=self, box='inbox', read=False).count()
 
 class Read(models.Model):
     """
@@ -289,10 +293,10 @@ class Read(models.Model):
 
 
 class PrivateMessage(RenderableItem):
-
-    dst_user = models.ForeignKey(User, verbose_name=_('Recipient'), related_name='dst_users')
-    src_user = models.ForeignKey(User, verbose_name=_('Author'), related_name='src_users')
-    read = models.BooleanField(_('Read'), blank=True, default=False)
+    thread = models.ForeignKey('self', blank=True, null=True)
+    user_box = models.ManyToManyField(User, verbose_name=_('User relation'), through='MessageBox')
+    src_user = models.ForeignKey(User, verbose_name=_('Author'), related_name='pm_author')
+    dst_user = models.ForeignKey(User, verbose_name=_('Recipient'), related_name='pm_recipient')
     created = models.DateTimeField(_('Created'), blank=True)
     markup = models.CharField(_('Markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     subject = models.CharField(_('Subject'), max_length=255)
@@ -325,6 +329,23 @@ class PrivateMessage(RenderableItem):
 
     def get_absolute_url(self):
         return  reverse('pybb_show_pm', args=[self.id])
+
+
+class MessageBox(models.Model):
+    """
+    Each private message may belong to one or more message boxes.
+    This m2m relationship also defines which message is first
+        in any given message thread (first message has head=True)
+        and if the thread has unread messages (thread_read)
+    """
+    message = models.ForeignKey(PrivateMessage)
+    user = models.ForeignKey(User)
+
+    box = models.CharField(_('Messagebox'), max_length=15, choices=MESSAGEBOX_CHOICES, db_index=True)
+    head = models.BooleanField(db_index=True)
+    read = models.BooleanField(default=False)
+    thread_read = models.BooleanField(db_index=True, default=False)
+    message_count = models.IntegerField(default=1)
 
 
 class Attachment(models.Model):

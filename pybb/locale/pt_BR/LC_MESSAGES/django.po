@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-25 08:17+0700\n"
+"POT-Creation-Date: 2009-06-26 10:24+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 msgid "Additional options"
 msgstr "Opçoes adicionais"
 
-#: admin.py:63 models.py:183 models.py:299
+#: admin.py:63 models.py:188 models.py:303
 msgid "Message"
 msgstr "Mensagem"
 
@@ -36,7 +36,8 @@ msgstr "Últimos posts no fórum"
 msgid "Latest topics on forum"
 msgstr "Últimos tópicos no fórum"
 
-#: forms.py:14 models.py:103 models.py:298
+#: forms.py:14 models.py:108 models.py:302
+#: templates/pybb/pm/messagebox.html:38
 msgid "Subject"
 msgstr "Assunto"
 
@@ -48,211 +49,246 @@ msgstr "Anexo"
 msgid "Attachment is too big"
 msgstr "O anexo é muito grande"
 
-#: forms.py:124 models.py:293
+#: forms.py:124 models.py:299
 msgid "Recipient"
 msgstr "Destinatário"
 
-#: forms.py:141
+#: forms.py:142
 #, python-format
 msgid "User with login %s does not exist"
 msgstr "Usuário com o login %s não existe"
 
-#: models.py:39 models.py:67 models.py:335
+#: forms.py:145
+msgid "You can't send PM to yourself"
+msgstr ""
+
+#: forms.py:158 forms.py:161
+msgid "Invalid thread ID"
+msgstr ""
+
+#: models.py:38 templates/pybb/edit_profile.html:12
+#: templates/pybb/pm/base.html:7 templates/pybb/pm/common.html:7
+#: templates/pybb/pm/inbox.html:7 templates/pybb/pm/message.html:8
+msgid "Inbox"
+msgstr "Caixa de entrada"
+
+#: models.py:39 templates/pybb/edit_profile.html:13
+#: templates/pybb/pm/base.html:8 templates/pybb/pm/common.html:8
+#: templates/pybb/pm/message.html:8 templates/pybb/pm/outbox.html:5
+msgid "Outbox"
+msgstr "Caixa de saída"
+
+#: models.py:40
+#, fuzzy
+msgid "Trash"
+msgstr "Hash"
+
+#: models.py:44 models.py:72 models.py:359
 msgid "Name"
 msgstr "Nome"
 
-#: models.py:40 models.py:68
+#: models.py:45 models.py:73
 msgid "Position"
 msgstr "Posição"
 
-#: models.py:44 models.py:66
+#: models.py:49 models.py:71
 msgid "Category"
 msgstr "Categoria"
 
-#: models.py:45
+#: models.py:50
 msgid "Categories"
 msgstr "Categorias"
 
-#: models.py:69
+#: models.py:74
 msgid "Description"
 msgstr "Descrição"
 
-#: models.py:70
+#: models.py:75
 msgid "Moderators"
 msgstr "Moderadores"
 
-#: models.py:71 models.py:105 models.py:181
+#: models.py:76 models.py:110 models.py:186
 msgid "Updated"
 msgstr "Atualizado"
 
-#: models.py:72 models.py:111
+#: models.py:77 models.py:116
 msgid "Post count"
 msgstr "Número de post"
 
-#: models.py:76 models.py:102
+#: models.py:81 models.py:107
 msgid "Forum"
 msgstr "Fórum"
 
-#: models.py:77
+#: models.py:82
 msgid "Forums"
 msgstr "Fóruns"
 
-#: models.py:104 models.py:180 models.py:296
+#: models.py:109 models.py:185 models.py:300
+#: templates/pybb/pm/messagebox.html:39
 msgid "Created"
 msgstr "Criado"
 
-#: models.py:106 models.py:179 models.py:240 models.py:272
+#: models.py:111 models.py:184 models.py:245 models.py:276
 msgid "User"
 msgstr "Usuário"
 
-#: models.py:107
+#: models.py:112
 msgid "Views count"
 msgstr "Contagem de visualizações"
 
-#: models.py:108
+#: models.py:113
 msgid "Sticky"
 msgstr "Pendurado"
 
-#: models.py:109 templates/pybb/forum.html:24
+#: models.py:114 templates/pybb/forum.html:24
 msgid "Closed"
 msgstr "Fechado"
 
-#: models.py:110
+#: models.py:115
 msgid "Subscribers"
 msgstr "Assinantes"
 
-#: models.py:115 models.py:178 models.py:273
+#: models.py:120 models.py:183 models.py:277
 msgid "Topic"
 msgstr "Tópico"
 
-#: models.py:116 templates/pybb/forum.html:35
+#: models.py:121 templates/pybb/forum.html:35
 #: templates/pybb/quick_access.html:47 templates/pybb/user_posts.html:21
 #: templates/pybb/user_topics.html:25
 msgid "Topics"
 msgstr "Tópicos"
 
-#: models.py:182 models.py:297
+#: models.py:187 models.py:301
 msgid "Markup"
 msgstr "Marcação"
 
-#: models.py:184 models.py:300
+#: models.py:189 models.py:304
 msgid "HTML version"
 msgstr "Versão HTML"
 
-#: models.py:185 models.py:301
+#: models.py:190 models.py:305
 msgid "Text version"
 msgstr "Versão Texto"
 
-#: models.py:186
+#: models.py:191
 msgid "User IP"
 msgstr "IP do usuário"
 
-#: models.py:191 models.py:331
+#: models.py:196 models.py:355
 msgid "Post"
 msgstr "Post"
 
-#: models.py:192 templates/pybb/quick_access.html:50
+#: models.py:197 templates/pybb/quick_access.html:50
 #: templates/pybb/topic.html:15 templates/pybb/topic.html.py:28
 msgid "Posts"
 msgstr "Posts"
 
-#: models.py:241 templates/pybb/user.html:40
+#: models.py:246 templates/pybb/user.html:40
 msgid "Site"
 msgstr "Site"
 
-#: models.py:242
+#: models.py:247
 msgid "Jabber"
 msgstr "Jabber"
 
-#: models.py:243
+#: models.py:248
 msgid "ICQ"
 msgstr "ICQ"
 
-#: models.py:244
+#: models.py:249
 msgid "MSN"
 msgstr "MSN"
 
-#: models.py:245
+#: models.py:250
 msgid "AIM"
 msgstr "AIM"
 
-#: models.py:246
+#: models.py:251
 msgid "Yahoo"
 msgstr "Yahoo"
 
-#: models.py:247 templates/pybb/user.html:37
+#: models.py:252 templates/pybb/user.html:37
 msgid "Location"
 msgstr "Localização"
 
-#: models.py:248
+#: models.py:253
 msgid "Signature"
 msgstr "Assinatura"
 
-#: models.py:249
+#: models.py:254
 msgid "Time zone"
 msgstr "Fuso horário"
 
-#: models.py:250
+#: models.py:255
 msgid "Language"
 msgstr "Língua"
 
-#: models.py:252
+#: models.py:257
 msgid "Avatar"
 msgstr "Avatar"
 
-#: models.py:253
+#: models.py:258
 msgid "Show signatures"
 msgstr "Mostrar assinaturas"
 
-#: models.py:254
+#: models.py:259
 msgid "Default markup"
 msgstr "Marcação padrão"
 
-#: models.py:257
+#: models.py:262
 msgid "Profile"
 msgstr "Perfil"
 
-#: models.py:258
+#: models.py:263
 msgid "Profiles"
 msgstr "Perfis"
 
-#: models.py:274
+#: models.py:278
 msgid "Time"
 msgstr "Tempo"
 
-#: models.py:278 models.py:295
+#: models.py:282
 msgid "Read"
 msgstr "Ler"
 
-#: models.py:279
+#: models.py:283
 msgid "Reads"
 msgstr "Leituras"
 
-#: models.py:294
+#: models.py:297
+msgid "User relation"
+msgstr ""
+
+#: models.py:298
 msgid "Author"
 msgstr "Autor"
 
-#: models.py:305
+#: models.py:309
 msgid "Private message"
 msgstr "Mensagem privada"
 
-#: models.py:306
+#: models.py:310
 msgid "Private messages"
 msgstr "Mensagens privadas"
 
-#: models.py:332
+#: models.py:344
+#, fuzzy
+msgid "Messagebox"
+msgstr "Mensagem"
+
+#: models.py:356
 msgid "Size"
 msgstr "Tamanho"
 
-#: models.py:333
+#: models.py:357
 msgid "Content type"
 msgstr "Tipo de conteúdo"
 
-#: models.py:334
+#: models.py:358
 msgid "Path"
 msgstr "Caminho"
 
-#: models.py:336
+#: models.py:360
 msgid "Hash"
 msgstr "Hash"
 
@@ -295,8 +331,7 @@ msgstr "Nova mensagem privada para você"
 #: templates/pybb/add_post.html:8 templates/pybb/add_post.html.py:10
 #: templates/pybb/category.html:11 templates/pybb/create_pm.html:7
 #: templates/pybb/edit_post.html:7 templates/pybb/forum.html:12
-#: templates/pybb/topic.html:12 templates/pybb/pm/create_pm.html:7
-#: templates/pybb/pm/message.html:9
+#: templates/pybb/topic.html:12 templates/pybb/pm/common.html:6
 msgid "Root"
 msgstr "Raiz"
 
@@ -314,16 +349,16 @@ msgid "Preview"
 msgstr "Prever"
 
 #: templates/pybb/add_post_form.html:12 templates/pybb/create_pm.html:14
-#: templates/pybb/pm/create_pm.html:15
+#: templates/pybb/pm/create_pm.html:13 templates/pybb/pm/thread.html:29
 msgid "Submit"
 msgstr "Enviar"
 
 #: templates/pybb/create_pm.html:7 templates/pybb/create_pm.html.py:12
-#: templates/pybb/pm/create_pm.html:7 templates/pybb/pm/create_pm.html:13
+#: templates/pybb/pm/create_pm.html:11
 msgid "New private message"
 msgstr "Nova mensagem privada"
 
-#: templates/pybb/delete_post.html:5
+#: templates/pybb/delete_post.html:5 templates/pybb/pm/message.html:36
 msgid "Are you sure you want to delete this message?"
 msgstr "Você tem certeza que deseja remover esta mensagem?"
 
@@ -346,16 +381,6 @@ msgstr "Editando perfil"
 #: templates/pybb/edit_profile.html:10
 msgid "Change the password"
 msgstr "Mudar a senha"
-
-#: templates/pybb/edit_profile.html:12 templates/pybb/pm/base.html:7
-#: templates/pybb/pm/common.html:5 templates/pybb/pm/inbox.html:7
-#: templates/pybb/pm/message.html:9
-msgid "Inbox"
-msgstr "Caixa de entrada"
-
-#: templates/pybb/edit_profile.html:13 templates/pybb/pm/base.html:8
-msgid "outbox"
-msgstr "Caixa de saída"
 
 #: templates/pybb/edit_profile.html:21
 msgid "Subscriptions on topics"
@@ -415,20 +440,24 @@ msgstr "Autenticar"
 msgid "Search powered by Google"
 msgstr "Procura by Google"
 
-#: templates/pybb/pagination.html:5
-msgid "Back"
-msgstr "Voltar"
+#: templates/pybb/pagination.html:6
+msgid "Enter page number"
+msgstr ""
 
-#: templates/pybb/pagination.html:8
+#: templates/pybb/pagination.html:15 templates/pybb/pagination.html.py:23
 msgid "of"
 msgstr "de"
 
-#: templates/pybb/pagination.html:12
-msgid "Forward"
-msgstr "Avançar"
+#: templates/pybb/pagination.html:21
+msgid "Go to page..."
+msgstr ""
+
+#: templates/pybb/pagination.html:22
+msgid "Page"
+msgstr ""
 
 #: templates/pybb/post_template.html:27 templates/pybb/user.html:61
-#: templates/pybb/pm/common.html:7
+#: templates/pybb/pm/common.html:9
 msgid "Send PM"
 msgstr "Enviar MP"
 
@@ -436,7 +465,8 @@ msgstr "Enviar MP"
 msgid "Edit"
 msgstr "Editar"
 
-#: templates/pybb/post_template.html:36
+#: templates/pybb/post_template.html:36 templates/pybb/pm/inbox.html:19
+#: templates/pybb/pm/message.html:36 templates/pybb/pm/messagebox.html:29
 msgid "Delete"
 msgstr "Deletar"
 
@@ -513,30 +543,86 @@ msgstr "Contatos"
 msgid "All topics created by"
 msgstr ""
 
-#: templates/pybb/pm/common.html:6 templates/pybb/pm/message.html:9
-#: templates/pybb/pm/outbox.html:7
-msgid "Outbox"
-msgstr "Caixa de saída"
+#: templates/pybb/pm/inbox.html:11 templates/pybb/pm/messagebox.html:21
+#, fuzzy
+msgid "Select messages:"
+msgstr "Mensagens privadas"
 
-#: templates/pybb/pm/inbox.html:12
-msgid "from"
-msgstr "de"
+#: templates/pybb/pm/inbox.html:12 templates/pybb/pm/messagebox.html:22
+msgid "All"
+msgstr ""
 
-#: templates/pybb/pm/message.html:22
+#: templates/pybb/pm/inbox.html:13 templates/pybb/pm/messagebox.html:23
+msgid "None"
+msgstr ""
+
+#: templates/pybb/pm/inbox.html:14 templates/pybb/pm/messagebox.html:24
+#, fuzzy
+msgid "Read messages"
+msgstr "Mensagens privadas"
+
+#: templates/pybb/pm/inbox.html:15 templates/pybb/pm/messagebox.html:25
+#, fuzzy
+msgid "Unread messages"
+msgstr "Mensagens privadas"
+
+#: templates/pybb/pm/inbox.html:17 templates/pybb/pm/messagebox.html:27
+msgid "With selected:"
+msgstr ""
+
+#: templates/pybb/pm/inbox.html:20 templates/pybb/pm/messagebox.html:30
+msgid "Mark as read"
+msgstr ""
+
+#: templates/pybb/pm/inbox.html:21 templates/pybb/pm/messagebox.html:31
+msgid "Mark as unread"
+msgstr ""
+
+#: templates/pybb/pm/inbox.html:36
+msgid "Inbox is empty"
+msgstr ""
+
+#: templates/pybb/pm/message.html:20
 msgid "Message from"
 msgstr "Mensagem de"
 
-#: templates/pybb/pm/message.html:24
+#: templates/pybb/pm/message.html:22
 msgid "Message for"
 msgstr "Mensagem para"
 
-#: templates/pybb/pm/message.html:64
+#: templates/pybb/pm/message.html:62 templates/pybb/pm/thread.html:27
 msgid "Reply"
 msgstr "Responser"
 
-#: templates/pybb/pm/outbox.html:11
+#: templates/pybb/pm/messagebox.html:8
+#, fuzzy
+msgid "Are you sure you want to delete these messages?"
+msgstr "Você tem certeza que deseja remover esta mensagem?"
+
+#: templates/pybb/pm/messagebox.html:18 templates/pybb/pm/messagebox.html:52
+#: templates/pybb/pm/thread.html:10 templates/pybb/pm/thread.html.py:23
+#, fuzzy
+msgid "Messages"
+msgstr "Mensagem"
+
+#: templates/pybb/pm/messagebox.html:37 templates/pybb/pm/outbox.html:9
+#: templates/pybb/pm/sent.html:11
 msgid "to"
 msgstr "para"
+
+#: templates/pybb/pm/messagebox.html:37
+#, fuzzy
+msgid "From"
+msgstr "de"
+
+#: templates/pybb/pm/messagebox.html:55
+msgid "This messagebox is empty"
+msgstr ""
+
+#: templates/pybb/pm/sent.html:7
+#, fuzzy
+msgid "Sent messages"
+msgstr "Mensagens privadas"
 
 #: templatetags/pybb_extras.py:50
 msgid "seconds ago,seconds ago,seconds ago"
@@ -563,3 +649,20 @@ msgstr "hoje, %s"
 #, python-format
 msgid "yesterday, %s"
 msgstr "ontem, %s"
+
+#~ msgid "outbox"
+#~ msgstr "Caixa de saída"
+
+#, fuzzy
+#~ msgid "inbox"
+#~ msgstr "Caixa de entrada"
+
+#, fuzzy
+#~ msgid "Are you sure you want to delete this post?"
+#~ msgstr "Você tem certeza que deseja remover esta mensagem?"
+
+#~ msgid "Back"
+#~ msgstr "Voltar"
+
+#~ msgid "Forward"
+#~ msgstr "Avançar"

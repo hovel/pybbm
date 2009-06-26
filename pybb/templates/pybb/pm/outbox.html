@@ -1,16 +1,16 @@
-{% extends 'pybb/base.html' %}
-{% load i18n %}
-{% load pybb_extras %}
+{% extends "base.html" %}
+{% load i18n filters %}
 
 {% block content %}
-{% include "pybb/pm/common.html" %}
 <h1>{% trans "Outbox" %}</h1>
 <ul>
     {% for msg in messages %}
     <li>
-        <a href="{% url pybb_show_pm msg.id %}">{{ msg.subject }}</a> {% trans "to" %}
-        <span class="author"> {{ msg.dst_user|pybb_profile_link }} </span>
-        <span class="date">@ {% pybb_time msg.created %}</span>
+        <a href="{% url show_pm msg.id %}">{{ msg.subject }}</a> {% trans "to" %}
+        <span class="author">
+            <a href="{% url user_profile msg.dst_user.id %}">{{ msg.dst_user.username }}</a>
+        </span>
+        <span class="date">{% humantime msg.created %}</span>
     </li>
     {% endfor %}
 </ul>

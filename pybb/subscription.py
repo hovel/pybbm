@@ -75,22 +75,24 @@ def notify_pm_recipients(pm):
     if pybb_settings.DISABLE_NOTIFICATION:
         return
 
-    if not pm.read:
-        from pybb.models import PrivateMessage
+    from pybb.models import PrivateMessage, MessageBox
+    old_lang = translation.get_language()
+    lang = pm.dst_user.pybb_profile.language or 'en'
+    translation.activate(lang)
 
-        old_lang = translation.get_language()
-        lang = pm.dst_user.pybb_profile.language or 'en'
-        translation.activate(lang)
-
-        print 'LANG', lang
+    print 'LANG', lang
+    try:
+        mb = MessageBox.objects.get(message=pm, user=pm.dst_user, read=False)
 
         subject = _(u'New private message for you')
         to_email = pm.dst_user.email
-        text_content = PM_RECIPIENT_TEXT_TEMPLATE() % {
+        text_content = PM_RECIPIENT_TEXT_TEMPLATE % {
             'username': pm.src_user.username,
             'message': pm.body_text,
             'pm_url': absolute_url(pm.get_absolute_url()),
         }
         send_mail([to_email], subject, text_content)
+    except:
+        pass
 
-        translation.activate(old_lang)
+    translation.activate(old_lang)
