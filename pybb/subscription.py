@@ -81,18 +81,14 @@ def notify_pm_recipients(pm):
     translation.activate(lang)
 
     print 'LANG', lang
-    try:
-        mb = MessageBox.objects.get(message=pm, user=pm.dst_user, read=False)
 
-        subject = _(u'New private message for you')
-        to_email = pm.dst_user.email
-        text_content = PM_RECIPIENT_TEXT_TEMPLATE % {
+    subject = _(u'New private message for you')
+    to_email = pm.dst_user.email
+    text_content = PM_RECIPIENT_TEXT_TEMPLATE() % {
             'username': pm.src_user.username,
             'message': pm.body_text,
-            'pm_url': absolute_url(pm.get_absolute_url()),
-        }
-        send_mail([to_email], subject, text_content)
-    except:
-        pass
+            'pm_url': pm.get_absolute_url(),
+    }
+    send_mail([to_email], subject, text_content)
 
     translation.activate(old_lang)
