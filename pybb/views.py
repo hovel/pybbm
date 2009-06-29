@@ -567,7 +567,8 @@ pm_show_message = render_to('pybb/pm/message.html')(pm_show_message_ctx)
 def show_attachment(request, hash):
     attachment = get_object_or_404(Attachment, hash=hash)
     file_obj = file(attachment.get_absolute_path())
-    return HttpResponse(file_obj, content_type=attachment.content_type)
+    # without it mod_python chokes with error that content_type must be string
+    return HttpResponse(file_obj, content_type=str(attachment.content_type))
 
 
 @login_required
