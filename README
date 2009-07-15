@@ -21,14 +21,15 @@ The main point in development of pybb is to build it so it could be
 How to install PYBB?
 ====================
 
-* copy or symlink pybb directory to you project directory
-* copy or symlink pybb/static/pybb to you media/pybb" directory
-* write {% extends 'pybb/base.html' %} to templates of other modules which you want to use the forum design
-* add include('pybb.urls')) to the urlpatterns
-* add pybb to the INSTALLED_APPS
-* add pybb settings to main settings file (take pybb settings from the settings file of the example project from the repo)
-* create media/pybb/avatars directory
-* make syncdb
+* Firstly you have to install pybb. You have two ways:
+  * Install pybb with easy_install or pip tools
+  * Clone pybb repository from http://bitbucket.org/lorien/pybb and place it in your project
+* Find the static directory in the pybb source and copy or symlink static/pybb to %MEDIA_ROOT%/pybb
+* Put `include('pybb.urls'))` into main project urls.py file
+* Put `pybb` into settings.INSTALLED_APPS
+* Create %MEDIA_ROOT%/pybb/avatars directory and chmod it (if that required)
+* Do `python manage.py syncdb`
+* And do not forget to install some authentication application like django-registration or django-account. See info in the bottom of README
 
 
 Dependencies
