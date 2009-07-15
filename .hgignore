@@ -10,6 +10,6 @@
 ^pybb/static/pybb/avatars
 ^pybb/static/pybb/attachments
 ^static/pybb/avatars
-.*\.swp$
 ^registration$
 ^debug_toolbar
+^django_account\.egg-info$
