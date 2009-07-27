@@ -7,6 +7,7 @@ except ImportError:
     from sha import sha as sha1
 
 from django.db import models
+from django.db.models import F
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
@@ -211,11 +212,9 @@ class Post(RenderableItem):
         new = self.id is None
 
         if new:
-            self.topic.updated = datetime.now()
-            self.topic.post_count += 1
-            self.topic.save()
-            self.topic.forum.updated = self.topic.updated
-            self.topic.forum.post_count += 1
+            Topic.objects.filter(id=self.topic_id).update(post_count=F('post_count')+1, updated=datetime.now())
+            self.topic.forum.updated = datetime.now()
+            self.topic.forum.post_count = Post.objects.filter(topic__forum=self.topic.forum).count()
             self.topic.forum.save()
 
         super(Post, self).save(*args, **kwargs)
