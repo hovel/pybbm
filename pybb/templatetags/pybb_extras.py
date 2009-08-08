@@ -1,4 +1,10 @@
 from datetime import datetime, timedelta
+import time as time
+try:
+    import pytils
+    pytils_enabled = True
+except ImportError:
+    pytils_enabled = False
 
 from django import template
 from django.core.urlresolvers import reverse
@@ -26,11 +32,11 @@ def pybb_profile_link(user):
 @register.tag
 def pybb_time(parser, token):
     try:
-        tag, time = token.split_contents()
+        tag, context_time = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError('pybb_time requires single argument')
     else:
-        return PybbTimeNode(time)
+        return PybbTimeNode(context_time)
 
 
 class PybbTimeNode(template.Node):
@@ -38,17 +44,16 @@ class PybbTimeNode(template.Node):
         self.time = template.Variable(time)
 
     def render(self, context):
-        time = self.time.resolve(context)
+        context_time = self.time.resolve(context)
 
-        delta = datetime.now() - time
+        delta = datetime.now() - context_time
         today = datetime.now().replace(hour=0, minute=0, second=0)
         yesterday = today - timedelta(days=1)
 
         if delta.days == 0:
             if delta.seconds < 60:
-                if context['LANGUAGE_CODE'].startswith('ru'):
+                if context['LANGUAGE_CODE'].startswith('ru') and pytils_enabled:
                     msg = _('seconds ago,seconds ago,seconds ago')
-                    import pytils
                     msg = pytils.numeral.choose_plural(delta.seconds, msg)
                 else:
                     msg = _('seconds ago')
@@ -56,19 +61,21 @@ class PybbTimeNode(template.Node):
 
             elif delta.seconds < 3600:
                 minutes = int(delta.seconds / 60)
-                if context['LANGUAGE_CODE'].startswith('ru'):
+                if context['LANGUAGE_CODE'].startswith('ru') and pytils_enabled:
                     msg = _('minutes ago,minutes ago,minutes ago')
-                    import pytils
                     msg = pytils.numeral.choose_plural(minutes, msg)
                 else:
                     msg = _('minutes ago')
                 return u'%d %s' % (minutes, msg)
-        if time > today:
-            return _('today, %s') % time.strftime('%H:%M')
-        elif time > yesterday:
-            return _('yesterday, %s') % time.strftime('%H:%M')
+
+        tz = time.altzone + context['user'].pybb_profile.time_zone * 60 * 60
+        context_time = context_time + timedelta(seconds=tz)
+        if context_time > today:
+            return _('today, %s') % context_time.strftime('%H:%M')
+        elif context_time > yesterday:
+            return _('yesterday, %s') % context_time.strftime('%H:%M')
         else:
-            return dateformat.format(time, 'd M, Y H:i')
+            return dateformat.format(context_time, 'd M, Y H:i')
 
 
 @register.inclusion_tag('pybb/pagination.html',takes_context=True)
@@ -87,7 +94,7 @@ def pybb_link(object, anchor=u''):
     Return A tag with link to object.
     """
 
-    url = hasattr(object,'get_absolute_url') and object.get_absolute_url() or None   
+    url = hasattr(object,'get_absolute_url') and object.get_absolute_url() or None
     anchor = anchor or smart_unicode(object)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
 
