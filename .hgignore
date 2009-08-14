@@ -13,3 +13,4 @@
 ^registration$
 ^debug_toolbar
 ^django_account\.egg-info$
+^update_trac\.sh$
