@@ -7,13 +7,14 @@ except ImportError:
     from sha import sha as sha1
 
 from django.db import models
+from django.db.models import F
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from pybb.markups import mypostmarkup 
+from pybb.markups import mypostmarkup
 from pybb.fields import AutoOneToOneField, ExtendedImageField
 from pybb.util import urlize, memoize_method, unescape
 from pybb import settings as pybb_settings
@@ -61,7 +62,7 @@ class Category(models.Model):
     @property
     def topics(self):
         return Topic.objects.filter(forum__category=self).select_related()
-    
+
     @property
     def posts(self):
         return Post.objects.filter(topic__forum__category=self).select_related()
@@ -198,7 +199,7 @@ class Post(RenderableItem):
 
     def summary(self):
         LIMIT = 50
-        tail = len(self.body) > LIMIT and '...' or '' 
+        tail = len(self.body) > LIMIT and '...' or ''
         return self.body[:LIMIT] + tail
 
     __unicode__ = summary
@@ -211,11 +212,9 @@ class Post(RenderableItem):
         new = self.id is None
 
         if new:
-            self.topic.updated = datetime.now()
-            self.topic.post_count += 1
-            self.topic.save()
-            self.topic.forum.updated = self.topic.updated
-            self.topic.forum.post_count += 1
+            Topic.objects.filter(id=self.topic_id).update(post_count=F('post_count')+1, updated=datetime.now())
+            self.topic.forum.updated = datetime.now()
+            self.topic.forum.post_count = Post.objects.filter(topic__forum=self.topic.forum).count()
             self.topic.forum.save()
 
         super(Post, self).save(*args, **kwargs)
@@ -269,7 +268,7 @@ class Profile(models.Model):
 
 class Read(models.Model):
     """
-    For each topic that user has entered the time 
+    For each topic that user has entered the time
     is logged to this model.
     """
 
@@ -313,7 +312,7 @@ class PrivateMessage(RenderableItem):
     # move to common functions
     def summary(self):
         LIMIT = 50
-        tail = len(self.body) > LIMIT and '...' or '' 
+        tail = len(self.body) > LIMIT and '...' or ''
         return self.body[:LIMIT] + tail
 
     def __unicode__(self):
@@ -373,7 +372,7 @@ class Attachment(models.Model):
     def size_display(self):
         size = self.size
         if size < 1024:
-            return '%b' % size
+            return '%db' % size
         elif size < 1024 * 1024:
             return '%dKb' % int(size / 1024)
         else:
