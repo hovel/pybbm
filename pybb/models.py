@@ -167,7 +167,8 @@ class RenderableItem(models.Model):
         if self.markup == 'bbcode':
             self.body_html = mypostmarkup.markup(self.body, auto_urls=False)
         elif self.markup == 'markdown':
-            self.body_html = unicode(Markdown(self.body, safe_mode='escape'))
+            instance = Markdown(safe_mode='escape')
+            self.body_html = unicode(instance.convert(self.body))
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
 
