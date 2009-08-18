@@ -53,6 +53,7 @@
 
                     {% if post.attachment_cache %}
                     {% for attach in post.attachment_cache %}
+                    <br/>
                     {% trans "Attachment" %}: <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
                     {% endfor %}
                     {% endif %}

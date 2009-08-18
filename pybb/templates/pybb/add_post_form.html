@@ -31,6 +31,18 @@ $(function() {
             }
         }, 'json');
     });
+
+    var i = 0;
+    $('#id_attachment').change(function(){ 
+        i++;
+        var filename = $(this)[0].files[0].fileName;
+        var filesize = $(this)[0].files[0].fileSize / 1024;
+        filesize = Math.round(filesize);
+        var link = '<a href="javascript://" onclick="$(this).parent().remove()">Удалить</a>'
+        $(this).clone(true).insertAfter(this).hide().attr({id:'id_attachment'+i, name:'attachment'+i}).wrap('<div></div>').parent().append(filename+'('+filesize+'Kb) '+link);
+        $(this).val('');
+    });
+
 });
 
 </script>

@@ -57,3 +57,15 @@ class Command(BaseCommand):
                 os.mkdir(avatar_dir)
                 print 'Changing access mode of avatar directory to 777'
                 os.chmod(avatar_dir, 0777)
+
+        attachments_dir = os.path.join(dst_static, 'attachments')
+        if not os.path.exists(attachments_dir):
+            print 'Attachments directory does not exist: %s' % attachments_dir
+            print 'Create attachments directory: [Y/n]'
+            
+            answer = raw_input().lower()
+            if answer == 'y':
+                print 'Creating directory: %s' % attachments_dir
+                os.mkdir(attachments_dir)
+                print 'Changing access mode of attachments directory to 777'
+                os.chmod(attachments_dir, 0777)

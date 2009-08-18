@@ -34,12 +34,11 @@ class AddPostForm(forms.ModelForm):
         if not pybb_settings.ATTACHMENT_ENABLE:
             self.fields['attachment'].widget = forms.HiddenInput()
             self.fields['attachment'].required = False
- 
+        
 
     def clean_attachment(self):
-        if self.cleaned_data['attachment']:
-            memfile = self.cleaned_data['attachment']
-            if memfile.size > pybb_settings.ATTACHMENT_SIZE_LIMIT:
+        for f in self.files:
+            if self.files[f].size > pybb_settings.ATTACHMENT_SIZE_LIMIT:
                 raise forms.ValidationError(_('Attachment is too big'))
         return self.cleaned_data['attachment']
 
@@ -60,7 +59,8 @@ class AddPostForm(forms.ModelForm):
         post.save()
 
         if pybb_settings.ATTACHMENT_ENABLE:
-            self.save_attachment(post, self.cleaned_data['attachment'])
+            for f in self.files:
+                self.save_attachment(post, self.files[f])
         return post
 
 
@@ -71,6 +71,7 @@ class AddPostForm(forms.ModelForm):
             dir = os.path.join(settings.MEDIA_ROOT, pybb_settings.ATTACHMENT_UPLOAD_TO)
             fname = '%d.0' % post.id
             path = os.path.join(dir, fname)
+            #print path
             file(path, 'w').write(memfile.read())
             obj.path = fname
             obj.save()
