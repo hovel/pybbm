@@ -16,7 +16,7 @@ class AddPostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['markup', 'body']
+        fields = ('body',)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -25,7 +25,7 @@ class AddPostForm(forms.ModelForm):
         self.ip = kwargs.pop('ip', None)
         super(AddPostForm, self).__init__(*args, **kwargs)
 
-        self.fields.keyOrder = ['name', 'markup', 'body', 'attachment']
+        self.fields.keyOrder = ['name', 'body', 'attachment']
 
         if self.topic:
             self.fields['name'].widget = forms.HiddenInput()
@@ -34,7 +34,7 @@ class AddPostForm(forms.ModelForm):
         if not pybb_settings.ATTACHMENT_ENABLE:
             self.fields['attachment'].widget = forms.HiddenInput()
             self.fields['attachment'].required = False
-        
+
 
     def clean_attachment(self):
         for f in self.files:
@@ -54,7 +54,7 @@ class AddPostForm(forms.ModelForm):
             topic = self.topic
 
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
-                    markup=self.cleaned_data['markup'],
+                    markup=self.user.pybb_profile.markup,
                     body=self.cleaned_data['body'])
         post.save()
 

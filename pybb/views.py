@@ -1,7 +1,7 @@
 import math
 import re
 from markdown import Markdown
-from pybb.markups import mypostmarkup 
+from pybb.markups import mypostmarkup
 
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
@@ -123,7 +123,7 @@ def show_topic_ctx(request, topic_id):
     profiles = Profile.objects.filter(user__pk__in=
         set(x.user.id for x in page.object_list))
     profiles = dict((x.user_id, x) for x in profiles)
-    
+
     for post in page.object_list:
         post.user.pybb_profile = profiles[post.user.id]
 
@@ -168,8 +168,7 @@ def add_post_ctx(request, forum_id, topic_id):
 
     ip = request.META.get('REMOTE_ADDR', '')
     form = build_form(AddPostForm, request, topic=topic, forum=forum,
-                      user=request.user, ip=ip,
-                      initial={'markup': request.user.pybb_profile.markup, 'body': quote})
+                      user=request.user, ip=ip, initial={'body': quote})
 
     if form.is_valid():
         post = form.save();
@@ -202,8 +201,8 @@ user = render_to('pybb/user.html')(user_ctx)
 
 
 def user_topics_ctx(request, username):
-    user = get_object_or_404(User, username=username) 
-    
+    user = get_object_or_404(User, username=username)
+
     topics = Topic.objects.filter(user=user).order_by('-created')
 
     page, paginator = paginate(topics, request, pybb_settings.TOPIC_PAGE_SIZE)
@@ -220,11 +219,11 @@ user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
 # TODO: create template for that view
 # which should be looking like topic template
 #
-#def user_posts_ctx(request, username): 
-    #user = get_object_or_404(User, username=username) 
-    
+#def user_posts_ctx(request, username):
+    #user = get_object_or_404(User, username=username)
+
     #posts = Post.objects.filter(user=user).order_by('-created')
-    
+
     #page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE)
     #return {'profile': user,
             #'page': page,
@@ -586,7 +585,8 @@ def post_ajax_preview(request):
     if markup == 'bbcode':
         html = mypostmarkup.markup(content, auto_urls=False)
     elif markup == 'markdown':
-        html = unicode(Markdown(content, safe_mode='escape'))
+        instance = Markdown(safe_mode='escape')
+        html = unicode(instance.convert(content))
 
     html = urlize(html)
 

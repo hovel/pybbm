@@ -9,19 +9,26 @@
         <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</legend>
         {{ form.as_p }}
         <p class="submit">
-            <input type="submit" value="{% trans "Submit" %}" />
-            <input class="preview-button" type="button" value="{% trans "Preview" %}" />
+            <input type="submit" value="{% trans 'Submit' %}" />
+            <input class="preview-button" type="button" value="{% trans 'Preview' %}" />
         </p>
     </fieldset>
 </form>
+
+
+
+<script type="text/javascript" src="/static/pybb/js/markitup/jquery.markitup.pack.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/pybb/js/markitup/skins/markitup/style.css" />
+
+<link rel="stylesheet" type="text/css" href="/static/pybb/js/markitup/sets/{{ user.pybb_profile.markup }}/style.css" />
+<script type="text/javascript" src="/static/pybb/js/markitup/sets/{{ user.pybb_profile.markup }}/set.js"></script>
 
 <script type="text/javascript">
 $(function() {
     $('.post-form .preview-button').click(function() {
         var raw_content = $.trim($('.post-form #id_body').val());
-        var markup = $('.post-form #id_markup').val();
 
-        args = {'content': raw_content, 'markup': markup}
+        args = {'content': raw_content, 'markup': '{{ user.pybb_profile.markup }}'}
         $.post('{% url pybb_post_ajax_preview %}', args, function(data) {
             if (data.error) {
                 alert(data.error);
@@ -33,15 +40,17 @@ $(function() {
     });
 
     var i = 0;
-    $('#id_attachment').change(function(){ 
+    $('#id_attachment').change(function(){
         i++;
         var filename = $(this)[0].files[0].fileName;
         var filesize = $(this)[0].files[0].fileSize / 1024;
         filesize = Math.round(filesize);
-        var link = '<a href="javascript://" onclick="$(this).parent().remove()">Удалить</a>'
+        var link = '<a href="javascript://" onclick="$(this).parent().remove()">{% trans "Remove" %}</a>'
         $(this).clone(true).insertAfter(this).hide().attr({id:'id_attachment'+i, name:'attachment'+i}).wrap('<div></div>').parent().append(filename+'('+filesize+'Kb) '+link);
         $(this).val('');
     });
+
+    $("textarea").markItUp(mySettings);
 
 });
 
