@@ -402,11 +402,10 @@ def add_subscription(request, topic_id):
 def create_pm_ctx(request):
     recipient = request.GET.get('recipient', '')
     form = build_form(CreatePMForm, request, user=request.user,
-                      initial={'markup': request.user.pybb_profile.markup,
-                               'recipient': recipient})
+                      initial={'recipient': recipient})
 
     if form.is_valid():
-        post = form.save();
+        post = form.save(request.user.pybb_profile.markup);
         return HttpResponseRedirect(reverse('pybb_pm_messagebox', args=['inbox']))
 
     return {'form': form,
@@ -473,7 +472,6 @@ def pm_show_thread_ctx(request, box, thread_id):
     initial = {
         'thread': thread_id,
         'subject': last.message.subject,
-        'markup': request.user.pybb_profile.markup,
         'recipient': head.message.src_user.username
     }
 

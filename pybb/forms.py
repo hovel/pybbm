@@ -166,7 +166,7 @@ class CreatePMForm(forms.ModelForm):
 
         return thread
 
-    def save(self):
+    def save(self, markup=None):
         recipient = self.cleaned_data['recipient']
         thread = self.cleaned_data['thread']
 
@@ -174,6 +174,9 @@ class CreatePMForm(forms.ModelForm):
             dst_user=recipient)
         if thread != None:
             pm.thread = thread
+
+        if markup is not None:
+            pm.markup = markup
 
         pm = forms.save_instance(self, pm)
 
