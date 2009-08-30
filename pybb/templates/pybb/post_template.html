@@ -22,6 +22,15 @@
                         <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
                         <span class="updated">{% pybb_time post.created %}</span>
                     </div>
+
+                    {% if post.user.pybb_profile.ban_status %}
+                        <div{% ifequal post.user.pybb_profile.ban_status 2 %}
+                        title="{% trans 'Expire' %} {{ post.user.pybb_profile.ban_till }}"{% endifequal %}
+                        class="banned">
+                            {{ post.user.pybb_profile.get_ban_status_display }}
+                        </div>
+                    {% endif %}
+
                     {% if user.is_authenticated %}
                     <div class="pm-link">
                         <a href="{% url pybb_create_pm %}?recipient={{ post.user.username }}">{% trans "Send PM" %}</a>

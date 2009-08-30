@@ -435,6 +435,10 @@ pre {
     color: #666;
 }
 
+.banned {
+    color: red;
+}
+
 .signature {
     margin-top: 1em;
     padding-top: 0.5em;

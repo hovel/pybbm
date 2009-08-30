@@ -12,10 +12,18 @@
 <div class="userinfo">
     {% if profile.pybb_profile.avatar %}
     <div class="avatar">
-        <img src="{{ profile.pybb_profile.avatar.url }}" />
+        <img src="{{ profile.pybb_profile.avatar.url }}" alt="" />
     </div>
     {% endif %}
     <div class="info">
+        {% if profile.pybb_profile.ban_status %}
+            <div{% ifequal profile.pybb_profile.ban_status 2 %}
+            title="{% trans 'Expire' %} {{ profile.pybb_profile.ban_till }}"{% endifequal %}
+            class="banned">
+                {{ profile.pybb_profile.get_ban_status_display }}
+            </div>
+        {% endif %}
+
         <div class="label">{% trans "Statistics" %}</div>
         <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}.
             {% comment %}
