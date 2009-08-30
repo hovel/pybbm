@@ -284,6 +284,14 @@ class Profile(models.Model):
             return True
         return False
 
+    @memoize_method
+    def post_count(self):
+        """ Use from template, in future may be replace by normalize field
+
+        {% trans 'Posts' %}: {{ post.user.pybb_profile.post_count }}"""
+        return self.user.posts.all().count()
+
+
 class Read(models.Model):
     """
     For each topic that user has entered the time
