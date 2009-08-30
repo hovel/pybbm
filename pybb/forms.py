@@ -127,12 +127,12 @@ class CreatePMForm(forms.ModelForm):
 
     class Meta:
         model = PrivateMessage
-        fields = ['thread', 'subject', 'body', 'markup', 'thread']
+        fields = ['thread', 'subject', 'body', 'thread']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(CreatePMForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder = ['recipient', 'subject', 'body', 'markup', 'thread']
+        self.fields.keyOrder = ['recipient', 'subject', 'body', 'thread']
 
 
     def clean_recipient(self):
