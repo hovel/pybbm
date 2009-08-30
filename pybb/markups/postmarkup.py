@@ -506,7 +506,7 @@ class SizeTag(TagBase):
 
         self.size = self.validate_size(self.size)
 
-        return u'<span style="font-size:%spx">' % self.size
+        return u'<span style="font-size:%s%%">' % self.size
 
     def render_close(self, parser, node_index):
 
@@ -517,8 +517,8 @@ class SizeTag(TagBase):
 
     def validate_size(self, size):
 
-        size = min(64, size)
-        size = max(4, size)
+        size = min(200, size)
+        size = max(30, size)
         return size
 
 

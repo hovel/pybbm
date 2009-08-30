@@ -265,7 +265,7 @@ class Profile(models.Model):
 
     @memoize_method
     def unread_pm_count(self):
-        return MessageBox.objects.filter(user=self, box='inbox', read=False).count()
+        return MessageBox.objects.filter(user=self.user, box='inbox', read=False).count()
 
 class Read(models.Model):
     """

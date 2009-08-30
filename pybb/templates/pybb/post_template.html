@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load pybb_extras %}
 
-<div class="post post-{% cycle "odd" "even" %}">
+<div class="post post-{% cycle 'odd' 'even' %}">
     <a name="post-{{ post.id }}"></a>
     <div class="inner">
         <table>
@@ -16,7 +16,7 @@
                     {% endif %}
                     <div class="author">{{ post.user|pybb_profile_link }}</div>
                     {% if user.is_superuser %}
-                    <!--<div class="updated">{{ post.user_ip }}</div>-->
+                        <div class="updated">{{ post.user_ip }}</div>
                     {% endif %}
                     <div class="bottom">
                         <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
@@ -65,6 +65,5 @@
                 </td>
             </tr>
         </table>
-                    <!--<div style="clear: both"></div>-->
     </div>
 </div>
