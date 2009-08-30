@@ -12,6 +12,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class ForumAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'position', 'topic_count']
     list_per_page = 20
+    raw_id_fields = ['moderators']
     ordering = ['-category']
     search_fields = ['name', 'category__name']
     fieldsets = (
@@ -29,6 +30,7 @@ class ForumAdmin(admin.ModelAdmin):
 class TopicAdmin(admin.ModelAdmin):
     list_display = ['name', 'forum', 'created', 'head', 'post_count']
     list_per_page = 20
+    raw_id_fields = ['user', 'forum', 'subscribers']
     ordering = ['-created']
     date_hierarchy = 'created'
     search_fields = ['name']
@@ -47,6 +49,7 @@ class TopicAdmin(admin.ModelAdmin):
 class PostAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'created', 'updated', 'summary']
     list_per_page = 20
+    raw_id_fields = ['user', 'topic']
     ordering = ['-created']
     date_hierarchy = 'created'
     search_fields = ['body']
@@ -69,6 +72,7 @@ class PostAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'time_zone', 'location', 'language']
     list_per_page = 20
+    raw_id_fields = ['user']
     ordering = ['-user']
     search_fields = ['user__username', 'user__first_name', 'user__last_name']
     fieldsets = (
@@ -96,6 +100,7 @@ class ProfileAdmin(admin.ModelAdmin):
 class ReadAdmin(admin.ModelAdmin):
     list_display = ['user', 'topic', 'time']
     list_per_page = 20
+    raw_id_fields = ['user', 'topic']
     ordering = ['-time']
     date_hierarchy = 'time'
     search_fields = ['user__username', 'topic__name']
