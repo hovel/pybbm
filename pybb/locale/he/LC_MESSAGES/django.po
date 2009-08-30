@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-26 10:24+0300\n"
+"POT-Creation-Date: 2009-08-30 16:56+0700\n"
 "PO-Revision-Date: 2009-04-04 18:14+0200\n"
 "Last-Translator: isoTop <isotop@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,13 +19,18 @@ msgstr ""
 msgid "Additional options"
 msgstr "אפשרויות נוספות"
 
-#: admin.py:63 models.py:188 models.py:303
+#: admin.py:63 models.py:190 models.py:320
 msgid "Message"
 msgstr "הודעה"
 
 #: admin.py:79
 msgid "IM"
 msgstr "IM"
+
+#: admin.py:89
+#, fuzzy
+msgid "Ban options"
+msgstr "אפשרויות נוספות"
 
 #: feeds.py:21 feeds.py:22 templates/pybb/base.html:13
 msgid "Latest posts on forum"
@@ -35,259 +40,280 @@ msgstr "הודעות אחרונות בפורום"
 msgid "Latest topics on forum"
 msgstr "אשכולות אחרונים בפורום"
 
-#: forms.py:14 models.py:108 models.py:302
+#: forms.py:14 models.py:109 models.py:319
 #: templates/pybb/pm/messagebox.html:38
 msgid "Subject"
 msgstr "נושא"
 
-#: forms.py:15 templates/pybb/post_template.html:56
+#: forms.py:15 templates/pybb/post_template.html:57
 msgid "Attachment"
 msgstr "קובץ מצורף"
 
-#: forms.py:43
+#: forms.py:42
 msgid "Attachment is too big"
 msgstr "הקובץ המצורף גדול מידי"
 
-#: forms.py:124 models.py:299
+#: forms.py:125 models.py:316
 msgid "Recipient"
 msgstr "נמען"
 
-#: forms.py:142
+#: forms.py:143
 #, python-format
 msgid "User with login %s does not exist"
 msgstr "משתמש עם השם %s לא קיים"
 
-#: forms.py:145
+#: forms.py:146
 msgid "You can't send PM to yourself"
 msgstr ""
 
-#: forms.py:158 forms.py:161
+#: forms.py:159 forms.py:162
 msgid "Invalid thread ID"
 msgstr ""
 
-#: models.py:38 templates/pybb/edit_profile.html:12
+#: models.py:39 templates/pybb/edit_profile.html:12
 #: templates/pybb/pm/base.html:7 templates/pybb/pm/common.html:7
 #: templates/pybb/pm/inbox.html:7 templates/pybb/pm/message.html:8
 msgid "Inbox"
 msgstr "דואר נכנס"
 
-#: models.py:39 templates/pybb/edit_profile.html:13
+#: models.py:40 templates/pybb/edit_profile.html:13
 #: templates/pybb/pm/base.html:8 templates/pybb/pm/common.html:8
 #: templates/pybb/pm/message.html:8 templates/pybb/pm/outbox.html:5
 msgid "Outbox"
 msgstr "דואר יוצא"
 
-#: models.py:40
+#: models.py:41
 #, fuzzy
 msgid "Trash"
 msgstr "תצריף"
 
-#: models.py:44 models.py:72 models.py:359
+#: models.py:45 models.py:73 models.py:375
 msgid "Name"
 msgstr "שם"
 
-#: models.py:45 models.py:73
+#: models.py:46 models.py:74
 msgid "Position"
 msgstr "מיקום"
 
-#: models.py:49 models.py:71
+#: models.py:50 models.py:72
 msgid "Category"
 msgstr "קטגוריה"
 
-#: models.py:50
+#: models.py:51
 msgid "Categories"
 msgstr "קטגוריות"
 
-#: models.py:74
+#: models.py:75
 msgid "Description"
 msgstr "תיאור"
 
-#: models.py:75
+#: models.py:76
 msgid "Moderators"
 msgstr "מנהלים"
 
-#: models.py:76 models.py:110 models.py:186
+#: models.py:77 models.py:111 models.py:188
 msgid "Updated"
 msgstr "מעודכן"
 
-#: models.py:77 models.py:116
+#: models.py:78 models.py:117
 msgid "Post count"
 msgstr "מס' הודעות"
 
-#: models.py:81 models.py:107
+#: models.py:82 models.py:108
 msgid "Forum"
 msgstr "פורום"
 
-#: models.py:82
+#: models.py:83
 msgid "Forums"
 msgstr "פורומים"
 
-#: models.py:109 models.py:185 models.py:300
+#: models.py:110 models.py:187 models.py:317
 #: templates/pybb/pm/messagebox.html:39
 msgid "Created"
 msgstr "נוצר"
 
-#: models.py:111 models.py:184 models.py:245 models.py:276
+#: models.py:112 models.py:186 models.py:250 models.py:293
 msgid "User"
 msgstr "משתמש"
 
-#: models.py:112
+#: models.py:113
 msgid "Views count"
 msgstr "מס' קריאות"
 
-#: models.py:113
+#: models.py:114
 msgid "Sticky"
 msgstr "דביק"
 
-#: models.py:114 templates/pybb/forum.html:24
+#: models.py:115 templates/pybb/forum.html:24
 msgid "Closed"
 msgstr "סגור"
 
-#: models.py:115
+#: models.py:116
 msgid "Subscribers"
 msgstr "נרשמים"
 
-#: models.py:120 models.py:183 models.py:277
+#: models.py:121 models.py:185 models.py:294
 msgid "Topic"
 msgstr "אשכול"
 
-#: models.py:121 templates/pybb/forum.html:35
+#: models.py:122 templates/pybb/forum.html:35
 #: templates/pybb/quick_access.html:47 templates/pybb/user_posts.html:21
 #: templates/pybb/user_topics.html:25
 msgid "Topics"
 msgstr "אשכולות"
 
-#: models.py:187 models.py:301
+#: models.py:189 models.py:318
 msgid "Markup"
 msgstr "שפת סימון"
 
-#: models.py:189 models.py:304
+#: models.py:191 models.py:321
 msgid "HTML version"
 msgstr "גרסת HTML"
 
-#: models.py:190 models.py:305
+#: models.py:192 models.py:322
 msgid "Text version"
 msgstr "גרסת טקסט"
 
-#: models.py:191
+#: models.py:193
 msgid "User IP"
 msgstr "IP משתמש"
 
-#: models.py:196 models.py:355
+#: models.py:198 models.py:371
 msgid "Post"
 msgstr "הודעה"
 
-#: models.py:197 templates/pybb/quick_access.html:50
+#: models.py:199 templates/pybb/quick_access.html:50
 #: templates/pybb/topic.html:15 templates/pybb/topic.html.py:28
 msgid "Posts"
 msgstr "הודעות"
 
-#: models.py:246 templates/pybb/user.html:40
+#: models.py:245
+msgid "No"
+msgstr ""
+
+#: models.py:246
+#, fuzzy
+msgid "Caution"
+msgstr "מיקום"
+
+#: models.py:247
+msgid "Ban"
+msgstr ""
+
+#: models.py:251 templates/pybb/user.html:40
 msgid "Site"
 msgstr "אתר"
 
-#: models.py:247
+#: models.py:252
 msgid "Jabber"
 msgstr "Jabber"
 
-#: models.py:248
+#: models.py:253
 msgid "ICQ"
 msgstr "ICQ"
 
-#: models.py:249
+#: models.py:254
 msgid "MSN"
 msgstr "MSN"
 
-#: models.py:250
+#: models.py:255
 msgid "AIM"
 msgstr "AIM"
 
-#: models.py:251
+#: models.py:256
 msgid "Yahoo"
 msgstr "Yahoo"
 
-#: models.py:252 templates/pybb/user.html:37
+#: models.py:257 templates/pybb/user.html:37
 msgid "Location"
 msgstr "מיקום"
 
-#: models.py:253
+#: models.py:258
 msgid "Signature"
 msgstr "חתימה"
 
-#: models.py:254
+#: models.py:259
 msgid "Time zone"
 msgstr "אזור זמן"
 
-#: models.py:255
+#: models.py:260
 msgid "Language"
 msgstr "שפה"
 
-#: models.py:257
+#: models.py:262
 msgid "Avatar"
 msgstr "אוואטר"
 
-#: models.py:258
+#: models.py:263
 msgid "Show signatures"
 msgstr "הראה חתימות"
 
-#: models.py:259
+#: models.py:264
 msgid "Default markup"
 msgstr "שפת סימון ברירת מחדל"
 
-#: models.py:262
+#: models.py:265
+msgid "Ban status"
+msgstr ""
+
+#: models.py:266
+msgid "Ban till"
+msgstr ""
+
+#: models.py:269
 msgid "Profile"
 msgstr "פרופיל"
 
-#: models.py:263
+#: models.py:270
 msgid "Profiles"
 msgstr "פרופילים"
 
-#: models.py:278
+#: models.py:295
 msgid "Time"
 msgstr "זמן"
 
-#: models.py:282
+#: models.py:299
 msgid "Read"
 msgstr "קריאה"
 
-#: models.py:283
+#: models.py:300
 msgid "Reads"
 msgstr "קריאות"
 
-#: models.py:297
+#: models.py:314
 msgid "User relation"
 msgstr ""
 
-#: models.py:298
+#: models.py:315
 msgid "Author"
 msgstr "מאת"
 
-#: models.py:309
+#: models.py:326
 msgid "Private message"
 msgstr "הודעה פרטית"
 
-#: models.py:310
+#: models.py:327
 msgid "Private messages"
 msgstr "הודעות פרטיות"
 
-#: models.py:344
+#: models.py:363
 #, fuzzy
 msgid "Messagebox"
 msgstr "הודעה"
 
-#: models.py:356
+#: models.py:372
 msgid "Size"
 msgstr "גודל"
 
-#: models.py:357
+#: models.py:373
 msgid "Content type"
 msgstr "סוג התוכן"
 
-#: models.py:358
+#: models.py:374
 msgid "Path"
 msgstr "כתובת"
 
-#: models.py:360
+#: models.py:376
 msgid "Hash"
 msgstr "תצריף"
 
@@ -323,23 +349,27 @@ msgstr ""
 "---\n"
 "צפה בהודעה: %(pm_url)s"
 
-#: subscription.py:87
+#: subscription.py:85
 msgid "New private message for you"
 msgstr "הודעה פרטית חדשה לך"
 
-#: templates/pybb/add_post.html:8 templates/pybb/add_post.html.py:10
+#: templates/pybb/add_post.html:7
+msgid "You banned"
+msgstr ""
+
+#: templates/pybb/add_post.html:11 templates/pybb/add_post.html.py:13
 #: templates/pybb/category.html:11 templates/pybb/create_pm.html:7
-#: templates/pybb/edit_post.html:7 templates/pybb/forum.html:12
+#: templates/pybb/edit_post.html:21 templates/pybb/forum.html:12
 #: templates/pybb/topic.html:12 templates/pybb/pm/common.html:6
 msgid "Root"
 msgstr "בית"
 
-#: templates/pybb/add_post.html:14 templates/pybb/add_post_form.html:9
-#: templates/pybb/forum.html:37
+#: templates/pybb/add_post.html:17 templates/pybb/add_post_form.html:9
+#: templates/pybb/forum.html:39
 msgid "New topic"
 msgstr "אשכול חדש"
 
-#: templates/pybb/add_post.html:14 templates/pybb/add_post_form.html:9
+#: templates/pybb/add_post.html:17 templates/pybb/add_post_form.html:9
 msgid "New reply"
 msgstr "תגובה חדשה"
 
@@ -348,12 +378,16 @@ msgid "Preview"
 msgstr "תצוגה מקדימה"
 
 #: templates/pybb/add_post_form.html:12 templates/pybb/create_pm.html:14
-#: templates/pybb/pm/create_pm.html:13 templates/pybb/pm/thread.html:29
+#: templates/pybb/pm/create_pm.html:27 templates/pybb/pm/thread.html:43
 msgid "Submit"
 msgstr "שלח"
 
+#: templates/pybb/add_post_form.html:48
+msgid "Remove"
+msgstr ""
+
 #: templates/pybb/create_pm.html:7 templates/pybb/create_pm.html.py:12
-#: templates/pybb/pm/create_pm.html:11
+#: templates/pybb/pm/create_pm.html:25
 msgid "New private message"
 msgstr "הודעה פרטית חדשה"
 
@@ -365,11 +399,11 @@ msgstr "האם אתה בטוח שאתה רוצה למחוק את ההודעה?"
 msgid "Yes, I am sure."
 msgstr "כן, אני בטוח."
 
-#: templates/pybb/edit_post.html:10 templates/pybb/edit_post.html.py:14
+#: templates/pybb/edit_post.html:24 templates/pybb/edit_post.html.py:28
 msgid "Editing the post"
 msgstr "עורך את ההודעה"
 
-#: templates/pybb/edit_post.html:16 templates/pybb/edit_profile.html:18
+#: templates/pybb/edit_post.html:30 templates/pybb/edit_profile.html:18
 msgid "Save"
 msgstr "שמור"
 
@@ -473,7 +507,7 @@ msgstr "מחק"
 msgid "Edited"
 msgstr "נערך"
 
-#: templates/pybb/post_template.html:61
+#: templates/pybb/post_template.html:62
 msgid "quote"
 msgstr "צטט"
 
@@ -589,9 +623,15 @@ msgstr "הודעה מאת"
 msgid "Message for"
 msgstr "הודעה עבור"
 
-#: templates/pybb/pm/message.html:62 templates/pybb/pm/thread.html:27
+#: templates/pybb/pm/message.html:62 templates/pybb/pm/thread.html:41
 msgid "Reply"
 msgstr "תגובה"
+
+#: templates/pybb/pm/message_template.html:27
+#: templates/pybb/pm/messagebox.html:37 templates/pybb/pm/outbox.html:9
+#: templates/pybb/pm/sent.html:11
+msgid "to"
+msgstr "אל"
 
 #: templates/pybb/pm/messagebox.html:8
 #, fuzzy
@@ -599,15 +639,10 @@ msgid "Are you sure you want to delete these messages?"
 msgstr "האם אתה בטוח שאתה רוצה למחוק את ההודעה?"
 
 #: templates/pybb/pm/messagebox.html:18 templates/pybb/pm/messagebox.html:52
-#: templates/pybb/pm/thread.html:10 templates/pybb/pm/thread.html.py:23
+#: templates/pybb/pm/thread.html:23 templates/pybb/pm/thread.html.py:36
 #, fuzzy
 msgid "Messages"
 msgstr "הודעה"
-
-#: templates/pybb/pm/messagebox.html:37 templates/pybb/pm/outbox.html:9
-#: templates/pybb/pm/sent.html:11
-msgid "to"
-msgstr "אל"
 
 #: templates/pybb/pm/messagebox.html:37
 #, fuzzy
@@ -623,28 +658,28 @@ msgstr ""
 msgid "Sent messages"
 msgstr "הודעות פרטיות"
 
-#: templatetags/pybb_extras.py:50
+#: templatetags/pybb_extras.py:56
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "שניות,שניות,שניות"
 
-#: templatetags/pybb_extras.py:54
+#: templatetags/pybb_extras.py:59
 msgid "seconds ago"
 msgstr "שניות"
 
-#: templatetags/pybb_extras.py:60
+#: templatetags/pybb_extras.py:65
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "דקות,דקות,דקות"
 
-#: templatetags/pybb_extras.py:64
+#: templatetags/pybb_extras.py:68
 msgid "minutes ago"
 msgstr "דקות"
 
-#: templatetags/pybb_extras.py:67
+#: templatetags/pybb_extras.py:78
 #, python-format
 msgid "today, %s"
 msgstr "היום, %s"
 
-#: templatetags/pybb_extras.py:69
+#: templatetags/pybb_extras.py:80
 #, python-format
 msgid "yesterday, %s"
 msgstr "אתמול, %s"

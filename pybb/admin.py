@@ -25,7 +25,7 @@ class ForumAdmin(admin.ModelAdmin):
                 }
             ),
         )
-    
+
 class TopicAdmin(admin.ModelAdmin):
     list_display = ['name', 'forum', 'created', 'head', 'post_count']
     list_per_page = 20
@@ -84,6 +84,11 @@ class ProfileAdmin(admin.ModelAdmin):
         (_('Additional options'), {
                 'classes': ('collapse',),
                 'fields' : ('site', 'avatar', 'signature', 'show_signatures')
+                }
+         ),
+        (_('Ban options'), {
+                'classes': ('collapse',),
+                'fields' : ('ban_status', 'ban_till')
                 }
          ),
         )

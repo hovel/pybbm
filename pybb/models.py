@@ -241,6 +241,11 @@ class Post(RenderableItem):
         self.topic.forum.save()
 
 
+BAN_STATUS = (
+(0, _('No')),
+(1, _('Caution')),
+(2, _('Ban')))
+
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
     site = models.URLField(_('Site'), verify_exists=False, blank=True, default='')
@@ -257,6 +262,8 @@ class Profile(models.Model):
     avatar = ExtendedImageField(_('Avatar'), blank=True, default='', upload_to=pybb_settings.AVATARS_UPLOAD_TO, width=pybb_settings.AVATAR_WIDTH, height=pybb_settings.AVATAR_HEIGHT)
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
     markup = models.CharField(_('Default markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
+    ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
 
     class Meta:
         verbose_name = _('Profile')
@@ -266,6 +273,16 @@ class Profile(models.Model):
     @memoize_method
     def unread_pm_count(self):
         return MessageBox.objects.filter(user=self.user, box='inbox', read=False).count()
+
+    def is_banned(self):
+        if self.ban_status == 2:
+            if self.ban_till is None or self.ban_till < datetime.now():
+                self.ban_status = 0
+                self.ban_till = None
+                self.save()
+                return False
+            return True
+        return False
 
 class Read(models.Model):
     """

@@ -52,9 +52,11 @@
 </div>
 
 {% if user.is_authenticated %}
-{% if not topic.closed %}
-{% include "pybb/add_post_form.html" %}
-{% endif %}
+ {% if not user.pybb_profile.is_banned %}
+  {% if not topic.closed %}
+   {% include "pybb/add_post_form.html" %}
+  {% endif %}
+ {% endif %}
 {% endif %}
 
 {% endblock %}

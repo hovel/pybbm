@@ -3,16 +3,20 @@
 {% load i18n %}
 
 {% block content %}
-<div class="crumbs">
-{% if forum %}
-    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
+{% if user.pybb_profile.is_banned %}
+    {% trans 'You banned' %}
 {% else %}
-    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / {% pybb_link topic %}
+    <div class="crumbs">
+    {% if forum %}
+        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
+    {% else %}
+        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / {% pybb_link topic %}
+    {% endif %}
+    </div>
+
+    <h1>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</h1>
+
+    {% include "pybb/add_post_form.html" %}
 {% endif %}
-</div>
-
-<h1>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</h1>
-
-{% include "pybb/add_post_form.html" %}
 
 {% endblock %}

@@ -33,9 +33,12 @@
             </li>
         </ul>
         {% pybb_pagination _('Topics') %}
-        <div class="controls">
-            <a href="{% url pybb_add_topic forum.id %}">{% trans "New topic" %}</a>
-        </div>
+
+        {% if not user.pybb_profile.is_banned %}
+            <div class="controls">
+                <a href="{% url pybb_add_topic forum.id %}">{% trans "New topic" %}</a>
+            </div>
+        {% endif %}
     </div>
     <div class="right">
         {% include 'pybb/quick_access.html' %}

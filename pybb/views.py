@@ -155,7 +155,7 @@ def add_post_ctx(request, forum_id, topic_id):
     elif topic_id:
         topic = get_object_or_404(Topic, pk=topic_id)
 
-    if topic and topic.closed:
+    if (topic and topic.closed) or request.user.pybb_profile.is_banned():
         return HttpResponseRedirect(topic.get_absolute_url())
 
     try:
@@ -263,7 +263,8 @@ def edit_post_ctx(request, post_id):
     from pybb.templatetags.pybb_extras import pybb_editable_by
 
     post = get_object_or_404(Post, pk=post_id)
-    if not pybb_editable_by(post, request.user):
+    if not pybb_editable_by(post, request.user) \
+    or request.user.pybb_profile.is_banned():
         return HttpResponseRedirect(post.get_absolute_url())
 
     form = build_form(EditPostForm, request, instance=post)
