@@ -164,7 +164,9 @@ def add_post_ctx(request, forum_id, topic_id):
         quote = ''
     else:
         post = get_object_or_404(Post, pk=quote_id)
-        quote = quote_text(post.body_text, request.user.pybb_profile.markup)
+        quote = quote_text(post.body_text,
+                           request.user.pybb_profile.markup,
+                           post.user.username)
 
     ip = request.META.get('REMOTE_ADDR', '')
     form = build_form(AddPostForm, request, topic=topic, forum=forum,

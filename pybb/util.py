@@ -166,15 +166,19 @@ def urlize(data):
         return unicode(soup)
 
 
-def quote_text(text, markup):
+def quote_text(text, markup, username=""):
     """
     Quote message using selected markup.
     """
 
     if markup == 'markdown':
         return '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
+
     elif markup == 'bbcode':
-        return '[quote]%s[/quote]\n' % text
+        if username is not "":
+            username = '="%s"' % username
+        return '[quote%s]%s[/quote]\n' % (username, text)
+
     else:
         return text
 
