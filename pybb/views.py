@@ -108,7 +108,10 @@ def show_topic_ctx(request, topic_id):
 
     initial = {}
     if request.user.is_authenticated():
-        initial = {'markup': request.user.pybb_profile.markup}
+        current_markup = request.user.pybb_profile.markup
+        initial = {'markup': current_markup}
+    else:
+        current_markup = pybb_settings.DEFAULT_MARKUP
     form = AddPostForm(topic=topic, initial=initial)
 
     moderator = (request.user.is_superuser or
@@ -139,6 +142,7 @@ def show_topic_ctx(request, topic_id):
             'page': page,
             'paginator': paginator,
             'form_url': reverse('pybb_add_post', args=[topic.id]),
+            'current_markup': current_markup,
             }
 
 
