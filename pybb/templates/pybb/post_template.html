@@ -1,8 +1,8 @@
 {% load i18n %}
 {% load pybb_extras %}
 
-<div class="post post-{% cycle 'odd' 'even' %}">
-    <a name="post-{{ post.id }}"></a>
+<div class="post post-{% cycle 'odd' 'even' %}" id="post-{{ post.id }}">
+    <a name="post-{{ post.id }}"></a> <!-- may be remove this string? -->
     <div class="inner">
         <table>
             <tr>
@@ -42,7 +42,9 @@
                         {% endif %}
                         {% if moderator or post|pybb_equal_to:last_post %}
                         {% if moderator or post.user|pybb_equal_to:user %}
-                        / <a href="{% url pybb_delete_post post.id %}">{% trans "Delete" %}</a>
+                        / <a onclick="pybb_delete_post('{% url pybb_delete_post post.id %}',
+                            'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
+                            href="{% url pybb_delete_post post.id %}">{% trans "Delete" %}</a>
                         {% endif %}
                         {% endif %}
                     </div>

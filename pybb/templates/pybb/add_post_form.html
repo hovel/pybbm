@@ -15,20 +15,12 @@
     </fieldset>
 </form>
 
-
-
-<script type="text/javascript" src="/static/pybb/js/markitup/jquery.markitup.pack.js"></script>
-<link rel="stylesheet" type="text/css" href="/static/pybb/js/markitup/skins/markitup/style.css" />
-
-<link rel="stylesheet" type="text/css" href="/static/pybb/js/markitup/sets/{{ user.pybb_profile.markup }}/style.css" />
-<script type="text/javascript" src="/static/pybb/js/markitup/sets/{{ user.pybb_profile.markup }}/set.js"></script>
-
 <script type="text/javascript">
 $(function() {
     $('.post-form .preview-button').click(function() {
         var raw_content = $.trim($('.post-form #id_body').val());
 
-        args = {'content': raw_content, 'markup': '{{ user.pybb_profile.markup }}'}
+        args = {'content': raw_content, 'markup': '{{ current_markup }}'}
         $.post('{% url pybb_post_ajax_preview %}', args, function(data) {
             if (data.error) {
                 alert(data.error);
@@ -49,9 +41,6 @@ $(function() {
         $(this).clone(true).insertAfter(this).hide().attr({id:'id_attachment'+i, name:'attachment'+i}).wrap('<div></div>').parent().append(filename+'('+filesize+'Kb) '+link);
         $(this).val('');
     });
-
-    $("textarea").markItUp(mySettings);
-
 });
 
 </script>
