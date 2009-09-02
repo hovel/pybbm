@@ -12,10 +12,12 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.utils.translation import ugettext_lazy as _
 
-from pybb.util import render_to, paged, build_form, quote_text, paginate, set_language, ajax, urlize
-from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage, Attachment,\
-                        MessageBox, MARKUP_CHOICES
-from pybb.forms import AddPostForm, EditProfileForm, EditPostForm, UserSearchForm, CreatePMForm
+from pybb.util import   render_to, paged, build_form, quote_text, paginate,\
+                        set_language, ajax, urlize
+from pybb.models import Category, Forum, Topic, Post, Profile, PrivateMessage,\
+                        MessageBox, Attachment, MARKUP_CHOICES
+from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
+                        EditProfileForm, UserSearchForm, CreatePMForm
 from pybb import settings as pybb_settings
 from pybb.orm import load_related
 
@@ -269,11 +271,17 @@ def edit_post_ctx(request, post_id):
     from pybb.templatetags.pybb_extras import pybb_editable_by
 
     post = get_object_or_404(Post, pk=post_id)
+
     if not pybb_editable_by(post, request.user) \
     or request.user.pybb_profile.is_banned():
         return HttpResponseRedirect(post.get_absolute_url())
 
-    form = build_form(EditPostForm, request, instance=post)
+    head_post_id = post.topic.posts.order_by('created')[0].id
+    if post.id == head_post_id:
+        form = build_form(EditHeadPostForm, request, instance=post,
+                          initial={'title': post.topic.name})
+    else:
+        form = build_form(EditPostForm, request, instance=post)
 
     if form.is_valid():
         post = form.save()

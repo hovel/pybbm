@@ -82,9 +82,7 @@ class EditProfileForm(forms.ModelForm):
         model = Profile
         fields = ['site', 'jabber', 'icq', 'msn', 'aim', 'yahoo',
                   'location', 'signature', 'time_zone', 'language',
-                  'avatar', 'show_signatures',
-                  'markup',
-                  ]
+                  'avatar', 'show_signatures', 'markup']
 
 
     #def __init__(self, *args, **kwargs):
@@ -107,6 +105,23 @@ class EditPostForm(forms.ModelForm):
         post = super(EditPostForm, self).save(commit=False)
         post.updated = datetime.now()
         post.save()
+        return post
+
+
+class EditHeadPostForm(EditPostForm):
+    title = forms.CharField(label=_("Subject"), required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(EditHeadPostForm, self).__init__(*args, **kwargs)
+        self.fields.keyOrder = ['title', 'body']
+
+    def save(self):
+        post = super(EditPostForm, self).save(commit=False)
+        post.updated = datetime.now()
+        post.save()
+
+        post.topic.name = self.cleaned_data['title']
+        post.topic.save()
         return post
 
 
