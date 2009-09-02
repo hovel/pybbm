@@ -256,6 +256,7 @@ class Profile(models.Model):
     yahoo = models.CharField(_('Yahoo'), max_length=80, blank=True, default='')
     location = models.CharField(_('Location'), max_length=30, blank=True, default='')
     signature = models.TextField(_('Signature'), blank=True, default='', max_length=pybb_settings.SIGNATURE_MAX_LENGTH)
+    signature_html = models.TextField(_('Signature HTML Version'), blank=True, default='', max_length=pybb_settings.SIGNATURE_MAX_LENGTH+30)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(pybb_settings.DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True, default='',
                                 choices=settings.LANGUAGES)
@@ -269,6 +270,10 @@ class Profile(models.Model):
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
 
+
+    def save(self, *args, **kwargs):
+        self.signature_html = mypostmarkup.markup(self.signature, auto_urls=False)
+        super(Profile, self).save(*args, **kwargs)
 
     @memoize_method
     def unread_pm_count(self):

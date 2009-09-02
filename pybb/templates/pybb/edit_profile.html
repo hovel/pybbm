@@ -2,6 +2,20 @@
 {% load pybb_extras %}
 {% load i18n %}
 
+{% block head_extra %}
+    <script type="text/javascript" src="/static/pybb/js/markitup/jquery.markitup.pack.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/pybb/js/markitup/skins/markitup/style.css" />
+
+    <link rel="stylesheet" type="text/css" href="/static/pybb/js/markitup/sets/bbcode/style.css" />
+    <script type="text/javascript" src="/static/pybb/js/markitup/sets/bbcode/set.js"></script>
+
+    <script type="text/javascript">
+    $(function() {
+        $("#id_signature").markItUp(mySettings);
+    });
+    </script>
+{% endblock %}
+
 {% block content %}
 <h1>{% trans "Profile editing" %}</h1>
 {% if profile.avatar %}
