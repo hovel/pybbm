@@ -388,6 +388,12 @@ pre {
     text-align: right;
 }
 
+.mini.pagination {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+    text-align: left;
+}
+
 .pagination a, .pagination span {
     padding: 0 0.2em;
 }
@@ -395,7 +401,7 @@ pre {
 .pagination a {
     background-color: #efefef;
     border: 1px solid #ccc;
-    color: #5c758c;
+    color: #5c758c !important;
 }
 
 .pagination .current {
