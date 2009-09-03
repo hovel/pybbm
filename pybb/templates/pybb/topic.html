@@ -41,29 +41,31 @@
 
 {% pybb_pagination _('Posts') %}
 
+{% if user.is_authenticated %}
 <div class="controls">
-    {% if moderator %}
+{% if moderator %}
     {% if topic.sticky %}
-    <a href="{% url pybb_unstick_topic topic.id %}">{% trans "Unstick topic" %}</a>
+    <a href="{% url pybb_unstick_topic topic.id %}">{% trans "Unstick topic" %}</a> /
     {% else %}
-    <a href="{% url pybb_stick_topic topic.id %}">{% trans "Stick topic" %}</a>
+    <a href="{% url pybb_stick_topic topic.id %}">{% trans "Stick topic" %}</a> /
     {% endif %}
-    /
+
     {% if topic.closed %}
-    <a href="{% url pybb_open_topic topic.id %}">{% trans "Open topic" %}</a>
+    <a href="{% url pybb_open_topic topic.id %}">{% trans "Open topic" %}</a> /
     {% else %}
-    <a href="{% url pybb_close_topic topic.id %}">{% trans "Close topic" %}</a>
+    <a href="{% url pybb_close_topic topic.id %}">{% trans "Close topic" %}</a> /
     {% endif %}
-    /
-    {% endif %}
-    {% if user.is_authenticated %}
+
+    <a href="{% url pybb_merge_topics %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
+{% endif %}
+
     {% if subscribed %}
     <a href="{% url pybb_delete_subscription topic.id %}?from_topic">{% trans "Unsubscribe" %}</a>
     {% else %}
     <a href="{% url pybb_add_subscription topic.id %}">{% trans "Subscribe" %}</a>
     {% endif %}
-    {% endif %}
 </div>
+{% endif %}
 
 {% if user.is_authenticated %}
  {% if not user.pybb_profile.is_banned %}

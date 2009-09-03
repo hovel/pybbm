@@ -7,7 +7,7 @@ except ImportError:
     from sha import sha as sha1
 
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Sum
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
@@ -88,6 +88,11 @@ class Forum(models.Model):
     def topic_count(self):
         return self.topics.all().count()
 
+    def update_post_count(self):
+        self.post_count = Topic.objects.filter(forum=self).aggregate(
+                                        Sum("post_count"))['post_count__sum']
+        self.save()
+
     def get_absolute_url(self):
         return reverse('pybb_forum', args=[self.id])
 
@@ -145,6 +150,10 @@ class Topic(models.Model):
         if not new:
             read.time = datetime.now()
             read.save()
+
+    def update_post_count(self):
+        self.post_count = self.posts.count()
+        self.save()
 
     #def has_unreads(self, user):
         #try:
@@ -206,19 +215,20 @@ class Post(RenderableItem):
     __unicode__ = summary
 
     def save(self, *args, **kwargs):
+        now = datetime.now()
         if self.created is None:
-            self.created = datetime.now()
+            self.created = now
         self.render()
 
         new = self.id is None
 
-        if new:
-            Topic.objects.filter(id=self.topic_id).update(post_count=F('post_count')+1, updated=datetime.now())
-            self.topic.forum.updated = datetime.now()
-            self.topic.forum.post_count = Post.objects.filter(topic__forum=self.topic.forum).count()
-            self.topic.forum.save()
-
         super(Post, self).save(*args, **kwargs)
+
+        if new:
+            self.topic.updated = now
+            self.topic.update_post_count()
+            self.topic.forum.updated = now
+            self.topic.forum.update_post_count()
 
 
     def get_absolute_url(self):
@@ -231,14 +241,11 @@ class Post(RenderableItem):
         super(Post, self).delete(*args, **kwargs)
 
         if self_id == head_post_id:
-            self.topic.forum.post_count -= 1 + self.topic.posts.all().count()
             self.topic.delete()
         else:
-            self.topic.post_count -= 1
-            self.topic.save()
-            self.topic.forum.post_count -= 1
+            self.topic.update_post_count()
 
-        self.topic.forum.save()
+        self.topic.forum.update_post_count()
 
 
 BAN_STATUS = (

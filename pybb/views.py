@@ -3,7 +3,7 @@ import re
 from markdown import Markdown
 from pybb.markups import mypostmarkup
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -375,6 +375,49 @@ def open_topic(request, topic_id):
             topic.closed = False
             topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
+
+
+
+@login_required
+@render_to('pybb/merge_topics.html')
+def merge_topics (request):
+    from pybb.templatetags.pybb_extras import pybb_moderated_by
+
+    topics_ids = request.GET.getlist('topic')
+    topics = get_list_or_404(Topic, pk__in=topics_ids)
+
+    for topic in topics:
+        if not pybb_moderated_by(topic, request.user):
+            # TODO: show error message: no permitions for edit this topic
+            return HttpResponseRedirect(topic.get_absolute_url())
+
+    if len(topics) < 2:
+        return {'topics': topics}
+
+    posts = get_list_or_404(Post, topic__in=topics_ids)
+    main = int(request.POST.get("main", 0))
+
+    if main and main in (topic.id for topic in topics):
+        for topic in topics:
+            if topic.id == main:
+                main_topic = topic
+
+        for post in posts:
+            if post.topic_id != main_topic.id:
+                post.topic = main_topic
+                post.save()
+
+        main_topic.update_post_count()
+        main_topic.forum.update_post_count()
+
+        for topic in topics:
+            if topic.id != main:
+                forum = topic.forum
+                topic.delete()
+                forum.update_post_count()
+
+        return HttpResponseRedirect(main_topic.get_absolute_url())
+    return {'posts': posts, 'topics': topics, 'topic': topics[0]}
 
 
 

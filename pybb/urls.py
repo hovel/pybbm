@@ -31,6 +31,7 @@ urlpatterns = patterns('',
     url('^topic/(?P<topic_id>\d+)/unstick/$', views.unstick_topic, name='pybb_unstick_topic'),
     url('^topic/(?P<topic_id>\d+)/close/$', views.close_topic, name='pybb_close_topic'),
     url('^topic/(?P<topic_id>\d+)/open/$', views.open_topic, name='pybb_open_topic'),
+    url('^merge_topics/$', views.merge_topics, name='pybb_merge_topics'),
 
     # Post
     url('^topic/(?P<topic_id>\d+)/post/add/$', views.add_post,
@@ -58,6 +59,6 @@ urlpatterns = patterns('',
         views.pm_show_unread, name='pybb_pm_show_unread'),
     url('^pm/message/(?P<pm_id>\d+)/$', views.pm_show_message, name='pybb_pm_show_message'),
 
-    # API 
+    # API
     url('^api/post_ajax_preview/$', views.post_ajax_preview, name='pybb_post_ajax_preview'),
 )

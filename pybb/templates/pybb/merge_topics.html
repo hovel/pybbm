@@ -1,0 +1,47 @@
+{% extends 'pybb/base.html' %}
+{% load pybb_extras %}
+{% load i18n %}
+
+{% block content %}
+
+
+
+<form method="get" action="">
+<fieldset>
+    <legend>{% trans 'Enter topic id for add to merged topics' %}</legend>
+    {% for topic in topics  %}
+        <input type="hidden" name="topic" value="{{ topic.id }}" />
+    {% endfor %}
+    <input type="text" name="topic" style="float:left;" />
+    <input type="submit" value="{% trans 'Add' %}" />
+</fieldset>
+</form>
+
+{% if topic %}
+
+    <form method="post" action="">
+    <fieldset>
+        <legend>{% trans 'Choose main topic to merge' %}</legend>
+
+    {% for topic in topics %}
+        <p><input type="radio" id="id_topic_{{ topic.id }}" style="float:left;" name="main" value="{{ topic.id }}" />
+        <label for="id_topic_{{ topic.id }}">{{ topic.id }} {{ topic.name }}</label></p>
+    {% endfor %}
+
+        <input type="submit" value="{% trans 'Merge' %}" />
+    </fieldset>
+    </form>
+
+    <p>{% trans 'Preview' %}: {% trans 'Posts from changed topics' %}.
+    {% trans 'Number of posts' %}: {{ posts|length }}</p>
+
+    <ul class="posts">
+        {% for post in posts %}
+            {{ post.topic.name }}
+            <li>{% include "pybb/post_template.html" %}</li>
+        {% endfor %}
+    </ul>
+
+{% endif %}
+
+{% endblock %}
