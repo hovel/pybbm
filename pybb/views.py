@@ -1,7 +1,14 @@
+# coding: utf-8
 import math
 import re
+from datetime import datetime
 from markdown import Markdown
 from pybb.markups import mypostmarkup
+try:
+    import pytils
+    pytils_enabled = True
+except ImportError:
+    pytils_enabled = False
 
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
@@ -177,6 +184,28 @@ def add_post_ctx(request, forum_id, topic_id):
     ip = request.META.get('REMOTE_ADDR', '')
     form = build_form(AddPostForm, request, topic=topic, forum=forum,
                       user=request.user, ip=ip, initial={'body': quote})
+
+    if topic and form.is_valid():
+        last_post = topic.last_post
+        time_diff = (datetime.now() - last_post.created).seconds / 60
+        if last_post.user == request.user and time_diff < 60:
+            if request.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
+                join_message = u"Добавлено спустя %s %s" % (time_diff,
+                                    pytils.numeral.choose_plural(time_diff,
+                                    (u"минуту", u"минуты", u"минут")))
+            else:
+                join_message = _(u"Added after %s minutes") % time_diff
+
+            if last_post.markup == "bbcode":
+                join_message = "[b]%s[/b]" % join_message
+            elif last_post.markup == "markdown":
+                join_message = "**%s**" % join_message
+
+            last_post.body += u"\n\n%s:\n\n%s" % (join_message,
+                                                form.cleaned_data["body"])
+            last_post.updated = datetime.now()
+            last_post.save()
+            return HttpResponseRedirect(last_post.get_absolute_url())
 
     if form.is_valid():
         post = form.save();
