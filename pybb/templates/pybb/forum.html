@@ -26,9 +26,7 @@
                 <span class="title">{% pybb_link topic %}</span>
                 <span class="post_count">{{ topic.post_count }}</span>
                 <span class="updated">{% pybb_time topic.updated %}</span>
-                {% if topic.is_paginated %}
-                <div class="mini pagination">{% trans 'Page' %}: {{ topic.pagination|safe }}</div>
-                {% endif %}
+                {% pybb_topic_mini_pagination topic %}
                 </li>
                 {% endfor %}
 

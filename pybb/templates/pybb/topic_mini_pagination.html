@@ -1,0 +1,4 @@
+{% load i18n %}
+{% if is_paginated %}
+<div class="mini pagination">{% trans 'Page' %}: {{ pagination|safe }}</div>
+{% endif %}

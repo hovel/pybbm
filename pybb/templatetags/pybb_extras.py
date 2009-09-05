@@ -185,3 +185,30 @@ def pybb_equal_to(obj1, obj2):
 @register.filter
 def pybb_unreads(qs, user):
     return cache_unreads(qs, user)
+
+
+@register.inclusion_tag('pybb/topic_mini_pagination.html')
+def pybb_topic_mini_pagination(topic):
+    """
+    Display links on topic pages.
+    """
+
+    is_paginated = topic.post_count > pybb_settings.TOPIC_PAGE_SIZE
+    if not is_paginated:
+        pagination = None
+    else:
+        page_size = pybb_settings.TOPIC_PAGE_SIZE
+        template =  u'<a href="%s?page=%%(p)s">%%(p)s</a>' % topic.get_absolute_url()
+        page_count =  ((topic.post_count - 1) / page_size ) + 1
+        if page_count > 4:
+            pages = [1, 2, page_count - 1, page_count]
+            links = [template % {'p': page} for page in pages]
+            pagination = u"%s, %s ... %s, %s" % tuple(links)
+        else:
+            pages = range(1,page_count+1)
+            links = [template % {'p': page} for page in pages]
+            pagination = u", ".join(links)
+
+    return {'pagination': pagination,
+            'is_paginated': is_paginated,
+            }

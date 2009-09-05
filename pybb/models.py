@@ -155,22 +155,6 @@ class Topic(models.Model):
         self.post_count = self.posts.count()
         self.save()
 
-    def is_paginated(self):
-        return self.post_count > pybb_settings.TOPIC_PAGE_SIZE
-
-    def pagination(self):
-        page_size = pybb_settings.TOPIC_PAGE_SIZE
-        template =  u'<a href="%s?page=%%(p)s">%%(p)s</a>' % self.get_absolute_url()
-        page_count =  ((self.post_count - 1) / page_size ) + 1
-        if page_count > 4:
-            pages = [1, 2, page_count - 1, page_count]
-            links = [template % {'p': page} for page in pages]
-            return u"%s, %s ... %s, %s" % tuple(links)
-        else:
-            pages = range(1,page_count+1)
-            links = [template % {'p': page} for page in pages]
-            return u", ".join(links)
-
     #def has_unreads(self, user):
         #try:
             #read = Read.objects.get(user=user, topic=self)
