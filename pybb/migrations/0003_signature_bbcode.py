@@ -9,8 +9,6 @@ class Migration:
         
         # Adding field 'Profile.signature_html'
         db.add_column('pybb_profile', 'signature_html', orm['pybb.profile:signature_html'])
-        [profile.save() for profile in Profile.objects.all()]
-        
     
     
     def backwards(self, orm):
