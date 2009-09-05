@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ungettext
 
 from pybb.util import   render_to, paged, build_form, quote_text, paginate,\
                         set_language, ajax, urlize
@@ -188,13 +189,16 @@ def add_post_ctx(request, forum_id, topic_id):
     if topic and form.is_valid():
         last_post = topic.last_post
         time_diff = (datetime.now() - last_post.created).seconds / 60
-        if last_post.user == request.user and time_diff < 60:
+        timeout = pybb_settings.POST_AUTOJOIN_TIMEOUT
+        if last_post.user == request.user and time_diff < timeout:
             if request.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
                 join_message = u"Добавлено спустя %s %s" % (time_diff,
                                     pytils.numeral.choose_plural(time_diff,
                                     (u"минуту", u"минуты", u"минут")))
             else:
-                join_message = _(u"Added after %s minutes") % time_diff
+                join_message = ungettext(u"Added after %s minute",
+                                         u"Added after %s minutes",
+                                         time_diff) % time_diff
 
             if last_post.markup == "bbcode":
                 join_message = "[b]%s[/b]" % join_message
