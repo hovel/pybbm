@@ -24,8 +24,8 @@
                     </div>
 
                     {% if post.user.pybb_profile.ban_status %}
-                        <div{% ifequal post.user.pybb_profile.ban_status 2 %}
-                        title="{% trans 'Expire' %} {{ post.user.pybb_profile.ban_till }}"{% endifequal %}
+                        <div{% if post.user.pybb_profile.is_banned %}
+                        title="{% trans 'Expire' %} {{ post.user.pybb_profile.ban_till }}"{% endif %}
                         class="banned">
                             {{ post.user.pybb_profile.get_ban_status_display }}
                         </div>
