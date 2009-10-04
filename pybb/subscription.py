@@ -87,7 +87,7 @@ def notify_pm_recipients(pm):
     text_content = PM_RECIPIENT_TEXT_TEMPLATE() % {
             'username': pm.src_user.username,
             'message': pm.body_text,
-            'pm_url': pm.get_absolute_url(),
+            'pm_url': absolute_url(pm.get_absolute_url()),
     }
     send_mail([to_email], subject, text_content)
 
