@@ -49,6 +49,7 @@ class PybbTimeNode(template.Node):
         delta = datetime.now() - context_time
         today = datetime.now().replace(hour=0, minute=0, second=0)
         yesterday = today - timedelta(days=1)
+        tomorrow = today + timedelta(days=1)
 
         if delta.days == 0:
             if delta.seconds < 60:
@@ -74,9 +75,9 @@ class PybbTimeNode(template.Node):
                 tz1 = time.timezone
             tz = tz1 + context['user'].pybb_profile.time_zone * 60 * 60
             context_time = context_time + timedelta(seconds=tz)
-        if context_time > today:
+        if today < context_time < tomorrow:
             return _('today, %s') % context_time.strftime('%H:%M')
-        elif context_time > yesterday:
+        elif yesterday < context_time < today:
             return _('yesterday, %s') % context_time.strftime('%H:%M')
         else:
             return dateformat.format(context_time, 'd M, Y H:i')

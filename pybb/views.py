@@ -220,10 +220,13 @@ def add_post_ctx(request, forum_id, topic_id):
     else:
         form_url = reverse('pybb_add_topic', args=[forum.id])
 
+    current_markup = request.user.pybb_profile.markup
+
     return {'form': form,
             'topic': topic,
             'forum': forum,
             'form_url': form_url,
+            'current_markup': current_markup,
             }
 
 
