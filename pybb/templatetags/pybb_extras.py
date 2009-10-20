@@ -117,7 +117,7 @@ def pybb_has_unreads(topic, user):
         return False
     else:
         if isinstance(topic, Topic):
-            if (now - delta > topic.updated):
+            if topic.updated and (now - delta > topic.updated):
                 return False
             else:
                 if hasattr(topic, '_read'):
