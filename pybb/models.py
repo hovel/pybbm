@@ -72,7 +72,7 @@ class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
-    description = models.TextField(_('Description'), blank=True, default='')
+    description = models.TextField(_('Description'), blank=True)
     moderators = models.ManyToManyField(User, blank=True, null=True, verbose_name=_('Moderators'))
     updated = models.DateTimeField(_('Updated'), null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
@@ -199,7 +199,7 @@ class Post(RenderableItem):
     body = models.TextField(_('Message'))
     body_html = models.TextField(_('HTML version'))
     body_text = models.TextField(_('Text version'))
-    user_ip = models.IPAddressField(_('User IP'), blank=True, default='')
+    user_ip = models.IPAddressField(_('User IP'), blank=True, default='0.0.0.0')
 
 
     class Meta:
@@ -255,19 +255,19 @@ BAN_STATUS = (
 
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
-    site = models.URLField(_('Site'), verify_exists=False, blank=True, default='')
-    jabber = models.CharField(_('Jabber'), max_length=80, blank=True, default='')
-    icq = models.CharField(_('ICQ'), max_length=12, blank=True, default='')
-    msn = models.CharField(_('MSN'), max_length=80, blank=True, default='')
-    aim = models.CharField(_('AIM'), max_length=80, blank=True, default='')
-    yahoo = models.CharField(_('Yahoo'), max_length=80, blank=True, default='')
-    location = models.CharField(_('Location'), max_length=30, blank=True, default='')
-    signature = models.TextField(_('Signature'), blank=True, default='', max_length=pybb_settings.SIGNATURE_MAX_LENGTH)
-    signature_html = models.TextField(_('Signature HTML Version'), blank=True, default='', max_length=pybb_settings.SIGNATURE_MAX_LENGTH+30)
+    site = models.URLField(_('Site'), verify_exists=False, blank=True)
+    jabber = models.CharField(_('Jabber'), max_length=80, blank=True)
+    icq = models.CharField(_('ICQ'), max_length=12, blank=True)
+    msn = models.CharField(_('MSN'), max_length=80, blank=True)
+    aim = models.CharField(_('AIM'), max_length=80, blank=True)
+    yahoo = models.CharField(_('Yahoo'), max_length=80, blank=True)
+    location = models.CharField(_('Location'), max_length=30, blank=True)
+    signature = models.TextField(_('Signature'), blank=True, max_length=pybb_settings.SIGNATURE_MAX_LENGTH)
+    signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=pybb_settings.SIGNATURE_MAX_LENGTH+30)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(pybb_settings.DEFAULT_TIME_ZONE))
-    language = models.CharField(_('Language'), max_length=10, blank=True, default='',
+    language = models.CharField(_('Language'), max_length=10, blank=True,
                                 choices=settings.LANGUAGES)
-    avatar = ExtendedImageField(_('Avatar'), blank=True, default='', upload_to=pybb_settings.AVATARS_UPLOAD_TO, width=pybb_settings.AVATAR_WIDTH, height=pybb_settings.AVATAR_HEIGHT)
+    avatar = ExtendedImageField(_('Avatar'), blank=True, upload_to=pybb_settings.AVATARS_UPLOAD_TO, width=pybb_settings.AVATAR_WIDTH, height=pybb_settings.AVATAR_HEIGHT)
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
     markup = models.CharField(_('Default markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
@@ -393,7 +393,7 @@ class Attachment(models.Model):
     content_type = models.CharField(_('Content type'), max_length=255)
     path = models.CharField(_('Path'), max_length=255)
     name = models.TextField(_('Name'))
-    hash = models.CharField(_('Hash'), max_length=40, blank=True, default='', db_index=True)
+    hash = models.CharField(_('Hash'), max_length=40, blank=True, db_index=True)
 
     def save(self, *args, **kwargs):
         super(Attachment, self).save(*args, **kwargs)

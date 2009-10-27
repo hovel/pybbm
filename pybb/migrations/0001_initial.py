@@ -264,7 +264,7 @@ class Migration:
             'topic': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['pybb.Topic']"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['auth.User']"}),
-            'user_ip': ('django.db.models.fields.IPAddressField', [], {'default': "''", 'max_length': '15', 'blank': 'True'})
+            'user_ip': ('django.db.models.fields.IPAddressField', [], {'default': "'0.0.0.0'", 'max_length': '15', 'blank': 'True'})
         },
         'pybb.privatemessage': {
             'body': ('django.db.models.fields.TextField', [], {}),
