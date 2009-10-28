@@ -7,13 +7,11 @@
         <table>
             <tr>
                 <td class="info" width="15%">
-                    {% if post.user.pybb_profile.avatar %}
                     <div class="avatar">
                         <a href="{% url pybb_profile post.user %}">
-                        <img src="{{ post.user.pybb_profile.avatar.url }}" />
+                        <img src="{{ post.user|pybb_avatar_url }}" alt="" />
                         </a>
                     </div>
-                    {% endif %}
                     <div class="author">{{ post.user|pybb_profile_link }}</div>
                     {% if user.is_superuser %}
                         <div class="updated">{{ post.user_ip }}</div>

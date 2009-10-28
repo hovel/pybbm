@@ -5,11 +5,9 @@
 {% block content %}
 <h1><a href="{% url pybb_profile profile.username %}">{{ profile.username }}</a></h1>
 <div class="userinfo">
-    {% if profile.pybb_profile.avatar %}
     <div class="avatar">
-        <img src="{{ profile.pybb_profile.avatar.url }}" />
+        <img src="{{ profile|pybb_avatar_url }}" alt="" />
     </div>
-    {% endif %}
     {% for topic in list %}
     <li class="user">
     

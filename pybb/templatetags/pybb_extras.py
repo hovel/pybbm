@@ -19,6 +19,7 @@ from django.utils import dateformat
 from pybb.models import Forum, Topic, Read, PrivateMessage
 from pybb.unread import cache_unreads
 from pybb import settings as pybb_settings
+from pybb.util import gravatar_url
 
 register = template.Library()
 
@@ -213,3 +214,11 @@ def pybb_topic_mini_pagination(topic):
     return {'pagination': pagination,
             'is_paginated': is_paginated,
             }
+
+
+@register.filter
+def pybb_avatar_url(user):
+    if user.pybb_profile.avatar:
+        return user.pybb_profile.avatar.url
+    else:
+        return gravatar_url(user.email)

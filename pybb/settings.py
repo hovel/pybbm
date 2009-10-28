@@ -1,3 +1,5 @@
+from urlparse import urljoin
+
 from django.conf import settings
 
 def get(key, default):
@@ -7,9 +9,14 @@ def get(key, default):
 TOPIC_PAGE_SIZE = get('PYBB_TOPIC_PAGE_SIZE', 10)
 FORUM_PAGE_SIZE = get('PYBB_FORUM_PAGE_SIZE', 20)
 USERS_PAGE_SIZE = get('PYBB_USERS_PAGE_SIZE', 20)
+HOST = get('PYBB_HOST', 'localhost:8000')
+
+# Avatar settings
 AVATARS_UPLOAD_TO = get('PYBB_AVATARS_UPLOAD_TO', 'pybb/avatars')
 AVATAR_WIDTH = get('PYBB_AVATAR_WIDTH', 60)
 AVATAR_HEIGHT = get('PYBB_AVATAR_HEIGHT', 60)
+DEFAULT_AVATAR_URL = 'http://%s%s' % (HOST, get('PYBB_DEFAULT_AVATAR_URL', urljoin(settings.MEDIA_URL, 'pybb/img/default_avatar.jpg')))
+
 DEFAULT_TIME_ZONE = get('PYBB_DEFAULT_TIME_ZONE', 3)
 SIGNATURE_MAX_LENGTH = get('PYBB_SIGNATURE_MAX_LENGTH', 1024)
 SIGNATURE_MAX_LINES = get('PYBB_SIGNATURE_MAX_LINES', 3)
@@ -21,7 +28,6 @@ HEADER = get('PYBB_HEADER', 'PYBB')
 TAGLINE = get('PYBB_TAGLINE', 'Django based forum engine')
 DEFAULT_MARKUP = get('PYBB_DEFAULT_MARKUP', 'bbcode')
 NOTICE = get('PYBB_NOTICE', '')
-HOST = get('PYBB_HOST', 'localhost:8000')
 FREEZE_FIRST_POST = get('PYBB_FREEZE_FIRST_POST', True)
 ADMIN_URL = get('PYBB_ADMIN_URL', '/admin/')
 EMAIL_DEBUG = get('PYBB_EMAIL_DEBUG', False)

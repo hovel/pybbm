@@ -1,0 +1,17 @@
+Dependencies
+============
+* BeautifulSoup
+* PIL
+* python-markdown
+* pytils
+* django application for registration accounts. For example django-registration or django-account
+
+
+Installation
+============
+... some actions ...
+
+
+Configuration
+=============
+* Put your site hostname to settings.PYBB_HOST

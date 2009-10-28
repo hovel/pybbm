@@ -3,6 +3,11 @@ import os.path
 import random
 from BeautifulSoup import BeautifulSoup
 import traceback
+try:
+	from hashlib import md5
+except ImportError:
+	from md5 import md5
+import urllib
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -283,3 +288,17 @@ def unescape(text):
     text = text.replace('&quot;', '"')
     text = text.replace('&#39;', '\'')
     return text
+
+
+def gravatar_url(email):
+    """
+    Return gravatar URL for given email.
+
+    Details: http://gravatar.com/site/implement/url
+    """
+
+    hash = md5(email).hexdigest()
+    size = max(pybb_settings.AVATAR_WIDTH, pybb_settings.AVATAR_HEIGHT)
+    default = urllib.quote(pybb_settings.DEFAULT_AVATAR_URL)
+    url = 'http://www.gravatar.com/avatar/%s?s=%d&d=%s' % (hash, size, default)
+    return url
