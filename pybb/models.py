@@ -353,6 +353,11 @@ class Attachment(models.Model):
         return os.path.join(settings.MEDIA_ROOT, pybb_settings.ATTACHMENT_UPLOAD_TO,
                             self.path)
 
+    class Meta:
+        verbose_name = _('Attachment')
+        verbose_name_plural = _('Attachments')
+
+
 
 from pybb import signals
 signals.setup_signals()

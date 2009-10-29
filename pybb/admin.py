@@ -1,13 +1,17 @@
 # -*- coding: utf-8
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from pybb.models import Category, Forum, Topic, Post, Profile, Read
+from django.core.urlresolvers import reverse
+
+from pybb.models import Category, Forum, Topic, Post, Profile, Read, Attachment
+
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'position', 'forum_count']
     list_per_page = 20
     ordering = ['position']
     search_fields = ['name']
+
 
 class ForumAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'position', 'topic_count']
@@ -27,6 +31,7 @@ class ForumAdmin(admin.ModelAdmin):
             ),
         )
 
+
 class TopicAdmin(admin.ModelAdmin):
     list_display = ['name', 'forum', 'created', 'head', 'post_count']
     list_per_page = 20
@@ -45,6 +50,7 @@ class TopicAdmin(admin.ModelAdmin):
                 }
          ),
         )
+
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'created', 'updated', 'summary']
@@ -68,6 +74,7 @@ class PostAdmin(admin.ModelAdmin):
                 }
          ),
         )
+
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'time_zone', 'location', 'language']
@@ -97,6 +104,7 @@ class ProfileAdmin(admin.ModelAdmin):
          ),
         )
 
+
 class ReadAdmin(admin.ModelAdmin):
     list_display = ['user', 'topic', 'time']
     list_per_page = 20
@@ -105,9 +113,37 @@ class ReadAdmin(admin.ModelAdmin):
     date_hierarchy = 'time'
     search_fields = ['user__username', 'topic__name']
 
+
+class AttachmentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'size', 'content_type',
+                    'admin_url', 'admin_path',
+                    'admin_view_post', 'admin_edit_post']
+
+    def admin_url(self, obj):
+        return u'<a href="%s">view</span>' % (obj.get_absolute_url())
+    admin_url.allow_tags = True
+    admin_url.short_description = _('Path')
+
+    def admin_path(self, obj):
+        return u'<span title="%s">%s</span>' % (obj.get_absolute_path(), obj.path)
+    admin_path.allow_tags = True
+    admin_path.short_description = _('Path')
+
+    def admin_view_post(self, obj):
+        return u'<a href="%s">view</a>' % obj.post.get_absolute_url()
+    admin_view_post.allow_tags = True
+    admin_view_post.short_description = _('View post')
+
+    def admin_edit_post(self, obj):
+        return u'<a href="%s">edit</a>' % reverse('admin:pybb_post_change', args=[obj.post.pk])
+    admin_edit_post.allow_tags = True
+    admin_edit_post.short_description = _('Edit post')
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Forum, ForumAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Read, ReadAdmin)
+admin.site.register(Attachment, AttachmentAdmin)
