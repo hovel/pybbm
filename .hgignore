@@ -1,16 +1,4 @@
-\.pyc$
-\.swp$
-^dump\.sql
-^settings_local\.py$
-^account
-^django/
-^spawn\.sh$
-^update\.sh$
-^update_pydev\.sh$
-^pybb/static/pybb/avatars
-^pybb/static/pybb/attachments
-^static/pybb/avatars
-^registration$
-^debug_toolbar
-^django_account\.egg-info$
-^update_trac\.sh$
+syntax: glob
+*.pyc
+*.swp
+update_forums.sh
