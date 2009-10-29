@@ -96,6 +96,7 @@ class EditProfileForm(forms.ModelForm):
             raise forms.ValidationError('Length of signature is limited to %d' % pybb_settings.SIGNATURE_MAX_LENGTH)
         return value
 
+
 class EditPostForm(forms.ModelForm):
     class Meta:
         model = Post
