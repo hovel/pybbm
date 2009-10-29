@@ -1,4 +1,4 @@
 syntax: glob
 *.pyc
 *.swp
-update_forums.sh
+pybb.egg-info

@@ -26,11 +26,11 @@ for dirpath, dirnames, filenames in os.walk(PACKAGE):
             data_files.append(os.path.join(prefix, f))
 
 setup(
-    version = '0.1.0',
+    version = '0.1.1',
     description = 'Django forum application',
     author = 'Grigoriy Petukhov',
     author_email = 'lorien@lorien.name',
-    url = 'http://bitbucket.org/lorien/pybb/',
+    url = 'http://pybb.org',
     name = 'pybb',
 
     packages = packages,
