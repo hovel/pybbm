@@ -23,8 +23,6 @@
 {% endif %}
 <p><a href="{% url auth_password_change %}">{% trans "Change the password" %}</a></p>
 {#<p><a href="{% url auth_email_change %}">{% trans "Change the email" %}</a></p>#}
-<p><a href="{% url pybb_pm_messagebox "inbox" %}">{% trans "Inbox" %}</a></p>
-<p><a href="{% url pybb_pm_messagebox "outbox" %}">{% trans "Outbox" %}</a></p>
 <form method="post" enctype="multipart/form-data">
     <fieldset>
         <legend>{% trans "Profile editing" %}</legend>

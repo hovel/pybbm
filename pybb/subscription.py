@@ -7,7 +7,6 @@ from django.utils import translation
 from pybb import settings as pybb_settings
 from pybb.util import absolute_url
 
-# i18n features disabled. See ticket #47
 
 TOPIC_SUBSCRIPTION_TEXT_TEMPLATE = lambda: _(u"""New reply from %(username)s to topic that you have subscribed on.
 ---
@@ -15,12 +14,6 @@ TOPIC_SUBSCRIPTION_TEXT_TEMPLATE = lambda: _(u"""New reply from %(username)s to 
 ---
 See topic: %(post_url)s
 Unsubscribe %(unsubscribe_url)s""")
-
-PM_RECIPIENT_TEXT_TEMPLATE = lambda: _(u"""User %(username)s have sent your the new private message.
----
-%(message)s
----
-See message online: %(pm_url)s""")
 
 
 def send_mail(rec_list, subject, text, html=None):
@@ -34,11 +27,11 @@ def send_mail(rec_list, subject, text, html=None):
     if html:
         msg.attach_alternative(html, "text/html")
     if pybb_settings.EMAIL_DEBUG:
-        print '---begin---'
-        print 'To:', rec_list
-        print 'Subject:', subject
-        print 'Body:', text
-        print '---end---'
+        logging.debug('---begin---')
+        logging.debug('To: %s' % rec_list)
+        logging.debug('Subject: %s' % subject)
+        logging.debug('Body: %s' % text)
+        logging.debug('---end---')
     else:
         msg.send(fail_silently=True)
 
@@ -69,26 +62,3 @@ def notify_topic_subscribers(post):
                 send_mail([to_email], subject, text_content)
 
                 translation.activate(old_lang)
-
-
-def notify_pm_recipients(pm):
-    if pybb_settings.DISABLE_NOTIFICATION:
-        return
-
-    from pybb.models import PrivateMessage, MessageBox
-    old_lang = translation.get_language()
-    lang = pm.dst_user.pybb_profile.language or 'en'
-    translation.activate(lang)
-
-    print 'LANG', lang
-
-    subject = _(u'New private message for you')
-    to_email = pm.dst_user.email
-    text_content = PM_RECIPIENT_TEXT_TEMPLATE() % {
-            'username': pm.src_user.username,
-            'message': pm.body_text,
-            'pm_url': absolute_url(pm.get_absolute_url()),
-    }
-    send_mail([to_email], subject, text_content)
-
-    translation.activate(old_lang)

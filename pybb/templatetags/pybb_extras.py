@@ -16,7 +16,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
 
-from pybb.models import Forum, Topic, Read, PrivateMessage
+from pybb.models import Forum, Topic, Read
 from pybb.unread import cache_unreads
 from pybb import settings as pybb_settings
 from pybb.util import gravatar_url

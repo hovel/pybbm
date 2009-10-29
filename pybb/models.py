@@ -35,12 +35,6 @@ MARKUP_CHOICES = (
     ('markdown', 'markdown'),
 )
 
-MESSAGEBOX_CHOICES = (
-    ('inbox', _('Inbox')),
-    ('outbox', _('Outbox')),
-    ('trash', _('Trash')),
-)
-
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -282,10 +276,6 @@ class Profile(models.Model):
         self.signature_html = mypostmarkup.markup(self.signature, auto_urls=False)
         super(Profile, self).save(*args, **kwargs)
 
-    @memoize_method
-    def unread_pm_count(self):
-        return MessageBox.objects.filter(user=self.user, box='inbox', read=False).count()
-
     def is_banned(self):
         if self.ban_status == 2:
             if self.ban_till is None or self.ban_till < datetime.now():
@@ -327,64 +317,6 @@ class Read(models.Model):
 
     def __unicode__(self):
         return u'T[%d], U[%d]: %s' % (self.topic.id, self.user.id, unicode(self.time))
-
-
-class PrivateMessage(RenderableItem):
-    thread = models.ForeignKey('self', blank=True, null=True)
-    user_box = models.ManyToManyField(User, verbose_name=_('User relation'), through='MessageBox')
-    src_user = models.ForeignKey(User, verbose_name=_('Author'), related_name='pm_author')
-    dst_user = models.ForeignKey(User, verbose_name=_('Recipient'), related_name='pm_recipient')
-    created = models.DateTimeField(_('Created'), blank=True)
-    markup = models.CharField(_('Markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
-    subject = models.CharField(_('Subject'), max_length=255)
-    body = models.TextField(_('Message'))
-    body_html = models.TextField(_('HTML version'))
-    body_text = models.TextField(_('Text version'))
-
-    class Meta:
-        ordering = ['-created']
-        verbose_name = _('Private message')
-        verbose_name_plural = _('Private messages')
-
-    # TODO: summary and part of the save method is the same as in the Post model
-    # move to common functions
-    def summary(self):
-        LIMIT = 50
-        tail = len(self.body) > LIMIT and '...' or ''
-        return self.body[:LIMIT] + tail
-
-    def __unicode__(self):
-        return self.subject
-
-    def save(self, *args, **kwargs):
-        if self.created is None:
-            self.created = datetime.now()
-        self.render()
-
-        new = self.id is None
-        super(PrivateMessage, self).save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse('pybb_pm_show_message', args=[self.id])
-
-
-class MessageBox(models.Model):
-    """
-    Each private message may belong to one or more message boxes.
-
-    This m2m relationship also defines which message is first
-        in any given message thread (first message has head=True)
-        and if the thread has unread messages (thread_read)
-    """
-
-    message = models.ForeignKey(PrivateMessage)
-    user = models.ForeignKey(User)
-
-    box = models.CharField(_('Messagebox'), max_length=15, choices=MESSAGEBOX_CHOICES, db_index=True)
-    head = models.BooleanField(db_index=True)
-    read = models.BooleanField(default=False)
-    thread_read = models.BooleanField(db_index=True, default=False)
-    message_count = models.IntegerField(default=1)
 
 
 class Attachment(models.Model):

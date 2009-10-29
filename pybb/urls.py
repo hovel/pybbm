@@ -49,16 +49,6 @@ urlpatterns = patterns('',
     url('^subscription/topic/(?P<topic_id>\d+)/add/$',
         views.add_subscription, name='pybb_add_subscription'),
 
-    # Private messages
-    url('^pm/new/(?P<thread_id>\d+)/$', views.create_pm, name='pybb_add_pm'),
-    url('^pm/new/$', views.create_pm, name='pybb_create_pm'),
-    url('^pm/(?P<box>inbox|outbox|trash)/$', views.pm_messagebox, name='pybb_pm_messagebox'),
-    url('^pm/(?P<box>inbox|outbox|trash)/thread/(?P<thread_id>\d+)/$',
-        views.pm_show_thread, name='pybb_pm_show_thread'),
-    url('^pm/(?P<box>inbox|outbox|trash)/unread/(?P<thread_id>\d+)/$',
-        views.pm_show_unread, name='pybb_pm_show_unread'),
-    url('^pm/message/(?P<pm_id>\d+)/$', views.pm_show_message, name='pybb_pm_show_message'),
-
     # API
     url('^api/post_ajax_preview/$', views.post_ajax_preview, name='pybb_post_ajax_preview'),
 )
