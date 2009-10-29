@@ -1,10 +1,10 @@
 Dependencies
 ============
-* BeautifulSoup
 * PIL
+* BeautifulSoup
 * python-markdown
+* sorl-thumbnail
 * pytils (optional)
-* django application for registration accounts. For example django-registration or django-account
 
 
 Installation

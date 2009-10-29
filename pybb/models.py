@@ -5,6 +5,7 @@ try:
     from hashlib import sha1
 except ImportError:
     from sha import sha as sha1
+from sorl.thumbnail.fields import ThumbnailField
 
 from django.db import models
 from django.db.models import F, Sum
@@ -15,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from pybb.markups import mypostmarkup
-from pybb.fields import AutoOneToOneField, ExtendedImageField
+from pybb.fields import AutoOneToOneField
 from pybb.util import urlize, memoize_method, unescape
 from pybb import settings as pybb_settings
 
@@ -261,7 +262,7 @@ class Profile(models.Model):
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(pybb_settings.DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
                                 choices=settings.LANGUAGES)
-    avatar = ExtendedImageField(_('Avatar'), blank=True, upload_to=pybb_settings.AVATARS_UPLOAD_TO, width=pybb_settings.AVATAR_WIDTH, height=pybb_settings.AVATAR_HEIGHT)
+    avatar = ThumbnailField(_('Avatar'), blank=True, upload_to=pybb_settings.AVATARS_UPLOAD_TO, size=(pybb_settings.AVATAR_WIDTH, pybb_settings.AVATAR_HEIGHT))
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
     markup = models.CharField(_('Default markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)

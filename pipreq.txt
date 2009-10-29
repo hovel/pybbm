@@ -1,0 +1,7 @@
+BeautifulSoup
+python-markdown
+sorl-thumbnail
+pytils
+
+# Following libraries is not good choice for installing via pip :-)
+#PIL
