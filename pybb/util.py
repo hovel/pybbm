@@ -9,8 +9,6 @@ except ImportError:
 	from md5 import md5
 import urllib
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
 from django.http import HttpResponse
 from django.utils.functional import Promise
 from django.utils.translation import force_unicode, check_for_language
@@ -21,73 +19,6 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.conf import settings
 
 from pybb import settings as pybb_settings
-
-
-def render_to(template_path):
-    """
-    Expect the dict from view. Render returned dict with
-    RequestContext.
-    """
-
-    def decorator(func):
-        def wrapper(request, *args, **kwargs):
-            import pdb
-            #output = pdb.runcall(func, request, *args, **kwargs)
-            output = func(request, *args, **kwargs)
-            if not isinstance(output, dict):
-                return output
-            kwargs = {'context_instance': RequestContext(request)}
-            if 'MIME_TYPE' in output:
-                kwargs['mimetype'] = output.pop('MIME_TYPE')
-            if 'TEMPLATE' in output:
-                template = output.pop('TEMPLATE')
-            else:
-                template = template_path
-            return render_to_response(template, output, **kwargs)
-        return wrapper
-
-    return decorator
-
-
-def paged(paged_list_name, per_page):#, per_page_var='per_page'):
-    """
-    Parse page from GET data and pass it to view. Split the
-    query set returned from view.
-    """
-
-    def decorator(func):
-        def wrapper(request, *args, **kwargs):
-            result = func(request, *args, **kwargs)
-            if not isinstance(result, dict):
-                return result
-            try:
-                page = int(request.GET.get('page', 1))
-            except ValueError:
-                page = 1
-
-            real_per_page = per_page
-
-            #if per_page_var:
-                #try:
-                    #value = int(request.GET[per_page_var])
-                #except (ValueError, KeyError):
-                    #pass
-                #else:
-                    #if value > 0:
-                        #real_per_page = value
-
-            from django.core.paginator import Paginator
-            paginator = Paginator(result['paged_qs'], real_per_page)
-            result[paged_list_name] = paginator.page(page).object_list
-            result['page'] = page
-            result['page_list'] = range(1, paginator.num_pages + 1)
-            result['pages'] = paginator.num_pages
-            result['per_page'] = real_per_page
-            result['request'] = request
-            return result
-        return wrapper
-
-    return decorator
 
 
 def ajax(func):
@@ -132,20 +63,6 @@ class JsonResponse(HttpResponse):
         json_data = LazyJSONEncoder().encode(data)
         super(JsonResponse, self).__init__(
             content=json_data, mimetype=mimetype)
-
-
-def build_form(Form, _request, GET=False, *args, **kwargs):
-    """
-    Shorcut for building the form instance of given form class.
-    """
-
-    if not GET and 'POST' == _request.method:
-        form = Form(_request.POST, _request.FILES, *args, **kwargs)
-    elif GET and 'GET' == _request.method:
-        form = Form(_request.GET, _request.FILES, *args, **kwargs)
-    else:
-        form = Form(*args, **kwargs)
-    return form
 
 
 def urlize(data):

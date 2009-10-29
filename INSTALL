@@ -3,7 +3,7 @@ Dependencies
 * BeautifulSoup
 * PIL
 * python-markdown
-* pytils
+* pytils (optional)
 * django application for registration accounts. For example django-registration or django-account
 
 

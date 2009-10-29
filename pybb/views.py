@@ -10,8 +10,10 @@ try:
 except ImportError:
     pytils_enabled = False
 
-from django.shortcuts import get_object_or_404, get_list_or_404
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, Http404
+from django.shortcuts import get_object_or_404, get_list_or_404, render_to_response
+from django.template import RequestContext
+from django.http import HttpResponseRedirect, HttpResponse,\
+                        HttpResponseNotFound, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -20,7 +22,7 @@ from django.db import connection
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext
 
-from pybb.util import   render_to, paged, build_form, quote_text, paginate,\
+from pybb.util import quote_text, paginate,\
                         set_language, ajax, urlize
 from pybb.models import Category, Forum, Topic, Post, Profile, \
                         Attachment, MARKUP_CHOICES
@@ -28,6 +30,24 @@ from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
                         EditProfileForm, UserSearchForm
 from pybb import settings as pybb_settings
 from pybb.orm import load_related
+
+
+def render_to(template, func):
+    """
+    Shortcut for rendering template with RequestContext.
+
+    If decorated function returns non dict then just return that result
+    else use RequestContext for rendering the template.
+    """
+
+    def wrapper(request, *args, **kwargs):
+        output = func(request, *args, **kwargs)
+        if not isinstance(output, dict):
+            return output
+        else:
+            return render_to_response(template, output,
+                                      context_instance=RequestContext(request))
+    return wrapper
 
 
 def index_ctx(request):
@@ -55,7 +75,7 @@ def index_ctx(request):
             }
 
 
-index = render_to('pybb/index.html')(index_ctx)
+index = render_to('pybb/index.html', index_ctx)
 
 
 def show_category_ctx(request, category_id):
@@ -71,7 +91,7 @@ def show_category_ctx(request, category_id):
             }
 
 
-show_category = render_to('pybb/category.html')(show_category_ctx)
+show_category = render_to('pybb/category.html', show_category_ctx)
 
 
 def show_forum_ctx(request, forum_id):
@@ -95,7 +115,7 @@ def show_forum_ctx(request, forum_id):
             }
 
 
-show_forum = render_to('pybb/forum.html')(show_forum_ctx)
+show_forum = render_to('pybb/forum.html', show_forum_ctx)
 
 
 def show_topic_ctx(request, topic_id):
@@ -156,7 +176,7 @@ def show_topic_ctx(request, topic_id):
             }
 
 
-show_topic = render_to('pybb/topic.html')(show_topic_ctx)
+show_topic = render_to('pybb/topic.html', show_topic_ctx)
 
 
 @login_required
@@ -183,8 +203,12 @@ def add_post_ctx(request, forum_id, topic_id):
                            post.user.username)
 
     ip = request.META.get('REMOTE_ADDR', '')
-    form = build_form(AddPostForm, request, topic=topic, forum=forum,
-                      user=request.user, ip=ip, initial={'body': quote})
+    form_kwargs = dict(topic=topic, forum=forum, user=request.user,
+                       ip=ip, initial={'body': quote})
+    if request.method == 'POST':
+        form = AddPostForm(request.POST, request.FILES, **form_kwargs)
+    else:
+        form = AddPostForm(**form_kwargs)
 
     if topic and form.is_valid():
         last_post = topic.last_post
@@ -230,7 +254,7 @@ def add_post_ctx(request, forum_id, topic_id):
             }
 
 
-add_post = render_to('pybb/add_post.html')(add_post_ctx)
+add_post = render_to('pybb/add_post.html', add_post_ctx)
 
 
 def user_ctx(request, username):
@@ -241,7 +265,7 @@ def user_ctx(request, username):
             }
 
 
-user = render_to('pybb/user.html')(user_ctx)
+user = render_to('pybb/user.html', user_ctx)
 
 
 def user_topics_ctx(request, username):
@@ -257,7 +281,7 @@ def user_topics_ctx(request, username):
             }
 
 
-user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
+user_topics = render_to('pybb/user_topics.html', user_topics_ctx)
 
 
 # TODO: create template for that view
@@ -276,7 +300,7 @@ user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
             #}
 
 
-#user_posts = render_to('pybb/user_posts.html')(user_posts_ctx)
+#user_posts = render_to('pybb/user_posts.html', user_posts_ctx)
 
 
 def show_post(request, post_id):
@@ -289,7 +313,13 @@ def show_post(request, post_id):
 
 @login_required
 def edit_profile_ctx(request):
-    form = build_form(EditProfileForm, request, instance=request.user.pybb_profile)
+
+    form_kwargs = dict(instance=request.user.pybb_profile)
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, request.FILES, **form_kwargs)
+    else:
+        form = EditProfileForm(**form_kwargs)
+
     if form.is_valid():
         profile = form.save()
         set_language(request, profile.language)
@@ -299,7 +329,7 @@ def edit_profile_ctx(request):
             }
 
 
-edit_profile = render_to('pybb/edit_profile.html')(edit_profile_ctx)
+edit_profile = render_to('pybb/edit_profile.html', edit_profile_ctx)
 
 
 @login_required
@@ -313,11 +343,17 @@ def edit_post_ctx(request, post_id):
         return HttpResponseRedirect(post.get_absolute_url())
 
     head_post_id = post.topic.posts.order_by('created')[0].id
+    form_kwargs = dict(instance=post, initial={'title': post.topic.name})
+
     if post.id == head_post_id:
-        form = build_form(EditHeadPostForm, request, instance=post,
-                          initial={'title': post.topic.name})
+        form_class = EditHeadPostForm
     else:
-        form = build_form(EditPostForm, request, instance=post)
+        form_class = EditPostForm
+
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES, **form_kwargs) 
+    else:
+        form = form_class(**form_kwargs)
 
     if form.is_valid():
         post = form.save()
@@ -328,7 +364,7 @@ def edit_post_ctx(request, post_id):
             }
 
 
-edit_post = render_to('pybb/edit_post.html')(edit_post_ctx)
+edit_post = render_to('pybb/edit_post.html', edit_post_ctx)
 
 
 @login_required
@@ -385,7 +421,7 @@ def delete_post_ctx(request, post_id):
                 }
 
 
-delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
+delete_post = render_to('pybb/delete_post.html', delete_post_ctx)
 
 
 @login_required
@@ -415,8 +451,7 @@ def open_topic(request, topic_id):
 
 
 @login_required
-@render_to('pybb/merge_topics.html')
-def merge_topics (request):
+def merge_topics_ctx(request):
     from pybb.templatetags.pybb_extras import pybb_moderated_by
 
     topics_ids = request.GET.getlist('topic')
@@ -455,9 +490,10 @@ def merge_topics (request):
         return HttpResponseRedirect(main_topic.get_absolute_url())
     return {'posts': posts, 'topics': topics, 'topic': topics[0]}
 
+merge_topics = render_to('pybb/merge_topics.html', merge_topics_ctx)
 
 
-@render_to('pybb/users.html')
+
 def users_ctx(request):
     users = User.objects.order_by('username')
     form = UserSearchForm(request.GET)
@@ -472,7 +508,7 @@ def users_ctx(request):
             }
 
 
-users = render_to('pybb/users.html')(users_ctx)
+users = render_to('pybb/users.html', users_ctx)
 
 
 @login_required
