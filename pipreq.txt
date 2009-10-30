@@ -1,7 +1,8 @@
 BeautifulSoup
-python-markdown
+markdown
 sorl-thumbnail
 pytils
+south
 
 # Following libraries is not good choice for installing via pip :-)
 #PIL

@@ -1,17 +1,5 @@
-Dependencies
-============
-* PIL
-* BeautifulSoup
-* python-markdown
-* sorl-thumbnail
-* pytils (optional)
+Dependencies:
+ * http://pybb.org/wiki/PybbDependencies
 
-
-Installation
-============
-... some actions ...
-
-
-Configuration
-=============
-* Put your site hostname to settings.PYBB_HOST
+Installation:
+ * http://pybb.org/wiki/InstallFromScratch
