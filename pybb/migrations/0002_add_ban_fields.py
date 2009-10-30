@@ -84,16 +84,6 @@ class Migration:
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
         },
-        'pybb.messagebox': {
-            'box': ('django.db.models.fields.CharField', [], {'max_length': '15', 'db_index': 'True'}),
-            'head': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'message': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pybb.PrivateMessage']"}),
-            'message_count': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
-            'read': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'thread_read': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
-        },
         'pybb.post': {
             'body': ('django.db.models.fields.TextField', [], {}),
             'body_html': ('django.db.models.fields.TextField', [], {}),
@@ -105,19 +95,6 @@ class Migration:
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['auth.User']"}),
             'user_ip': ('django.db.models.fields.IPAddressField', [], {'default': "'0.0.0.0'", 'max_length': '15', 'blank': 'True'})
-        },
-        'pybb.privatemessage': {
-            'body': ('django.db.models.fields.TextField', [], {}),
-            'body_html': ('django.db.models.fields.TextField', [], {}),
-            'body_text': ('django.db.models.fields.TextField', [], {}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
-            'dst_user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pm_recipient'", 'to': "orm['auth.User']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'markup': ('django.db.models.fields.CharField', [], {'default': "'bbcode'", 'max_length': '15'}),
-            'src_user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'pm_author'", 'to': "orm['auth.User']"}),
-            'subject': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'thread': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pybb.PrivateMessage']", 'null': 'True', 'blank': 'True'}),
-            'user_box': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']"})
         },
         'pybb.profile': {
             'aim': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '80', 'blank': 'True'}),
