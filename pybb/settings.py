@@ -19,7 +19,7 @@ DEFAULTS = (
     ('QUICK_TOPICS_NUMBER', 10),
     ('QUICK_POSTS_NUMBER', 10),
     ('READ_TIMEOUT', 3600 * 24 * 7), # seconds
-    ('POST_TIMEOUT_AUTOJOIN', 60), # minutes
+    ('POST_AUTOJOIN_TIMEOUT', 60), # minutes
     ('HEADER', 'PyBB'),
     ('TAGLINE', 'Yet another PyBB forum'),
     ('DEFAULT_MARKUP', 'bbcode'),
