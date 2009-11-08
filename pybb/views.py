@@ -168,10 +168,13 @@ def add_post_ctx(request, forum_id, topic_id):
 
     if topic and form.is_valid():
         last_post = topic.last_post
-        time_diff = (datetime.now() - last_post.created).seconds / 60
+        delta = (datetime.now() - last_post.created)
+        time_diff = delta.seconds / 60
         timeout = pybb_settings.POST_AUTOJOIN_TIMEOUT
-        if last_post.user == request.user and time_diff < timeout:
-            if request.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
+
+        if (last_post.user == request.user and
+            not delta.days and time_diff < timeout):
+            if settings.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
                 join_message = u"Добавлено спустя %s %s" % (time_diff,
                                     pytils.numeral.choose_plural(time_diff,
                                     (u"минуту", u"минуты", u"минут")))
