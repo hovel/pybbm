@@ -51,71 +51,32 @@ def render_to(template, func):
 
 
 def index_ctx(request):
-    quick = {'posts': Post.objects.count(),
-             'topics': Topic.objects.count(),
-             'users': User.objects.count(),
-             'last_topics': Topic.objects.all().select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
-             'last_posts': Post.objects.order_by('-created').select_related()[:pybb_settings.QUICK_POSTS_NUMBER],
-             }
-
     cats = {}
-    forums = {}
-
     for forum in Forum.objects.all().select_related():
-        cat = cats.setdefault(forum.category.id,
-            {'cat': forum.category, 'forums': []})
+        cat = cats.setdefault(forum.category.pk,
+                              {'cat': forum.category, 'forums': []})
         cat['forums'].append(forum)
-        forums[forum.id] = forum
-
-    cmpdef = lambda a, b: cmp(a['cat'].position, b['cat'].position)
-    cats = sorted(cats.values(), cmpdef)
+    cats = sorted(cats.values(), key=lambda x: x['cat'].position)
 
     return {'cats': cats,
-            'quick': quick,
             }
-
-
-index = render_to('pybb/index.html', index_ctx)
 
 
 def show_category_ctx(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
-    quick = {'posts': category.posts.count(),
-             'topics': category.topics.count(),
-             'last_topics': category.topics.select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
-             'last_posts': category.posts.order_by('-created').select_related()\
-                [:pybb_settings.QUICK_POSTS_NUMBER],
-             }
+
     return {'category': category,
-            'quick': quick,
             }
-
-
-show_category = render_to('pybb/category.html', show_category_ctx)
 
 
 def show_forum_ctx(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
-
-    quick = {'posts': forum.post_count,
-             'topics': forum.topics.count(),
-             'last_topics': forum.topics.all().select_related()[:pybb_settings.QUICK_TOPICS_NUMBER],
-             'last_posts': forum.posts.order_by('-created').select_related()\
-                [:pybb_settings.QUICK_POSTS_NUMBER],
-             }
-
     topics = forum.topics.order_by('-sticky', '-updated').select_related()
     page, paginator = paginate(topics, request, pybb_settings.FORUM_PAGE_SIZE)
 
     return {'forum': forum,
-            'topics': page.object_list,
-            'quick': quick,
             'page': page,
-            'paginator': paginator,
             }
-
-
-show_forum = render_to('pybb/forum.html', show_forum_ctx)
 
 
 def show_topic_ctx(request, topic_id):
@@ -123,9 +84,9 @@ def show_topic_ctx(request, topic_id):
         topic = Topic.objects.select_related().get(pk=topic_id)
     except Topic.DoesNotExist:
         raise Http404()
+
     topic.views += 1
     topic.save()
-
 
     if request.user.is_authenticated():
         topic.update_read(request.user)
@@ -170,13 +131,8 @@ def show_topic_ctx(request, topic_id):
             'subscribed': subscribed,
             'posts': page.object_list,
             'page': page,
-            'paginator': paginator,
-            'form_url': reverse('pybb_add_post', args=[topic.id]),
             'current_markup': current_markup,
             }
-
-
-show_topic = render_to('pybb/topic.html', show_topic_ctx)
 
 
 @login_required
@@ -239,68 +195,29 @@ def add_post_ctx(request, forum_id, topic_id):
         post = form.save();
         return HttpResponseRedirect(post.get_absolute_url())
 
-    if topic:
-        form_url = reverse('pybb_add_post', args=[topic.id])
-    else:
-        form_url = reverse('pybb_add_topic', args=[forum.id])
-
-    current_markup = request.user.pybb_profile.markup
-
     return {'form': form,
             'topic': topic,
             'forum': forum,
-            'form_url': form_url,
-            'current_markup': current_markup,
             }
-
-
-add_post = render_to('pybb/add_post.html', add_post_ctx)
 
 
 def user_ctx(request, username):
     user = get_object_or_404(User, username=username)
     topic_count = Topic.objects.filter(user=user).count()
+
     return {'profile': user,
             'topic_count': topic_count,
             }
 
 
-user = render_to('pybb/user.html', user_ctx)
-
-
 def user_topics_ctx(request, username):
     user = get_object_or_404(User, username=username)
-
     topics = Topic.objects.filter(user=user).order_by('-created')
-
     page, paginator = paginate(topics, request, pybb_settings.TOPIC_PAGE_SIZE)
+
     return {'profile': user,
             'page': page,
-            'paginator': paginator,
-            'list': page.object_list,
             }
-
-
-user_topics = render_to('pybb/user_topics.html', user_topics_ctx)
-
-
-# TODO: create template for that view
-# which should be looking like topic template
-#
-#def user_posts_ctx(request, username):
-    #user = get_object_or_404(User, username=username)
-
-    #posts = Post.objects.filter(user=user).order_by('-created')
-
-    #page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE)
-    #return {'profile': user,
-            #'page': page,
-            #'paginator': paginator,
-            #'list': page.object_list,
-            #}
-
-
-#user_posts = render_to('pybb/user_posts.html', user_posts_ctx)
 
 
 def show_post(request, post_id):
@@ -324,12 +241,10 @@ def edit_profile_ctx(request):
         profile = form.save()
         set_language(request, profile.language)
         return HttpResponseRedirect(reverse('pybb_edit_profile'))
+
     return {'form': form,
             'profile': request.user.pybb_profile,
             }
-
-
-edit_profile = render_to('pybb/edit_profile.html', edit_profile_ctx)
 
 
 @login_required
@@ -362,9 +277,6 @@ def edit_post_ctx(request, post_id):
     return {'form': form,
             'post': post,
             }
-
-
-edit_post = render_to('pybb/edit_post.html', edit_post_ctx)
 
 
 @login_required
@@ -419,9 +331,6 @@ def delete_post_ctx(request, post_id):
     else:
         return {'post': post,
                 }
-
-
-delete_post = render_to('pybb/delete_post.html', delete_post_ctx)
 
 
 @login_required
@@ -488,10 +397,11 @@ def merge_topics_ctx(request):
                 forum.update_post_count()
 
         return HttpResponseRedirect(main_topic.get_absolute_url())
-    return {'posts': posts, 'topics': topics, 'topic': topics[0]}
 
-merge_topics = render_to('pybb/merge_topics.html', merge_topics_ctx)
-
+    return {'posts': posts,
+            'topics': topics,
+            'topic': topics[0],
+            }
 
 
 def users_ctx(request):
@@ -501,14 +411,9 @@ def users_ctx(request):
 
     page, paginator = paginate(users, request, pybb_settings.USERS_PAGE_SIZE)
 
-    return {'users': page.object_list,
-            'page': page,
-            'paginator': paginator,
+    return {'page': page,
             'form': form,
             }
-
-
-users = render_to('pybb/users.html', users_ctx)
 
 
 @login_required
@@ -558,3 +463,17 @@ def post_ajax_preview(request):
 
     return {'content': html,
             }
+
+
+users = render_to('pybb/users.html', users_ctx)
+merge_topics = render_to('pybb/merge_topics.html', merge_topics_ctx)
+delete_post = render_to('pybb/delete_post.html', delete_post_ctx)
+edit_post = render_to('pybb/edit_post.html', edit_post_ctx)
+edit_profile = render_to('pybb/edit_profile.html', edit_profile_ctx)
+user_topics = render_to('pybb/user_topics.html', user_topics_ctx)
+user = render_to('pybb/user.html', user_ctx)
+add_post = render_to('pybb/add_post.html', add_post_ctx)
+show_topic = render_to('pybb/topic.html', show_topic_ctx)
+show_forum = render_to('pybb/forum.html', show_forum_ctx)
+index = render_to('pybb/index.html', index_ctx)
+show_category = render_to('pybb/category.html', show_category_ctx)

@@ -1,0 +1,6 @@
+{% with user.pybb_profile.markup as markup %}
+<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/jquery.markitup.pack.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/skins/markitup/style.css" />
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/sets/{{ markup }}/style.css" />
+<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/sets/{{ markup }}/set.js"></script>
+{% endwith %}

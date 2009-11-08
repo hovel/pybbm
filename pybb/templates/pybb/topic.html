@@ -6,13 +6,7 @@
 
 {% block head_extra %}
     <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/pybbjs.js"></script>
-
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/jquery.markitup.pack.js"></script>
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/skins/markitup/style.css" />
-
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/sets/{{ current_markup }}/style.css" />
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/sets/{{ current_markup }}/set.js"></script>
-
+    {% include "pybb/markitup_resources.html" %}
     <script type="text/javascript">
     $(function() {
         $("textarea").markItUp(mySettings);

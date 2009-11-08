@@ -1,6 +1,5 @@
 {% extends 'pybb/base.html' %}
-{% load pybb_extras %}
-{% load pybb_extras %}
+{% load pybb_extras i18n %}
 
 {% block content %}
 <div class="splitted">
@@ -22,7 +21,8 @@
     </div>
 
     <div class="right">
-        {% include 'pybb/quick_access.html' %}
+        {% pybb_load_last_topics as last_topics with limit=10 %}
+        {% include "pybb/last_topics.html" %}
     </div>
     <div class="clear"></div>
 </div>

@@ -1,0 +1,30 @@
+{% load i18n pybb_extras %}
+
+<ul class="tablist">
+    <li class="tablist-row">
+        <div class="header">
+            {% if category %}
+            {% blocktrans %}Last topics in category {{ category }}{% endblocktrans %}
+            {% else %}
+                {% if forum %}
+                {% trans "Last updated topics" %}
+                {% else %}
+                {% trans "Last topics" %}
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <ul class="tablist-inner">
+            {% for topic in last_topics|pybb_unreads:user %}
+            <li class="tablist-inner-row">
+            {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
+            {% pybb_link topic %}
+            &rarr;
+            <span class="author">{{ topic.user|pybb_profile_link }}</span>
+            &rarr;
+            <span class="updated">{% pybb_time topic.created %}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

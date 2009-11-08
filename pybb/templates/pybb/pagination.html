@@ -12,7 +12,7 @@
 
     <span class="summary">{{ label }}
         {{ page.start_index }}&mdash;{{ page.end_index }}
-        {% trans "of" %} {{ paginator.count }}</span>
+        {% trans "of" %} {{ page.paginator.count }}</span>
 
     {% if page.has_other_pages %}
         &bull;
@@ -20,7 +20,7 @@
         <span class="pages-of" onclick="jumpto(); return false;"
         title="{% trans 'Go to page...' %}">
         {% trans "Page" %} {{ page.number }}
-        {% trans "of" %} {{ paginator.num_pages }}</span>
+        {% trans "of" %} {{ page.paginator.num_pages }}</span>
 
         &bull;
 
@@ -39,7 +39,7 @@
 
         {% if page.last %}
         <span>&#133;</span>
-        <a href="{{ page.last }}">{{ paginator.num_pages }}</a>
+        <a href="{{ page.last }}">{{ page.paginator.num_pages }}</a>
         {% endif %}
 
     {% endif %}

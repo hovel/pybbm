@@ -1,4 +1,5 @@
 syntax: glob
 *.pyc
 *.swp
-pybb.egg-info
+pybb.egg-info/
+dist/

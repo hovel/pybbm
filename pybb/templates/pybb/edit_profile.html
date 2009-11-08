@@ -3,12 +3,7 @@
 {% load i18n %}
 
 {% block head_extra %}
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/jquery.markitup.pack.js"></script>
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/skins/markitup/style.css" />
-
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/sets/bbcode/style.css" />
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/sets/bbcode/set.js"></script>
-
+    {% include "pybb/markitup_resources.html" %}
     <script type="text/javascript">
     $(function() {
         $("#id_signature").markItUp(mySettings);

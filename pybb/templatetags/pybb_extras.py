@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 import time as time
 try:
@@ -87,9 +88,7 @@ class PybbTimeNode(template.Node):
 @register.inclusion_tag('pybb/pagination.html',takes_context=True)
 def pybb_pagination(context, label):
     page = context['page']
-    paginator = context['paginator']
     return {'page': page,
-            'paginator': paginator,
             'label': label,
             }
 
@@ -222,3 +221,66 @@ def pybb_avatar_url(user):
         return user.pybb_profile.avatar.url
     else:
         return gravatar_url(user.email)
+
+
+@register.tag(name='pybb_load_last_topics')
+def do_pybb_load_last_topics(parser, token):
+    """
+    Create new context variable pointed to the list of topics.
+    
+    Usage examples:
+        
+        {% pybb_load_last_topics as last_topics %}
+        {% pybb_load_last_topics as last_topics with limit=10 %}
+        {% pybb_load_last_topics as last_topics with limit=10, category=cat.pk %}
+        {% pybb_load_last_topics as last_topics with forum=forum.pk,order_by="updated" %}
+
+    Available arguments for with clause:
+        limit: limitation of number of loaded items
+        category: primary key of category to load topics from
+        forum: primary key of forum to load topics from
+        order_by: the Topic field name to order the topic selection with. Default is "created"
+    """
+
+    try:
+        tag_name, arg = token.contents.split(None, 1)
+    except ValueError:
+        raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents.split()[0]
+
+    match = re.search(r'as\s+(\w+)(?:\s+with\s+(.+))?', arg)
+    if not match:
+        raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name
+    name = match.group(1)
+
+    limit = '10'
+    category = '0'
+    order_by='"created"'
+
+    if match.group(2):
+        args = dict([x.strip().split('=') for x in match.group(2).split(',')])
+        if 'limit' in args:
+            limit = args['limit']
+        if 'category' in args:
+            category = args['category']
+        if 'order_by' in args:
+            order_by = args['order_by']
+
+    return PybbLoadLastTopicsNode(name, limit, category, order_by)
+
+
+class PybbLoadLastTopicsNode(template.Node):
+    def __init__(self, name, limit, category, order_by):
+        self.name = name
+        self.limit = template.Variable(limit)
+        self.category = template.Variable(category)
+        self.order_by = template.Variable(order_by)
+
+    def render(self, context):
+        limit = self.limit.resolve(context)
+        category = self.category.resolve(context)
+        order_by = self.order_by.resolve(context)
+        topics = Topic.objects.all().select_related().order_by('-' + order_by)
+        if category:
+            topics = topics.filter(forum__category__pk=category)
+        context[self.name] = topics[:limit]
+        return ''

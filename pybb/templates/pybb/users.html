@@ -10,7 +10,7 @@
     </form>
 </h1>
 <ul class="users">
-    {% for profile in users %}
+    {% for profile in page.object_list %}
     <li class="user">
     <span class="author">{{ profile|pybb_profile_link }}</span>
     <span class="post_count">{{ profile.posts.count }}</span>

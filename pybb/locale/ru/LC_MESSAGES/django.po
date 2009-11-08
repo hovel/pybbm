@@ -470,11 +470,11 @@ msgstr "цитировать"
 
 #: templates/pybb/quick_access.html:16
 msgid "Last topics"
-msgstr "Темы"
+msgstr "Последние темы"
 
 #: templates/pybb/quick_access.html:17
 msgid "Last posts"
-msgstr "Сообщения"
+msgstr "Последние сообщения"
 
 #: templates/pybb/quick_access.html:18 templates/pybb/user.html:25
 msgid "Statistics"

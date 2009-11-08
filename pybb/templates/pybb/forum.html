@@ -18,7 +18,7 @@
                 <h3 class="header">{{ forum }}</h3>
                 <ul class="tablist-inner topic">
 
-                {% for topic in topics|pybb_unreads:user %}
+                {% for topic in page.object_list|pybb_unreads:user %}
                 <li class="tablist-inner-row topic {% if topic.sticky %}sticky{% endif %}">
                 {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
                 {% if topic.closed %}{% trans "Closed" %}:{% endif %}
@@ -42,7 +42,8 @@
         {% endif %}
     </div>
     <div class="right">
-        {% include 'pybb/quick_access.html' %}
+        {% pybb_load_last_topics as last_topics with limit=10,forum=forum.pk,order_by="updated" %}
+        {% include "pybb/last_topics.html" %}
     </div>
     <div class="clear"></div>
 </div>
