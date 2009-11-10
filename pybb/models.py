@@ -294,6 +294,9 @@ class Profile(models.Model):
         {% trans 'Posts' %}: {{ post.user.pybb_profile.post_count }}"""
         return self.user.posts.all().count()
 
+    def get_absolute_url(self):
+        return reverse('pybb_profile', args=[self.user.username])
+
 
 class Read(models.Model):
     """
