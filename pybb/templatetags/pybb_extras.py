@@ -17,8 +17,9 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
 from django.conf import settings
+from django.contrib.auth.models import User
 
-from pybb.models import Forum, Topic, Read
+from pybb.models import Forum, Topic, Read, Post
 from pybb.unread import cache_unreads
 from pybb.util import gravatar_url
 
@@ -279,4 +280,44 @@ class PybbLoadLastTopicsNode(template.Node):
         if category:
             topics = topics.filter(forum__category__pk=category)
         context[self.name] = topics[:limit]
+        return ''
+
+
+@register.tag(name='pybb_load_stats')
+def do_pybb_load_stats(parser, token):
+    """
+    Create new context variable stored the pybb statistics.
+
+    Keys of variable:
+        TODO: write keys
+    
+    """
+
+    try:
+        tag_name, arg = token.contents.split(None, 1)
+    except ValueError:
+        raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents.split()[0]
+
+    match = re.search(r'as\s+(\w+)', arg)
+    if not match:
+        raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name
+    name = match.group(1)
+
+    return PybbLoadStats(name)
+
+
+class PybbLoadStats(template.Node):
+    def __init__(self, name):
+        self.name = name
+
+    def render(self, context):
+        stats = {}
+        stats['user_count'] = User.objects.count()
+        stats['topic_count'] = Topic.objects.count()
+        stats['post_count'] = Post.objects.count()
+        try:
+            stats['last_user'] = User.objects.order_by('-date_joined')[0]
+        except IndexError:
+            stats['last_user'] = None
+        context[self.name] = stats
         return ''
