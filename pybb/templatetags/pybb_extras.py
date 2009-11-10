@@ -16,11 +16,12 @@ from django.db import settings
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
+from django.conf import settings
 
 from pybb.models import Forum, Topic, Read
 from pybb.unread import cache_unreads
-from pybb import settings as pybb_settings
 from pybb.util import gravatar_url
+
 
 register = template.Library()
 
@@ -111,7 +112,7 @@ def pybb_has_unreads(topic, user):
     """
 
     now = datetime.now()
-    delta = timedelta(seconds=pybb_settings.READ_TIMEOUT)
+    delta = timedelta(seconds=settings.PYBB_READ_TIMEOUT)
 
     if not user.is_authenticated():
         return False
@@ -138,7 +139,7 @@ def pybb_has_unreads(topic, user):
 
 @register.filter
 def pybb_setting(name):
-    return mark_safe(getattr(pybb_settings, name, 'NOT DEFINED'))
+    return mark_safe(getattr(settings, 'PYBB_%s' % name, 'NOT DEFINED'))
 
 
 @register.filter
@@ -194,11 +195,11 @@ def pybb_topic_mini_pagination(topic):
     Display links on topic pages.
     """
 
-    is_paginated = topic.post_count > pybb_settings.TOPIC_PAGE_SIZE
+    is_paginated = topic.post_count > settings.PYBB_TOPIC_PAGE_SIZE
     if not is_paginated:
         pagination = None
     else:
-        page_size = pybb_settings.TOPIC_PAGE_SIZE
+        page_size = settings.PYBB_TOPIC_PAGE_SIZE
         template =  u'<a href="%s?page=%%(p)s">%%(p)s</a>' % topic.get_absolute_url()
         page_count =  ((topic.post_count - 1) / page_size ) + 1
         if page_count > 4:

@@ -28,7 +28,6 @@ from pybb.models import Category, Forum, Topic, Post, Profile, \
                         Attachment, MARKUP_CHOICES
 from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
                         EditProfileForm, UserSearchForm
-from pybb import settings as pybb_settings
 from pybb.orm import load_related
 
 
@@ -72,7 +71,7 @@ def show_category_ctx(request, category_id):
 def show_forum_ctx(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
     topics = forum.topics.order_by('-sticky', '-updated').select_related()
-    page, paginator = paginate(topics, request, pybb_settings.FORUM_PAGE_SIZE)
+    page, paginator = paginate(topics, request, settings.PYBB_FORUM_PAGE_SIZE)
 
     return {'forum': forum,
             'page': page,
@@ -91,7 +90,7 @@ def show_topic_ctx(request, topic_id):
     if request.user.is_authenticated():
         topic.update_read(request.user)
 
-    if pybb_settings.FREEZE_FIRST_POST:
+    if settings.PYBB_FREEZE_FIRST_POST:
         first_post = topic.posts.order_by('created')[0]
     else:
         first_post = None
@@ -102,7 +101,7 @@ def show_topic_ctx(request, topic_id):
         current_markup = request.user.pybb_profile.markup
         initial = {'markup': current_markup}
     else:
-        current_markup = pybb_settings.DEFAULT_MARKUP
+        current_markup = settings.PYBB_DEFAULT_MARKUP
     form = AddPostForm(topic=topic, initial=initial)
 
     moderator = (request.user.is_superuser or
@@ -111,7 +110,7 @@ def show_topic_ctx(request, topic_id):
                   request.user in topic.subscribers.all())
 
     posts = topic.posts.all().select_related()
-    page, paginator = paginate(posts, request, pybb_settings.TOPIC_PAGE_SIZE,
+    page, paginator = paginate(posts, request, settings.PYBB_TOPIC_PAGE_SIZE,
                                total_count=topic.post_count)
 
     profiles = Profile.objects.filter(user__pk__in=
@@ -170,7 +169,7 @@ def add_post_ctx(request, forum_id, topic_id):
         last_post = topic.last_post
         delta = (datetime.now() - last_post.created)
         time_diff = delta.seconds / 60
-        timeout = pybb_settings.POST_AUTOJOIN_TIMEOUT
+        timeout = settings.PYBB_POST_AUTOJOIN_TIMEOUT
 
         if (last_post.user == request.user and
             not delta.days and time_diff < timeout):
@@ -216,7 +215,7 @@ def user_ctx(request, username):
 def user_topics_ctx(request, username):
     user = get_object_or_404(User, username=username)
     topics = Topic.objects.filter(user=user).order_by('-created')
-    page, paginator = paginate(topics, request, pybb_settings.TOPIC_PAGE_SIZE)
+    page, paginator = paginate(topics, request, settings.PYBB_TOPIC_PAGE_SIZE)
 
     return {'profile': user,
             'page': page,
@@ -226,7 +225,7 @@ def user_topics_ctx(request, username):
 def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     count = post.topic.posts.filter(created__lt=post.created).count() + 1
-    page = math.ceil(count / float(pybb_settings.TOPIC_PAGE_SIZE))
+    page = math.ceil(count / float(settings.PYBB_TOPIC_PAGE_SIZE))
     url = '%s?page=%d#post-%d' % (reverse('pybb_topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
 
@@ -412,7 +411,7 @@ def users_ctx(request):
     form = UserSearchForm(request.GET)
     users = form.filter(users)
 
-    page, paginator = paginate(users, request, pybb_settings.USERS_PAGE_SIZE)
+    page, paginator = paginate(users, request, settings.PYBB_USERS_PAGE_SIZE)
 
     return {'page': page,
             'form': form,

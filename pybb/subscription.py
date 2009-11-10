@@ -4,7 +4,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.utils import translation
 
-from pybb import settings as pybb_settings
 from pybb.util import absolute_url
 
 
@@ -26,7 +25,7 @@ def send_mail(rec_list, subject, text, html=None):
     msg = EmailMultiAlternatives(subject, text, from_email, rec_list)
     if html:
         msg.attach_alternative(html, "text/html")
-    if pybb_settings.EMAIL_DEBUG:
+    if settings.PYBB_EMAIL_DEBUG:
         logging.debug('---begin---')
         logging.debug('To: %s' % rec_list)
         logging.debug('Subject: %s' % subject)
@@ -39,7 +38,7 @@ def send_mail(rec_list, subject, text, html=None):
 def notify_topic_subscribers(post):
     from pybb.models import Post
 
-    if pybb_settings.DISABLE_NOTIFICATION:
+    if settings.PYBB_DISABLE_NOTIFICATION:
         return
 
     topic = post.topic

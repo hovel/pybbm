@@ -1,45 +1,37 @@
-from urlparse import urljoin
 from os.path import join
-import sys
 
-from django.conf import settings
+# Public settings
 
-DEFAULTS = (
-    ('TOPIC_PAGE_SIZE', 10),
-    ('FORUM_PAGE_SIZE', 20),
-    ('USERS_PAGE_SIZE', 20),
-    ('HOST', 'hey.fix.your.settings'),
-    ('AVATARS_UPLOAD_TO', join('pybb_upload', 'avatars')),
-    ('AVATAR_WIDTH', 60),
-    ('AVATAR_HEIGHT', 60),
-    ('DEFAULT_AVATAR_URL', 'pybb/img/default_avatar.jpg'),
-    ('DEFAULT_TIME_ZONE', 3),
-    ('SIGNATURE_MAX_LENGTH', 1024),
-    ('SIGNATURE_MAX_LINES', 3),
-    ('QUICK_TOPICS_NUMBER', 10),
-    ('QUICK_POSTS_NUMBER', 10),
-    ('READ_TIMEOUT', 3600 * 24 * 7), # seconds
-    ('POST_AUTOJOIN_TIMEOUT', 60), # minutes
-    ('HEADER', 'PyBB'),
-    ('TAGLINE', 'Yet another PyBB forum'),
-    ('DEFAULT_MARKUP', 'bbcode'),
-    ('NOTICE', ''),
-    ('FREEZE_FIRST_POST', True),
-    ('ADMIN_URL', '/admin/'),
-    ('EMAIL_DEBUG', False),
-    ('ATTACHMENT_UPLOAD_TO', join('pybb_upload', 'attachments')),
-    ('ATTACHMENT_SIZE_LIMIT', 1024 * 1024),
-    ('ATTACHMENT_ENABLE', True),
-)
+PYBB_TOPIC_PAGE_SIZE = 10
+PYBB_FORUM_PAGE_SIZE = 20
+PYBB_USERS_PAGE_SIZE = 20
+PYBB_HOST = 'hey.fix.your.settings'
+PYBB_AVATAR_WIDTH = 60
+PYBB_AVATAR_HEIGHT = 60
+PYBB_DEFAULT_TIME_ZONE = 3
+PYBB_SIGNATURE_MAX_LENGTH = 1024
+PYBB_SIGNATURE_MAX_LINES = 3
+PYBB_QUICK_TOPICS_NUMBER = 10
+PYBB_QUICK_POSTS_NUMBER = 10
+PYBB_READ_TIMEOUT = 3600 * 24 * 7 # seconds
+PYBB_POST_AUTOJOIN_TIMEOUT = 60 # minutes
+PYBB_HEADER = 'PyBB'
+PYBB_TAGLINE = 'Yet another PyBB forum'
+PYBB_DEFAULT_MARKUP = 'bbcode'
+PYBB_NOTICE = ''
+PYBB_FREEZE_FIRST_POST = True
+PYBB_ADMIN_URL = '/admin/'
+PYBB_EMAIL_DEBUG = False
+PYBB_ATTACHMENT_SIZE_LIMIT = 1024 * 1024
+PYBB_ATTACHMENT_ENABLE = True
 
-mod = sys.modules[__name__]
+PYBB_AVATARS_UPLOAD_TO = join('pybb_upload', 'avatars')
+PYBB_ATTACHMENT_UPLOAD_TO = join('pybb_upload', 'attachments')
+PYBB_DEFAULT_AVATAR_URL = 'pybb/img/default_avatar.jpg'
 
-for key, default in DEFAULTS:
-    setattr(mod, key, getattr(settings, 'PYBB_%s' % key, default))
-
-mod.DEFAULT_AVATAR_URL = 'http://%s%s%s' % (mod.HOST, settings.MEDIA_URL,
-                                            mod.DEFAULT_AVATAR_URL)
+#mod.DEFAULT_AVATAR_URL = 'http://%s%s%s' % (mod.HOST, settings.MEDIA_URL,
+                                            #mod.DEFAULT_AVATAR_URL)
 
 
 # Internal settings
-DISABLE_NOTIFICATION = False
+PYBB_DISABLE_NOTIFICATION = False

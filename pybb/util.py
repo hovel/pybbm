@@ -18,8 +18,6 @@ from django.template.defaultfilters import urlize as django_urlize
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.conf import settings
 
-from pybb import settings as pybb_settings
-
 
 def ajax(func):
     """
@@ -106,7 +104,7 @@ def quote_text(text, markup, username=""):
 
 
 def absolute_url(path):
-    return 'http://%s%s' % (pybb_settings.HOST, path)
+    return 'http://%s%s' % (settings.PYBB_HOST, path)
 
 
 def memoize_method(func):
@@ -215,7 +213,7 @@ def gravatar_url(email):
     """
 
     hash = md5(email).hexdigest()
-    size = max(pybb_settings.AVATAR_WIDTH, pybb_settings.AVATAR_HEIGHT)
-    default = urllib.quote(pybb_settings.DEFAULT_AVATAR_URL)
+    size = max(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT)
+    default = urllib.quote(settings.PYBB_DEFAULT_AVATAR_URL)
     url = 'http://www.gravatar.com/avatar/%s?s=%d&d=%s' % (hash, size, default)
     return url

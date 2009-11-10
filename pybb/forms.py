@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 
 from pybb.models import Topic, Post, Profile, Attachment
-from pybb import settings as pybb_settings
+
 
 class AddPostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
@@ -31,14 +31,14 @@ class AddPostForm(forms.ModelForm):
             self.fields['name'].widget = forms.HiddenInput()
             self.fields['name'].required = False
 
-        if not pybb_settings.ATTACHMENT_ENABLE:
+        if not settings.PYBB_ATTACHMENT_ENABLE:
             self.fields['attachment'].widget = forms.HiddenInput()
             self.fields['attachment'].required = False
 
 
     def clean_attachment(self):
         for f in self.files:
-            if self.files[f].size > pybb_settings.ATTACHMENT_SIZE_LIMIT:
+            if self.files[f].size > settings.PYBB_ATTACHMENT_SIZE_LIMIT:
                 raise forms.ValidationError(_('Attachment is too big'))
         return self.cleaned_data['attachment']
 
@@ -58,7 +58,7 @@ class AddPostForm(forms.ModelForm):
                     body=self.cleaned_data['body'])
         post.save()
 
-        if pybb_settings.ATTACHMENT_ENABLE:
+        if settings.PYBB_ATTACHMENT_ENABLE:
             for f in self.files:
                 self.save_attachment(post, self.files[f])
         return post
@@ -68,7 +68,7 @@ class AddPostForm(forms.ModelForm):
         if memfile:
             obj = Attachment(size=memfile.size, content_type=memfile.content_type,
                              name=memfile.name, post=post)
-            dir = os.path.join(settings.MEDIA_ROOT, pybb_settings.ATTACHMENT_UPLOAD_TO)
+            dir = os.path.join(settings.MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO)
             fname = '%d.0' % post.id
             path = os.path.join(dir, fname)
             #print path
@@ -90,10 +90,10 @@ class EditProfileForm(forms.ModelForm):
 
     def clean_signature(self):
         value = self.cleaned_data['signature'].strip()
-        if len(re.findall(r'\n', value)) > pybb_settings.SIGNATURE_MAX_LINES:
-            raise forms.ValidationError('Number of lines is limited to %d' % pybb_settings.SIGNATURE_MAX_LINES)
-        if len(value) > pybb_settings.SIGNATURE_MAX_LENGTH:
-            raise forms.ValidationError('Length of signature is limited to %d' % pybb_settings.SIGNATURE_MAX_LENGTH)
+        if len(re.findall(r'\n', value)) > settings.PYBB_SIGNATURE_MAX_LINES:
+            raise forms.ValidationError('Number of lines is limited to %d' % settings.PYBB_SIGNATURE_MAX_LINES)
+        if len(value) > settings.PYBB_SIGNATURE_MAX_LENGTH:
+            raise forms.ValidationError('Length of signature is limited to %d' % settings.PYBB_SIGNATURE_MAX_LENGTH)
         return value
 
 

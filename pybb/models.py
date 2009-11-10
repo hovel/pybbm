@@ -18,7 +18,7 @@ from django.conf import settings
 from pybb.markups import mypostmarkup
 from pybb.fields import AutoOneToOneField
 from pybb.util import urlize, memoize_method, unescape
-from pybb import settings as pybb_settings
+
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
     (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
@@ -190,7 +190,7 @@ class Post(RenderableItem):
     user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
-    markup = models.CharField(_('Markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     body = models.TextField(_('Message'))
     body_html = models.TextField(_('HTML version'))
     body_text = models.TextField(_('Text version'))
@@ -257,14 +257,14 @@ class Profile(models.Model):
     aim = models.CharField(_('AIM'), max_length=80, blank=True)
     yahoo = models.CharField(_('Yahoo'), max_length=80, blank=True)
     location = models.CharField(_('Location'), max_length=30, blank=True)
-    signature = models.TextField(_('Signature'), blank=True, max_length=pybb_settings.SIGNATURE_MAX_LENGTH)
-    signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=pybb_settings.SIGNATURE_MAX_LENGTH+30)
-    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(pybb_settings.DEFAULT_TIME_ZONE))
+    signature = models.TextField(_('Signature'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
+    signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH+30)
+    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
                                 choices=settings.LANGUAGES)
-    avatar = ThumbnailField(_('Avatar'), blank=True, upload_to=pybb_settings.AVATARS_UPLOAD_TO, size=(pybb_settings.AVATAR_WIDTH, pybb_settings.AVATAR_HEIGHT))
+    avatar = ThumbnailField(_('Avatar'), blank=True, upload_to=settings.PYBB_AVATARS_UPLOAD_TO, size=(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT))
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
-    markup = models.CharField(_('Default markup'), max_length=15, default=pybb_settings.DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
     ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
 
@@ -351,7 +351,7 @@ class Attachment(models.Model):
 
 
     def get_absolute_path(self):
-        return os.path.join(settings.MEDIA_ROOT, pybb_settings.ATTACHMENT_UPLOAD_TO,
+        return os.path.join(settings.MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO,
                             self.path)
 
     class Meta:
