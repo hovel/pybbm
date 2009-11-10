@@ -30,9 +30,5 @@ PYBB_AVATARS_UPLOAD_TO = join('pybb_upload', 'avatars')
 PYBB_ATTACHMENT_UPLOAD_TO = join('pybb_upload', 'attachments')
 PYBB_DEFAULT_AVATAR_URL = 'pybb/img/default_avatar.jpg'
 
-#mod.DEFAULT_AVATAR_URL = 'http://%s%s%s' % (mod.HOST, settings.MEDIA_URL,
-                                            #mod.DEFAULT_AVATAR_URL)
-
-
 # Internal settings
 PYBB_DISABLE_NOTIFICATION = False

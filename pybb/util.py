@@ -214,6 +214,12 @@ def gravatar_url(email):
 
     hash = md5(email).hexdigest()
     size = max(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT)
-    default = urllib.quote(settings.PYBB_DEFAULT_AVATAR_URL)
+
+    url = settings.PYBB_DEFAULT_AVATAR_URL
+    if not url.startswith('http://'):
+        url = 'http://%s%s%s' % (settings.PYBB_HOST,
+                                 settings.MEDIA_URL,
+                                 settings.PYBB_DEFAULT_AVATAR_URL)
+    default = urllib.quote(url)
     url = 'http://www.gravatar.com/avatar/%s?s=%d&d=%s' % (hash, size, default)
     return url
