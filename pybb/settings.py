@@ -1,6 +1,9 @@
 from os.path import join
 
-# Public settings
+
+PYBB_HEADER = 'PyBB'
+PYBB_TAGLINE = 'Yet another PyBB forum'
+PYBB_NOTICE = ''
 
 PYBB_TOPIC_PAGE_SIZE = 10
 PYBB_FORUM_PAGE_SIZE = 20
@@ -15,15 +18,13 @@ PYBB_QUICK_TOPICS_NUMBER = 10
 PYBB_QUICK_POSTS_NUMBER = 10
 PYBB_READ_TIMEOUT = 3600 * 24 * 7 # seconds
 PYBB_POST_AUTOJOIN_TIMEOUT = 60 # minutes
-PYBB_HEADER = 'PyBB'
-PYBB_TAGLINE = 'Yet another PyBB forum'
 PYBB_DEFAULT_MARKUP = 'bbcode'
-PYBB_NOTICE = ''
 PYBB_FREEZE_FIRST_POST = True
 PYBB_ADMIN_URL = '/admin/'
 PYBB_EMAIL_DEBUG = False
 PYBB_ATTACHMENT_SIZE_LIMIT = 1024 * 1024
 PYBB_ATTACHMENT_ENABLE = True
+PYBB_SKIN = 'default'
 
 PYBB_AVATARS_UPLOAD_TO = join('pybb_upload', 'avatars')
 PYBB_ATTACHMENT_UPLOAD_TO = join('pybb_upload', 'attachments')

@@ -4,25 +4,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
 <head>
     <title>{% block title %}{{ PYBB_HEADER }}: {{ PYBB_TAGLINE }}{% endblock %}</title>
-    <!--<meta name="description" content="pybb demo" />-->
-    <!--<meta name="keywords" content="pybb" />-->
 
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-    <link href="{{ MEDIA_URL }}pybb/css/style.css" type="text/css" rel="stylesheet" />
+    <link href="{{ PYBB_SKIN_MEDIA_URL }}css/style.css" type="text/css" rel="stylesheet" />
     <link rel="alternate" type="application/atom+xml" href="{% url pybb_feed "posts" %}" title="{% trans "Latest posts on forum" %}" />
     <link rel="alternate" type="application/atom+xml" href="{% url pybb_feed "topics" %}" title="{% trans "Latest topics on forum" %}" />
-    <!--<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />-->
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/jquery.js"></script>
-    <!--<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/rounded_corners.inc.js"></script>-->
-    <!--<script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/corners_init.js"></script>-->
+    <script type="text/javascript" src="{{ PYBB_MEDIA_URL }}js/jquery.js"></script>
 
     <!-- Highlightjs goodies -->
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/highlight.js"></script>
+    <script type="text/javascript" src="{{ PYBB_MEDIA_URL }}js/highlight.js"></script>
     <script type="text/javascript">
       hljs.initHighlightingOnLoad();
     </script>
-    <link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}pybb/css/hljs_styles/idea.css" />
+    <link type="text/css" rel="stylesheet" href="{{ PYBB_MEDIA_URL }}css/hljs_styles/idea.css" />
 
     {% block extra_meta %}{% endblock %}
     {% block head_extra %}{% endblock %}

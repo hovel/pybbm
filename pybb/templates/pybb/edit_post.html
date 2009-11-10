@@ -3,11 +3,9 @@
 {% load i18n %}
 
 {% block head_extra %}
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/jquery.markitup.pack.js"></script>
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/skins/markitup/style.css" />
-
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}pybb/js/markitup/sets/{{ post.markup }}/style.css" />
-    <script type="text/javascript" src="{{ MEDIA_URL }}pybb/js/markitup/sets/{{ post.markup }}/set.js"></script>
+    {% with post.markup as markup %}
+    {% include "markitup_resources.html" %}
+    {% endwith %}
 
     <script type="text/javascript">
     $(function() {

@@ -20,7 +20,7 @@
             <li><a href="{% url registration_register %}">{% trans "Sign up" %}</a></li>
             <li><a href="{% url auth_login %}">{% trans "Log in" %}</a></li>
             {% endif %}
-            <li><a href="{% url pybb_feed "posts" %}" ><img src="{{ MEDIA_URL }}/pybb/img/feed-icon-small.png" alt="feed" /></a></li>
+            <li><a href="{% url pybb_feed "posts" %}" ><img src="{{ PYBB_MEDIA_URL }}img/feed-icon-small.png" alt="feed" /></a></li>
         </ul>
         <div class="clear"></div>
         <h2 class="description">{{ PYBB_TAGLINE|safe }}</h2>
