@@ -138,11 +138,6 @@ def pybb_has_unreads(topic, user):
 
 
 @register.filter
-def pybb_setting(name):
-    return mark_safe(getattr(settings, 'PYBB_%s' % name, 'NOT DEFINED'))
-
-
-@register.filter
 def pybb_moderated_by(topic, user):
     """
     Check if user is moderator of topic's forum.
