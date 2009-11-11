@@ -87,14 +87,6 @@ class PybbTimeNode(template.Node):
             return dateformat.format(context_time, 'd M, Y H:i')
 
 
-@register.inclusion_tag('pybb/pagination.html',takes_context=True)
-def pybb_pagination(context, label):
-    page = context['page']
-    return {'page': page,
-            'label': label,
-            }
-
-
 @register.simple_tag
 def pybb_link(object, anchor=u''):
     """

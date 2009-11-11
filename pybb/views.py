@@ -197,9 +197,15 @@ def add_post_ctx(request, forum_id, topic_id):
         post = form.save();
         return HttpResponseRedirect(post.get_absolute_url())
 
+    if request.user.is_authenticated():
+        current_markup = request.user.pybb_profile.markup
+    else:
+        current_markup = settings.PYBB_DEFAULT_MARKUP
+
     return {'form': form,
             'topic': topic,
             'forum': forum,
+            'current_markup': current_markup,
             }
 
 
