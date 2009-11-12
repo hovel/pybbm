@@ -96,13 +96,7 @@ def show_topic_ctx(request, topic_id):
         first_post = None
     last_post = topic.posts.order_by('-created')[0]
 
-    initial = {}
-    if request.user.is_authenticated():
-        current_markup = request.user.pybb_profile.markup
-        initial = {'markup': current_markup}
-    else:
-        current_markup = settings.PYBB_DEFAULT_MARKUP
-    form = AddPostForm(topic=topic, initial=initial)
+    form = AddPostForm(topic=topic)
 
     moderator = (request.user.is_superuser or
                  request.user in topic.forum.moderators.all())
@@ -130,7 +124,6 @@ def show_topic_ctx(request, topic_id):
             'subscribed': subscribed,
             'posts': page.object_list,
             'page': page,
-            'current_markup': current_markup,
             }
 
 
@@ -197,15 +190,9 @@ def add_post_ctx(request, forum_id, topic_id):
         post = form.save();
         return HttpResponseRedirect(post.get_absolute_url())
 
-    if request.user.is_authenticated():
-        current_markup = request.user.pybb_profile.markup
-    else:
-        current_markup = settings.PYBB_DEFAULT_MARKUP
-
     return {'form': form,
             'topic': topic,
             'forum': forum,
-            'current_markup': current_markup,
             }
 
 
