@@ -71,6 +71,7 @@ class Forum(models.Model):
     moderators = models.ManyToManyField(User, blank=True, null=True, verbose_name=_('Moderators'))
     updated = models.DateTimeField(_('Updated'), null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
+    topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
 
     class Meta:
         ordering = ['position']
@@ -79,9 +80,6 @@ class Forum(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    def topic_count(self):
-        return self.topics.all().count()
 
     def update_post_count(self):
         self.post_count = Topic.objects.filter(forum=self).aggregate(
@@ -246,6 +244,7 @@ class Profile(models.Model):
     markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
     ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
+    post_count = models.IntegerField(_('Post count'), blank=True, default=0)
 
     class Meta:
         verbose_name = _('Profile')
@@ -265,13 +264,6 @@ class Profile(models.Model):
                 return False
             return True
         return False
-
-    @memoize_method
-    def post_count(self):
-        """ Use from template, in future may be replace by normalize field
-
-        {% trans 'Posts' %}: {{ post.user.pybb_profile.post_count }}"""
-        return self.user.posts.all().count()
 
     def get_absolute_url(self):
         return reverse('pybb_profile', args=[self.user.username])
