@@ -306,7 +306,7 @@ def pybb_forum_unread(forum, user):
     """
 
     if not user.is_authenticated():
-        return Flase
+        return False
 
     if not forum.updated:
         return False
