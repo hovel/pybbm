@@ -24,12 +24,6 @@
 
         <div class="label">{% trans "Statistics" %}</div>
         <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}.
-            {% comment %}
-            &nbsp;
-            <a href="{% url pybb_profile_posts profile.username %}">
-                {% trans "Find all posts" %}
-            </a>
-            {% endcomment %}
         </div>
         <div>{% trans "Number of topics" %}: {{ topic_count }}.
             &nbsp;
@@ -38,28 +32,6 @@
             </a>
         </div>
         <div>{% trans "Date of registration" %}: {% pybb_time profile.date_joined %}</div>
-        <div class="label">{% trans "Contacts" %}</div>
-        {% if profile.pybb_profile.location %}
-        <div>{% trans "Location" %}: {{ profile.pybb_profile.location }}</div>
-        {% endif %}
-        {% if profile.pybb_profile.site %}
-        <div>{% trans "Site" %}: {{ profile.pybb_profile.site|urlize }}</div>
-        {% endif %}
-        {% if profile.pybb_profile.icq %}
-        <div>ICQ: {{ profile.pybb_profile.icq }}</div>
-        {% endif %}
-        {% if profile.pybb_profile.jabber %}
-        <div>Jabber: {{ profile.pybb_profile.jabber }}</div>
-        {% endif %}
-        {% if profile.pybb_profile.yahoo %}
-        <div>Yahoo: {{ profile.pybb_profile.yahoo }}</div>
-        {% endif %}
-        {% if profile.pybb_profile.msn %}
-        <div>MSN: {{ profile.pybb_profile.msn }}</div>
-        {% endif %}
-        {% if profile.pybb_profile.aim %}
-        <div>AIM: {{ profile.pybb_profile.aim }}</div>
-        {% endif %}
     </div>
     <div class="clear"></div>
 </div>

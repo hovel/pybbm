@@ -16,6 +16,10 @@
     <a href={% url pybb_post topic.id %}>{{ topic.body_text }}</a>
     </li>
     {% endfor %}
-    {% pybb_pagination _("Topics") %}
+
+    {% with _('Topics') as label %}
+    {% include "pybb/pagination.html" %}
+    {% endwith %}
+
 </div>
 {% endblock %}

@@ -3,7 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
-from pybb.models import Category, Forum, Topic, Post, Profile, Read, Attachment
+from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, \
+                        ReadTracking
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -77,24 +78,19 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'time_zone', 'location', 'language']
+    list_display = ['user', 'time_zone', 'language']
     list_per_page = 20
     raw_id_fields = ['user']
     ordering = ['-user']
     search_fields = ['user__username', 'user__first_name', 'user__last_name']
     fieldsets = (
         (None, {
-                'fields': ('user', 'time_zone', 'markup', 'location', 'language')
-                }
-         ),
-        (_('IM'), {
-                'classes': ('collapse',),
-                'fields' : ('jabber', 'icq', 'msn', 'aim', 'yahoo')
+                'fields': ('user', 'time_zone', 'markup', 'language')
                 }
          ),
         (_('Additional options'), {
                 'classes': ('collapse',),
-                'fields' : ('site', 'avatar', 'signature', 'show_signatures')
+                'fields' : ('avatar', 'signature', 'show_signatures')
                 }
          ),
         (_('Ban options'), {
@@ -103,15 +99,6 @@ class ProfileAdmin(admin.ModelAdmin):
                 }
          ),
         )
-
-
-class ReadAdmin(admin.ModelAdmin):
-    list_display = ['user', 'topic', 'time']
-    list_per_page = 20
-    raw_id_fields = ['user', 'topic']
-    ordering = ['-time']
-    date_hierarchy = 'time'
-    search_fields = ['user__username', 'topic__name']
 
 
 class AttachmentAdmin(admin.ModelAdmin):
@@ -140,10 +127,19 @@ class AttachmentAdmin(admin.ModelAdmin):
     admin_edit_post.short_description = _('Edit post')
 
 
+class ReadTrackingAdmin(admin.ModelAdmin):
+    list_display = ['user', 'last_read']
+    search_fields = ['user__username', 'user__email']
+    raw_id_fields = ['user']
+    list_per_page = 20
+    ordering = ['-last_read']
+    date_hierarchy = 'last_read'
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Forum, ForumAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Profile, ProfileAdmin)
-admin.site.register(Read, ReadAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
+admin.site.register(ReadTracking, ReadTrackingAdmin)

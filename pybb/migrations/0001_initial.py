@@ -224,7 +224,7 @@ class Migration:
         },
         'pybb.profile': {
             'aim': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '80', 'blank': 'True'}),
-            'avatar': ('ThumbnailField', ["_('Avatar')"], {'default': "''", 'size': '(pybb_settings.AVATAR_WIDTH, pybb_settings.AVATAR_HEIGHT)', 'blank': 'True'}),
+            'avatar': ('ThumbnailField', ["_('Avatar')"], {'default': "''", 'size': '(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT)', 'blank': 'True'}),
             'icq': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '12', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'jabber': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '80', 'blank': 'True'}),

@@ -19,8 +19,7 @@ from django.utils import dateformat
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from pybb.models import Forum, Topic, Read, Post
-from pybb.unread import cache_unreads
+from pybb.models import Forum, Topic, Post
 from pybb.util import gravatar_url
 
 
@@ -99,38 +98,6 @@ def pybb_link(object, anchor=u''):
 
 
 @register.filter
-def pybb_has_unreads(topic, user):
-    """
-    Check if topic has messages which user didn't read.
-    """
-
-    now = datetime.now()
-    delta = timedelta(seconds=settings.PYBB_READ_TIMEOUT)
-
-    if not user.is_authenticated():
-        return False
-    else:
-        if isinstance(topic, Topic):
-            if topic.updated and (now - delta > topic.updated):
-                return False
-            else:
-                if hasattr(topic, '_read'):
-                    read = topic._read
-                else:
-                    try:
-                        read = Read.objects.get(user=user, topic=topic)
-                    except Read.DoesNotExist:
-                        read = None
-
-                if read is None:
-                    return True
-                else:
-                    return topic.updated > read.time
-        else:
-            raise Exception('Object should be a topic')
-
-
-@register.filter
 def pybb_moderated_by(topic, user):
     """
     Check if user is moderator of topic's forum.
@@ -170,11 +137,6 @@ def pybb_equal_to(obj1, obj2):
     """
 
     return obj1 == obj2
-
-
-@register.filter
-def pybb_unreads(qs, user):
-    return cache_unreads(qs, user)
 
 
 @register.inclusion_tag('pybb/topic_mini_pagination.html')
@@ -313,3 +275,45 @@ class PybbLoadStats(template.Node):
             stats['last_user'] = None
         context[self.name] = stats
         return ''
+
+
+@register.filter
+def pybb_topic_unread(topic, user):
+    """
+    Check if topic has unread messages.
+    """
+
+    if not user.is_authenticated():
+        return False
+
+    track = user.readtracking
+
+    if track.last_read and track.last_read > (topic.last_post.updated or
+                                              topic.last_post.created):
+        return False
+
+    if isinstance(track.topics, dict):
+        post_pk = track.topics.get(str(topic.pk), 0)
+        return topic.last_post.pk > post_pk
+
+    return True
+
+
+@register.filter
+def pybb_forum_unread(forum, user):
+    """
+    Check if forum has unread messages.
+    """
+
+    if not user.is_authenticated():
+        return Flase
+
+    if not forum.updated:
+        return False
+
+    track = user.readtracking
+
+    if not track.last_read:
+        return False
+    
+    return track.last_read < forum.updated

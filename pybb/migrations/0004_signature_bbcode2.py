@@ -90,7 +90,7 @@ class Migration:
         },
         'pybb.profile': {
             'aim': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '80', 'blank': 'True'}),
-            'avatar': ('ThumbnailField', ["_('Avatar')"], {'default': "''", 'size': '(pybb_settings.AVATAR_WIDTH, pybb_settings.AVATAR_HEIGHT)', 'blank': 'True'}),
+            'avatar': ('ThumbnailField', ["_('Avatar')"], {'default': "''", 'size': '(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT)', 'blank': 'True'}),
             'ban_status': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
             'ban_till': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'icq': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '12', 'blank': 'True'}),

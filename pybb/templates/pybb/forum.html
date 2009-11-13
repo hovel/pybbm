@@ -18,9 +18,9 @@
                 <h3 class="header">{{ forum }}</h3>
                 <ul class="tablist-inner topic">
 
-                {% for topic in page.object_list|pybb_unreads:user %}
+                {% for topic in page.object_list %}
                 <li class="tablist-inner-row topic {% if topic.sticky %}sticky{% endif %}">
-                {% if topic|pybb_has_unreads:user %}<span class="unread"></span>{% endif %}
+                {% if topic|pybb_topic_unread:user %}<span class="unread"></span>{% endif %}
                 {% if topic.closed %}{% trans "Closed" %}:{% endif %}
                 {% if topic.sticky %}{% trans "Important" %}:{% endif %}
                 <span class="title">{% pybb_link topic %}</span>
@@ -33,7 +33,9 @@
                 </ul>
             </li>
         </ul>
-        {% pybb_pagination _('Topics') %}
+        {% with _('Topics') as label %}
+        {% include "pybb/pagination.html" %}
+        {% endwith %}
 
         {% if not user.pybb_profile.is_banned %}
             <div class="controls">

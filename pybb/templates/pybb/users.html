@@ -17,5 +17,9 @@
     <span class="updated">{{ profile.date_joined|date:"d M Y" }}</span>
     {% endfor %}
 </u>
-{% pybb_pagination _("Users") %}
+
+{% with _('Users') as label %}
+{% include "pybb/pagination.html" %}
+{% endwith %}
+
 {% endblock %}

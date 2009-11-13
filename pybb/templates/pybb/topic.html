@@ -20,7 +20,9 @@
     <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
 </div>
 
-{% pybb_pagination _('Posts') %}
+{% with _('Posts') as label %}
+{% include "pybb/pagination.html" %}
+{% endwith %}
 
 <ul class="posts">
     {% if first_post %}{% ifnotequal first_post posts.0 %}
@@ -33,7 +35,9 @@
     {% endfor %}
 </ul>
 
-{% pybb_pagination _('Posts') %}
+{% with _('Posts') as label %}
+{% include "pybb/pagination.html" %}
+{% endwith %}
 
 {% if user.is_authenticated %}
 <div class="controls">

@@ -22,6 +22,10 @@
         </ul>
     </li>
 </ul>
-{% pybb_pagination _("Topics") %}
+
+{% with _('Topics') as label %}
+{% include "pybb/pagination.html" %}
+{% endwith %}
+
 </div>
 {% endblock %}

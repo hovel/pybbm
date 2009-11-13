@@ -3,7 +3,6 @@ import math
 import re
 from datetime import datetime
 from markdown import Markdown
-from pybb.markups import mypostmarkup
 try:
     import pytils
     pytils_enabled = True
@@ -22,6 +21,7 @@ from django.db import connection
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext
 
+from pybb.markups import mypostmarkup
 from pybb.util import quote_text, paginate,\
                         set_language, ajax, urlize
 from pybb.models import Category, Forum, Topic, Post, Profile, \
@@ -29,6 +29,7 @@ from pybb.models import Category, Forum, Topic, Post, Profile, \
 from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
                         EditProfileForm, UserSearchForm
 from pybb.orm import load_related
+from pybb.read_tracking import update_read_tracking
 
 
 def render_to(template, func):
@@ -88,7 +89,7 @@ def show_topic_ctx(request, topic_id):
     topic.save()
 
     if request.user.is_authenticated():
-        topic.update_read(request.user)
+        update_read_tracking(topic, request.user)
 
     if settings.PYBB_FREEZE_FIRST_POST:
         first_post = topic.posts.order_by('created')[0]
@@ -163,7 +164,8 @@ def add_post_ctx(request, forum_id, topic_id):
         delta = (datetime.now() - last_post.created)
         time_diff = delta.seconds / 60
         timeout = settings.PYBB_POST_AUTOJOIN_TIMEOUT
-
+        
+        # TODO: Move to formmmmm
         if (last_post.user == request.user and
             not delta.days and time_diff < timeout):
             if settings.LANGUAGE_CODE.startswith('ru') and pytils_enabled:

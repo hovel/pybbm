@@ -16,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from pybb.markups import mypostmarkup
-from pybb.fields import AutoOneToOneField
+from pybb.fields import AutoOneToOneField, JSONField
 from pybb.util import urlize, memoize_method, unescape
 
 
@@ -140,23 +140,9 @@ class Topic(models.Model):
             self.created = datetime.now()
         super(Topic, self).save(*args, **kwargs)
 
-    def update_read(self, user):
-        read, new = Read.objects.get_or_create(user=user, topic=self)
-        if not new:
-            read.time = datetime.now()
-            read.save()
-
     def update_post_count(self):
         self.post_count = self.posts.count()
         self.save()
-
-    #def has_unreads(self, user):
-        #try:
-            #read = Read.objects.get(user=user, topic=self)
-        #except Read.DoesNotExist:
-            #return True
-        #else:
-            #return self.updated > read.time
 
 
 class RenderableItem(models.Model):
@@ -215,7 +201,7 @@ class Post(RenderableItem):
             self.created = now
         self.render()
 
-        new = self.id is None
+        new = self.pk is None
 
         super(Post, self).save(*args, **kwargs)
 
@@ -250,13 +236,6 @@ BAN_STATUS = (
 
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
-    site = models.URLField(_('Site'), verify_exists=False, blank=True)
-    jabber = models.CharField(_('Jabber'), max_length=80, blank=True)
-    icq = models.CharField(_('ICQ'), max_length=12, blank=True)
-    msn = models.CharField(_('MSN'), max_length=80, blank=True)
-    aim = models.CharField(_('AIM'), max_length=80, blank=True)
-    yahoo = models.CharField(_('Yahoo'), max_length=80, blank=True)
-    location = models.CharField(_('Location'), max_length=30, blank=True)
     signature = models.TextField(_('Signature'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
     signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH+30)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
@@ -298,31 +277,6 @@ class Profile(models.Model):
         return reverse('pybb_profile', args=[self.user.username])
 
 
-class Read(models.Model):
-    """
-    For each topic that user has entered the time
-    is logged to this model.
-    """
-
-    user = models.ForeignKey(User, verbose_name=_('User'))
-    topic = models.ForeignKey(Topic, verbose_name=_('Topic'))
-    time = models.DateTimeField(_('Time'), blank=True)
-
-    class Meta:
-        unique_together = ['user', 'topic']
-        verbose_name = _('Read')
-        verbose_name_plural = _('Reads')
-
-    def save(self, *args, **kwargs):
-        if self.time is None:
-            self.time = datetime.now()
-        super(Read, self).save(*args, **kwargs)
-
-
-    def __unicode__(self):
-        return u'T[%d], U[%d]: %s' % (self.topic.id, self.user.id, unicode(self.time))
-
-
 class Attachment(models.Model):
     post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
@@ -361,6 +315,30 @@ class Attachment(models.Model):
         verbose_name = _('Attachment')
         verbose_name_plural = _('Attachments')
 
+
+class ReadTracking(models.Model):
+    """
+    Model for tracking read/unread posts.
+
+    `topics` field stores JSON serialized mapping of
+    `topic pk` --> `topic last post pk`
+    """
+
+    user = AutoOneToOneField(User)
+    topics = JSONField(null=True)
+    last_read = models.DateTimeField(null=True)
+
+    class Meta:
+        verbose_name = _('Read tracking')
+        verbose_name_plural = _('Read tracking')
+
+    def __unicode__(self):
+        return self.user.username
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.last_read = datetime.now()
+        super(ReadTracking, self).save(*args, **kwargs)
 
 
 from pybb import signals
