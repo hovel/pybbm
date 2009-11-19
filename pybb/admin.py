@@ -36,7 +36,7 @@ class ForumAdmin(admin.ModelAdmin):
 class TopicAdmin(admin.ModelAdmin):
     list_display = ['name', 'forum', 'created', 'head', 'post_count']
     list_per_page = 20
-    raw_id_fields = ['user', 'forum', 'subscribers']
+    raw_id_fields = ['user', 'subscribers']
     ordering = ['-created']
     date_hierarchy = 'created'
     search_fields = ['name']
