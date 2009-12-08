@@ -80,8 +80,7 @@ class AddPostForm(forms.ModelForm):
 class EditProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['site', 'jabber', 'icq', 'msn', 'aim', 'yahoo',
-                  'location', 'signature', 'time_zone', 'language',
+        fields = ['signature', 'time_zone', 'language',
                   'avatar', 'show_signatures', 'markup']
 
 
