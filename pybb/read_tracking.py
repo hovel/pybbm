@@ -12,9 +12,9 @@ def update_read_tracking(topic, user):
             tracking.topics = None
             tracking.last_read = datetime.now()
             tracking.save()
-        #update topics if exist new post or does't exist in dict
+        #update topics if new post exists or cache entry is empty
         if topic.last_post.pk > tracking.topics.get(str(topic.pk), 0):
-            tracking.topics.setdefault(str(topic.pk), topic.last_post.pk)
+            tracking.topics[str(topic.pk)] = topic.last_post.pk
             tracking.save()
     else:
         #initialize topic tracking dict
