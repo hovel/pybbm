@@ -17,7 +17,7 @@
         <ul class="tablist-inner">
             {% for topic in last_topics %}
             <li class="tablist-inner-row">
-            {% if "" {#topic|pybb_topic_unread:user#} %}<span class="unread"></span>{% endif %}
+            {% if topic|pybb_topic_unread:user %}<span class="unread"></span>{% endif %}
             {% pybb_link topic %}
             &rarr;
             <span class="author">{{ topic.user|pybb_profile_link }}</span>
