@@ -5,7 +5,6 @@ try:
     from hashlib import sha1
 except ImportError:
     from sha import sha as sha1
-from sorl.thumbnail.fields import ThumbnailField
 
 from django.db import models
 from django.db.models import F, Sum
@@ -239,7 +238,6 @@ class Profile(models.Model):
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
                                 choices=settings.LANGUAGES)
-    avatar = ThumbnailField(_('Avatar'), blank=True, upload_to=settings.PYBB_AVATARS_UPLOAD_TO, size=(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT))
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
     markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)

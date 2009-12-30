@@ -90,7 +90,7 @@ class ProfileAdmin(admin.ModelAdmin):
          ),
         (_('Additional options'), {
                 'classes': ('collapse',),
-                'fields' : ('avatar', 'signature', 'show_signatures')
+                'fields' : ('signature', 'show_signatures')
                 }
          ),
         (_('Ban options'), {

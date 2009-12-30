@@ -168,10 +168,7 @@ def pybb_topic_mini_pagination(topic):
 
 @register.filter
 def pybb_avatar_url(user):
-    if user.pybb_profile.avatar:
-        return user.pybb_profile.avatar.url
-    else:
-        return gravatar_url(user.email)
+    return gravatar_url(user.email)
 
 
 @register.tag(name='pybb_load_last_topics')

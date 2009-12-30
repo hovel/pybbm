@@ -26,7 +26,6 @@ PYBB_ATTACHMENT_SIZE_LIMIT = 1024 * 1024
 PYBB_ATTACHMENT_ENABLE = True
 PYBB_SKIN = 'default'
 
-PYBB_AVATARS_UPLOAD_TO = join('pybb_upload', 'avatars')
 PYBB_ATTACHMENT_UPLOAD_TO = join('pybb_upload', 'attachments')
 PYBB_DEFAULT_AVATAR_URL = 'pybb/img/default_avatar.jpg'
 

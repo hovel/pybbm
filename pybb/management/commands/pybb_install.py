@@ -46,18 +46,6 @@ class Command(BaseCommand):
         else:
             raise Exception('Unknown answer')
 
-        avatar_dir = os.path.join(dst_static, 'avatars')
-        if not os.path.exists(avatar_dir):
-            print 'Avatar directory does not exist: %s' % avatar_dir
-            print 'Create avatar directory: [Y/n]'
-            
-            answer = raw_input().lower()
-            if answer == 'y':
-                print 'Creating directory: %s' % avatar_dir
-                os.mkdir(avatar_dir)
-                print 'Changing access mode of avatar directory to 777'
-                os.chmod(avatar_dir, 0777)
-
         attachments_dir = os.path.join(dst_static, 'attachments')
         if not os.path.exists(attachments_dir):
             print 'Attachments directory does not exist: %s' % attachments_dir

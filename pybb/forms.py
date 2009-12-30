@@ -81,7 +81,7 @@ class EditProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['signature', 'time_zone', 'language',
-                  'avatar', 'show_signatures', 'markup']
+                  'show_signatures', 'markup']
 
 
     #def __init__(self, *args, **kwargs):
