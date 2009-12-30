@@ -2,7 +2,7 @@
 {% load pybb_extras %}
 {% load i18n %}
 
-{% block head_extra %}
+{% block pybb_head_extra %}
     {% with post.markup as markup %}
     {% include "markitup_resources.html" %}
     {% endwith %}
@@ -14,7 +14,7 @@
     </script>
 {% endblock %}
 
-{% block content %}
+{% block pybb_content %}
 <div class="crumbs">
 <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link post.topic.forum.category %} / {% pybb_link post.topic.forum %} / {% pybb_link post.topic %}
 </div>

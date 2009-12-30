@@ -2,7 +2,7 @@
 {% load pybb_extras %}
 {% load i18n %}
 
-{% block head_extra %}
+{% block pybb_head_extra %}
     <script type="text/javascript" src="{{ PYBB_MEDIA_URL }}js/pybbjs.js"></script>
     {% include "pybb/markitup_resources.html" %}
     <script type="text/javascript">
@@ -12,7 +12,7 @@
     </script>
 {% endblock %}
 
-{% block content %}
+{% block pybb_content %}
 {% if user.pybb_profile.is_banned %}
     {% trans 'You banned' %}
 {% else %}

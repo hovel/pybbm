@@ -2,9 +2,9 @@
 {% load pybb_extras %}
 {% load i18n %}
 
-{% block title %}{{ topic }}{% endblock %}
+{% block pybb_title %}{{ topic }}{% endblock %}
 
-{% block head_extra %}
+{% block pybb_head_extra %}
     <script type="text/javascript" src="{{ PYBB_MEDIA_URL }}/js/pybbjs.js"></script>
     {% include "pybb/markitup_resources.html" %}
     <script type="text/javascript">
@@ -15,7 +15,7 @@
 {% endblock %}
 
 
-{% block content %}
+{% block pybb_content %}
 <div class="crumbs">
     <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
 </div>

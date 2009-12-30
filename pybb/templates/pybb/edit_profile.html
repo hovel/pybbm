@@ -2,7 +2,7 @@
 {% load pybb_extras %}
 {% load i18n %}
 
-{% block head_extra %}
+{% block pybb_head_extra %}
     {% include "pybb/markitup_resources.html" %}
     <script type="text/javascript">
     $(function() {
@@ -11,7 +11,7 @@
     </script>
 {% endblock %}
 
-{% block content %}
+{% block pybb_content %}
 <h1>{% trans "Profile editing" %}</h1>
 {% if profile.avatar %}
 <img src="{{ profile.avatar.url }}" />
