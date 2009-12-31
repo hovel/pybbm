@@ -13,7 +13,7 @@
 
 {% block pybb_content %}
 <h1>{% trans "Profile editing" %}</h1>
-<img src="{{ profile|pybb_avatar_url }}" />
+<img src="{{ profile.user|pybb_avatar_url }}" />
 <p><a href="{% url auth_password_change %}">{% trans "Change the password" %}</a></p>
 {#<p><a href="{% url auth_email_change %}">{% trans "Change the email" %}</a></p>#}
 <form method="post" enctype="multipart/form-data">
