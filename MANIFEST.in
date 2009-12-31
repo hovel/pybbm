@@ -1,2 +1,2 @@
-recursive-include account *
+recursive-include pybb *
 global-exclude *.pyc
