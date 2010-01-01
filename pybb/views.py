@@ -9,8 +9,7 @@ try:
 except ImportError:
     pytils_enabled = False
 
-from django.shortcuts import get_object_or_404, get_list_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect, HttpResponse,\
                         HttpResponseNotFound, Http404
 from django.contrib.auth.models import User
@@ -21,33 +20,17 @@ from django.db import connection
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext
 
+from common.decorators import render_to, ajax
+
 from pybb.markups import mypostmarkup
 from pybb.util import quote_text, paginate,\
-                        set_language, ajax, urlize
+                        set_language, urlize
 from pybb.models import Category, Forum, Topic, Post, Profile, \
                         Attachment, MARKUP_CHOICES
 from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
                         EditProfileForm, UserSearchForm
 from pybb.orm import load_related
 from pybb.read_tracking import update_read_tracking
-
-
-def render_to(template, func):
-    """
-    Shortcut for rendering template with RequestContext.
-
-    If decorated function returns non dict then just return that result
-    else use RequestContext for rendering the template.
-    """
-
-    def wrapper(request, *args, **kwargs):
-        output = func(request, *args, **kwargs)
-        if not isinstance(output, dict):
-            return output
-        else:
-            return render_to_response(template, output,
-                                      context_instance=RequestContext(request))
-    return wrapper
 
 
 def index_ctx(request):
@@ -444,6 +427,7 @@ def post_ajax_preview(request):
     content = request.POST.get('content')
     markup = request.POST.get('markup')
 
+    print 'markup', markup
     if not markup in dict(MARKUP_CHOICES).keys():
         return {'error': 'Invalid markup'}
 
@@ -462,15 +446,15 @@ def post_ajax_preview(request):
             }
 
 
-users = render_to('pybb/users.html', users_ctx)
-merge_topics = render_to('pybb/merge_topics.html', merge_topics_ctx)
-delete_post = render_to('pybb/delete_post.html', delete_post_ctx)
-edit_post = render_to('pybb/edit_post.html', edit_post_ctx)
-edit_profile = render_to('pybb/edit_profile.html', edit_profile_ctx)
-user_topics = render_to('pybb/user_topics.html', user_topics_ctx)
-user = render_to('pybb/user.html', user_ctx)
-add_post = render_to('pybb/add_post.html', add_post_ctx)
-show_topic = render_to('pybb/topic.html', show_topic_ctx)
-show_forum = render_to('pybb/forum.html', show_forum_ctx)
-index = render_to('pybb/index.html', index_ctx)
-show_category = render_to('pybb/category.html', show_category_ctx)
+users = render_to('pybb/users.html')(users_ctx)
+merge_topics = render_to('pybb/merge_topics.html')(merge_topics_ctx)
+delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
+edit_post = render_to('pybb/edit_post.html')(edit_post_ctx)
+edit_profile = render_to('pybb/edit_profile.html')(edit_profile_ctx)
+user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
+user = render_to('pybb/user.html')(user_ctx)
+add_post = render_to('pybb/add_post.html')(add_post_ctx)
+show_topic = render_to('pybb/topic.html')(show_topic_ctx)
+show_forum = render_to('pybb/forum.html')(show_forum_ctx)
+index = render_to('pybb/index.html')(index_ctx)
+show_category = render_to('pybb/category.html')(show_category_ctx)

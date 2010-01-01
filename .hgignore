@@ -1,5 +1,12 @@
 syntax: glob
+# Global
 *.pyc
 *.swp
+*.swo
+
+# Distutils
 pybb.egg-info/
 dist/
+
+# Sphinx
+docs/_build/

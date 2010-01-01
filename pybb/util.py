@@ -9,81 +9,34 @@ except ImportError:
 	from md5 import md5
 import urllib
 
-from django.http import HttpResponse
-from django.utils.functional import Promise
-from django.utils.translation import force_unicode, check_for_language
-from django.utils.simplejson import JSONEncoder
+from django.utils.translation import check_for_language
 from django import forms
 from django.template.defaultfilters import urlize as django_urlize
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.conf import settings
 
 
-def ajax(func):
-    """
-    Checks request.method is POST. Return error in JSON in other case.
-
-    If view returned dict, returns JsonResponse with this dict as content.
-    """
-    def wrapper(request, *args, **kwargs):
-        if request.method == 'POST':
-            try:
-                response = func(request, *args, **kwargs)
-            except Exception, ex:
-                response = {'error': traceback.format_exc()}
-        else:
-            response = {'error': {'type': 403, 'message': 'Accepts only POST request'}}
-        if isinstance(response, dict):
-            return JsonResponse(response)
-        else:
-            return response
-    return wrapper
-
-
-class LazyJSONEncoder(JSONEncoder):
-    """
-    This fing need to save django from crashing.
-    """
-
-    def default(self, o):
-        if isinstance(o, Promise):
-            return force_unicode(o)
-        else:
-            return super(LazyJSONEncoder, self).default(o)
-
-
-class JsonResponse(HttpResponse):
-    """
-    HttpResponse subclass that serialize data into JSON format.
-    """
-
-    def __init__(self, data, mimetype='application/json'):
-        json_data = LazyJSONEncoder().encode(data)
-        super(JsonResponse, self).__init__(
-            content=json_data, mimetype=mimetype)
-
-
 def urlize(data):
-        """
-        Urlize plain text links in the HTML contents.
+    """
+    Urlize plain text links in the HTML contents.
 
-        Do not urlize content of A and CODE tags.
-        """
+    Do not urlize content of A and CODE tags.
+    """
 
-        soup = BeautifulSoup(data)
-        for chunk in soup.findAll(text=True):
-            islink = False
-            ptr = chunk.parent
-            while ptr.parent:
-                if ptr.name == 'a' or ptr.name == 'code':
-                    islink = True
-                    break
-                ptr = ptr.parent
+    soup = BeautifulSoup(data)
+    for chunk in soup.findAll(text=True):
+        islink = False
+        ptr = chunk.parent
+        while ptr.parent:
+            if ptr.name == 'a' or ptr.name == 'code':
+                islink = True
+                break
+            ptr = ptr.parent
 
-            if not islink:
-                chunk = chunk.replaceWith(django_urlize(unicode(chunk)))
+        if not islink:
+            chunk = chunk.replaceWith(django_urlize(unicode(chunk)))
 
-        return unicode(soup)
+    return unicode(soup)
 
 
 def quote_text(text, markup, username=""):
@@ -101,29 +54,6 @@ def quote_text(text, markup, username=""):
 
     else:
         return text
-
-
-def absolute_url(path):
-    return 'http://%s%s' % (settings.PYBB_HOST, path)
-
-
-def memoize_method(func):
-    """
-    Cached result of function call.
-    """
-
-    def wrapper(self, *args, **kwargs):
-        CACHE_NAME = '__memcache'
-        try:
-            cache = getattr(self, CACHE_NAME)
-        except AttributeError:
-            cache = {}
-            setattr(self, CACHE_NAME, cache)
-        key = (func, tuple(args), frozenset(kwargs.items()))
-        if key not in cache:
-            cache[key] = func(self, *args, **kwargs)
-        return cache[key]
-    return wrapper
 
 
 def paginate(items, request, per_page, total_count=None):

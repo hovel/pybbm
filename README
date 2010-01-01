@@ -17,6 +17,18 @@ The main point in development of pybb is to build it so it could be
   development. I mean that there are no threaded posts and there is only bbcode
   markup support and there is no multi-level nested categories.
 
+  
+Dependencies
+============
+
+* BeautifulSoup
+* python-markdown
+* simplejson
+* django-common
+* pytils (optional, need for russian language support)
+* SQLAlchemy (optional) - required for punbb importer
+* south (optional) - required for migrations
+
 
 How to install PYBB?
 ====================
@@ -33,17 +45,6 @@ How to install PYBB?
 * Put `include('pybb.urls'))` into main project urls.py file
 * Do `python manage.py syncdb`
 * And do not forget to install some authentication application like django-registration or django-account. See info in the bottom of README
-
-
-Dependencies
-============
-
-* BeautifulSoup
-* PIL
-* python-markdown
-* pytils
-* SQLAlchemy (optional) - required for punbb importer
-* south (optional) - required for migrations
 
 
 i18n support

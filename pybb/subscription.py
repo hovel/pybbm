@@ -3,8 +3,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.utils import translation
-
-from pybb.util import absolute_url
+from django.contrib.sites.models import Site
 
 
 TOPIC_SUBSCRIPTION_TEXT_TEMPLATE = lambda: _(u"""New reply from %(username)s to topic that you have subscribed on.
@@ -51,11 +50,13 @@ def notify_topic_subscribers(post):
 
                 subject = u'RE: %s' % topic.name
                 to_email = user.email
+                hostname = Sites.objects.get_current().domain
+                delete_url = reverse('pybb_delete_subscription', args=[post.topic.id])
                 text_content = TOPIC_SUBSCRIPTION_TEXT_TEMPLATE() % {
                     'username': post.user.username,
                     'message': post.body_text,
-                    'post_url': absolute_url(post.get_absolute_url()),
-                    'unsubscribe_url': absolute_url(reverse('pybb_delete_subscription', args=[post.topic.id])),
+                    'post_url': 'http://%s%s' % (hostname, post.get_absolute_url()),
+                    'unsubscribe_url': 'http://%s%s' % (hostname, delete_url),
                 }
                 #html_content = html_version(post)
                 send_mail([to_email], subject, text_content)

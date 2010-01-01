@@ -16,7 +16,7 @@ from django.conf import settings
 
 from pybb.markups import mypostmarkup
 from pybb.fields import AutoOneToOneField, JSONField
-from pybb.util import urlize, memoize_method, unescape
+from pybb.util import urlize, unescape
 
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
