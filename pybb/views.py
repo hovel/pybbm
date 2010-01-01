@@ -145,10 +145,11 @@ def add_post_ctx(request, forum_id, topic_id):
     if topic and form.is_valid():
         last_post = topic.last_post
         delta = (datetime.now() - last_post.created)
-        time_diff = delta.seconds / 60
+        time_diff = delta.seconds
         timeout = settings.PYBB_POST_AUTOJOIN_TIMEOUT
         
         # TODO: Move to formmmmm
+        # TODO: Do autojoin on the fly, adjacent post should not be joined physically
         if (last_post.user == request.user and
             not delta.days and time_diff < timeout):
             if settings.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
