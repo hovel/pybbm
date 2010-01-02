@@ -18,7 +18,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ungettext
 
 from common.decorators import render_to, ajax
 
@@ -141,36 +140,6 @@ def add_post_ctx(request, forum_id, topic_id):
         form = AddPostForm(request.POST, request.FILES, **form_kwargs)
     else:
         form = AddPostForm(**form_kwargs)
-
-    if topic and form.is_valid():
-        last_post = topic.last_post
-        delta = (datetime.now() - last_post.created)
-        time_diff = delta.seconds
-        timeout = settings.PYBB_POST_AUTOJOIN_TIMEOUT
-        
-        # TODO: Move to formmmmm
-        # TODO: Do autojoin on the fly, adjacent post should not be joined physically
-        if (last_post.user == request.user and
-            not delta.days and time_diff < timeout):
-            if settings.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
-                join_message = u"Добавлено спустя %s %s" % (time_diff,
-                                    pytils.numeral.choose_plural(time_diff,
-                                    (u"минуту", u"минуты", u"минут")))
-            else:
-                join_message = ungettext(u"Added after %s minute",
-                                         u"Added after %s minutes",
-                                         time_diff) % time_diff
-
-            if last_post.markup == "bbcode":
-                join_message = "[b]%s[/b]" % join_message
-            elif last_post.markup == "markdown":
-                join_message = "**%s**" % join_message
-
-            last_post.body += u"\n\n%s:\n\n%s" % (join_message,
-                                                form.cleaned_data["body"])
-            last_post.updated = datetime.now()
-            last_post.save()
-            return HttpResponseRedirect(last_post.get_absolute_url())
 
     if form.is_valid():
         post = form.save();

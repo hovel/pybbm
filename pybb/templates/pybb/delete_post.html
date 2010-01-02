@@ -1,10 +1,10 @@
 {% extends 'pybb/base.html' %}
-{% load i18n %}
+{% load i18n pybb_extras %}
 
 {% block pybb_content %}
 <h1>{% trans "Are you sure you want to delete this message?" %}</h1>
 <div class="post-preview">
-    {{ post.body_html|safe }}
+    {% pybb_render_post post %}
 </div>
 <form method="post" action=".">
     <p><input type="submit" value="{% trans 'Yes, I am sure.' %}" /></p>

@@ -43,7 +43,7 @@
                     </div>
                 </td>
                 <td class="content" width="85%">
-                    {{ post.body_html|safe }}
+                    {% pybb_render_post post %}
                     {% if not user.is_authenticated or user.pybb_profile.show_signatures %}
                     {% if post.user.pybb_profile.signature %}
                     <div class="signature">

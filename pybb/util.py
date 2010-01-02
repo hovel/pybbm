@@ -14,6 +14,7 @@ from django import forms
 from django.template.defaultfilters import urlize as django_urlize
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.conf import settings
+from django.contrib.sites.models import Site
 
 
 def urlize(data):
@@ -144,10 +145,10 @@ def gravatar_url(email):
 
     hash = md5(email).hexdigest()
     size = max(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT)
-
     url = settings.PYBB_DEFAULT_AVATAR_URL
+    hostname = Site.objects.get_current().domain
     if not url.startswith('http://'):
-        url = 'http://%s%s%s' % (settings.PYBB_HOST,
+        url = 'http://%s%s%s' % (hostname,
                                  settings.MEDIA_URL,
                                  settings.PYBB_DEFAULT_AVATAR_URL)
     default = urllib.quote(url)

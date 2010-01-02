@@ -53,14 +53,37 @@ class AddPostForm(forms.ModelForm):
         else:
             topic = self.topic
 
-        post = Post(topic=topic, user=self.user, user_ip=self.ip,
-                    markup=self.user.pybb_profile.markup,
-                    body=self.cleaned_data['body'])
-        post.save()
+        autojoin_done = False
+
+        if self.topic and settings.PYBB_POST_AUTOJOIN_ENABLED:
+            last_post = self.topic.last_post
+            delta = datetime.now() - last_post.created
+            time_diff = delta.seconds
+            timeout = settings.PYBB_POST_AUTOJOIN_TIMEOUT
+            
+            if (last_post.user == self.user and
+                not delta.days and time_diff < timeout):
+
+                join_message = '@@@AUTOJOIN-%d@@@' % time_diff
+
+                last_post.body = u"%s\n\n%s\n\n%s" % (last_post.body, join_message, self.cleaned_data['body'])
+                last_post.updated = datetime.now()
+                last_post.save()
+                post = last_post
+
+                autojoin_done = True
+
+        if not autojoin_done:
+            post = Post(topic=topic, user=self.user, user_ip=self.ip,
+                        markup=self.user.pybb_profile.markup,
+                        body=self.cleaned_data['body'])
+            post.save()
 
         if settings.PYBB_ATTACHMENT_ENABLE:
             for f in self.files:
                 self.save_attachment(post, self.files[f])
+
+
         return post
 
 
