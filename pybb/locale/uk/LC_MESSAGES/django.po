@@ -508,28 +508,28 @@ msgstr "Дата реєстрації"
 msgid "All topics created by"
 msgstr "Теми, що створені користувачем"
 
-#: .\templatetags\pybb_extras.py:60
+#: .\templatetags\pybb_tags.py:60
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "секунду тому,секунди тому,секунд тому"
 
-#: .\templatetags\pybb_extras.py:63
+#: .\templatetags\pybb_tags.py:63
 msgid "seconds ago"
 msgstr "секунди тому"
 
-#: .\templatetags\pybb_extras.py:69
+#: .\templatetags\pybb_tags.py:69
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "хвилину тому,хвилини тому,хвилин тому"
 
-#: .\templatetags\pybb_extras.py:72
+#: .\templatetags\pybb_tags.py:72
 msgid "minutes ago"
 msgstr "хвилини тому"
 
-#: .\templatetags\pybb_extras.py:82
+#: .\templatetags\pybb_tags.py:82
 #, python-format
 msgid "today, %s"
 msgstr "сьогодні, %s"
 
-#: .\templatetags\pybb_extras.py:84
+#: .\templatetags\pybb_tags.py:84
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчора, %s"

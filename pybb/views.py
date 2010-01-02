@@ -199,7 +199,7 @@ def edit_profile_ctx(request):
 
 @login_required
 def edit_post_ctx(request, post_id):
-    from pybb.templatetags.pybb_extras import pybb_editable_by
+    from pybb.templatetags.pybb_tags import pybb_editable_by
 
     post = get_object_or_404(Post, pk=post_id)
 
@@ -231,7 +231,7 @@ def edit_post_ctx(request, post_id):
 
 @login_required
 def stick_topic(request, topic_id):
-    from pybb.templatetags.pybb_extras import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
     if pybb_moderated_by(topic, request.user):
@@ -243,7 +243,7 @@ def stick_topic(request, topic_id):
 
 @login_required
 def unstick_topic(request, topic_id):
-    from pybb.templatetags.pybb_extras import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
     if pybb_moderated_by(topic, request.user):
@@ -285,7 +285,7 @@ def delete_post_ctx(request, post_id):
 
 @login_required
 def close_topic(request, topic_id):
-    from pybb.templatetags.pybb_extras import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
     if pybb_moderated_by(topic, request.user):
@@ -298,7 +298,7 @@ def close_topic(request, topic_id):
 
 @login_required
 def open_topic(request, topic_id):
-    from pybb.templatetags.pybb_extras import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
     if pybb_moderated_by(topic, request.user):
@@ -311,7 +311,7 @@ def open_topic(request, topic_id):
 
 @login_required
 def merge_topics_ctx(request):
-    from pybb.templatetags.pybb_extras import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_moderated_by
 
     topics_ids = request.GET.getlist('topic')
     topics = get_list_or_404(Topic, pk__in=topics_ids)

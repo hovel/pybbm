@@ -538,28 +538,28 @@ msgstr "Contatos"
 msgid "All topics created by"
 msgstr ""
 
-#: templatetags/pybb_extras.py:58
+#: templatetags/pybb_tags.py:58
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "segundos atrás,segundos atrás,segundos atrás"
 
-#: templatetags/pybb_extras.py:61
+#: templatetags/pybb_tags.py:61
 msgid "seconds ago"
 msgstr "segundos atrás"
 
-#: templatetags/pybb_extras.py:67
+#: templatetags/pybb_tags.py:67
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "minutos atrás,minutos atrás,minutos atrás"
 
-#: templatetags/pybb_extras.py:70
+#: templatetags/pybb_tags.py:70
 msgid "minutes ago"
 msgstr "minutos atrás"
 
-#: templatetags/pybb_extras.py:80
+#: templatetags/pybb_tags.py:80
 #, python-format
 msgid "today, %s"
 msgstr "hoje, %s"
 
-#: templatetags/pybb_extras.py:82
+#: templatetags/pybb_tags.py:82
 #, python-format
 msgid "yesterday, %s"
 msgstr "ontem, %s"

@@ -532,28 +532,28 @@ msgstr "Контакты"
 msgid "All topics created by"
 msgstr "Темы, созданные пользователем"
 
-#: templatetags/pybb_extras.py:58
+#: templatetags/pybb_tags.py:58
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "секунду назад,секунды назад,секунд назад"
 
-#: templatetags/pybb_extras.py:61
+#: templatetags/pybb_tags.py:61
 msgid "seconds ago"
 msgstr "seconds ago"
 
-#: templatetags/pybb_extras.py:67
+#: templatetags/pybb_tags.py:67
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "минуту назад,минуты назад,минут назад"
 
-#: templatetags/pybb_extras.py:70
+#: templatetags/pybb_tags.py:70
 msgid "minutes ago"
 msgstr "minutes ago"
 
-#: templatetags/pybb_extras.py:80
+#: templatetags/pybb_tags.py:80
 #, python-format
 msgid "today, %s"
 msgstr "сегодня, %s"
 
-#: templatetags/pybb_extras.py:82
+#: templatetags/pybb_tags.py:82
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"
