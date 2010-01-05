@@ -1,0 +1,6 @@
+django
+django-common
+beautifulsoup
+markdown
+pytils
+south
