@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block pybb_content %}
-<h1><a href="{% url pybb_profile profile.username %}">{{ profile.username }}</a></h1>
+<h1><a href="{{ profile.pybb_profile.get_absolute_url }}">{{ profile.username }}</a></h1>
 <div class="userinfo">
     <div class="avatar">
         <img src="{{ profile|pybb_avatar_url }}" alt="" />

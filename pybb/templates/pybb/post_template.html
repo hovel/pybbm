@@ -8,7 +8,7 @@
             <tr>
                 <td class="info" width="15%">
                     <div class="avatar">
-                        <a href="{% url pybb_profile post.user %}">
+                        <a href="{{ post.user.pybb_profile.get_absolute_url }}">
                         <img src="{{ post.user|pybb_avatar_url }}" alt="" />
                         </a>
                     </div>

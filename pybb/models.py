@@ -264,7 +264,7 @@ class Profile(models.Model):
         return False
 
     def get_absolute_url(self):
-        return reverse('pybb_profile', args=[self.user.username])
+        return reverse('pybb_user', args=[self.user.username])
 
 
 class Attachment(models.Model):

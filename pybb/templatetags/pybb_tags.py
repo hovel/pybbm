@@ -29,9 +29,8 @@ register = template.Library()
 
 @register.filter
 def pybb_profile_link(user):
-    data = u'<a href="%s">%s</a>' % (\
-        reverse('pybb_profile', args=[user.username]), user.username)
-    return mark_safe(data)
+    url = reverse('pybb_user', args=[user.username])
+    return mark_safe(u'<a href="%s">%s</a>' % (url, user.username))
 
 
 @register.tag
