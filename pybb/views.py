@@ -87,6 +87,9 @@ def show_topic_ctx(request, topic_id):
                   request.user in topic.subscribers.all())
 
     posts = topic.posts.all().select_related()
+
+    # TODO: Here could be gotcha
+    # If topic.post_count is broken then strange effect could be possible!
     page, paginator = paginate(posts, request, settings.PYBB_TOPIC_PAGE_SIZE,
                                total_count=topic.post_count)
 

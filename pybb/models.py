@@ -128,6 +128,7 @@ class Topic(models.Model):
 
     @property
     def last_post(self):
+        #return Post.objects.all()[0]
         return self.posts.all().order_by('-created').select_related()[0]
 
     def get_absolute_url(self):
@@ -180,7 +181,6 @@ class Post(RenderableItem):
     body_text = models.TextField(_('Text version'))
     user_ip = models.IPAddressField(_('User IP'), blank=True, default='0.0.0.0')
 
-
     class Meta:
         ordering = ['created']
         verbose_name = _('Post')
@@ -209,10 +209,8 @@ class Post(RenderableItem):
             self.topic.forum.updated = now
             self.topic.forum.update_post_count()
 
-
     def get_absolute_url(self):
         return reverse('pybb_post', args=[self.id])
-
 
     def delete(self, *args, **kwargs):
         self_id = self.id
@@ -232,6 +230,7 @@ BAN_STATUS = (
 (1, _('Caution')),
 (2, _('Ban')))
 
+
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
     signature = models.TextField(_('Signature'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
@@ -248,7 +247,6 @@ class Profile(models.Model):
     class Meta:
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
-
 
     def save(self, *args, **kwargs):
         self.signature_html = mypostmarkup.markup(self.signature, auto_urls=False)
@@ -296,7 +294,6 @@ class Attachment(models.Model):
             return '%dKb' % int(size / 1024)
         else:
             return '%.2fMb' % (size / float(1024 * 1024))
-
 
     def get_absolute_path(self):
         return os.path.join(settings.MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO,

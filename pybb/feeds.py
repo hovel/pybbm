@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from pybb.models import Post, Topic
 
+
 class PybbFeed(Feed):
     feed_type = Atom1Feed
 
@@ -16,6 +17,7 @@ class PybbFeed(Feed):
 
     def item_pubdate(self, obj):
         return obj.created
+
 
 class LastPosts(PybbFeed):
     title = _('Latest posts on forum')

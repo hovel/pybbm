@@ -27,6 +27,3 @@ PYBB_SKIN = 'default'
 
 PYBB_ATTACHMENT_UPLOAD_TO = join('pybb_upload', 'attachments')
 PYBB_DEFAULT_AVATAR_URL = 'pybb/img/default_avatar.jpg'
-
-# Internal settings
-PYBB_DISABLE_NOTIFICATION = False

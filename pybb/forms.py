@@ -35,16 +35,14 @@ class AddPostForm(forms.ModelForm):
             self.fields['attachment'].widget = forms.HiddenInput()
             self.fields['attachment'].required = False
 
-
     def clean_attachment(self):
         for f in self.files:
             if self.files[f].size > settings.PYBB_ATTACHMENT_SIZE_LIMIT:
                 raise forms.ValidationError(_('Attachment is too big'))
         return self.cleaned_data['attachment']
 
-
-
     def save(self):
+
         if self.forum:
             topic = Topic(forum=self.forum,
                           user=self.user,
@@ -83,9 +81,7 @@ class AddPostForm(forms.ModelForm):
             for f in self.files:
                 self.save_attachment(post, self.files[f])
 
-
         return post
-
 
     def save_attachment(self, post, memfile):
         if memfile:
@@ -94,7 +90,6 @@ class AddPostForm(forms.ModelForm):
             dir = os.path.join(settings.MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO)
             fname = '%d.0' % post.id
             path = os.path.join(dir, fname)
-            #print path
             file(path, 'w').write(memfile.read())
             obj.path = fname
             obj.save()
@@ -105,10 +100,6 @@ class EditProfileForm(forms.ModelForm):
         model = Profile
         fields = ['signature', 'time_zone', 'language',
                   'show_signatures', 'markup']
-
-
-    #def __init__(self, *args, **kwargs):
-        #super(EditProfileForm, self).__init__(*args, **kwargs)
 
     def clean_signature(self):
         value = self.cleaned_data['signature'].strip()
