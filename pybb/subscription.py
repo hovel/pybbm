@@ -14,24 +14,16 @@ See topic: %(post_url)s
 Unsubscribe %(unsubscribe_url)s""")
 
 
-def send_mail(rec_list, subject, text, html=None):
+def send_mail(recipients, subject, text, html=None):
     """
     Shortcut for sending email.
     """
 
-    from_email = settings.DEFAULT_FROM_EMAIL
-
-    msg = EmailMultiAlternatives(subject, text, from_email, rec_list)
+    msg = EmailMultiAlternatives(subject, text, settings.DEFAULT_FROM_EMAIL,
+                                 recipients)
     if html:
         msg.attach_alternative(html, "text/html")
-    if settings.PYBB_EMAIL_DEBUG:
-        logging.debug('---begin---')
-        logging.debug('To: %s' % rec_list)
-        logging.debug('Subject: %s' % subject)
-        logging.debug('Body: %s' % text)
-        logging.debug('---end---')
-    else:
-        msg.send(fail_silently=True)
+    msg.send(fail_silently=True)
 
 
 def notify_topic_subscribers(post):
