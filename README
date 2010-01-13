@@ -25,7 +25,6 @@ Dependencies
 * python-markdown
 * simplejson
 * pytils (optional, need for russian language support)
-* SQLAlchemy (optional) - required for punbb importer
 * south (optional) - required for migrations
 
 
