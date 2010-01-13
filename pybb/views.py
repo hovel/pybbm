@@ -19,8 +19,8 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.utils.translation import ugettext_lazy as _
 
-from common.decorators import render_to, ajax
 
+from pybb.shortcuts import render_to, ajax
 from pybb.markups import mypostmarkup
 from pybb.util import quote_text, paginate,\
                         set_language, urlize

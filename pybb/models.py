@@ -14,8 +14,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.fields import JSONField
-
+from pybb.shortcuts import JSONField
 from pybb.markups import mypostmarkup
 from pybb.util import urlize, unescape
 
