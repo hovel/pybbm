@@ -201,7 +201,7 @@ class Migration:
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'topic_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
+            'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
         'pybb.post': {
             'body': ('django.db.models.fields.TextField', [], {}),
@@ -227,13 +227,13 @@ class Migration:
             'signature': ('django.db.models.fields.TextField', [], {'max_length': '1024', 'blank': 'True'}),
             'signature_html': ('django.db.models.fields.TextField', [], {'max_length': '1054', 'blank': 'True'}),
             'time_zone': ('django.db.models.fields.FloatField', [], {'default': '3.0'}),
-            'user': ('AutoOneToOneField', ["orm['auth.User']"], {'related_name': "'pybb_profile'"})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'related_name': "'pybb_profile'", 'unique': 'True'})
         },
         'pybb.readtracking': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_read': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'topics': ('JSONField', [], {'null': 'True'}),
-            'user': ('AutoOneToOneField', ["orm['auth.User']"], {})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['auth.User']"})
         },
         'pybb.topic': {
             'closed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -244,7 +244,7 @@ class Migration:
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'sticky': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'blank': 'True'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'updated': ('django.db.models.fields.DateTimeField', [], {'blank': 'True', 'null': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'views': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
         }

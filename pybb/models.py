@@ -14,7 +14,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.fields import AutoOneToOneField, JSONField
+from common.fields import JSONField
 
 from pybb.markups import mypostmarkup
 from pybb.util import urlize, unescape
@@ -232,9 +232,9 @@ BAN_STATUS = (
 
 
 class Profile(models.Model):
-    user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
+    user = models.OneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
     signature = models.TextField(_('Signature'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
-    signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH+30)
+    signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH + 30)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
                                 choices=settings.LANGUAGES)
@@ -312,7 +312,7 @@ class ReadTracking(models.Model):
     `topic pk` --> `topic last post pk`
     """
 
-    user = AutoOneToOneField(User)
+    user = models.OneToOneField(User)
     topics = JSONField(null=True)
     last_read = models.DateTimeField(null=True)
 

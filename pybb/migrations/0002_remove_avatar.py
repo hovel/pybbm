@@ -102,13 +102,13 @@ class Migration:
             'signature': ('django.db.models.fields.TextField', [], {'max_length': '1024', 'blank': 'True'}),
             'signature_html': ('django.db.models.fields.TextField', [], {'max_length': '1054', 'blank': 'True'}),
             'time_zone': ('django.db.models.fields.FloatField', [], {'default': '3.0'}),
-            'user': ('AutoOneToOneField', ["orm['auth.User']"], {'related_name': "'pybb_profile'"})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'related_name': "'pybb_profile'", 'unique': 'True'})
         },
         'pybb.readtracking': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_read': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'topics': ('JSONField', [], {'null': 'True'}),
-            'user': ('AutoOneToOneField', ["orm['auth.User']"], {})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['auth.User']"})
         },
         'pybb.topic': {
             'closed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),

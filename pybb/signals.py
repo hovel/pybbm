@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
 from pybb.subscription import notify_topic_subscribers
-from pybb.models import Post, Topic
+from pybb.models import Post, Topic, Profile, ReadTracking
 
 
 def post_saved(instance, **kwargs):
@@ -19,6 +19,13 @@ def topic_saved(instance, **kwargs):
     forum.save()
 
 
+def user_saved(instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+        ReadTracking.objects.create(user=instance)
+
+
 def setup_signals():
     post_save.connect(post_saved, sender=Post)
     post_save.connect(topic_saved, sender=Topic)
+    post_save.connect(user_saved, sender=User)
