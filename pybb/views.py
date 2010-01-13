@@ -20,7 +20,7 @@ from django.db import connection
 from django.utils.translation import ugettext_lazy as _
 
 
-from pybb.shortcuts import render_to, ajax
+from pybb.shortcuts import render_to, ajax, load_related
 from pybb.markups import mypostmarkup
 from pybb.util import quote_text, paginate,\
                         set_language, urlize
@@ -28,7 +28,6 @@ from pybb.models import Category, Forum, Topic, Post, Profile, \
                         Attachment, MARKUP_CHOICES
 from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
                         EditProfileForm, UserSearchForm
-from pybb.orm import load_related
 from pybb.read_tracking import update_read_tracking
 
 
