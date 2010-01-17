@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
-
+from django.conf import settings
 
 class HttpResponseJson(HttpResponse):
     def __init__(self, data):
@@ -30,8 +30,9 @@ def render_to(template):
             output = func(request, *args, **kwargs)
             if not isinstance(output, dict):
                 return output
-            else:
+            else:                
                 ctx = RequestContext(request)
+                ctx['use_csrf'] = 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE_CLASSES
                 return render_to_response(template, output, context_instance=ctx)
         return wrapper
     return decorator
