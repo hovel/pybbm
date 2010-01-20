@@ -1,6 +1,7 @@
-{% load i18n %}
+{% load i18n pybb_tags %}
 
 <form class="post-form" action="{% if forum %}{% url pybb_add_topic forum.pk %}{% else %}{% url pybb_add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
+    {% pybb_csrf %}
     <div class="preview-box" style="display: none">
         <div class="header">{% trans "Preview" %}</div>
         <div class="content"></div>

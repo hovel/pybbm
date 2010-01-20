@@ -11,7 +11,7 @@ except ImportError:
 from django import template
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
-from django.template import RequestContext
+from django.template import RequestContext, TextNode
 from django.utils.encoding import smart_unicode
 from django.db import settings
 from django.utils.html import escape
@@ -26,6 +26,19 @@ from pybb.util import gravatar_url
 
 
 register = template.Library()
+
+@register.tag
+def pybb_csrf(parser, token):
+    """
+    This tag returns CsrfTokenNode if CsrfViewMiddleware is enabled, or empty string if not
+    """
+
+    if 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE_CLASSES:
+        from django.template.defaulttags import CsrfTokenNode 
+        return CsrfTokenNode()
+    else:
+        return TextNode('')
+
 
 @register.filter
 def pybb_profile_link(user):
