@@ -3,12 +3,11 @@
 {% load i18n %}
 
 {% block pybb_content %}
-<h1>{% trans "Users" %}
+<h1>{% trans "Users" %}</h1>
     <form method="get" class="filter_form">
         {{ form.query }}
         <input type="submit" value="{% trans "Search" %}" />
     </form>
-</h1>
 <ul class="users">
     {% for profile in page.object_list %}
     <li class="user">
@@ -17,7 +16,7 @@
     <span class="updated">{{ profile.date_joined|date:"d M Y" }}</span>
     </li>
     {% endfor %}
-</u>
+</ul>
 
 {% with _('Users') as label %}
 {% include "pybb/pagination.html" %}
