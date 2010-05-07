@@ -62,6 +62,7 @@ class Category(models.Model):
         return Post.objects.filter(topic__forum__category=self).select_related()
 
 
+import logging
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
     name = models.CharField(_('Name'), max_length=80)
@@ -71,6 +72,7 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
+    last_post = models.ForeignKey("Post", related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True, null=True)
 
     class Meta:
         ordering = ['position']
@@ -92,11 +94,9 @@ class Forum(models.Model):
     def posts(self):
         return Post.objects.filter(topic__forum=self).select_related()
 
-    @property
-    def last_post(self):
-        posts = self.posts.order_by('-created').select_related()
+    def get_last_post(self):
         try:
-            return posts[0]
+            return self.posts.order_by('-created').select_related()[0]
         except IndexError:
             return None
 
@@ -112,6 +112,7 @@ class Topic(models.Model):
     closed = models.BooleanField(_('Closed'), blank=True, default=False)
     subscribers = models.ManyToManyField(User, related_name='subscriptions', verbose_name=_('Subscribers'), blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
+    last_post = models.ForeignKey("Post", related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True, null=True)
 
     class Meta:
         ordering = ['-created']
@@ -123,12 +124,12 @@ class Topic(models.Model):
 
     @property
     def head(self):
-        return self.posts.all().order_by('created').select_related()[0]
+        if not hasattr(self, "_head"):
+            self._head = self.posts.all().order_by('created')[0]
+        return self._head
 
-    @property
-    def last_post(self):
-        #return Post.objects.all()[0]
-        return self.posts.all().order_by('-created').select_related()[0]
+    def get_last_post(self):
+        return self.posts.order_by('-created').select_related()[0]
 
     def get_absolute_url(self):
         return reverse('pybb_topic', args=[self.id])
@@ -204,8 +205,10 @@ class Post(RenderableItem):
 
         if new:
             self.topic.updated = now
+            self.topic.last_post = self
             self.topic.update_post_count()
             self.topic.forum.updated = now
+            self.topic.forum.last_post = self
             self.topic.forum.update_post_count()
 
     def get_absolute_url(self):
@@ -219,8 +222,10 @@ class Post(RenderableItem):
         if self_id == head_post_id:
             self.topic.delete()
         else:
+            self.topic.last_post = self.topic.get_last_post()
             self.topic.update_post_count()
 
+        self.topic.forum.last_post = self.topic.forum.get_last_post()
         self.topic.forum.update_post_count()
 
 

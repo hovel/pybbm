@@ -31,12 +31,32 @@ from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
 from pybb.read_tracking import update_read_tracking
 
 
+def load_last_post(objects):
+    """Load post for forums or topics, make __in query"""
+    pks = [object.last_post_id for object in objects]
+    posts = dict((post.pk, post) for post in Post.objects.filter(pk__in=pks))
+    for object in objects:
+        object.last_post = posts.get(object.last_post_id)
+
+
+def load_users_for_last_post(objects):
+    """Load user for last post of forums or topics, make __in query"""
+    pks = set(obj.last_post.user_id for obj in objects if obj.last_post)
+    users = dict((user.pk, user) for user in User.objects.filter(pk__in=pks))
+    for object in objects:
+        if object.last_post:
+            object.last_post.user = users.get(object.last_post.user_id)
+
+
 def index_ctx(request):
-    cats = {}
-    for forum in Forum.objects.all().select_related():
-        cat = cats.setdefault(forum.category.pk,
-                              {'cat': forum.category, 'forums': []})
-        cat['forums'].append(forum)
+    cats = Category.objects.all()
+    cats = dict((cat.pk, {'cat': cat, 'forums': []}) for cat in cats)
+    forums = list(Forum.objects.all())
+    load_last_post(forums)
+    load_users_for_last_post(forums)
+    for forum in forums:
+        forum.category = cats[forum.category_id]['cat']
+        cats[forum.category_id]['forums'].append(forum)
     cats = sorted(cats.values(), key=lambda x: x['cat'].position)
 
     return {'cats': cats,
@@ -53,12 +73,13 @@ def show_category_ctx(request, category_id):
 def show_forum_ctx(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
     topics = forum.topics.order_by('-sticky', '-updated').select_related()
+    load_last_post(topics)
+    load_users_for_last_post(topics)
     page, paginator = paginate(topics, request, settings.PYBB_FORUM_PAGE_SIZE)
 
     return {'forum': forum,
             'page': page,
             }
-
 
 def show_topic_ctx(request, topic_id):
     try:
@@ -72,11 +93,7 @@ def show_topic_ctx(request, topic_id):
     if request.user.is_authenticated():
         update_read_tracking(topic, request.user)
 
-    if settings.PYBB_FREEZE_FIRST_POST:
-        first_post = topic.posts.order_by('created')[0]
-    else:
-        first_post = None
-    last_post = topic.posts.order_by('-created')[0]
+    first_post = topic.head if settings.PYBB_FREEZE_FIRST_POST else None
 
     form = AddPostForm(topic=topic)
 
@@ -85,24 +102,24 @@ def show_topic_ctx(request, topic_id):
     subscribed = (request.user.is_authenticated() and
                   request.user in topic.subscribers.all())
 
-    posts = topic.posts.all().select_related()
+    posts = topic.posts.all()
 
     # TODO: Here could be gotcha
     # If topic.post_count is broken then strange effect could be possible!
     page, paginator = paginate(posts, request, settings.PYBB_TOPIC_PAGE_SIZE,
                                total_count=topic.post_count)
 
-    profiles = Profile.objects.filter(user__pk__in=
-        set(x.user.id for x in page.object_list))
-    profiles = dict((x.user_id, x) for x in profiles)
+    users = User.objects.filter(pk__in=
+        set(x.user_id for x in page.object_list)).select_related("pybb_profile")
+    users = dict((user.pk, user) for user in users)
 
     for post in page.object_list:
-        post.user.pybb_profile = profiles[post.user.id]
+        post.user = users.get(post.user_id)
 
     load_related(page.object_list, Attachment.objects.all(), 'post')
 
     return {'topic': topic,
-            'last_post': last_post,
+            'last_post': topic.last_post,
             'first_post': first_post,
             'form': form,
             'moderator': moderator,
@@ -218,7 +235,7 @@ def edit_post_ctx(request, post_id):
         form_class = EditPostForm
 
     if request.method == 'POST':
-        form = form_class(request.POST, request.FILES, **form_kwargs) 
+        form = form_class(request.POST, request.FILES, **form_kwargs)
     else:
         form = form_class(**form_kwargs)
 
