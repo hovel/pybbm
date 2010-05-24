@@ -92,8 +92,11 @@ def show_topic_ctx(request, topic_id):
 
     if request.user.is_authenticated():
         update_read_tracking(topic, request.user)
-
-    first_post = topic.head if settings.PYBB_FREEZE_FIRST_POST else None
+	
+    if settings.PYBB_FREEZE_FIRST_POST:
+        first_post = topic.head
+    else:
+        first_post = None
 
     form = AddPostForm(topic=topic)
 
