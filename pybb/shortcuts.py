@@ -87,6 +87,12 @@ class JSONField(models.TextField):
             value = simplejson.dumps(value, cls=DjangoJSONEncoder)
         return super(JSONField, self).get_db_prep_save(value)
 
+    def south_field_triple(self):
+
+        from south.modelsinspector import introspector
+        field_class = 'django.db.models.TextField'
+        args, kwargs = introspector(models.TextField)
+        return (field_class, args, kwargs)
 
 def load_related(objects, rel_qs, rel_field_name, cache_field_name=None):
     """
