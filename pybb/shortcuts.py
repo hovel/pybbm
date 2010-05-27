@@ -80,12 +80,12 @@ class JSONField(models.TextField):
             pass
         return value
 
-    def get_db_prep_save(self, value):
+    def get_db_prep_save(self, value, *args, **kwargs):
         if value == "":
             return None
         if isinstance(value, dict):
             value = simplejson.dumps(value, cls=DjangoJSONEncoder)
-        return super(JSONField, self).get_db_prep_save(value)
+        return super(JSONField, self).get_db_prep_save(value, *args, **kwargs)
 
     def south_field_triple(self):
 
