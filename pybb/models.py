@@ -324,7 +324,7 @@ class ReadTracking(models.Model):
     """
 
     user = models.OneToOneField(User)
-    topics = JSONField(null=True)
+    topics = JSONField(null=True, blank=True)
     last_read = models.DateTimeField(null=True)
 
     class Meta:

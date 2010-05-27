@@ -14,9 +14,6 @@ class Migration(SchemaMigration):
         # Changing field 'Forum.updated'
         db.alter_column('pybb_forum', 'updated', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True))
 
-        # Changing field 'ReadTracking.topics'
-        db.alter_column('pybb_readtracking', 'topics', self.gf('django.db.models.TextField')())
-
         # Adding field 'Topic.last_post'
         db.add_column('pybb_topic', 'last_post', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='last_post_in_topic', null=True, to=orm['pybb.Post']), keep_default=False)
 
@@ -28,9 +25,6 @@ class Migration(SchemaMigration):
 
         # Changing field 'Forum.updated'
         db.alter_column('pybb_forum', 'updated', self.gf('django.db.models.fields.DateTimeField')(null=True))
-
-        # Changing field 'ReadTracking.topics'
-        db.alter_column('pybb_readtracking', 'topics', self.gf('JSONField')(null=True))
 
         # Deleting field 'Topic.last_post'
         db.delete_column('pybb_topic', 'last_post_id')
