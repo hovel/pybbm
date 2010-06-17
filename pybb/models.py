@@ -84,7 +84,7 @@ class Forum(models.Model):
 
     def update_post_count(self):
         self.post_count = Topic.objects.filter(forum=self).aggregate(
-                                        Sum("post_count"))['post_count__sum']
+                                Sum("post_count"))['post_count__sum'] or 0
         self.save()
 
     def get_absolute_url(self):
@@ -217,15 +217,22 @@ class Post(RenderableItem):
     def delete(self, *args, **kwargs):
         self_id = self.id
         head_post_id = self.topic.posts.order_by('created')[0].id
-        super(Post, self).delete(*args, **kwargs)
+        last_posts = list(self.topic.posts.order_by('-created')[:2])
+        last_post_id = self.topic.get_last_post().id
 
         if self_id == head_post_id:
             self.topic.delete()
+        elif self_id == last_post_id:
+            self.topic.last_post = last_posts[-1]
+            self.topic.save()
+            self.topic.forum.last_post = self.topic.last_post
+            self.topic.forum.save()
+            super(Post, self).delete(*args, **kwargs)
+            self.topic.forum.last_post = self.topic.forum.get_last_post()
         else:
-            self.topic.last_post = self.topic.get_last_post()
+            super(Post, self).delete(*args, **kwargs)
             self.topic.update_post_count()
 
-        self.topic.forum.last_post = self.topic.forum.get_last_post()
         self.topic.forum.update_post_count()
 
 
@@ -317,7 +324,7 @@ class ReadTracking(models.Model):
     """
 
     user = models.OneToOneField(User)
-    topics = JSONField(null=True)
+    topics = JSONField(null=True, blank=True)
     last_read = models.DateTimeField(null=True)
 
     class Meta:
