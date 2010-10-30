@@ -1,0 +1,42 @@
+/* Forum styles */
+
+.category {
+    display: block;
+    width: 100%;
+    background: #e9e8e8;
+    padding: 5px;
+    margin: 3px;
+    clear: both;
+    border: 1px solid #CCC;
+}
+
+.category h1 {
+    font-size: 130%;
+    font-weight: normal;
+    padding: 3px;
+    margin: 3px;
+}
+
+.forum-row {
+    clear:both;
+}
+
+.forum-name, .forum-topic-count, .forum-post-count, .forum-last-post {
+    display: inline-block;
+    border: 1px solid #CCC;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+.forum-name {
+    width: 30%;
+}
+
+.forum-topic-count, .forum-post-count {
+    width: 10%;
+    text-align: center;
+}
+
+.forum-last-post {
+    width: 20%;
+}

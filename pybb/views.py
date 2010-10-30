@@ -1,33 +1,29 @@
 # coding: utf-8
 import math
-import re
-from datetime import datetime
 from markdown import Markdown
+
 try:
     import pytils
+
     pytils_enabled = True
 except ImportError:
     pytils_enabled = False
 
 from django.shortcuts import get_object_or_404, get_list_or_404
-from django.http import HttpResponseRedirect, HttpResponse,\
-                        HttpResponseNotFound, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.db import connection
-from django.utils.translation import ugettext_lazy as _
-
 
 from pybb.shortcuts import render_to, ajax, load_related
 from pybb.markups import mypostmarkup
 from pybb.util import quote_text, paginate,\
-                        set_language, urlize
-from pybb.models import Category, Forum, Topic, Post, Profile, \
-                        Attachment, MARKUP_CHOICES
-from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, \
-                        EditProfileForm, UserSearchForm
+    set_language, urlize
+from pybb.models import Category, Forum, Topic, Post,\
+    Attachment, MARKUP_CHOICES
+from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm,\
+    EditProfileForm, UserSearchForm
 from pybb.read_tracking import update_read_tracking
 
 
@@ -47,41 +43,27 @@ def load_users_for_last_post(objects):
         if object.last_post:
             object.last_post.user = users.get(object.last_post.user_id)
 
+@render_to('pybb/index.html')
+def index(request):
+    categories = Category.objects.all()
+    return {'categories': categories, }
 
-def index_ctx(request):
-    cats = Category.objects.all()
-    cats = dict((cat.pk, {'cat': cat, 'forums': []}) for cat in cats)
-    forums = list(Forum.objects.all())
-    load_last_post(forums)
-    load_users_for_last_post(forums)
-    for forum in forums:
-        forum.category = cats[forum.category_id]['cat']
-        cats[forum.category_id]['forums'].append(forum)
-    cats = sorted(cats.values(), key=lambda x: x['cat'].position)
-
-    return {'cats': cats,
-            }
-
-
-def show_category_ctx(request, category_id):
+@render_to('pybb/index.html')
+def show_category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
+    return {'categories': [category, ]}
 
-    return {'category': category,
-            }
-
-
-def show_forum_ctx(request, forum_id):
+@render_to('pybb/forum.html')
+def show_forum(request, forum_id):
     forum = get_object_or_404(Forum, pk=forum_id)
     topics = forum.topics.order_by('-sticky', '-updated').select_related()
-    load_last_post(topics)
-    load_users_for_last_post(topics)
     page, paginator = paginate(topics, request, settings.PYBB_FORUM_PAGE_SIZE)
-
     return {'forum': forum,
             'page': page,
-            }
+    }
 
-def show_topic_ctx(request, topic_id):
+@render_to('pybb/topic.html')
+def show_topic(request, topic_id):
     try:
         topic = Topic.objects.select_related().get(pk=topic_id)
     except Topic.DoesNotExist:
@@ -92,7 +74,7 @@ def show_topic_ctx(request, topic_id):
 
     if request.user.is_authenticated():
         update_read_tracking(topic, request.user)
-	
+
     if settings.PYBB_FREEZE_FIRST_POST:
         first_post = topic.head
     else:
@@ -113,7 +95,7 @@ def show_topic_ctx(request, topic_id):
                                total_count=topic.post_count)
 
     users = User.objects.filter(pk__in=
-        set(x.user_id for x in page.object_list)).select_related("pybb_profile")
+                                set(x.user_id for x in page.object_list)).select_related("pybb_profile")
     users = dict((user.pk, user) for user in users)
 
     for post in page.object_list:
@@ -129,11 +111,12 @@ def show_topic_ctx(request, topic_id):
             'subscribed': subscribed,
             'posts': page.object_list,
             'page': page,
-            }
+    }
 
 
 @login_required
-def add_post_ctx(request, forum_id, topic_id):
+@render_to('pybb/add_post.html')
+def add_post(request, forum_id, topic_id):
     forum = None
     topic = None
 
@@ -164,32 +147,33 @@ def add_post_ctx(request, forum_id, topic_id):
         form = AddPostForm(**form_kwargs)
 
     if form.is_valid():
-        post = form.save();
+        post = form.save()
         return HttpResponseRedirect(post.get_absolute_url())
 
     return {'form': form,
             'topic': topic,
             'forum': forum,
-            }
+    }
 
+render_to('pybb/user.html')
 
-def user_ctx(request, username):
-    user = get_object_or_404(User, username=username)
+def user(request, username):
+    profile = get_object_or_404(User, username=username)
     topic_count = Topic.objects.filter(user=user).count()
 
-    return {'profile': user,
+    return {'profile': profile,
             'topic_count': topic_count,
-            }
+    }
 
-
-def user_topics_ctx(request, username):
-    user = get_object_or_404(User, username=username)
+@render_to('pybb/user_topics.html')
+def user_topics(request, username):
+    profile = get_object_or_404(User, username=username)
     topics = Topic.objects.filter(user=user).order_by('-created')
     page, paginator = paginate(topics, request, settings.PYBB_TOPIC_PAGE_SIZE)
 
-    return {'profile': user,
+    return {'profile': profile,
             'page': page,
-            }
+    }
 
 
 def show_post(request, post_id):
@@ -201,8 +185,8 @@ def show_post(request, post_id):
 
 
 @login_required
-def edit_profile_ctx(request):
-
+@render_to('pybb/edit_profile.html')
+def edit_profile(request):
     form_kwargs = dict(instance=request.user.pybb_profile)
     if request.method == 'POST':
         form = EditProfileForm(request.POST, request.FILES, **form_kwargs)
@@ -216,16 +200,17 @@ def edit_profile_ctx(request):
 
     return {'form': form,
             'profile': request.user.pybb_profile,
-            }
+    }
 
 
 @login_required
-def edit_post_ctx(request, post_id):
+@render_to('pybb/edit_post.html')
+def edit_post(request, post_id):
     from pybb.templatetags.pybb_tags import pybb_editable_by
 
     post = get_object_or_404(Post, pk=post_id)
 
-    if not pybb_editable_by(post, request.user) \
+    if not pybb_editable_by(post, request.user)\
     or request.user.pybb_profile.is_banned():
         return HttpResponseRedirect(post.get_absolute_url())
 
@@ -248,7 +233,7 @@ def edit_post_ctx(request, post_id):
 
     return {'form': form,
             'post': post,
-            }
+    }
 
 
 @login_required
@@ -276,14 +261,15 @@ def unstick_topic(request, topic_id):
 
 
 @login_required
-def delete_post_ctx(request, post_id):
+@render_to('pybb/delete_post.html')
+def delete_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     last_post = post.topic.posts.order_by('-created')[0]
 
     allowed = False
     if request.user.is_superuser or\
-        request.user in post.topic.forum.moderators.all() or \
-        (post.user == request.user and post == last_post):
+       request.user in post.topic.forum.moderators.all() or\
+       (post.user == request.user and post == last_post):
         allowed = True
 
     if not allowed:
@@ -302,7 +288,7 @@ def delete_post_ctx(request, post_id):
             return HttpResponseRedirect(topic.get_absolute_url())
     else:
         return {'post': post,
-                }
+        }
 
 
 @login_required
@@ -317,7 +303,6 @@ def close_topic(request, topic_id):
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
-
 @login_required
 def open_topic(request, topic_id):
     from pybb.templatetags.pybb_tags import pybb_moderated_by
@@ -330,9 +315,9 @@ def open_topic(request, topic_id):
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
-
 @login_required
-def merge_topics_ctx(request):
+@render_to('pybb/merge_topics.html')
+def merge_topics(request):
     from pybb.templatetags.pybb_tags import pybb_moderated_by
 
     topics_ids = request.GET.getlist('topic')
@@ -340,7 +325,7 @@ def merge_topics_ctx(request):
 
     for topic in topics:
         if not pybb_moderated_by(topic, request.user):
-            # TODO: show error message: no permitions for edit this topic
+        # TODO: show error message: no permitions for edit this topic
             return HttpResponseRedirect(topic.get_absolute_url())
 
     if len(topics) < 2:
@@ -373,19 +358,19 @@ def merge_topics_ctx(request):
     return {'posts': posts,
             'topics': topics,
             'topic': topics[0],
-            }
+    }
 
+render_to('pybb/users.html')
 
-def users_ctx(request):
-    users = User.objects.order_by('username')
+def users(request):
     form = UserSearchForm(request.GET)
-    users = form.filter(users)
+    all_users = form.filter(User.objects.order_by('username'))
 
-    page, paginator = paginate(users, request, settings.PYBB_USERS_PAGE_SIZE)
+    page, paginator = paginate(all_users, request, settings.PYBB_USERS_PAGE_SIZE)
 
     return {'page': page,
             'form': form,
-            }
+    }
 
 
 @login_required
@@ -431,22 +416,13 @@ def post_ajax_preview(request):
     elif markup == 'markdown':
         instance = Markdown(safe_mode='escape')
         html = unicode(instance.convert(content))
-
+    else:
+        return Http404
     html = urlize(html)
 
     return {'content': html,
-            }
+    }
 
 
-users = render_to('pybb/users.html')(users_ctx)
-merge_topics = render_to('pybb/merge_topics.html')(merge_topics_ctx)
-delete_post = render_to('pybb/delete_post.html')(delete_post_ctx)
-edit_post = render_to('pybb/edit_post.html')(edit_post_ctx)
-edit_profile = render_to('pybb/edit_profile.html')(edit_profile_ctx)
-user_topics = render_to('pybb/user_topics.html')(user_topics_ctx)
-user = render_to('pybb/user.html')(user_ctx)
-add_post = render_to('pybb/add_post.html')(add_post_ctx)
-show_topic = render_to('pybb/topic.html')(show_topic_ctx)
-show_forum = render_to('pybb/forum.html')(show_forum_ctx)
-index = render_to('pybb/index.html')(index_ctx)
-show_category = render_to('pybb/category.html')(show_category_ctx)
+
+

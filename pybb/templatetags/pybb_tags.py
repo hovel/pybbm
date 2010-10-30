@@ -13,7 +13,6 @@ from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 from django.template import RequestContext, TextNode
 from django.utils.encoding import smart_unicode
-from django.db import settings
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
@@ -152,18 +151,17 @@ def pybb_equal_to(obj1, obj2):
 
     return obj1 == obj2
 
-
+PYBB_TOPIC_PAGE_SIZE = settings.PYBB_TOPIC_PAGE_SIZE
 @register.inclusion_tag('pybb/topic_mini_pagination.html')
 def pybb_topic_mini_pagination(topic):
     """
     Display links on topic pages.
     """
-
-    is_paginated = topic.post_count > settings.PYBB_TOPIC_PAGE_SIZE
+    is_paginated = topic.post_count > PYBB_TOPIC_PAGE_SIZE
     if not is_paginated:
         pagination = None
     else:
-        page_size = settings.PYBB_TOPIC_PAGE_SIZE
+        page_size = PYBB_TOPIC_PAGE_SIZE
         template =  u'<a href="%s?page=%%(p)s">%%(p)s</a>' % topic.get_absolute_url()
         page_count =  ((topic.post_count - 1) / page_size ) + 1
         if page_count > 4:

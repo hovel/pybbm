@@ -1,5 +1,7 @@
-django
-beautifulsoup
+Django
 markdown
+South
+django-common
+BeatifulSoup
 pytils
-south
+django-annoying

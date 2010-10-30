@@ -1,5 +1,14 @@
 Dependencies:
- * http://code.pybb.org/wiki/PybbDependencies
+-------------
+Django
+markdown
+South
+django-common
+BeatifulSoup
+pytils
+django-annoying
+
+
 
 Installation:
  * http://code.pybb.org/wiki/InstallFromScratch

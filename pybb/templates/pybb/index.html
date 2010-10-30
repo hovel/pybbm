@@ -1,29 +1,8 @@
 {% extends 'pybb/base.html' %}
-{% load pybb_tags i18n %}
+{% load i18n %}
 
-{% block pybb_content %}
-<div class="splitted">
-    <div class="left">
-        <ul class="tablist">
-        {% for iter in cats %}
-            <li class="tablist-row category corners">
-                <h3 class="header">{% pybb_link iter.cat %}</h3>
-                <ul class="tablist-inner">
-                    {% for forum in iter.forums %}
-                    <li class="tablist-inner-row forum">
-                    {% include 'pybb/forum_row.html' %}
-                    </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-        </ul>
-    </div>
-
-    <div class="right">
-        {% pybb_load_last_topics as last_topics with limit=10 %}
-        {% include "pybb/last_topics.html" %}
-    </div>
-    <div class="clear"></div>
-</div>
-{% endblock %}
+{% block content %}
+    {% for category in categories %}
+        {% include 'pybb/category.html' %}
+    {% endfor %}
+{% endblock content %}

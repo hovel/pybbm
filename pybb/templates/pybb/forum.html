@@ -1,40 +1,44 @@
 {% extends 'pybb/base.html' %}
-{% load pybb_tags %}
-{% load i18n %}
+{% load pybb_tags i18n %}
 
 {% block title %}
 {{ forum }}
-{% endblock %}
+{% endblock title %}
 
 
-{% block pybb_content %}
-<div class="crumbs">
-    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
-</div>
-<div class="splitted">
-    <div class="left">
-        <ul class="tablist">
-            <li class="tablist-row last">
-                <h3 class="header">{{ forum }}</h3>
-                <ul class="tablist-inner topic">
-
-                {% for topic in page.object_list %}
-                <li class="tablist-inner-row topic {% if topic.sticky %}sticky{% endif %}">
-                {% if topic|pybb_topic_unread:user %}<span class="unread"></span>{% endif %}
-                {% if topic.closed %}{% trans "Closed" %}:{% endif %}
-                {% if topic.sticky %}{% trans "Important" %}:{% endif %}
-                <span class="title">{% pybb_link topic %}</span>
-                <span class="post_count">{{ topic.post_count }}</span>
-                <span class="updated">{% pybb_time topic.updated %}</span>
-                {% pybb_topic_mini_pagination topic %}
-                </li>
-                {% endfor %}
-
-                </ul>
-            </li>
-        </ul>
+{% block content %}
+    <div class="crumbs">
+        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
+    </div>
+    <h1>{{ forum.name }}</h1>
+    <div id='topic-list'>
+        {% for topic in forum.topics.all  %}
+            <div class="topic-row">
+                <div class="topic-name">
+                    <a href='{{ topic.get_absolute_url }}'
+                       class='
+                        {% if topic.sticky %} sticky {% endif %}
+                        {% if topic|pybb_topic_unread:user %} unread {% endif %}'
+                     >
+                      {{ topic.name }}
+                      {% if topic.closed %} [{% trans "Closed" %}] {% endif %}</a>
+                    {% pybb_topic_mini_pagination topic %}
+                </div>
+                <div class="topic-post-count">
+                    {{ topic.post_count }}
+                </div>
+                <div class="topic-view-count">
+                    {{ forum.views }}
+                </div>
+                <div class="topic-last-post">
+                    {% if topic.updated %}
+                        {{ topic.updated|date:"d.m.Y H.i" }}
+                    {% endif %}
+                </div>
+            </div>
+        {%  endfor %}
         {% with _('Topics') as label %}
-        {% include "pybb/pagination.html" %}
+            {% include "pybb/pagination.html" %}
         {% endwith %}
 
         {% if not user.pybb_profile.is_banned %}
@@ -43,10 +47,4 @@
             </div>
         {% endif %}
     </div>
-    <div class="right">
-        {% pybb_load_last_topics as last_topics with limit=10,forum=forum.pk,order_by="updated" %}
-        {% include "pybb/last_topics.html" %}
-    </div>
-    <div class="clear"></div>
-</div>
-{% endblock %}
+{% endblock content %}
