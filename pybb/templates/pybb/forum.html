@@ -11,7 +11,7 @@
         <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
     </div>
     <h1>{{ forum.name }}</h1>
-    <div id='topic-list'>
+    <div class='topic-list'>
         {% for topic in forum.topics.all  %}
             <div class="topic-row">
                 <div class="topic-name">

@@ -65,50 +65,36 @@ def show_forum(request, forum_id):
 @render_to('pybb/topic.html')
 def show_topic(request, topic_id):
     try:
-        topic = Topic.objects.select_related().get(pk=topic_id)
+        topic = Topic.objects.select_related('forum').get(pk=topic_id)
     except Topic.DoesNotExist:
         raise Http404()
 
     topic.views += 1
     topic.save()
 
+    form = False
     if request.user.is_authenticated():
         update_read_tracking(topic, request.user)
+        user.is_moderator = request.user in topic.forum.moderators.all()
+        user.is_subscribed = request.user in topic.subscribers.all()
+        form = AddPostForm(topic=topic)
 
     if settings.PYBB_FREEZE_FIRST_POST:
         first_post = topic.head
     else:
         first_post = None
 
-    form = AddPostForm(topic=topic)
-
-    moderator = (request.user.is_superuser or
-                 request.user in topic.forum.moderators.all())
-    subscribed = (request.user.is_authenticated() and
-                  request.user in topic.subscribers.all())
-
-    posts = topic.posts.all()
-
+    posts = topic.posts.all().select_related('user', 'user__pybb_profile')
     # TODO: Here could be gotcha
     # If topic.post_count is broken then strange effect could be possible!
     page, paginator = paginate(posts, request, settings.PYBB_TOPIC_PAGE_SIZE,
                                total_count=topic.post_count)
 
-    users = User.objects.filter(pk__in=
-                                set(x.user_id for x in page.object_list)).select_related("pybb_profile")
-    users = dict((user.pk, user) for user in users)
-
-    for post in page.object_list:
-        post.user = users.get(post.user_id)
-
     load_related(page.object_list, Attachment.objects.all(), 'post')
 
     return {'topic': topic,
-            'last_post': topic.last_post,
             'first_post': first_post,
             'form': form,
-            'moderator': moderator,
-            'subscribed': subscribed,
             'posts': page.object_list,
             'page': page,
     }

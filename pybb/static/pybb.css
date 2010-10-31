@@ -1,29 +1,33 @@
 /* Forum styles */
 
-.category {
+.controls {
+    padding: 10px 0 10px 0;
+}
+
+.category, .topic-list {
     display: block;
     width: 100%;
-    background: #e9e8e8;
+    background: #E1EBF2;
     padding: 5px;
     margin: 3px;
     clear: both;
-    border: 1px solid #CCC;
+    border: 1px solid #ffffff;
 }
 
-.category h1 {
-    font-size: 130%;
-    font-weight: normal;
-    padding: 3px;
-    margin: 3px;
-}
+/*.category h1, .topic-list h1 {*/
+    /*font-size: 130%;*/
+    /*font-weight: normal;*/
+    /*padding: 3px;*/
+    /*margin: 3px;*/
+/*}*/
 
-.forum-row {
+.forum-row, topic-row {
     clear:both;
 }
 
 .forum-name, .forum-topic-count, .forum-post-count, .forum-last-post {
     display: inline-block;
-    border: 1px solid #CCC;
+    border: 1px solid #FFF;
     border-collapse: collapse;
     padding: 5px;
 }
@@ -39,4 +43,53 @@
 
 .forum-last-post {
     width: 20%;
+}
+
+.topic-name, .topic-post-count, .topic-view-count, .topic-last-post {
+    display: inline-block;
+    border: 1px solid #FFF;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+.topic-name {
+    width: 30%;
+}
+
+.topic-post-count, .topic-view-count {
+    width: 10%;
+    text-align: center;
+}
+
+.topic-last-post {
+    width: 20%;
+}
+
+.posts {
+    list-style-type: none;
+}
+
+.post {
+    float: right;
+    width: 100%;
+    margin: 3px;
+    background-color: #E1EBF2;
+    clear: both;
+}
+
+.post .info {
+    float: left;
+    width: 200px;
+    display: block;
+    border-right: 1px solid #ffffff;
+    padding: 5px;
+}
+
+.post .content {
+    display: block;
+    padding: 5px;
+}
+
+.pagination {
+    font-size: 80%;
 }

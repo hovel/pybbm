@@ -4,17 +4,6 @@
 
 {% block pybb_title %}{{ topic }}{% endblock %}
 
-{% block pybb_head_extra %}
-    <script type="text/javascript" src="{{ PYBB_MEDIA_URL }}/js/pybbjs.js"></script>
-    {% include "pybb/markitup_resources.html" %}
-    <script type="text/javascript">
-    $(function() {
-        $("textarea").markItUp(mySettings);
-    });
-    </script>
-{% endblock %}
-
-
 {% block pybb_content %}
 <div class="crumbs">
     <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
@@ -41,7 +30,7 @@
 
 {% if user.is_authenticated %}
 <div class="controls">
-{% if moderator %}
+{% if user.is_moderator %}
     {% if topic.sticky %}
     <a href="{% url pybb_unstick_topic topic.id %}">{% trans "Unstick topic" %}</a> /
     {% else %}
@@ -57,7 +46,7 @@
     <a href="{% url pybb_merge_topics %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
 {% endif %}
 
-    {% if subscribed %}
+    {% if user.is_subscribed %}
     <a href="{% url pybb_delete_subscription topic.id %}?from_topic">{% trans "Unsubscribe" %}</a>
     {% else %}
     <a href="{% url pybb_add_subscription topic.id %}">{% trans "Subscribe" %}</a>
