@@ -82,10 +82,11 @@
     width: 200px;
     display: block;
     border-right: 1px solid #ffffff;
-    padding: 5px;
+    padding: 10px;
 }
 
 .post .content {
+    margin-left: 230px;
     display: block;
     padding: 5px;
 }

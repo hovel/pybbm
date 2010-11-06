@@ -2,17 +2,7 @@
 {% load pybb_tags %}
 {% load i18n %}
 
-{% block pybb_head_extra %}
-    <script type="text/javascript" src="{{ PYBB_MEDIA_URL }}js/pybbjs.js"></script>
-    {% include "pybb/markitup_resources.html" %}
-    <script type="text/javascript">
-    $(function() {
-        $("textarea").markItUp(mySettings);
-    });
-    </script>
-{% endblock %}
-
-{% block pybb_content %}
+{% block content %}
 {% if user.pybb_profile.is_banned %}
     {% trans 'You banned' %}
 {% else %}
@@ -29,4 +19,4 @@
     {% include "pybb/add_post_form.html" %}
 {% endif %}
 
-{% endblock %}
+{% endblock content %}

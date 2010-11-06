@@ -1,44 +1,12 @@
-from datetime import datetime
-import os.path
-import random
-from BeautifulSoup import BeautifulSoup
-import traceback
 try:
-	from hashlib import md5
+    from hashlib import md5
 except ImportError:
-	from md5 import md5
+    from md5 import md5
 import urllib
 
-from django.utils.translation import check_for_language
-from django import forms
-from django.template.defaultfilters import urlize as django_urlize
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.conf import settings
 from django.contrib.sites.models import Site
-
-
-def urlize(data):
-    """
-    Urlize plain text links in the HTML contents.
-
-    Do not urlize content of A and CODE tags.
-    """
-
-    soup = BeautifulSoup(data)
-    for chunk in soup.findAll(text=True):
-        islink = False
-        ptr = chunk.parent
-        while ptr.parent:
-            if ptr.name == 'a' or ptr.name == 'code':
-                islink = True
-                break
-            ptr = ptr.parent
-
-        if not islink:
-            chunk = chunk.replaceWith(django_urlize(unicode(chunk)))
-
-    return unicode(soup)
-
 
 def quote_text(text, markup, username=""):
     """
@@ -49,10 +17,10 @@ def quote_text(text, markup, username=""):
         return '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
 
     elif markup == 'bbcode':
-        if username is not "":
-            username = '="%s"' % username
-        return '[quote%s]%s[/quote]\n' % (username, text)
-
+        if username:
+            return '[quote="%s"]%s[/quote]\n' % (username, text)
+        else:
+            return '[quote]%s[/quote]\n' % (text)
     else:
         return text
 
@@ -111,29 +79,11 @@ def paginate(items, request, per_page, total_count=None):
     return page, paginator
 
 
-def set_language(request, language):
-    """
-    Change the language of session of authenticated user.
-    """
-
-    if language and check_for_language(language):
-        if hasattr(request, 'session'):
-            request.session['django_language'] = language
-        else:
-            response.set_cookie(settings.LANGUAGE_COOKIE_NAME, language)
-
-
 def unescape(text):
     """
     Do reverse escaping.
     """
-
-    text = text.replace('&amp;', '&')
-    text = text.replace('&lt;', '<')
-    text = text.replace('&gt;', '>')
-    text = text.replace('&quot;', '"')
-    text = text.replace('&#39;', '\'')
-    return text
+    return text.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', '\'')
 
 
 def gravatar_url(email):

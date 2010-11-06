@@ -15,8 +15,6 @@ Unsubscribe %(unsubscribe_url)s""")
 
 
 def notify_topic_subscribers(post):
-    from pybb.models import Post
-
     topic = post.topic
     if post != topic.head:
         for user in topic.subscribers.all():

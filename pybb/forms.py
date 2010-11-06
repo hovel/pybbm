@@ -41,7 +41,7 @@ class AddPostForm(forms.ModelForm):
                 raise forms.ValidationError(_('Attachment is too big'))
         return self.cleaned_data['attachment']
 
-    def save(self):
+    def save(self, *args, **kwargs):
 
         if self.forum:
             topic = Topic(forum=self.forum,
@@ -115,8 +115,8 @@ class EditPostForm(forms.ModelForm):
         model = Post
         fields = ['body']
 
-    def save(self):
-        post = super(EditPostForm, self).save(commit=False)
+    def save(self, *args, **kwargs):
+        post = super(EditPostForm, self).save(commit=False, *args, **kwargs)
         post.updated = datetime.now()
         post.save()
         return post

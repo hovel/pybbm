@@ -2,30 +2,21 @@
 import math
 from markdown import Markdown
 
-try:
-    import pytils
-
-    pytils_enabled = True
-except ImportError:
-    pytils_enabled = False
-
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.html import urlize
 
-from pybb.shortcuts import render_to, ajax, load_related
 from pybb.markups import mypostmarkup
-from pybb.util import quote_text, paginate,\
-    set_language, urlize
-from pybb.models import Category, Forum, Topic, Post,\
-    Attachment, MARKUP_CHOICES
-from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm,\
-    EditProfileForm, UserSearchForm
+from pybb.util import quote_text, paginate
+from pybb.models import Category, Forum, Topic, Post, Attachment, MARKUP_CHOICES
+from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, EditProfileForm, UserSearchForm
 from pybb.read_tracking import update_read_tracking
 
+from annoying.decorators import render_to, ajax_request
 
 def load_last_post(objects):
     """Load post for forums or topics, make __in query"""
@@ -89,8 +80,6 @@ def show_topic(request, topic_id):
     # If topic.post_count is broken then strange effect could be possible!
     page, paginator = paginate(posts, request, settings.PYBB_TOPIC_PAGE_SIZE,
                                total_count=topic.post_count)
-
-    load_related(page.object_list, Attachment.objects.all(), 'post')
 
     return {'topic': topic,
             'first_post': first_post,
@@ -181,7 +170,7 @@ def edit_profile(request):
 
     if form.is_valid():
         profile = form.save()
-        set_language(request, profile.language)
+        profile.save()
         return HttpResponseRedirect(reverse('pybb_edit_profile'))
 
     return {'form': form,
@@ -385,7 +374,7 @@ def show_attachment(request, hash):
 
 
 @login_required
-@ajax
+@ajax_request
 def post_ajax_preview(request):
     content = request.POST.get('content')
     markup = request.POST.get('markup')

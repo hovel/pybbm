@@ -1,3 +1,5 @@
+from datetime import datetime
+
 def update_read_tracking(topic, user):
     tracking = user.readtracking
 

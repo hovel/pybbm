@@ -7,16 +7,21 @@ except ImportError:
     from sha import sha as sha1
 
 from django.db import models
-from django.db.models import F, Sum
+from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils.html import urlize
 
-from pybb.shortcuts import JSONField
-from pybb.markups import mypostmarkup
-from pybb.util import urlize, unescape
+from annoying.fields import JSONField, AutoOneToOneField
+from bbmarkup import bbcode
+from pybb.util import unescape
+
+from south.modelsinspector import add_introspection_rules
+add_introspection_rules([], ["^annoying\.fields\.JSONField"])
+add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
 
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
@@ -39,7 +44,7 @@ class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
 
-    class Meta:
+    class Meta(object):
         ordering = ['position']
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
@@ -62,7 +67,6 @@ class Category(models.Model):
         return Post.objects.filter(topic__forum__category=self).select_related()
 
 
-import logging
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
     name = models.CharField(_('Name'), max_length=80)
@@ -74,7 +78,7 @@ class Forum(models.Model):
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
     last_post = models.ForeignKey("Post", related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True, null=True)
 
-    class Meta:
+    class Meta(object):
         ordering = ['position']
         verbose_name = _('Forum')
         verbose_name_plural = _('Forums')
@@ -114,7 +118,7 @@ class Topic(models.Model):
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     last_post = models.ForeignKey("Post", related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True, null=True)
 
-    class Meta:
+    class Meta(object):
         ordering = ['-created']
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
@@ -149,12 +153,16 @@ class RenderableItem(models.Model):
     Base class for models that has markup, body, body_text and body_html fields.
     """
 
-    class Meta:
+    class Meta(object):
         abstract = True
 
+    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    body = models.TextField(_('Message'))
+    body_html = models.TextField(_('HTML version'))
+    body_text = models.TextField(_('Text version'))
     def render(self):
         if self.markup == 'bbcode':
-            self.body_html = mypostmarkup.markup(self.body, auto_urls=False)
+            self.body_html = bbcode(self.body)
         elif self.markup == 'markdown':
             instance = Markdown(safe_mode='escape')
             self.body_html = unicode(instance.convert(self.body))
@@ -175,13 +183,9 @@ class Post(RenderableItem):
     user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
-    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
-    body = models.TextField(_('Message'))
-    body_html = models.TextField(_('HTML version'))
-    body_text = models.TextField(_('Text version'))
     user_ip = models.IPAddressField(_('User IP'), blank=True, default='0.0.0.0')
 
-    class Meta:
+    class Meta(object):
         ordering = ['created']
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
@@ -243,7 +247,7 @@ BAN_STATUS = (
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
+    user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
     signature = models.TextField(_('Signature'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
     signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH + 30)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
@@ -255,12 +259,12 @@ class Profile(models.Model):
     ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
 
     def save(self, *args, **kwargs):
-        self.signature_html = mypostmarkup.markup(self.signature, auto_urls=False)
+        self.signature_html = bbcode(self.signature)
         super(Profile, self).save(*args, **kwargs)
 
     def is_banned(self):
@@ -310,7 +314,7 @@ class Attachment(models.Model):
         return os.path.join(settings.MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO,
                             self.path)
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Attachment')
         verbose_name_plural = _('Attachments')
 
@@ -327,7 +331,7 @@ class ReadTracking(models.Model):
     topics = JSONField(null=True, blank=True)
     last_read = models.DateTimeField(null=True)
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Read tracking')
         verbose_name_plural = _('Read tracking')
 
