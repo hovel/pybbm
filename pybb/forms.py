@@ -3,9 +3,8 @@ from datetime import datetime
 import os.path
 
 from django import forms
-from django.conf import settings
+import settings
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 
 from pybb.models import Topic, Post, Profile, Attachment
 
@@ -14,7 +13,7 @@ class AddPostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
     attachment = forms.FileField(label=_('Attachment'), required=False)
 
-    class Meta:
+    class Meta(object):
         model = Post
         fields = ('body',)
 

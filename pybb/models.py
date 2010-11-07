@@ -1,6 +1,7 @@
 from datetime import datetime
 from markdown import Markdown
 import os.path
+
 try:
     from hashlib import sha1
 except ImportError:
@@ -12,32 +13,40 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from django.utils.html import urlize
 
 from annoying.fields import JSONField, AutoOneToOneField
 from bbmarkup import bbcode
 from pybb.util import unescape
 
+import settings
+
+from annoying.functions import get_config
+
+# None is safe as default since django settings always have LANGUAGES, MEDIA_ROOT and SECRET_KEY variable set
+LANGUAGES = get_config('LANGUAGES', None)
+MEDIA_ROOT = get_config('MEDIA_ROOT', None)
+SECRET_KEY = get_config('SECRET_KEY', None)
+
 from south.modelsinspector import add_introspection_rules
+
 add_introspection_rules([], ["^annoying\.fields\.JSONField"])
 add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
 
-
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
-    (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
-    (-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
-    (-5, '-05 EST'), (-4, '-04 AST'), (-3.5, '-03.5'), (-3, '-03 ADT'),
-    (-2, '-02'), (-1, '-01'), (0, '00 GMT'), (1, '+01 CET'), (2, '+02'),
-    (3, '+03'), (3.5, '+03.5'), (4, '+04'), (4.5, '+04.5'), (5, '+05'),
-    (5.5, '+05.5'), (6, '+06'), (6.5, '+06.5'), (7, '+07'), (8, '+08'),
-    (9, '+09'), (9.5, '+09.5'), (10, '+10'), (10.5, '+10.5'), (11, '+11'),
-    (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
+(-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
+(-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
+(-5, '-05 EST'), (-4, '-04 AST'), (-3.5, '-03.5'), (-3, '-03 ADT'),
+(-2, '-02'), (-1, '-01'), (0, '00 GMT'), (1, '+01 CET'), (2, '+02'),
+(3, '+03'), (3.5, '+03.5'), (4, '+04'), (4.5, '+04.5'), (5, '+05'),
+(5.5, '+05.5'), (6, '+06'), (6.5, '+06.5'), (7, '+07'), (8, '+08'),
+(9, '+09'), (9.5, '+09.5'), (10, '+10'), (10.5, '+10.5'), (11, '+11'),
+(11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
 )]
 
 MARKUP_CHOICES = (
-    ('bbcode', 'bbcode'),
-    ('markdown', 'markdown'),
+('bbcode', 'bbcode'),
+('markdown', 'markdown'),
 )
 
 class Category(models.Model):
@@ -76,7 +85,8 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-    last_post = models.ForeignKey("Post", related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True, null=True)
+    last_post = models.ForeignKey("Post", related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True,
+                                  null=True)
 
     class Meta(object):
         ordering = ['position']
@@ -88,7 +98,7 @@ class Forum(models.Model):
 
     def update_post_count(self):
         self.post_count = Topic.objects.filter(forum=self).aggregate(
-                                Sum("post_count"))['post_count__sum'] or 0
+                Sum("post_count"))['post_count__sum'] or 0
         self.save()
 
     def get_absolute_url(self):
@@ -116,7 +126,8 @@ class Topic(models.Model):
     closed = models.BooleanField(_('Closed'), blank=True, default=False)
     subscribers = models.ManyToManyField(User, related_name='subscriptions', verbose_name=_('Subscribers'), blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    last_post = models.ForeignKey("Post", related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True, null=True)
+    last_post = models.ForeignKey("Post", related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True,
+                                  null=True)
 
     class Meta(object):
         ordering = ['-created']
@@ -160,6 +171,7 @@ class RenderableItem(models.Model):
     body = models.TextField(_('Message'))
     body_html = models.TextField(_('HTML version'))
     body_text = models.TextField(_('Text version'))
+
     def render(self):
         if self.markup == 'bbcode':
             self.body_html = bbcode(self.body)
@@ -245,16 +257,17 @@ BAN_STATUS = (
 (1, _('Caution')),
 (2, _('Ban')))
 
-
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
     signature = models.TextField(_('Signature'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
-    signature_html = models.TextField(_('Signature HTML Version'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH + 30)
+    signature_html = models.TextField(_('Signature HTML Version'), blank=True,
+                                      max_length=settings.PYBB_SIGNATURE_MAX_LENGTH + 30)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
-                                choices=settings.LANGUAGES)
+                                choices=LANGUAGES)
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
-    markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP,
+                              choices=MARKUP_CHOICES)
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
     ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
@@ -292,7 +305,7 @@ class Attachment(models.Model):
     def save(self, *args, **kwargs):
         super(Attachment, self).save(*args, **kwargs)
         if not self.hash:
-            self.hash = sha1(str(self.id) + settings.SECRET_KEY).hexdigest()
+            self.hash = sha1(str(self.id) + SECRET_KEY).hexdigest()
         super(Attachment, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -311,7 +324,7 @@ class Attachment(models.Model):
             return '%.2fMb' % (size / float(1024 * 1024))
 
     def get_absolute_path(self):
-        return os.path.join(settings.MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO,
+        return os.path.join(MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO,
                             self.path)
 
     class Meta(object):
@@ -345,4 +358,5 @@ class ReadTracking(models.Model):
 
 
 from pybb import signals
+
 signals.setup_signals()
