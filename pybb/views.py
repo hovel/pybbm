@@ -1,20 +1,18 @@
 # coding: utf-8
 import math
-from markdown import Markdown
 
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.html import urlize
 
-from pybb.markups import mypostmarkup
 from pybb.util import quote_text, paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment, MARKUP_CHOICES
 from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, EditProfileForm, UserSearchForm
 from pybb.read_tracking import update_read_tracking
+
+import settings
 
 from annoying.decorators import render_to, ajax_request
 
@@ -378,25 +376,12 @@ def show_attachment(request, hash):
 def post_ajax_preview(request):
     content = request.POST.get('content')
     markup = request.POST.get('markup')
-
-    print 'markup', markup
     if not markup in dict(MARKUP_CHOICES).keys():
         return {'error': 'Invalid markup'}
-
     if not content:
         return {'content': ''}
-
-    if markup == 'bbcode':
-        html = mypostmarkup.markup(content, auto_urls=False)
-    elif markup == 'markdown':
-        instance = Markdown(safe_mode='escape')
-        html = unicode(instance.convert(content))
-    else:
-        return Http404
-    html = urlize(html)
-
-    return {'content': html,
-    }
+    html = settings.PYBB_MARKUP_ENGINES[markup](content)
+    return {'content': html,}
 
 
 

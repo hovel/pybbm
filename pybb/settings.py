@@ -25,3 +25,12 @@ PYBB_ATTACHMENT_UPLOAD_TO = get_config('PYBB_ATTACHMENT_UPLOAD_TO', join('pybb_u
 
 
 PYBB_DEFAULT_AVATAR_URL = get_config('PYBB_DEFAULT_AVATAR_URL', get_config('MEDIA_URL', '/media/') + 'pybb/img/default_avatar.jpg')
+
+from bbmarkup import bbcode
+from markdown import Markdown
+from django.utils.html import urlize
+
+PYBB_MARKUP_ENGINES = get_config('PYBB_MARKUP_ENGINES', {
+    'bbcode': lambda str: urlize(bbcode(str)),
+    'markdown': lambda str: urlize(Markdown(safe_mode='escape').convert(str))
+})

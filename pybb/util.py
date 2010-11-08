@@ -5,8 +5,11 @@ except ImportError:
 import urllib
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
-from django.conf import settings
 from django.contrib.sites.models import Site
+from annoying.functions import get_config
+
+import settings
+MEDIA_URL = get_config('MEDIA_URL', None)
 
 def quote_text(text, markup, username=""):
     """
@@ -99,7 +102,7 @@ def gravatar_url(email):
     hostname = Site.objects.get_current().domain
     if not url.startswith('http://'):
         url = 'http://%s%s%s' % (hostname,
-                                 settings.MEDIA_URL,
+                                 MEDIA_URL,
                                  settings.PYBB_DEFAULT_AVATAR_URL)
     default = urllib.quote(url)
     url = 'http://www.gravatar.com/avatar/%s?s=%d&d=%s' % (hash, size, default)

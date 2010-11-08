@@ -2,8 +2,10 @@
 import re
 from datetime import datetime, timedelta
 import time as time
+
 try:
     import pytils
+
     pytils_enabled = True
 except ImportError:
     pytils_enabled = False
@@ -11,29 +13,34 @@ except ImportError:
 from django import template
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
-from django.template import RequestContext, TextNode
+from django.template import TextNode
 from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
-from django.conf import settings
-from django.contrib.auth.models import User
 from django.utils.translation import ungettext
 
-from pybb.models import Forum, Topic, Post
+from pybb.models import Topic
 from pybb.util import gravatar_url
+from annoying.functions import get_config
 
+import pybb.settings as settings
+
+MIDDLEWARE_CLASSES = get_config('MIDDLEWARE_CLASSES', None)
+LANGUAGE_CODE = get_config('LANGUAGE_CODE', None)
 
 register = template.Library()
 
+#noinspection PyUnusedLocal
 @register.tag
 def pybb_csrf(parser, token):
     """
     This tag returns CsrfTokenNode if CsrfViewMiddleware is enabled, or empty string if not
     """
 
-    if 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE_CLASSES:
-        from django.template.defaulttags import CsrfTokenNode 
+    if 'django.middleware.csrf.CsrfViewMiddleware' in MIDDLEWARE_CLASSES:
+        from django.template.defaulttags import CsrfTokenNode
+
         return CsrfTokenNode()
     else:
         return TextNode('')
@@ -45,6 +52,7 @@ def pybb_profile_link(user):
     return mark_safe(u'<a href="%s">%s</a>' % (url, user.username))
 
 
+#noinspection PyUnusedLocal
 @register.tag
 def pybb_time(parser, token):
     try:
@@ -57,6 +65,7 @@ def pybb_time(parser, token):
 
 class PybbTimeNode(template.Node):
     def __init__(self, time):
+    #noinspection PyRedeclaration
         self.time = template.Variable(time)
 
     def render(self, context):
@@ -105,7 +114,8 @@ def pybb_link(object, anchor=u''):
     Return A tag with link to object.
     """
 
-    url = hasattr(object,'get_absolute_url') and object.get_absolute_url() or None
+    url = hasattr(object, 'get_absolute_url') and object.get_absolute_url() or None
+    #noinspection PyRedeclaration
     anchor = anchor or smart_unicode(object)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
 
@@ -151,31 +161,31 @@ def pybb_equal_to(obj1, obj2):
 
     return obj1 == obj2
 
-PYBB_TOPIC_PAGE_SIZE = settings.PYBB_TOPIC_PAGE_SIZE
+
 @register.inclusion_tag('pybb/topic_mini_pagination.html')
 def pybb_topic_mini_pagination(topic):
     """
     Display links on topic pages.
     """
-    is_paginated = topic.post_count > PYBB_TOPIC_PAGE_SIZE
+    is_paginated = topic.post_count > settings.PYBB_TOPIC_PAGE_SIZE
     if not is_paginated:
         pagination = None
     else:
-        page_size = PYBB_TOPIC_PAGE_SIZE
-        template =  u'<a href="%s?page=%%(p)s">%%(p)s</a>' % topic.get_absolute_url()
-        page_count =  ((topic.post_count - 1) / page_size ) + 1
+        page_size = settings.PYBB_TOPIC_PAGE_SIZE
+        a_template = u'<a href="%s?page=%%(p)s">%%(p)s</a>' % topic.get_absolute_url()
+        page_count = ((topic.post_count - 1) / page_size ) + 1
         if page_count > 4:
             pages = [1, 2, page_count - 1, page_count]
-            links = [template % {'p': page} for page in pages]
+            links = [a_template % {'p': page} for page in pages]
             pagination = u"%s, %s ... %s, %s" % tuple(links)
         else:
-            pages = range(1,page_count+1)
-            links = [template % {'p': page} for page in pages]
+            pages = range(1, page_count + 1)
+            links = [a_template % {'p': page} for page in pages]
             pagination = u", ".join(links)
 
     return {'pagination': pagination,
             'is_paginated': is_paginated,
-            }
+    }
 
 
 @register.filter
@@ -183,6 +193,7 @@ def pybb_avatar_url(user):
     return gravatar_url(user.email)
 
 
+#noinspection PyUnusedLocal
 @register.tag(name='pybb_load_last_topics')
 def do_pybb_load_last_topics(parser, token):
     """
@@ -214,7 +225,7 @@ def do_pybb_load_last_topics(parser, token):
 
     limit = '10'
     category = '0'
-    order_by='"created"'
+    order_by = '"created"'
 
     if match.group(2):
         args = dict([x.strip().split('=') for x in match.group(2).split(',')])
@@ -244,47 +255,6 @@ class PybbLoadLastTopicsNode(template.Node):
             topics = topics.filter(forum__category__pk=category)
         context[self.name] = topics[:limit]
         return ''
-
-
-@register.tag(name='pybb_load_stats')
-def do_pybb_load_stats(parser, token):
-    """
-    Create new context variable stored the pybb statistics.
-
-    Keys of variable:
-        TODO: write keys
-    
-    """
-
-    try:
-        tag_name, arg = token.contents.split(None, 1)
-    except ValueError:
-        raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents.split()[0]
-
-    match = re.search(r'as\s+(\w+)', arg)
-    if not match:
-        raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name
-    name = match.group(1)
-
-    return PybbLoadStats(name)
-
-
-class PybbLoadStats(template.Node):
-    def __init__(self, name):
-        self.name = name
-
-    def render(self, context):
-        stats = {}
-        stats['user_count'] = User.objects.count()
-        stats['topic_count'] = Topic.objects.count()
-        stats['post_count'] = Post.objects.count()
-        try:
-            stats['last_user'] = User.objects.order_by('-date_joined')[0]
-        except IndexError:
-            stats['last_user'] = None
-        context[self.name] = stats
-        return ''
-
 
 @register.filter
 def pybb_topic_unread(topic, user):
@@ -324,7 +294,7 @@ def pybb_forum_unread(forum, user):
 
     if not track.last_read:
         return False
-    
+
     return track.last_read < forum.updated
 
 
@@ -346,7 +316,7 @@ def pybb_render_post(post, mode='html'):
     def render_autojoin_message(match):
         time_diff = int(match.group(1)) / 60
 
-        if settings.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
+        if LANGUAGE_CODE.startswith('ru') and pytils_enabled:
             minutes = pytils.numeral.choose_plural(time_diff,
                                                    (u'минуту', u'минуты', u'минут'))
             join_message = u'Добавлено через %s %s' % (time_diff, minutes)

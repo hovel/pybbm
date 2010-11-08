@@ -36,13 +36,8 @@ How to install PYBB?
   * Clone pybb repository from http://bitbucket.org/lorien/pybb and place it in your project
 
 * Put `pybb` into settings.INSTALLED_APPS
-* Run `python manage.py pybb_install` or do following steps manually:
-  * Find the static directory in the pybb source and copy or symlink static/pybb to %MEDIA_ROOT%/pybb
-  * Create %MEDIA_ROOT%/pybb/avatars directory and chmod it (if that required)
-
 * Put `include('pybb.urls'))` into main project urls.py file
-* Do `python manage.py syncdb`
-* And do not forget to install some authentication application like django-registration or django-account. See info in the bottom of README
+* Do `manage.py migrate` if you have South installed or 'manage.py syncdb'
 
 
 i18n support

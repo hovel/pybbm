@@ -1,5 +1,4 @@
 from datetime import datetime
-from markdown import Markdown
 import os.path
 
 try:
@@ -13,10 +12,8 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
-from django.utils.html import urlize
 
 from annoying.fields import JSONField, AutoOneToOneField
-from bbmarkup import bbcode
 from pybb.util import unescape
 
 import settings
@@ -44,10 +41,7 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
 )]
 
-MARKUP_CHOICES = (
-('bbcode', 'bbcode'),
-('markdown', 'markdown'),
-)
+MARKUP_CHOICES = [(i, i) for i in settings.PYBB_MARKUP_ENGINES.keys()]
 
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
@@ -173,22 +167,14 @@ class RenderableItem(models.Model):
     body_text = models.TextField(_('Text version'))
 
     def render(self):
-        if self.markup == 'bbcode':
-            self.body_html = bbcode(self.body)
-        elif self.markup == 'markdown':
-            instance = Markdown(safe_mode='escape')
-            self.body_html = unicode(instance.convert(self.body))
+        if self.markup in settings.PYBB_MARKUP_ENGINES:
+            self.body_html = settings.PYBB_MARKUP_ENGINES[self.markup](self.body)
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
-
         # Remove tags which was generated with the markup processor
         text = strip_tags(self.body_html)
-
         # Unescape entities which was generated with the markup processor
         self.body_text = unescape(text)
-
-        self.body_html = urlize(self.body_html)
-
 
 class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
@@ -277,7 +263,7 @@ class Profile(models.Model):
         verbose_name_plural = _('Profiles')
 
     def save(self, *args, **kwargs):
-        self.signature_html = bbcode(self.signature)
+        self.signature_html = settings.PYBB_MARKUP_ENGINES[self.markup](self.signature)
         super(Profile, self).save(*args, **kwargs)
 
     def is_banned(self):
