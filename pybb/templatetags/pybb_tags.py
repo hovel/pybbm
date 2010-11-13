@@ -121,13 +121,12 @@ def pybb_link(object, anchor=u''):
 
 
 @register.filter
-def pybb_moderated_by(topic, user):
+def pybb_topic_moderated_by(topic, user):
     """
     Check if user is moderator of topic's forum.
     """
 
-    return user.is_superuser or user in topic.forum.moderators.all()
-
+    return user.is_superuser or (user in topic.forum.moderators.all())
 
 @register.filter
 def pybb_editable_by(post, user):

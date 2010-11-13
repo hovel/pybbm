@@ -7,32 +7,32 @@
 {% endblock %}
 
 
-{% block pybb_content %}
-<h1>{{ profile.username }}</h1>
-<div class="userinfo">
-    <div class="avatar">
-        <img src="{{ profile|pybb_avatar_url }}" alt="" />
-    </div>
-    <div class="info">
-        {% if profile.pybb_profile.ban_status %}
-            <div{% ifequal profile.pybb_profile.ban_status 2 %}
-            title="{% trans 'Expire' %} {{ profile.pybb_profile.ban_till }}"{% endifequal %}
-            class="banned">
-                {{ profile.pybb_profile.get_ban_status_display }}
-            </div>
-        {% endif %}
+{% block content %}
+    <h1>{{ profile.username }}</h1>
+    <div class="userinfo">
+        <div class="avatar">
+            <img src="{{ profile|pybb_avatar_url }}" alt="" />
+        </div>
+        <div class="info">
+            {% if profile.pybb_profile.ban_status %}
+                <div{% ifequal profile.pybb_profile.ban_status 2 %}
+                title="{% trans 'Expire' %} {{ profile.pybb_profile.ban_till }}"{% endifequal %}
+                class="banned">
+                    {{ profile.pybb_profile.get_ban_status_display }}
+                </div>
+            {% endif %}
 
-        <div class="label">{% trans "Statistics" %}</div>
-        <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}.
+            <div class="label">{% trans "Statistics" %}</div>
+            <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}.
+            </div>
+            <div>{% trans "Number of topics" %}: {{ topic_count }}.
+                &nbsp;
+                <a href="{% url pybb_user_topics profile.username %}">
+                    {% trans "Find all topics" %}
+                </a>
+            </div>
+            <div>{% trans "Date of registration" %}: {% pybb_time profile.date_joined %}</div>
         </div>
-        <div>{% trans "Number of topics" %}: {{ topic_count }}.
-            &nbsp;
-            <a href="{% url pybb_user_topics profile.username %}">
-                {% trans "Find all topics" %}
-            </a>
-        </div>
-        <div>{% trans "Date of registration" %}: {% pybb_time profile.date_joined %}</div>
+        <div class="clear"></div>
     </div>
-    <div class="clear"></div>
-</div>
 {% endblock %}

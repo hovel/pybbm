@@ -1,0 +1,12 @@
+<script type="text/javascript" src="{{ MEDIA_URL }}markitup/jquery.markitup.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}markitup/skins/simple/style.css">
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}markitup/sets/{{ request.user.pybb_profile.markup }}/style.css">
+<script type="text/javascript" src="{{ MEDIA_URL }}markitup/sets/{{ request.user.pybb_profile.markup }}/set.js"></script>
+
+<script type="text/javascript">
+$(function() {
+    mySettings['previewParserPath'] = '{% url pybb_post_ajax_preview %}';
+    mySettings['previewPosition'] = 'before';
+    $("textarea").markItUp(mySettings);
+});
+</script>

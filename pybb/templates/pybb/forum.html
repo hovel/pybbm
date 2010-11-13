@@ -12,6 +12,20 @@
     </div>
     <h1>{{ forum.name }}</h1>
     <div class='topic-list'>
+        <div class="topic-row head-row">
+            <div class="topic-name">
+                {% trans "Topic" %}
+            </div>
+            <div class="topic-post-count">
+                {% trans "Posts" %}
+            </div>
+            <div class="topic-view-count">
+                {% trans "Views" %}
+            </div>
+            <div class="topic-last-post">
+                {% trans "Last post" %}
+            </div>
+        </div>
         {% for topic in forum.topics.all  %}
             <div class="topic-row">
                 <div class="topic-name">
@@ -28,7 +42,7 @@
                     {{ topic.post_count }}
                 </div>
                 <div class="topic-view-count">
-                    {{ forum.views }}
+                    {{ topic.views }}
                 </div>
                 <div class="topic-last-post">
                     {% if topic.updated %}

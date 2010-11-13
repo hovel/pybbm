@@ -2,35 +2,11 @@
 
 <form class="post-form" action="{% if forum %}{% url pybb_add_topic forum.pk %}{% else %}{% url pybb_add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
     {% pybb_csrf %}
-    <div class="preview-box" style="display: none">
-        <div class="header">{% trans "Preview" %}</div>
-        <div class="content"></div>
-    </div>
     <fieldset>
         <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</legend>
         {{ form.as_p }}
         <p class="submit">
             <input type="submit" value="{% trans 'Submit' %}" />
-            <input class="preview-button" type="button" value="{% trans 'Preview' %}" />
         </p>
     </fieldset>
 </form>
-
-<script type="text/javascript">
-$(function() {
-    $('.post-form .preview-button').click(function() {
-        var raw_content = $.trim($('.post-form #id_body').val());
-
-        args = {'content': raw_content, 'markup': '{{ PYBB_MARKUP }}'};
-        $.post('{% url pybb_post_ajax_preview %}', args, function(data) {
-            if (data.error) {
-                alert(data.error);
-            } else {
-                $('.preview-box .content').html(data.content);
-                $('.preview-box').show();
-            }
-        }, 'json');
-    });
-});
-
-</script>

@@ -2,6 +2,10 @@
 {% load pybb_tags %}
 {% load i18n %}
 
+{% block head %}
+    {% include "pybb/markitup.html" %}
+{% endblock head %}
+
 {% block content %}
 {% if user.pybb_profile.is_banned %}
     {% trans 'You banned' %}

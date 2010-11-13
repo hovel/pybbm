@@ -4,62 +4,66 @@
 
 {% block pybb_title %}{{ topic }}{% endblock %}
 
-{% block pybb_content %}
-<div class="crumbs">
-    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
-</div>
+{% block head %}
+    {% include "pybb/markitup.html" %}
+{% endblock head %}
 
-{% with _('Posts') as label %}
-{% include "pybb/pagination.html" %}
-{% endwith %}
+{% block content %}
+    <div class="crumbs">
+        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
+    </div>
 
-<ul class="posts">
-    {% if first_post %}{% ifnotequal first_post posts.0 %}
-        {% with first_post as post %}
-        <li class="first_post">{% include "pybb/post_template.html" %}</li>
-        {% endwith %}
-    {% endifnotequal %}{% endif %}
-    {% for post in posts %}
-        <li>{% include "pybb/post_template.html" %}</li>
-    {% endfor %}
-</ul>
+    {% with _('Posts') as label %}
+    {% include "pybb/pagination.html" %}
+    {% endwith %}
 
-{% with _('Posts') as label %}
-{% include "pybb/pagination.html" %}
-{% endwith %}
+    <ul class="posts">
+        {% if first_post %}{% ifnotequal first_post posts.0 %}
+            {% with first_post as post %}
+            <li class="first_post">{% include "pybb/post_template.html" %}</li>
+            {% endwith %}
+        {% endifnotequal %}{% endif %}
+        {% for post in posts %}
+            <li>{% include "pybb/post_template.html" %}</li>
+        {% endfor %}
+    </ul>
 
-{% if user.is_authenticated %}
-<div class="controls">
-{% if user.is_moderator %}
-    {% if topic.sticky %}
-    <a href="{% url pybb_unstick_topic topic.id %}">{% trans "Unstick topic" %}</a> /
-    {% else %}
-    <a href="{% url pybb_stick_topic topic.id %}">{% trans "Stick topic" %}</a> /
+    {% with _('Posts') as label %}
+    {% include "pybb/pagination.html" %}
+    {% endwith %}
+
+    {% if user.is_authenticated %}
+    <div class="controls">
+    {% if user.is_moderator %}
+        {% if topic.sticky %}
+        <a href="{% url pybb_unstick_topic topic.id %}">{% trans "Unstick topic" %}</a> /
+        {% else %}
+        <a href="{% url pybb_stick_topic topic.id %}">{% trans "Stick topic" %}</a> /
+        {% endif %}
+
+        {% if topic.closed %}
+        <a href="{% url pybb_open_topic topic.id %}">{% trans "Open topic" %}</a> /
+        {% else %}
+        <a href="{% url pybb_close_topic topic.id %}">{% trans "Close topic" %}</a> /
+        {% endif %}
+
+        <a href="{% url pybb_merge_topics %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
     {% endif %}
 
-    {% if topic.closed %}
-    <a href="{% url pybb_open_topic topic.id %}">{% trans "Open topic" %}</a> /
-    {% else %}
-    <a href="{% url pybb_close_topic topic.id %}">{% trans "Close topic" %}</a> /
+        {% if user.is_subscribed %}
+        <a href="{% url pybb_delete_subscription topic.id %}?from_topic">{% trans "Unsubscribe" %}</a>
+        {% else %}
+        <a href="{% url pybb_add_subscription topic.id %}">{% trans "Subscribe" %}</a>
+        {% endif %}
+    </div>
     {% endif %}
 
-    <a href="{% url pybb_merge_topics %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
-{% endif %}
-
-    {% if user.is_subscribed %}
-    <a href="{% url pybb_delete_subscription topic.id %}?from_topic">{% trans "Unsubscribe" %}</a>
-    {% else %}
-    <a href="{% url pybb_add_subscription topic.id %}">{% trans "Subscribe" %}</a>
+    {% if user.is_authenticated %}
+     {% if not user.pybb_profile.is_banned %}
+      {% if not topic.closed %}
+       {% include "pybb/add_post_form.html" %}
+      {% endif %}
+     {% endif %}
     {% endif %}
-</div>
-{% endif %}
-
-{% if user.is_authenticated %}
- {% if not user.pybb_profile.is_banned %}
-  {% if not topic.closed %}
-   {% include "pybb/add_post_form.html" %}
-  {% endif %}
- {% endif %}
-{% endif %}
 
 {% endblock %}

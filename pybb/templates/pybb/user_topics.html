@@ -7,7 +7,7 @@
 {% endblock %}
 
 
-{% block pybb_content %}
+{% block content %}
 <h1>{% trans "All topics created by" %} {{ profile|pybb_profile_link }}</h1>
 <ul class="tablist">
     <li class="tablist-row last">
@@ -27,5 +27,4 @@
 {% include "pybb/pagination.html" %}
 {% endwith %}
 
-</div>
 {% endblock %}

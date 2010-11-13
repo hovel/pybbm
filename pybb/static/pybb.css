@@ -1,5 +1,4 @@
 /* Forum styles */
-
 .controls {
     padding: 10px 0 10px 0;
 }
@@ -21,8 +20,9 @@
     /*margin: 3px;*/
 /*}*/
 
-.forum-row, topic-row {
+.forum-row, .topic-row {
     clear:both;
+    padding-bottom: 3px;
 }
 
 .forum-name, .forum-topic-count, .forum-post-count, .forum-last-post {
@@ -33,11 +33,11 @@
 }
 
 .forum-name {
-    width: 30%;
+    width: 40%;
 }
 
 .forum-topic-count, .forum-post-count {
-    width: 10%;
+    width: 16%;
     text-align: center;
 }
 
@@ -53,11 +53,11 @@
 }
 
 .topic-name {
-    width: 30%;
+    width: 40%;
 }
 
 .topic-post-count, .topic-view-count {
-    width: 10%;
+    width: 16%;
     text-align: center;
 }
 

@@ -1,5 +1,8 @@
 {% extends 'pybb/base.html' %}
 {% load i18n %}
+{% block title %}
+    {{ request.pybb_title }}
+{% endblock title %}
 
 {% block content %}
     {% for category in categories %}

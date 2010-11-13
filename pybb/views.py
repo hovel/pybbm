@@ -8,29 +8,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 
 from pybb.util import quote_text, paginate
-from pybb.models import Category, Forum, Topic, Post, Attachment, MARKUP_CHOICES
+from pybb.models import Category, Forum, Topic, Post, Attachment
 from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, EditProfileForm, UserSearchForm
 from pybb.read_tracking import update_read_tracking
 
 import settings
 
 from annoying.decorators import render_to, ajax_request
-
-def load_last_post(objects):
-    """Load post for forums or topics, make __in query"""
-    pks = [object.last_post_id for object in objects]
-    posts = dict((post.pk, post) for post in Post.objects.filter(pk__in=pks))
-    for object in objects:
-        object.last_post = posts.get(object.last_post_id)
-
-
-def load_users_for_last_post(objects):
-    """Load user for last post of forums or topics, make __in query"""
-    pks = set(obj.last_post.user_id for obj in objects if obj.last_post)
-    users = dict((user.pk, user) for user in User.objects.filter(pk__in=pks))
-    for object in objects:
-        if object.last_post:
-            object.last_post.user = users.get(object.last_post.user_id)
 
 @render_to('pybb/index.html')
 def index(request):
@@ -64,8 +48,8 @@ def show_topic(request, topic_id):
     form = False
     if request.user.is_authenticated():
         update_read_tracking(topic, request.user)
-        user.is_moderator = request.user in topic.forum.moderators.all()
-        user.is_subscribed = request.user in topic.subscribers.all()
+        request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
+        request.user.is_subscribed = request.user in topic.subscribers.all()
         form = AddPostForm(topic=topic)
 
     if settings.PYBB_FREEZE_FIRST_POST:
@@ -128,24 +112,23 @@ def add_post(request, forum_id, topic_id):
             'forum': forum,
     }
 
-render_to('pybb/user.html')
-
+@render_to('pybb/user.html')
 def user(request, username):
     profile = get_object_or_404(User, username=username)
-    topic_count = Topic.objects.filter(user=user).count()
-
-    return {'profile': profile,
-            'topic_count': topic_count,
+    topic_count = Topic.objects.filter(user=profile).count()
+    return {
+        'profile': profile,
+        'topic_count': topic_count,
     }
 
 @render_to('pybb/user_topics.html')
 def user_topics(request, username):
     profile = get_object_or_404(User, username=username)
-    topics = Topic.objects.filter(user=user).order_by('-created')
+    topics = Topic.objects.filter(user=profile).order_by('-created')
     page, paginator = paginate(topics, request, settings.PYBB_TOPIC_PAGE_SIZE)
-
-    return {'profile': profile,
-            'page': page,
+    return {
+        'profile': profile,
+        'page': page,
     }
 
 
@@ -211,10 +194,10 @@ def edit_post(request, post_id):
 
 @login_required
 def stick_topic(request, topic_id):
-    from pybb.templatetags.pybb_tags import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
-    if pybb_moderated_by(topic, request.user):
+    if pybb_topic_moderated_by(topic, request.user):
         if not topic.sticky:
             topic.sticky = True
             topic.save()
@@ -223,10 +206,10 @@ def stick_topic(request, topic_id):
 
 @login_required
 def unstick_topic(request, topic_id):
-    from pybb.templatetags.pybb_tags import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
-    if pybb_moderated_by(topic, request.user):
+    if pybb_topic_moderated_by(topic, request.user):
         if topic.sticky:
             topic.sticky = False
             topic.save()
@@ -266,10 +249,10 @@ def delete_post(request, post_id):
 
 @login_required
 def close_topic(request, topic_id):
-    from pybb.templatetags.pybb_tags import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
-    if pybb_moderated_by(topic, request.user):
+    if pybb_topic_moderated_by(topic, request.user):
         if not topic.closed:
             topic.closed = True
             topic.save()
@@ -278,10 +261,10 @@ def close_topic(request, topic_id):
 
 @login_required
 def open_topic(request, topic_id):
-    from pybb.templatetags.pybb_tags import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
-    if pybb_moderated_by(topic, request.user):
+    if pybb_topic_moderated_by(topic, request.user):
         if topic.closed:
             topic.closed = False
             topic.save()
@@ -291,13 +274,13 @@ def open_topic(request, topic_id):
 @login_required
 @render_to('pybb/merge_topics.html')
 def merge_topics(request):
-    from pybb.templatetags.pybb_tags import pybb_moderated_by
+    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
     topics_ids = request.GET.getlist('topic')
     topics = get_list_or_404(Topic, pk__in=topics_ids)
 
     for topic in topics:
-        if not pybb_moderated_by(topic, request.user):
+        if not pybb_topic_moderated_by(topic, request.user):
         # TODO: show error message: no permitions for edit this topic
             return HttpResponseRedirect(topic.get_absolute_url())
 
@@ -333,8 +316,7 @@ def merge_topics(request):
             'topic': topics[0],
     }
 
-render_to('pybb/users.html')
-
+@render_to('pybb/users.html')
 def users(request):
     form = UserSearchForm(request.GET)
     all_users = form.filter(User.objects.order_by('username'))
@@ -374,14 +356,11 @@ def show_attachment(request, hash):
 @login_required
 @ajax_request
 def post_ajax_preview(request):
-    content = request.POST.get('content')
-    markup = request.POST.get('markup')
-    if not markup in dict(MARKUP_CHOICES).keys():
-        return {'error': 'Invalid markup'}
-    if not content:
-        return {'content': ''}
-    html = settings.PYBB_MARKUP_ENGINES[markup](content)
-    return {'content': html,}
+    if request.user.is_authenticated():
+        content = request.POST.get('data')
+        html = settings.PYBB_MARKUP_ENGINES[request.user.pybb_profile.markup](content)
+        return HttpResponse(html)
+    return Http404
 
 
 

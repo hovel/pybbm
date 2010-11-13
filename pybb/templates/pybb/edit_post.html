@@ -3,18 +3,18 @@
 {% load i18n %}
 
 
-{% block pybb_content %}
-<div class="crumbs">
-<a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link post.topic.forum.category %} / {% pybb_link post.topic.forum %} / {% pybb_link post.topic %}
-</div>
+{% block content %}
+    <div class="crumbs">
+    <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link post.topic.forum.category %} / {% pybb_link post.topic.forum %} / {% pybb_link post.topic %}
+    </div>
 
-<h1>{% trans "Editing the post" %}</h1>
+    <h1>{% trans "Editing the post" %}</h1>
 
-<form method="post" action=".">
-    <fieldset>
-        <legend>{% trans "Editing the post" %}</legend>
-            {{ form.as_p }}
-            <p><input type="submit" value="{% trans 'Save' %}" /></p>
-    </fieldset>
-</form>
-{% endblock %}
+    <form method="post" action=".">
+        <fieldset>
+            <legend>{% trans "Editing the post" %}</legend>
+                {{ form.as_p }}
+                <p><input type="submit" value="{% trans 'Save' %}" /></p>
+        </fieldset>
+    </form>
+{% endblock content %}

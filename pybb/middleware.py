@@ -1,8 +1,9 @@
 from django.utils import translation
-
+import settings
 
 class PybbMiddleware(object):
     def process_request(self, request):
+        request.pybb_title = settings.PYBB_DEFAULT_TITLE
         if request.user.is_authenticated():
             profile = request.user.pybb_profile
             language = translation.get_language_from_request(request)
