@@ -26,7 +26,7 @@ for dirpath, dirnames, filenames in os.walk(PACKAGE):
             data_files.append(os.path.join(prefix, f))
 
 setup(
-    version = '0.1.4',
+    version = '0.1.5',
     description = 'Django forum application',
     author = 'Grigoriy Petukhov',
     author_email = 'lorien@lorien.name',
