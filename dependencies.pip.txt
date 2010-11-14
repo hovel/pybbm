@@ -5,3 +5,4 @@ django-common
 BeatifulSoup
 pytils
 django-annoying
+django-bbmarkup
