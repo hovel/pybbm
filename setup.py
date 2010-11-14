@@ -17,7 +17,6 @@ setup(
             'BeautifulSoup',
             'pytils',
             'django-annoying',
-            'django-bbmarkup',
             ],
 
     license = "BSD",
