@@ -3,8 +3,12 @@ from datetime import datetime
 import os.path
 
 from django import forms
-import settings
 from django.utils.translation import ugettext as _
+from annoying.functions import get_config
+
+import settings
+
+MEDIA_ROOT = get_config('MEDIA_ROOT', '/media/')
 
 from pybb.models import Topic, Post, Profile, Attachment
 
@@ -21,6 +25,8 @@ class AddPostForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         self.topic = kwargs.pop('topic', None)
         self.forum = kwargs.pop('forum', None)
+        if not (self.topic or self.forum):
+            raise ValueError('You should provide topic or forum')
         self.ip = kwargs.pop('ip', None)
         super(AddPostForm, self).__init__(*args, **kwargs)
 
@@ -50,31 +56,10 @@ class AddPostForm(forms.ModelForm):
         else:
             topic = self.topic
 
-        autojoin_done = False
-
-        if self.topic and settings.PYBB_POST_AUTOJOIN_ENABLED:
-            last_post = self.topic.last_post
-            delta = datetime.now() - last_post.created
-            time_diff = delta.seconds
-            timeout = settings.PYBB_POST_AUTOJOIN_TIMEOUT
-            
-            if (last_post.user == self.user and
-                not delta.days and time_diff < timeout):
-
-                join_message = '@@@AUTOJOIN-%d@@@' % time_diff
-
-                last_post.body = u"%s\n\n%s\n\n%s" % (last_post.body, join_message, self.cleaned_data['body'])
-                last_post.updated = datetime.now()
-                last_post.save()
-                post = last_post
-
-                autojoin_done = True
-
-        if not autojoin_done:
-            post = Post(topic=topic, user=self.user, user_ip=self.ip,
-                        markup=self.user.pybb_profile.markup,
-                        body=self.cleaned_data['body'])
-            post.save()
+        post = Post(topic=topic, user=self.user, user_ip=self.ip,
+                    markup=self.user.pybb_profile.markup,
+                    body=self.cleaned_data['body'])
+        post.save()
 
         if settings.PYBB_ATTACHMENT_ENABLE:
             for f in self.files:
@@ -86,7 +71,7 @@ class AddPostForm(forms.ModelForm):
         if memfile:
             obj = Attachment(size=memfile.size, content_type=memfile.content_type,
                              name=memfile.name, post=post)
-            dir = os.path.join(settings.MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO)
+            dir = os.path.join(MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO)
             fname = '%d.0' % post.id
             path = os.path.join(dir, fname)
             file(path, 'w').write(memfile.read())
@@ -95,7 +80,7 @@ class AddPostForm(forms.ModelForm):
 
 
 class EditProfileForm(forms.ModelForm):
-    class Meta:
+    class Meta(object):
         model = Profile
         fields = ['signature', 'time_zone', 'language',
                   'show_signatures', 'markup']
@@ -110,12 +95,12 @@ class EditProfileForm(forms.ModelForm):
 
 
 class EditPostForm(forms.ModelForm):
-    class Meta:
+    class Meta(object):
         model = Post
         fields = ['body']
 
-    def save(self, *args, **kwargs):
-        post = super(EditPostForm, self).save(commit=False, *args, **kwargs)
+    def save(self, commit=False):
+        post = super(EditPostForm, self).save(commit=False)
         post.updated = datetime.now()
         post.save()
         return post
@@ -128,7 +113,7 @@ class EditHeadPostForm(EditPostForm):
         super(EditHeadPostForm, self).__init__(*args, **kwargs)
         self.fields.keyOrder = ['title', 'body']
 
-    def save(self):
+    def save(self, commit=False):
         post = super(EditPostForm, self).save(commit=False)
         post.updated = datetime.now()
         post.save()
