@@ -326,7 +326,7 @@ class ReadTracking(models.Model):
     `topic pk` --> `topic last post pk`
     """
 
-    user = models.OneToOneField(User)
+    user = AutoOneToOneField(User)
     topics = JSONField(null=True, blank=True)
     last_read = models.DateTimeField(null=True)
 
