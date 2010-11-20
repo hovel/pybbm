@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 from pybb.util import quote_text, paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment
-from pybb.forms import  AddPostForm, EditPostForm, EditHeadPostForm, EditProfileForm, UserSearchForm
+from pybb.forms import  AddPostForm, AdminAddPostForm, EditPostForm, EditHeadPostForm, EditProfileForm, UserSearchForm
 from pybb.read_tracking import update_read_tracking
 
 import settings
@@ -50,7 +50,10 @@ def show_topic(request, topic_id):
         update_read_tracking(topic, request.user)
         request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
         request.user.is_subscribed = request.user in topic.subscribers.all()
-        form = AddPostForm(topic=topic)
+        if request.user.is_superuser:
+            form = AdminAddPostForm(initial={'login': request.user.username}, topic=topic)
+        else:
+            form = AddPostForm(topic=topic)
 
     if settings.PYBB_FREEZE_FIRST_POST:
         first_post = topic.head
@@ -91,6 +94,7 @@ def add_post(request, forum_id, topic_id):
         quote = ''
     else:
         post = get_object_or_404(Post, pk=quote_id)
+        #TODO Rewrite to clienside js
         quote = quote_text(post.body_text,
                            request.user.pybb_profile.markup,
                            post.user.username)
@@ -98,10 +102,14 @@ def add_post(request, forum_id, topic_id):
     ip = request.META.get('REMOTE_ADDR', '')
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
                        ip=ip, initial={'body': quote})
-    if request.method == 'POST':
-        form = AddPostForm(request.POST, request.FILES, **form_kwargs)
+    if request.user.is_superuser:
+        AForm = AdminAddPostForm
     else:
-        form = AddPostForm(**form_kwargs)
+        AForm = AddPostForm
+    if request.method == 'POST':
+        form = AForm(request.POST, request.FILES, **form_kwargs)
+    else:
+        form = AForm(**form_kwargs)
 
     if form.is_valid():
         post = form.save()

@@ -11,6 +11,7 @@ import settings
 MEDIA_ROOT = get_config('MEDIA_ROOT', '/media/')
 
 from pybb.models import Topic, Post, Profile, Attachment
+from django.contrib.auth.models import User
 
 
 class AddPostForm(forms.ModelForm):
@@ -47,7 +48,6 @@ class AddPostForm(forms.ModelForm):
         return self.cleaned_data['attachment']
 
     def save(self, *args, **kwargs):
-
         if self.forum:
             topic = Topic(forum=self.forum,
                           user=self.user,
@@ -55,16 +55,13 @@ class AddPostForm(forms.ModelForm):
             topic.save()
         else:
             topic = self.topic
-
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
                     markup=self.user.pybb_profile.markup,
                     body=self.cleaned_data['body'])
         post.save()
-
         if settings.PYBB_ATTACHMENT_ENABLE:
             for f in self.files:
                 self.save_attachment(post, self.files[f])
-
         return post
 
     def save_attachment(self, post, memfile):
@@ -77,6 +74,27 @@ class AddPostForm(forms.ModelForm):
             file(path, 'w').write(memfile.read())
             obj.path = fname
             obj.save()
+
+
+class AdminAddPostForm(AddPostForm):
+    '''
+    Superusers can post messages from any user and from any time
+    If no user with specified name - new user will be created
+    '''
+    login = forms.CharField(label=_('User'))
+
+    def __init__(self, *args, **kwargs):
+        super(AdminAddPostForm, self).__init__(*args, **kwargs)
+        self.fields.keyOrder = ['name', 'login', 'body', 'attachment']
+
+    def save(self, *args, **kwargs):
+        try:
+            self.user = User.objects.filter(username=self.cleaned_data['login']).get()
+        except:
+            self.user = User.objects.create_user(self.cleaned_data['login'],'%s@example.com' % self.cleaned_data['login'])
+        return super(AdminAddPostForm, self).save(*args, **kwargs)
+
+
 
 
 class EditProfileForm(forms.ModelForm):
