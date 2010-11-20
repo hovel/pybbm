@@ -189,7 +189,15 @@ def pybb_topic_mini_pagination(topic):
 
 @register.filter
 def pybb_avatar_url(user):
-    return gravatar_url(user.email)
+    '''
+    Return gravatar url
+    Fail sliently
+    '''
+    try:
+        gurl = gravatar_url(user.email)
+    except:
+        return ''
+    return gurl
 
 
 #noinspection PyUnusedLocal
