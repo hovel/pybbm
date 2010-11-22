@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 
-from pybb.util import quote_text, paginate
+from pybb.util import  paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment
 from pybb.forms import  AddPostForm, AdminAddPostForm, EditPostForm, EditHeadPostForm, EditProfileForm, UserSearchForm
 from pybb.read_tracking import update_read_tracking
@@ -94,10 +94,7 @@ def add_post(request, forum_id, topic_id):
         quote = ''
     else:
         post = get_object_or_404(Post, pk=quote_id)
-        #TODO Rewrite to clienside js
-        quote = quote_text(post.body_text,
-                           request.user.pybb_profile.markup,
-                           post.user.username)
+        quote = settings.PYBB_QUOTE_ENGINES[request.user.pybb_profile.markup](post.body_text, post.user.username)
 
     ip = request.META.get('REMOTE_ADDR', '')
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
@@ -242,6 +239,7 @@ def delete_post(request, post_id):
     if 'POST' == request.method:
         topic = post.topic
         forum = post.topic.forum
+
         post.delete()
 
         try:

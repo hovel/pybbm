@@ -15,16 +15,16 @@
 }
 
 /*.category h1, .topic-list h1 {*/
-    /*font-size: 130%;*/
-    /*font-weight: normal;*/
-    /*padding: 3px;*/
-    /*margin: 3px;*/
+/*font-size: 130%;*/
+/*font-weight: normal;*/
+/*padding: 3px;*/
+/*margin: 3px;*/
 /*}*/
 
 .forum-row, .topic-row {
     float: left;
     width: 100%;
-    clear:both;
+    clear: both;
 }
 
 .forum-name, .forum-topic-count, .forum-post-count, .forum-last-post {
@@ -34,6 +34,7 @@
     border-collapse: collapse;
     padding: 5px;
     margin: 1px;
+    line-height: 2.2em;
 }
 
 .forum-name {
@@ -56,6 +57,17 @@
     border-collapse: collapse;
     padding: 5px;
     margin: 1px;
+    height: 2.2em;
+    vertical-align: middle;
+}
+
+.topic-post-count, .topic-view-count, .topic-last-post {
+    line-height: 2.2em;
+}
+
+.head-row div {
+    height: 1.1em;
+    line-height: 1.1em;
 }
 
 .topic-name {
@@ -99,4 +111,13 @@
 
 .pagination {
     font-size: 80%;
+}
+
+/* ----- Quoting ---- */
+
+blockquote {
+    background: #FFF;
+    border: 1px solid #CCC;
+    margin-left: 20px;
+    padding: 5px;
 }

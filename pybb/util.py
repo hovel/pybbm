@@ -11,23 +11,6 @@ from annoying.functions import get_config
 import settings
 MEDIA_URL = get_config('MEDIA_URL', None)
 
-def quote_text(text, markup, username=""):
-    """
-    Quote message using selected markup.
-    """
-
-    if markup == 'markdown':
-        return '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
-
-    elif markup == 'bbcode':
-        if username:
-            return '[quote="%s"]%s[/quote]\n' % (username, text)
-        else:
-            return '[quote]%s[/quote]\n' % (text)
-    else:
-        return text
-
-
 def paginate(items, request, per_page, total_count=None):
     try:
         page_number = int(request.GET.get('page', 1))

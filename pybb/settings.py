@@ -32,3 +32,8 @@ PYBB_MARKUP_ENGINES = get_config('PYBB_MARKUP_ENGINES', {
     'bbcode': lambda str: urlize(bbcode(str)),
     'markdown': lambda str: urlize(Markdown(safe_mode='escape').convert(str))
 })
+
+PYBB_QUOTE_ENGINES = get_config('PYBB_QUOTE_ENGINES', {
+    'bbcode': lambda text, username="": '[quote="%s"]%s[/quote]\n' % (username, text),
+    'markdown': lambda text, username="": '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
+})

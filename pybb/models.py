@@ -79,7 +79,7 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-    last_post = models.ForeignKey("Post", related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True,
+    last_post = models.ForeignKey('Post', related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True,
                                   null=True)
 
     class Meta(object):
@@ -120,7 +120,7 @@ class Topic(models.Model):
     closed = models.BooleanField(_('Closed'), blank=True, default=False)
     subscribers = models.ManyToManyField(User, related_name='subscriptions', verbose_name=_('Subscribers'), blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    last_post = models.ForeignKey("Post", related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True,
+    last_post = models.ForeignKey('Post', related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True,
                                   null=True)
 
     class Meta(object):
@@ -151,6 +151,16 @@ class Topic(models.Model):
     def update_post_count(self):
         self.post_count = self.posts.count()
         self.save()
+
+    def delete(self, *args, **kwargs):
+        #noinspection PyUnresolvedReferences
+        if self.forum.last_post.topic == self:
+            try:
+                self.forum.last_post = Post.objects.filter(topic__forum=self.forum).exclude(topic=self)[0]
+            except:
+                self.forum.last_post = None
+            self.forum.save()
+        super(Topic, self).delete(*args, **kwargs)
 
 
 class RenderableItem(models.Model):
