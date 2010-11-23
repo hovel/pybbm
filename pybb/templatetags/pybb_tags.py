@@ -193,9 +193,11 @@ def pybb_avatar_url(user):
     Return forum url link
     Fail sliently
     '''
-    if user.pybb_profile.avatar is None:
+    try:
+        return user.pybb_profile.avatar.url
+    except:
         return MEDIA_URL + settings.PYBB_DEFAULT_AVATAR_URL
-    return user.pybb_profile.avatar.url
+
 
 
 #noinspection PyUnusedLocal
