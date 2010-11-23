@@ -101,7 +101,7 @@ class EditProfileForm(forms.ModelForm):
     class Meta(object):
         model = Profile
         fields = ['signature', 'time_zone', 'language',
-                  'show_signatures', 'markup']
+                  'show_signatures', 'markup', 'avatar']
 
     def clean_signature(self):
         value = self.cleaned_data['signature'].strip()

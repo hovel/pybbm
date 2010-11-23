@@ -3,7 +3,7 @@ from setuptools import setup
 PACKAGE = 'pybb'
 
 setup(
-    version = '0.1.6',
+    version = '0.1.7',
     description = 'Django forum application',
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
@@ -17,6 +17,7 @@ setup(
             'BeautifulSoup',
             'pytils',
             'django-annoying',
+            'sorl-thumbnail'
             ],
 
     license = "BSD",

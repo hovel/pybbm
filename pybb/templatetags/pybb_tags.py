@@ -21,8 +21,8 @@ from django.utils import dateformat
 from django.utils.translation import ungettext
 
 from pybb.models import Topic
-from pybb.util import gravatar_url
 from annoying.functions import get_config
+MEDIA_URL = get_config('MEDIA_URL', None)
 
 import pybb.settings as settings
 
@@ -190,14 +190,12 @@ def pybb_topic_mini_pagination(topic):
 @register.filter
 def pybb_avatar_url(user):
     '''
-    Return gravatar url
+    Return forum url link
     Fail sliently
     '''
-    try:
-        gurl = gravatar_url(user.email)
-    except:
-        return ''
-    return gurl
+    if user.pybb_profile.avatar is None:
+        return MEDIA_URL + settings.PYBB_DEFAULT_AVATAR_URL
+    return user.pybb_profile.avatar.url
 
 
 #noinspection PyUnusedLocal

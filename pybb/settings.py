@@ -20,7 +20,7 @@ PYBB_ATTACHMENT_SIZE_LIMIT = get_config('PYBB_ATTACHMENT_SIZE_LIMIT', 1024 * 102
 PYBB_ATTACHMENT_ENABLE = get_config('PYBB_ATTACHMENT_ENABLE', False)
 PYBB_ATTACHMENT_UPLOAD_TO = get_config('PYBB_ATTACHMENT_UPLOAD_TO', join('pybb_upload', 'attachments'))
 
-PYBB_DEFAULT_AVATAR_URL = get_config('PYBB_DEFAULT_AVATAR_URL', get_config('MEDIA_URL', '/media/') + 'pybb/img/default_avatar.jpg')
+PYBB_DEFAULT_AVATAR_URL = 'pybb/img/default_avatar.jpg'
 
 PYBB_DEFAULT_TITLE = get_config('PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 

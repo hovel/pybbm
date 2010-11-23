@@ -14,6 +14,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 
 from annoying.fields import JSONField, AutoOneToOneField
+from sorl.thumbnail import ImageField
 from pybb.util import unescape
 
 import settings
@@ -267,6 +268,8 @@ class Profile(models.Model):
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
     ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
+    avatar = ImageField(_('Avatar'), blank=True, null=True, upload_to='pybb/avatars')
+    
 
     class Meta(object):
         verbose_name = _('Profile')
