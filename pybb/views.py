@@ -94,7 +94,7 @@ def add_post(request, forum_id, topic_id):
         quote = ''
     else:
         post = get_object_or_404(Post, pk=quote_id)
-        quote = settings.PYBB_QUOTE_ENGINES[request.user.pybb_profile.markup](post.body_text, post.user.username)
+        quote = settings.PYBB_QUOTE_ENGINES[request.user.pybb_profile.markup](post.body, post.user.username)
 
     ip = request.META.get('REMOTE_ADDR', '')
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
