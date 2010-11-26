@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 from pybb.util import  paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment
-from pybb.forms import  AddPostForm, AdminAddPostForm, EditPostForm, EditHeadPostForm, EditProfileForm, UserSearchForm
+from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, UserSearchForm
 from pybb.read_tracking import update_read_tracking
 
 import settings
@@ -51,9 +51,9 @@ def show_topic(request, topic_id):
         request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
         request.user.is_subscribed = request.user in topic.subscribers.all()
         if request.user.is_superuser:
-            form = AdminAddPostForm(initial={'login': request.user.username}, topic=topic)
+            form = AdminPostForm(initial={'login': request.user.username}, topic=topic)
         else:
-            form = AddPostForm(topic=topic)
+            form = PostForm(topic=topic)
 
     if settings.PYBB_FREEZE_FIRST_POST:
         first_post = topic.head
@@ -100,9 +100,9 @@ def add_post(request, forum_id, topic_id):
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
                        ip=ip, initial={'body': quote})
     if request.user.is_superuser:
-        AForm = AdminAddPostForm
+        AForm = AdminPostForm
     else:
-        AForm = AddPostForm
+        AForm = PostForm
     if request.method == 'POST':
         form = AForm(request.POST, request.FILES, **form_kwargs)
     else:
@@ -175,18 +175,15 @@ def edit_post(request, post_id):
     or request.user.pybb_profile.is_banned():
         return HttpResponseRedirect(post.get_absolute_url())
 
-    head_post_id = post.topic.posts.order_by('created')[0].id
-    form_kwargs = dict(instance=post, initial={'title': post.topic.name})
-
-    if post.id == head_post_id:
-        form_class = EditHeadPostForm
+    if request.user.is_superuser:
+        form_class = AdminPostForm
     else:
-        form_class = EditPostForm
+        form_class = PostForm
 
     if request.method == 'POST':
-        form = form_class(request.POST, request.FILES, **form_kwargs)
+        form = form_class(request.POST, request.FILES, instance=post)
     else:
-        form = form_class(**form_kwargs)
+        form = form_class(instance=post)
 
     if form.is_valid():
         post = form.save()

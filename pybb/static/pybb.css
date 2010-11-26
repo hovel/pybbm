@@ -7,11 +7,9 @@
     display: block;
     float: left;
     width: 100%;
-    background: #E1EBF2;
     padding: 5px;
     margin: 3px;
     clear: both;
-    border: 1px solid #ffffff;
 }
 
 /*.category h1, .topic-list h1 {*/
@@ -25,13 +23,12 @@
     float: left;
     width: 100%;
     clear: both;
+    border-bottom: 1px solid #CCCCCC;
 }
 
 .forum-name, .forum-topic-count, .forum-post-count, .forum-last-post {
     display: block;
     float: left;
-    border: 1px solid #FFF;
-    border-collapse: collapse;
     padding: 5px;
     margin: 1px;
     line-height: 2.2em;
@@ -53,8 +50,6 @@
 .topic-name, .topic-post-count, .topic-view-count, .topic-last-post {
     display: block;
     float: left;
-    border: 1px solid #FFF;
-    border-collapse: collapse;
     padding: 5px;
     margin: 1px;
     height: 2.2em;
@@ -63,6 +58,10 @@
 
 .topic-post-count, .topic-view-count, .topic-last-post {
     line-height: 2.2em;
+}
+
+.head-row {
+    background:#EBF1F5;
 }
 
 .head-row div {

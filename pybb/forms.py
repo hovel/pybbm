@@ -5,6 +5,7 @@ import os.path
 from django import forms
 from django.utils.translation import ugettext as _
 from annoying.functions import get_config
+import inspect
 
 import settings
 
@@ -14,7 +15,7 @@ from pybb.models import Topic, Post, Profile, Attachment
 from django.contrib.auth.models import User
 
 
-class AddPostForm(forms.ModelForm):
+class PostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
     attachment = forms.FileField(label=_('Attachment'), required=False)
 
@@ -23,17 +24,24 @@ class AddPostForm(forms.ModelForm):
         fields = ('body',)
 
     def __init__(self, *args, **kwargs):
+        #Move args to kwargs
+        if args:
+            kwargs.update(dict(zip(inspect.getargspec(super(PostForm, self).__init__)[0][1:], args)))
         self.user = kwargs.pop('user', None)
+        self.ip = kwargs.pop('ip', None)
         self.topic = kwargs.pop('topic', None)
         self.forum = kwargs.pop('forum', None)
-        if not (self.topic or self.forum):
-            raise ValueError('You should provide topic or forum')
-        self.ip = kwargs.pop('ip', None)
-        super(AddPostForm, self).__init__(*args, **kwargs)
+        if not (self.topic or self.forum or ('instance' in kwargs)):
+            raise ValueError('You should provide topic, forum or instance')
+        #Handle topic subject if editing topic head
+        if ('instance' in kwargs) and (kwargs['instance'].topic.head==kwargs['instance']):
+            kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
+
+        super(PostForm, self).__init__(**kwargs)
 
         self.fields.keyOrder = ['name', 'body', 'attachment']
 
-        if self.topic:
+        if not (self.forum or (self.instance.pk and (self.instance.topic.head==self.instance))):
             self.fields['name'].widget = forms.HiddenInput()
             self.fields['name'].required = False
 
@@ -47,7 +55,17 @@ class AddPostForm(forms.ModelForm):
                 raise forms.ValidationError(_('Attachment is too big'))
         return self.cleaned_data['attachment']
 
-    def save(self, *args, **kwargs):
+    def save(self, commit=True):
+        if self.instance.pk:
+            post = super(PostForm, self).save(commit=False)
+            if self.user:
+                post.user = self.user
+            if post.topic.head == post:
+                post.topic.name = self.cleaned_data['name']
+                post.topic.updated = datetime.now()
+                post.topic.save()
+            post.save()
+            return post
         if self.forum:
             topic = Topic(forum=self.forum,
                           user=self.user,
@@ -76,7 +94,7 @@ class AddPostForm(forms.ModelForm):
             obj.save()
 
 
-class AdminAddPostForm(AddPostForm):
+class AdminPostForm(PostForm):
     '''
     Superusers can post messages from any user and from any time
     If no user with specified name - new user will be created
@@ -84,7 +102,11 @@ class AdminAddPostForm(AddPostForm):
     login = forms.CharField(label=_('User'))
 
     def __init__(self, *args, **kwargs):
-        super(AdminAddPostForm, self).__init__(*args, **kwargs)
+        if args:
+            kwargs.update(dict(zip(inspect.getargspec(forms.ModelForm.__init__)[0][1:], args)))
+        if 'instance' in kwargs:
+            kwargs.setdefault('initial', {}).update({'login': kwargs['instance'].user.username})
+        super(AdminPostForm, self).__init__(**kwargs)
         self.fields.keyOrder = ['name', 'login', 'body', 'attachment']
 
     def save(self, *args, **kwargs):
@@ -92,7 +114,7 @@ class AdminAddPostForm(AddPostForm):
             self.user = User.objects.filter(username=self.cleaned_data['login']).get()
         except:
             self.user = User.objects.create_user(self.cleaned_data['login'],'%s@example.com' % self.cleaned_data['login'])
-        return super(AdminAddPostForm, self).save(*args, **kwargs)
+        return super(AdminPostForm, self).save(*args, **kwargs)
 
 
 
@@ -110,36 +132,6 @@ class EditProfileForm(forms.ModelForm):
         if len(value) > settings.PYBB_SIGNATURE_MAX_LENGTH:
             raise forms.ValidationError('Length of signature is limited to %d' % settings.PYBB_SIGNATURE_MAX_LENGTH)
         return value
-
-
-class EditPostForm(forms.ModelForm):
-    class Meta(object):
-        model = Post
-        fields = ['body']
-
-    def save(self, commit=False):
-        post = super(EditPostForm, self).save(commit=False)
-        post.updated = datetime.now()
-        post.save()
-        return post
-
-
-class EditHeadPostForm(EditPostForm):
-    title = forms.CharField(label=_("Subject"), required=True)
-
-    def __init__(self, *args, **kwargs):
-        super(EditHeadPostForm, self).__init__(*args, **kwargs)
-        self.fields.keyOrder = ['title', 'body']
-
-    def save(self, commit=False):
-        post = super(EditPostForm, self).save(commit=False)
-        post.updated = datetime.now()
-        post.save()
-
-        post.topic.name = self.cleaned_data['title']
-        post.topic.save()
-        return post
-
 
 class UserSearchForm(forms.Form):
     query = forms.CharField(required=False, label='')
