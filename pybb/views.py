@@ -101,6 +101,7 @@ def add_post(request, forum_id, topic_id):
                        ip=ip, initial={'body': quote})
     if request.user.is_superuser:
         AForm = AdminPostForm
+        form_kwargs['initial']['login'] = request.user.username
     else:
         AForm = PostForm
     if request.method == 'POST':
