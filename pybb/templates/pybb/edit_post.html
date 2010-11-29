@@ -2,6 +2,11 @@
 {% load pybb_tags %}
 {% load i18n %}
 
+{% block topic %} {% trans "Editing the post" %} {% endblock %}
+
+{% block head %}
+    {% include "pybb/markitup.html" %}
+{% endblock head %}
 
 {% block content %}
     <div class="crumbs">

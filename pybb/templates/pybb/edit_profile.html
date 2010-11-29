@@ -1,6 +1,8 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_tags i18n %}
 
+{% block title %}{% trans "Profile editing" %}{% endblock title %}
+
 {% block content %}
     <h1>{% trans "Profile editing" %}</h1>
     <img src="{{ profile.avatar.url }}" />

@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load pybb_tags %}
+{% load thumbnail %}
 
 <div class="post post-{% cycle 'odd' 'even' %}" id="post-{{ post.id }}">
     <a name="post-{{ post.id }}"></a> <!-- may be remove this string? -->
@@ -7,7 +8,14 @@
                 <div class="info">
                     <div class="avatar">
                         <a href="{{ post.user.pybb_profile.get_absolute_url }}">
-                        <img src="{{ post.user.pybb_profile.avatar_url }}" alt="" />
+                        {% comment %}
+                        <img src="{{ post.user.pybb_profile.avatar_url }}" alt="avatar" width="50px" height="50px">
+                        {% endcomment %}
+                        {% thumbnail post.user.pybb_profile.avatar request.pybb_avatar_dimensions as avatar %}
+                            <img src="{{ avatar.url }}" alt="avatar">
+                        {% empty %}
+                            <img src="{{ request.pybb_default_avatar }}" alt="avatar">
+                        {% endthumbnail %}
                         </a>
                     </div>
                     <div class="author">{{ post.user|pybb_profile_link }}</div>

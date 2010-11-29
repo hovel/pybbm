@@ -295,7 +295,7 @@ class Profile(models.Model):
         try:
             return self.avatar.url
         except:
-            return MEDIA_URL + settings.PYBB_DEFAULT_AVATAR_URL
+            return settings.PYBB_DEFAULT_AVATAR_URL
 
     def get_absolute_url(self):
         return reverse('pybb_user', args=[self.user.username])
