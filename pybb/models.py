@@ -25,6 +25,7 @@ from annoying.functions import get_config
 LANGUAGES = get_config('LANGUAGES', None)
 MEDIA_ROOT = get_config('MEDIA_ROOT', None)
 SECRET_KEY = get_config('SECRET_KEY', None)
+MEDIA_URL = get_config('MEDIA_URL', None)
 
 from south.modelsinspector import add_introspection_rules
 
@@ -288,6 +289,13 @@ class Profile(models.Model):
                 return False
             return True
         return False
+
+    @property
+    def avatar_url(self):
+        try:
+            return self.avatar.url
+        except:
+            return MEDIA_URL + settings.PYBB_DEFAULT_AVATAR_URL
 
     def get_absolute_url(self):
         return reverse('pybb_user', args=[self.user.username])

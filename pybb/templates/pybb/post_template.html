@@ -7,7 +7,7 @@
                 <div class="info">
                     <div class="avatar">
                         <a href="{{ post.user.pybb_profile.get_absolute_url }}">
-                        <img src="{{ post.user|pybb_avatar_url }}" alt="" />
+                        <img src="{{ post.user.pybb_profile.avatar_url }}" alt="" />
                         </a>
                     </div>
                     <div class="author">{{ post.user|pybb_profile_link }}</div>

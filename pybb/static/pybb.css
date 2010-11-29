@@ -100,6 +100,11 @@
     padding: 10px;
 }
 
+.post .info .extra-info {
+    font-size: 80%;
+    color: #CCC;
+}
+
 .post .content {
     margin-left: 230px;
     display: block;

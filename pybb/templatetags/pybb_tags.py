@@ -187,19 +187,6 @@ def pybb_topic_mini_pagination(topic):
     }
 
 
-@register.filter
-def pybb_avatar_url(user):
-    '''
-    Return forum url link
-    Fail sliently
-    '''
-    try:
-        return user.pybb_profile.avatar.url
-    except:
-        return MEDIA_URL + settings.PYBB_DEFAULT_AVATAR_URL
-
-
-
 #noinspection PyUnusedLocal
 @register.tag(name='pybb_load_last_topics')
 def do_pybb_load_last_topics(parser, token):
