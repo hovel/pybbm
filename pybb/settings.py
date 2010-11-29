@@ -24,12 +24,12 @@ PYBB_DEFAULT_AVATAR_URL = 'pybb/img/default_avatar.jpg'
 
 PYBB_DEFAULT_TITLE = get_config('PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 
-from bbmarkup import bbcode
+from postmarkup import render_bbcode
 from markdown import Markdown
 from django.utils.html import urlize
 
 PYBB_MARKUP_ENGINES = get_config('PYBB_MARKUP_ENGINES', {
-    'bbcode': lambda str: urlize(bbcode(str)),
+    'bbcode': lambda str: urlize(render_bbcode(str)),
     'markdown': lambda str: urlize(Markdown(safe_mode='escape').convert(str))
 })
 

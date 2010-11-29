@@ -1,14 +1,13 @@
-PyBB was originally created in late 2008.
-
-The PRIMARY AUTHORS are (and/or have been):
-
+PyBB was originally created in late 2008 by:
     * Grigoriy Petukhov <lorien@lorien.name>
+
+PyBBM - A fork, created by Pavel Zhukov <gelios@gmail.com> since original pybb began unmaintained
 
 And here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
 people who have submitted patches, reported bugs, added translations, helped
 answer newbie questions, and generally made PyBB that much better:
 
-    Zhukov Pavel <gelios@gmail.com>
+    Pavel Zhukov <gelios@gmail.com>
     Nikolai Sevostjanov <nikolai.sevostjanov@gmail.com>
     Denis Burij <denger@footter.com>
     Alexander Solovyov <piranha@piranha.org.ua>

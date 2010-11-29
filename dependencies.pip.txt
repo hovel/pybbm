@@ -1,8 +1,0 @@
-Django
-markdown
-South
-django-common
-BeatifulSoup
-pytils
-django-annoying
-django-bbmarkup

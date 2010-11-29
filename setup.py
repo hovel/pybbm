@@ -1,20 +1,19 @@
 from setuptools import setup
 
-PACKAGE = 'pybb'
+PACKAGE = 'pybbm'
 
 setup(
-    version = '0.1.7',
-    description = 'Django forum application',
+    version = '0.1.8',
+    description = 'PyBB Modified. Django forum application',
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
-    name = 'pybb',
+    name = 'pybbm',
     packages = ['pybb'],
     install_requires = [
             'django',
             'markdown',
+            'postmarkup',
             'south',
-            'django-common',
-            'BeautifulSoup',
             'pytils',
             'django-annoying',
             'sorl-thumbnail'

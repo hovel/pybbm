@@ -1,4 +1,4 @@
-What is PYBB?
+What is PYBBM?
 =============
 
 The main point in development of pybb is to build it so it could be
@@ -7,33 +7,17 @@ The main point in development of pybb is to build it so it could be
 * pybb does not provide features like user registration, password restoring.
   It does not provide authentication page. You should use your favorite
   application for such things. You can try well known django-registration
-  http://code.google.com/p/django-registration/ or my own implementation
+  http://code.google.com/p/django-registration/ or lorien own implementation
   http://hg.pydev.ru/django-account. Both applications contain install instruction
-  in the distributive. The demo site http://pybb.org use django-account.
-
-* all pybb stuff placed in one application which is called pybb
-
-* I'm trying to stay with KISS principle. At least in the beginning of pybb
-  development. I mean that there are no threaded posts and there is only bbcode
-  markup support and there is no multi-level nested categories.
+  in the distributive.
 
   
-Dependencies
-============
-
-* BeautifulSoup
-* python-markdown
-* simplejson
-* pytils (optional, need for russian language support)
-* south (optional) - required for migrations
-
-
-How to install PYBB?
+How to install PYBBM?
 ====================
 
 * Firstly you have to install pybb. You have two ways:
   * Install pybb with easy_install or pip tools
-  * Clone pybb repository from http://bitbucket.org/lorien/pybb and place it in your project
+  * Clone pybb repository from http://bitbucket.org/zeus/pybb and place it in your project
 
 * Put `pybb` into settings.INSTALLED_APPS
 * Put `include('pybb.urls'))` into main project urls.py file

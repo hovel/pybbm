@@ -17,17 +17,17 @@
     {% include "pybb/pagination.html" %}
     {% endwith %}
 
-    <ul class="posts">
+    <div class="posts">
         {% if first_post %}{% ifnotequal first_post posts.0 %}
             {% with first_post as post %}
             <li class="first_post">{% include "pybb/post_template.html" %}</li>
             {% endwith %}
         {% endifnotequal %}{% endif %}
         {% for post in posts %}
-            <li>{% include "pybb/post_template.html" %}</li>
+            {% include "pybb/post_template.html" %}
         {% endfor %}
-    </ul>
-
+    </div>
+    <div>&nbsp;</div>
     {% with _('Posts') as label %}
     {% include "pybb/pagination.html" %}
     {% endwith %}

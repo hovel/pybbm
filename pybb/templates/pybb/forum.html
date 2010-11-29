@@ -26,16 +26,16 @@
                 {% trans "Last post" %}
             </div>
         </div>
-        {% for topic in forum.topics.all  %}
-            <div class="topic-row">
+        {% for topic in page.object_list  %}
+            <div class="topic-row {% if topic.sticky %} sticky {% endif %}">
                 <div class="topic-name">
                     <a href='{{ topic.get_absolute_url }}'
-                       class='
-                        {% if topic.sticky %} sticky {% endif %}
-                        {% if topic|pybb_topic_unread:user %} unread {% endif %}'
+                       class='{% if topic|pybb_topic_unread:user %} unread {% endif %}'
                      >
                       {{ topic.name }}
-                      {% if topic.closed %} [{% trans "Closed" %}] {% endif %}</a>
+                    </a>
+                    {% if topic.sticky %} &nbsp;[{% trans "Sticky" %}] {% endif %}
+                    {% if topic.closed %} &nbsp;[{% trans "Closed" %}] {% endif %}
                     {% pybb_topic_mini_pagination topic %}
                 </div>
                 <div class="topic-post-count">
@@ -51,6 +51,7 @@
                 </div>
             </div>
         {%  endfor %}
+        <div>&nbsp;</div>
         {% with _('Topics') as label %}
             {% include "pybb/pagination.html" %}
         {% endwith %}

@@ -12,12 +12,6 @@
     clear: both;
 }
 
-/*.category h1, .topic-list h1 {*/
-/*font-size: 130%;*/
-/*font-weight: normal;*/
-/*padding: 3px;*/
-/*margin: 3px;*/
-/*}*/
 
 .forum-row, .topic-row {
     float: left;
@@ -31,7 +25,7 @@
     float: left;
     padding: 5px;
     margin: 1px;
-    line-height: 2.2em;
+    line-height: 2.4em;
 }
 
 .forum-name {
@@ -52,12 +46,12 @@
     float: left;
     padding: 5px;
     margin: 1px;
-    height: 2.2em;
+    height: 2.4em;
     vertical-align: middle;
 }
 
 .topic-post-count, .topic-view-count, .topic-last-post {
-    line-height: 2.2em;
+    line-height: 2.4em;
 }
 
 .head-row {
@@ -71,6 +65,7 @@
 
 .topic-name {
     width: 40%;
+    line-height: 1.2em;
 }
 
 .topic-post-count, .topic-view-count {
@@ -83,22 +78,25 @@
 }
 
 .posts {
-    list-style-type: none;
+    float: right;
+    clear: both;
+    width: 100%;
 }
 
 .post {
     float: right;
-    width: 100%;
+    width: 99%;
     margin: 3px;
-    background-color: #E1EBF2;
     clear: both;
+    margin-bottom: 5px;
+    border: 1px solid #CCC;
 }
 
 .post .info {
     float: left;
     width: 200px;
     display: block;
-    border-right: 1px solid #ffffff;
+    border-right: 1px solid #CCC;
     padding: 10px;
 }
 
@@ -109,9 +107,29 @@
 }
 
 .pagination {
-    font-size: 80%;
+    padding: 20px;
+    font-size: 110%;
 }
 
+.pagination.mini {
+    padding: 3px;
+    font-size: 90%;
+}
+
+.pagination a {
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+.pagination.mini a{
+    font-weight: normal;
+    padding-left: 2px;
+}
+
+.pages-of {
+    border-bottom: 1px dashed #CCC;
+    cursor: pointer;
+}
 /* ----- Quoting ---- */
 
 blockquote {
@@ -119,4 +137,12 @@ blockquote {
     border: 1px solid #CCC;
     margin-left: 20px;
     padding: 5px;
+}
+
+/* ---- Special features --- */
+
+.updated-message {
+    font-size: 80%;
+    padding: 5px;
+    color: #CCC;
 }
