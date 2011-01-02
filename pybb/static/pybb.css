@@ -151,3 +151,9 @@ blockquote {
     padding: 5px;
     color: #CCC;
 }
+
+/* --- Unread --- */
+
+.unread a{
+    font-weight: bold;
+}

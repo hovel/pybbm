@@ -26,12 +26,10 @@
                 {% trans "Last post" %}
             </div>
         </div>
-        {% for topic in page.object_list  %}
+        {% for topic in page.object_list|pybb_topic_unread:user  %}
             <div class="topic-row {% if topic.sticky %} sticky {% endif %}">
-                <div class="topic-name">
-                    <a href='{{ topic.get_absolute_url }}'
-                       class='{% if topic|pybb_topic_unread:user %} unread {% endif %}'
-                     >
+                <div class="topic-name{% if topic.unread %} unread {% endif %}">
+                    <a href='{{ topic.get_absolute_url }}'>
                       {{ topic.name }}
                     </a>
                     {% if topic.sticky %} &nbsp;[{% trans "Sticky" %}] {% endif %}

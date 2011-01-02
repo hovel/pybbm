@@ -3,7 +3,7 @@ from setuptools import setup
 PACKAGE = 'pybbm'
 
 setup(
-    version = '0.1.8',
+    version = '0.2.0',
     description = 'PyBB Modified. Django forum application',
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
@@ -16,7 +16,7 @@ setup(
             'south',
             'pytils',
             'django-annoying',
-            'sorl-thumbnail'
+            'sorl-thumbnail',
             ],
 
     license = "BSD",

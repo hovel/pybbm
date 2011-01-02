@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load pybb_tags %}
 
 <div class='category'>
     <h1>{{ category.name }}</h1>
@@ -16,9 +17,9 @@
                 {% trans "Last posts" %}
             </div>
     </div>
-    {% for forum in category.forums.all %}
+    {% for forum in category.forums_extended.all|pybb_forum_unread:request.user %}
         <div class="forum-row">
-            <div class="forum-name">
+            <div class="forum-name {% if forum.unread %} unread {% endif %}">
                 <a href='{{ forum.get_absolute_url }}'>{{ forum.name }}</a>
             </div>
             <div class="forum-topic-count">

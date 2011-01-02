@@ -3,9 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
-from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, \
-                        ReadTracking
-
+from pybb.models import Category, Forum, Topic, Post, Profile, Attachment
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'position', 'forum_count']
@@ -127,19 +125,9 @@ class AttachmentAdmin(admin.ModelAdmin):
     admin_edit_post.short_description = _('Edit post')
 
 
-class ReadTrackingAdmin(admin.ModelAdmin):
-    list_display = ['user', 'last_read']
-    search_fields = ['user__username', 'user__email']
-    raw_id_fields = ['user']
-    list_per_page = 20
-    ordering = ['-last_read']
-    date_hierarchy = 'last_read'
-
-
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Forum, ForumAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
-admin.site.register(ReadTracking, ReadTrackingAdmin)

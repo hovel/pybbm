@@ -1,5 +1,6 @@
 from datetime import datetime
 import os.path
+import uuid
 
 try:
     from hashlib import sha1
@@ -7,13 +8,12 @@ except ImportError:
     from sha import sha as sha1
 
 from django.db import models
-from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 
-from annoying.fields import JSONField, AutoOneToOneField
+from annoying.fields import AutoOneToOneField
 from sorl.thumbnail import ImageField
 from pybb.util import unescape
 
@@ -45,6 +45,12 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 
 MARKUP_CHOICES = [(i, i) for i in settings.PYBB_MARKUP_ENGINES.keys()]
 
+#noinspection PyUnusedLocal
+def get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    return os.path.join('pybb/avatar', filename)
+
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -71,6 +77,11 @@ class Category(models.Model):
     def posts(self):
         return Post.objects.filter(topic__forum__category=self).select_related()
 
+    @property
+    def forums_extended(self):
+        forums = self.forums.select_related('last_post').all()
+        return forums
+
 
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
@@ -83,6 +94,7 @@ class Forum(models.Model):
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
     last_post = models.ForeignKey('Post', related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True,
                                   null=True)
+    readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
 
     class Meta(object):
         ordering = ['position']
@@ -93,8 +105,7 @@ class Forum(models.Model):
         return self.name
 
     def update_post_count(self):
-        self.post_count = Topic.objects.filter(forum=self).aggregate(
-                Sum("post_count"))['post_count__sum'] or 0
+        self.post_count = Topic.objects.filter(forum=self).Count()
         self.save()
 
     def get_absolute_url(self):
@@ -124,6 +135,7 @@ class Topic(models.Model):
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     last_post = models.ForeignKey('Post', related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True,
                                   null=True)
+    readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
 
     class Meta(object):
         ordering = ['-created']
@@ -269,7 +281,7 @@ class Profile(models.Model):
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
     ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    avatar = ImageField(_('Avatar'), blank=True, null=True, upload_to='pybb/avatars')
+    avatar = ImageField(_('Avatar'), blank=True, null=True, upload_to=get_file_path)
     
 
     class Meta(object):
@@ -339,30 +351,29 @@ class Attachment(models.Model):
         verbose_name_plural = _('Attachments')
 
 
-class ReadTracking(models.Model):
-    """
-    Model for tracking read/unread posts.
-
-    `topics` field stores JSON serialized mapping of
-    `topic pk` --> `topic last post pk`
-    """
-
-    user = AutoOneToOneField(User)
-    topics = JSONField(null=True, blank=True)
-    last_read = models.DateTimeField(null=True)
-
+class TopicReadTracker(models.Model):
+    '''
+    Save per user topic read tracking
+    '''
     class Meta(object):
-        verbose_name = _('Read tracking')
-        verbose_name_plural = _('Read tracking')
+        verbose_name = _('Topic read tracker')
+        verbose_name_plural = _('Topic read trackers')
 
-    def __unicode__(self):
-        return self.user.username
+    user = models.ForeignKey(User, blank=False, null=False)
+    topic = models.ForeignKey(Topic, blank=True, null=True)
+    time_stamp = models.DateTimeField(auto_now=True)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.last_read = datetime.now()
-        super(ReadTracking, self).save(*args, **kwargs)
+class ForumReadTracker(models.Model):
+    '''
+    Save per user forum read tracking
+    '''
+    class Meta(object):
+        verbose_name = _('Forum read tracker')
+        verbose_name_plural = _('Forum read trackers')
 
+    user = models.ForeignKey(User, blank=False, null=False)
+    forum = models.ForeignKey(Forum, blank=True, null=True)
+    time_stamp = models.DateTimeField(auto_now=True)
 
 from pybb import signals
 

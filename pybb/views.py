@@ -1,5 +1,7 @@
 # coding: utf-8
 import math
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.expressions import F
 
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect, HttpResponse, Http404
@@ -8,9 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 
 from pybb.util import  paginate
-from pybb.models import Category, Forum, Topic, Post, Attachment
+from pybb.models import Category, Forum, Topic, Post, Attachment, TopicReadTracker, ForumReadTracker
 from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, UserSearchForm
-from pybb.read_tracking import update_read_tracking
 
 import settings
 
@@ -47,7 +48,37 @@ def show_topic(request, topic_id):
 
     form = False
     if request.user.is_authenticated():
-        update_read_tracking(topic, request.user)
+        # Do read/unread mark
+        try:
+            forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=request.user)
+        except ObjectDoesNotExist:
+            forum_mark = None
+        if (forum_mark is None) or (forum_mark.time_stamp < topic.updated):
+            # Mark topic as readed
+            topic_mark, new = TopicReadTracker.objects.get_or_create(topic=topic, user=request.user)
+            if not new:
+                topic_mark.save()
+            # Check, if there are any unread topics in forum
+            try:
+                qs = Topic.objects.filter(
+                        topicreadtracker__user=request.user,
+                        topicreadtracker__time_stamp__lt=F('updated'),
+                        forum=topic.forum,
+                        )
+                if forum_mark:
+                    qs = qs.filter(topicreadtracker__time_stamp__gte=forum_mark.time_stamp)
+                qs[0:1].get()
+            except Topic.DoesNotExist:
+                # Clear all topic marks for this forum, mark forum as readed
+                TopicReadTracker.objects.filter(
+                        user=request.user,
+                        topic__forum=topic.forum
+                        ).delete()
+                forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum,user=request.user)
+                if new:
+                    forum_mark.save()
+
+        # Set is_moderator / is_subscribed properties
         request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
         request.user.is_subscribed = request.user in topic.subscribers.all()
         if request.user.is_superuser:
