@@ -2,7 +2,7 @@ from os.path import join
 from annoying.functions import get_config
 
 PYBB_TOPIC_PAGE_SIZE = get_config('PYBB_TOPIC_PAGE_SIZE', 10)
-PYBB_FORUM_PAGE_SIZE = get_config('PYBB_FORUM_PAGE_SIZE', 20)
+PYBB_FORUM_PAGE_SIZE = get_config('PYBB_FORUM_PAGE_SIZE', 10)
 PYBB_USERS_PAGE_SIZE = get_config('PYBB_USERS_PAGE_SZIE', 20)
 PYBB_AVATAR_WIDTH = get_config('PYBB_AVATAR_WIDTH', 60)
 PYBB_AVATAR_HEIGHT = get_config('PYBB_AVATAR_HEIGHT',60)

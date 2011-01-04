@@ -12,6 +12,7 @@
     </div>
     <h1>{{ forum.name }}</h1>
     <div class='topic-list'>
+        {% include "pybb/pagination/pagination.html" %}
         <div class="topic-row head-row">
             <div class="topic-name">
                 {% trans "Topic" %}
@@ -26,7 +27,7 @@
                 {% trans "Last post" %}
             </div>
         </div>
-        {% for topic in page.object_list|pybb_topic_unread:user  %}
+        {% for topic in topic_list|pybb_topic_unread:user  %}
             <div class="topic-row {% if topic.sticky %} sticky {% endif %}">
                 <div class="topic-name{% if topic.unread %} unread {% endif %}">
                     <a href='{{ topic.get_absolute_url }}'>
@@ -34,7 +35,6 @@
                     </a>
                     {% if topic.sticky %} &nbsp;[{% trans "Sticky" %}] {% endif %}
                     {% if topic.closed %} &nbsp;[{% trans "Closed" %}] {% endif %}
-                    {% pybb_topic_mini_pagination topic %}
                 </div>
                 <div class="topic-post-count">
                     {{ topic.post_count }}
@@ -50,9 +50,7 @@
             </div>
         {%  endfor %}
         <div>&nbsp;</div>
-        {% with _('Topics') as label %}
-            {% include "pybb/pagination.html" %}
-        {% endwith %}
+        {% include "pybb/pagination/pagination.html" %}
 
         {% if not user.pybb_profile.is_banned %}
             <div class="controls">

@@ -105,7 +105,7 @@ class Forum(models.Model):
         return self.name
 
     def update_post_count(self):
-        self.post_count = Topic.objects.filter(forum=self).Count()
+        self.post_count = Topic.objects.filter(forum=self).count()
         self.save()
 
     def get_absolute_url(self):

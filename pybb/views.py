@@ -1,13 +1,13 @@
 # coding: utf-8
 import math
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.expressions import F
-
+from django.db.models import F, Q
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.views.generic.list_detail import object_list
 
 from pybb.util import  paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment, TopicReadTracker, ForumReadTracker
@@ -27,25 +27,24 @@ def show_category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
     return {'categories': [category, ]}
 
-@render_to('pybb/forum.html')
 def show_forum(request, forum_id):
+    kwargs = {}
     forum = get_object_or_404(Forum, pk=forum_id)
-    topics = forum.topics.order_by('-sticky', '-updated').select_related()
-    page, paginator = paginate(topics, request, settings.PYBB_FORUM_PAGE_SIZE)
-    return {'forum': forum,
-            'page': page,
-    }
+    kwargs['queryset'] = forum.topics.order_by('-sticky', '-updated').select_related()
+    kwargs['paginate_by'] = settings.PYBB_FORUM_PAGE_SIZE
+    kwargs['template_name'] = 'pybb/forum.html'
+    kwargs['extra_context'] = {'forum': forum}
+    kwargs['template_object_name'] = 'topic'
+    return object_list(request, **kwargs)
 
-@render_to('pybb/topic.html')
 def show_topic(request, topic_id):
     try:
         topic = Topic.objects.select_related('forum').get(pk=topic_id)
     except Topic.DoesNotExist:
         raise Http404()
-
     topic.views += 1
     topic.save()
-
+    kwargs = {}
     form = False
     if request.user.is_authenticated():
         # Do read/unread mark
@@ -60,13 +59,15 @@ def show_topic(request, topic_id):
                 topic_mark.save()
             # Check, if there are any unread topics in forum
             try:
-                qs = Topic.objects.filter(
+                if forum_mark:
+                    q_not_marked = Q(topicreadtracker=None, updated__gt=forum_mark.time_stamp)
+                else:
+                    q_not_marked = Q(topicreadtracker=None)
+                qs = Topic.objects.filter(Q(
                         topicreadtracker__user=request.user,
                         topicreadtracker__time_stamp__lt=F('updated'),
                         forum=topic.forum,
-                        )
-                if forum_mark:
-                    qs = qs.filter(topicreadtracker__time_stamp__gte=forum_mark.time_stamp)
+                        )|q_not_marked)
                 qs[0:1].get()
             except Topic.DoesNotExist:
                 # Clear all topic marks for this forum, mark forum as readed
@@ -75,9 +76,7 @@ def show_topic(request, topic_id):
                         topic__forum=topic.forum
                         ).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum,user=request.user)
-                if new:
-                    forum_mark.save()
-
+                forum_mark.save()
         # Set is_moderator / is_subscribed properties
         request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
         request.user.is_subscribed = request.user in topic.subscribers.all()
@@ -85,24 +84,17 @@ def show_topic(request, topic_id):
             form = AdminPostForm(initial={'login': request.user.username}, topic=topic)
         else:
             form = PostForm(topic=topic)
-
     if settings.PYBB_FREEZE_FIRST_POST:
         first_post = topic.head
     else:
         first_post = None
+    kwargs['queryset'] = topic.posts.all().select_related('user', 'user__pybb_profile')
+    kwargs['paginate_by'] = settings.PYBB_TOPIC_PAGE_SIZE
+    kwargs['template_object_name'] = 'post'
+    kwargs['extra_context'] = {'form': form, 'first_post': first_post, 'topic': topic}
+    kwargs['template_name'] = 'pybb/topic.html'
+    return object_list(request, **kwargs)
 
-    posts = topic.posts.all().select_related('user', 'user__pybb_profile')
-    # TODO: Here could be gotcha
-    # If topic.post_count is broken then strange effect could be possible!
-    page, paginator = paginate(posts, request, settings.PYBB_TOPIC_PAGE_SIZE,
-                               total_count=topic.post_count)
-
-    return {'topic': topic,
-            'first_post': first_post,
-            'form': form,
-            'posts': page.object_list,
-            'page': page,
-    }
 
 
 @login_required

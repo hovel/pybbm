@@ -14,22 +14,22 @@
     </div>
 
     {% with _('Posts') as label %}
-    {% include "pybb/pagination.html" %}
+    {% include "pybb/pagination/pagination.html" %}
     {% endwith %}
 
     <div class="posts">
-        {% if first_post %}{% ifnotequal first_post posts.0 %}
+        {% if first_post %}{% ifnotequal first_post post_list.0 %}
             {% with first_post as post %}
             <li class="first_post">{% include "pybb/post_template.html" %}</li>
             {% endwith %}
         {% endifnotequal %}{% endif %}
-        {% for post in posts %}
+        {% for post in post_list %}
             {% include "pybb/post_template.html" %}
         {% endfor %}
     </div>
     <div>&nbsp;</div>
     {% with _('Posts') as label %}
-    {% include "pybb/pagination.html" %}
+    {% include "pybb/pagination/pagination.html" %}
     {% endwith %}
 
     {% if user.is_authenticated %}

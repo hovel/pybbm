@@ -114,6 +114,7 @@
 .pagination {
     padding: 20px;
     font-size: 110%;
+    text-align: center;
 }
 
 .pagination.mini {
@@ -134,6 +135,14 @@
 .pages-of {
     border-bottom: 1px dashed #CCC;
     cursor: pointer;
+}
+
+.pagination .first {
+    margin-right: 20px;
+}
+
+.pagination .last {
+    margin-left: 20px;
 }
 /* ----- Quoting ---- */
 

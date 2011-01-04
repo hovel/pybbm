@@ -161,7 +161,7 @@ def pybb_equal_to(obj1, obj2):
     return obj1 == obj2
 
 
-@register.inclusion_tag('pybb/topic_mini_pagination.html')
+@register.inclusion_tag('pybb/mini_pagination.html')
 def pybb_topic_mini_pagination(topic):
     """
     Display links on topic pages.
@@ -259,10 +259,20 @@ def pybb_topic_unread(topics, user):
     for topic in topic_list:
         topic.unread = True
     if user.is_authenticated():
-        topic_marks = TopicReadTracker.objects.filter(
+        try:
+            forum_mark = ForumReadTracker.objects.get(user=user, forum=topic_list[0].forum)
+        except:
+            forum_mark = None
+        qs = TopicReadTracker.objects.filter(
                 user=user,
                 topic__in=topic_list
                 ).select_related('topic')
+        if forum_mark:
+            qs.filter(topic__updated__gt=forum_mark.time_stamp)
+        for topic in topic_list:
+            if topic.updated < forum_mark.time_stamp:
+                topic.unread = False
+        topic_marks = list(qs)
         topic_dict = dict(((topic.id, topic) for topic in topic_list))
         for mark in topic_marks:
             if topic_dict[mark.topic.id].updated < mark.time_stamp:
