@@ -63,11 +63,10 @@ def show_topic(request, topic_id):
                     q_not_marked = Q(topicreadtracker=None, updated__gt=forum_mark.time_stamp)
                 else:
                     q_not_marked = Q(topicreadtracker=None)
-                qs = Topic.objects.filter(Q(
+                qs = Topic.objects.filter(Q(forum=topic.forum) & (Q(
                         topicreadtracker__user=request.user,
                         topicreadtracker__time_stamp__lt=F('updated'),
-                        forum=topic.forum,
-                        )|q_not_marked)
+                        )|q_not_marked))
                 qs[0:1].get()
             except Topic.DoesNotExist:
                 # Clear all topic marks for this forum, mark forum as readed
