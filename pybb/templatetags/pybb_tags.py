@@ -269,9 +269,10 @@ def pybb_topic_unread(topics, user):
                 ).select_related('topic')
         if forum_mark:
             qs.filter(topic__updated__gt=forum_mark.time_stamp)
-        for topic in topic_list:
-            if topic.updated < forum_mark.time_stamp:
-                topic.unread = False
+        if forum_mark:
+            for topic in topic_list:
+                if topic.updated < forum_mark.time_stamp:
+                    topic.unread = False
         topic_marks = list(qs)
         topic_dict = dict(((topic.id, topic) for topic in topic_list))
         for mark in topic_marks:
