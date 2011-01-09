@@ -2,12 +2,14 @@
 import math
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F, Q
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404, redirect
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.views.generic.list_detail import object_list
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
 
 from pybb.util import  paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment, TopicReadTracker, ForumReadTracker
@@ -388,6 +390,12 @@ def post_ajax_preview(request):
         return HttpResponse(html)
     return Http404
 
-
-
-
+@login_required
+def mark_all_as_read(request):
+    for forum in Forum.objects.all():
+        forum_mark, new = ForumReadTracker.objects.get_or_create(forum=forum, user=request.user)
+        forum_mark.save()
+    TopicReadTracker.objects.filter(user=request.user).delete()
+    msg = _('All forums marked as read')
+    messages.success(request, msg, fail_silently=True)
+    return redirect(reverse('pybb_index'))

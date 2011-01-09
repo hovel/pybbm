@@ -67,4 +67,7 @@ urlpatterns += patterns('pybb.views',
 
                         # API
                         url('^api/post_ajax_preview/$', 'post_ajax_preview', name='pybb_post_ajax_preview'),
+
+                        # Commands
+                        url('^mark_all_as_read/$', 'mark_all_as_read', name='mark_all_as_read')
                         )
