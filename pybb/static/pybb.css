@@ -1,4 +1,9 @@
 /* Forum styles */
+
+legend {
+    font-size: 110%;
+}
+
 .controls {
     padding: 10px 0 10px 0;
 }
@@ -166,3 +171,6 @@ blockquote {
 .unread a{
     font-weight: bold;
 }
+
+
+

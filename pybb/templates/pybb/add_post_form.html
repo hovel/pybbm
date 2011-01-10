@@ -1,12 +1,21 @@
 {% load i18n pybb_tags %}
 
+
+
 <form class="post-form" action="{% if forum %}{% url pybb_add_topic forum.pk %}{% else %}{% url pybb_add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
     {% pybb_csrf %}
-    <fieldset>
-        <legend>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</legend>
-        {{ form.as_p }}
-        <p class="submit">
-            <input type="submit" value="{% trans 'Submit' %}" />
-        </p>
+       <fieldset>
+            <legend>
+                {% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}
+            </legend>
+            {{ form.as_p }}
+            <div id='emoticons'>
+                {% for smile, url in form.aviable_smiles.items %}
+                    <a href='#' title='{{ smile|safe }}'><img src='{{ MEDIA_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
+                {% endfor %}
+            </div>
+            <p class="submit">
+                <input type="submit" value="{% trans 'Submit' %}" />
+            </p>
     </fieldset>
 </form>

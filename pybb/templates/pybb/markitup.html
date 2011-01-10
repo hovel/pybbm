@@ -7,6 +7,14 @@
 $(function() {
     mySettings['previewParserPath'] = '{% url pybb_post_ajax_preview %}';
     mySettings['previewPosition'] = 'before';
-    $("textarea").markItUp(mySettings);
+    mySettings['resizeHandle'] = true;
+    mySettings['']
+    $('textarea').markItUp(mySettings);
+
+    $('#emoticons a').click(function() {
+        var emoticon = $(this).attr("title");
+        $.markItUp({replaceWith: emoticon});
+        return false;
+    });
 });
 </script>

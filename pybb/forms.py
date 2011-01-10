@@ -47,6 +47,9 @@ class PostForm(forms.ModelForm):
             self.fields['attachment'].widget = forms.HiddenInput()
             self.fields['attachment'].required = False
 
+        self.aviable_smiles = settings.PYBB_SMILES
+        self.smiles_prefix = settings.PYBB_SMILES_PREFIX
+
     def clean_attachment(self):
         for f in self.files:
             if self.files[f].size > settings.PYBB_ATTACHMENT_SIZE_LIMIT:
