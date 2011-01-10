@@ -328,14 +328,14 @@ def merge_topics(request):
                 post.topic = main_topic
                 post.save()
 
-        main_topic.update_post_count()
-        main_topic.forum.update_post_count()
+        main_topic.update_counters()
+        main_topic.forum.update_counters()
 
         for topic in topics:
             if topic.id != main:
                 forum = topic.forum
                 topic.delete()
-                forum.update_post_count()
+                forum.update_counters()
 
         return HttpResponseRedirect(main_topic.get_absolute_url())
 

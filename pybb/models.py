@@ -104,8 +104,9 @@ class Forum(models.Model):
     def __unicode__(self):
         return self.name
 
-    def update_post_count(self):
-        self.post_count = Topic.objects.filter(forum=self).count()
+    def update_counters(self):
+        self.post_count = Post.objects.filter(topic__forum=self).count()
+        self.topic_count = Topic.objects.filter(forum=self).count()
         self.save()
 
     def get_absolute_url(self):
@@ -162,7 +163,7 @@ class Topic(models.Model):
             self.created = datetime.now()
         super(Topic, self).save(*args, **kwargs)
 
-    def update_post_count(self):
+    def update_counters(self):
         self.post_count = self.posts.count()
         self.save()
 
@@ -232,10 +233,10 @@ class Post(RenderableItem):
         if new:
             self.topic.updated = now
             self.topic.last_post = self
-            self.topic.update_post_count()
+            self.topic.update_counters()
             self.topic.forum.updated = now
             self.topic.forum.last_post = self
-            self.topic.forum.update_post_count()
+            self.topic.forum.update_counters()
 
     def get_absolute_url(self):
         return reverse('pybb_post', args=[self.id])
@@ -257,9 +258,9 @@ class Post(RenderableItem):
             self.topic.forum.last_post = self.topic.forum.get_last_post()
         else:
             super(Post, self).delete(*args, **kwargs)
-            self.topic.update_post_count()
+            self.topic.update_counters()
 
-        self.topic.forum.update_post_count()
+        self.topic.forum.update_counters()
 
 
 BAN_STATUS = (
