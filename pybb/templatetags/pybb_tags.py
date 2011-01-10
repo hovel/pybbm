@@ -296,7 +296,8 @@ def pybb_forum_unread(forums, user):
                 ).select_related('forum')
         forum_dict = dict(((forum.id, forum) for forum in forum_list))
         for mark in forum_marks:
-            if forum_dict[mark.forum.id].updated < mark.time_stamp:
+            if (forum_dict[mark.forum.id].updated is None) or\
+               (forum_dict[mark.forum.id].updated < mark.time_stamp):
                 forum_dict[mark.forum.id].unread = False
     return forum_list
 
