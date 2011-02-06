@@ -5,6 +5,7 @@
 {% block pybb_title %}{{ topic }}{% endblock %}
 
 {% block head %}
+    {{ block.super }}
     {% include "pybb/markitup.html" %}
 {% endblock head %}
 

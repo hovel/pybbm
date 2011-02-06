@@ -5,6 +5,7 @@
 {% block title %} {% trans "Editing the post" %} {% endblock title %}
 
 {% block head %}
+    {{ block.super }}
     {% include "pybb/markitup.html" %}
 {% endblock head %}
 
