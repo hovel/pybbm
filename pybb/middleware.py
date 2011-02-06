@@ -1,11 +1,11 @@
 from django.utils import translation
-import settings
+import defaults
 
 class PybbMiddleware(object):
     def process_request(self, request):
-        request.pybb_title = settings.PYBB_DEFAULT_TITLE
-        request.pybb_avatar_dimensions = '%sx%s' % (settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_WIDTH)
-        request.pybb_default_avatar = settings.PYBB_DEFAULT_AVATAR_URL
+        request.pybb_title = defaults.PYBB_DEFAULT_TITLE
+        request.pybb_avatar_dimensions = '%sx%s' % (defaults.PYBB_AVATAR_WIDTH, defaults.PYBB_AVATAR_WIDTH)
+        request.pybb_default_avatar = defaults.PYBB_DEFAULT_AVATAR_URL
         if request.user.is_authenticated():
             profile = request.user.pybb_profile
             language = translation.get_language_from_request(request)

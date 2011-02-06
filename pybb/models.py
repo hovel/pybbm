@@ -17,7 +17,7 @@ from annoying.fields import AutoOneToOneField
 from sorl.thumbnail import ImageField
 from pybb.util import unescape
 
-import settings
+import defaults
 
 from annoying.functions import get_config
 
@@ -43,7 +43,7 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
 )]
 
-MARKUP_CHOICES = [(i, i) for i in settings.PYBB_MARKUP_ENGINES.keys()]
+MARKUP_CHOICES = [(i, i) for i in defaults.PYBB_MARKUP_ENGINES.keys()]
 
 #noinspection PyUnusedLocal
 def get_file_path(instance, filename):
@@ -186,14 +186,14 @@ class RenderableItem(models.Model):
     class Meta(object):
         abstract = True
 
-    markup = models.CharField(_('Markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
+    markup = models.CharField(_('Markup'), max_length=15, default=defaults.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     body = models.TextField(_('Message'))
     body_html = models.TextField(_('HTML version'))
     body_text = models.TextField(_('Text version'))
 
     def render(self):
-        if self.markup in settings.PYBB_MARKUP_ENGINES:
-            self.body_html = settings.PYBB_MARKUP_ENGINES[self.markup](self.body)
+        if self.markup in defaults.PYBB_MARKUP_ENGINES:
+            self.body_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.body)
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
         # Remove tags which was generated with the markup processor
@@ -270,14 +270,14 @@ BAN_STATUS = (
 
 class Profile(models.Model):
     user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
-    signature = models.TextField(_('Signature'), blank=True, max_length=settings.PYBB_SIGNATURE_MAX_LENGTH)
+    signature = models.TextField(_('Signature'), blank=True, max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH)
     signature_html = models.TextField(_('Signature HTML Version'), blank=True,
-                                      max_length=settings.PYBB_SIGNATURE_MAX_LENGTH + 30)
-    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(settings.PYBB_DEFAULT_TIME_ZONE))
+                                      max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH + 30)
+    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
                                 choices=LANGUAGES)
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
-    markup = models.CharField(_('Default markup'), max_length=15, default=settings.PYBB_DEFAULT_MARKUP,
+    markup = models.CharField(_('Default markup'), max_length=15, default=defaults.PYBB_DEFAULT_MARKUP,
                               choices=MARKUP_CHOICES)
     ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
     ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
@@ -290,7 +290,7 @@ class Profile(models.Model):
         verbose_name_plural = _('Profiles')
 
     def save(self, *args, **kwargs):
-        self.signature_html = settings.PYBB_MARKUP_ENGINES[self.markup](self.signature)
+        self.signature_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.signature)
         super(Profile, self).save(*args, **kwargs)
 
     def is_banned(self):
@@ -308,7 +308,7 @@ class Profile(models.Model):
         try:
             return self.avatar.url
         except:
-            return settings.PYBB_DEFAULT_AVATAR_URL
+            return defaults.PYBB_DEFAULT_AVATAR_URL
 
     def get_absolute_url(self):
         return reverse('pybb_user', args=[self.user.username])
@@ -344,7 +344,7 @@ class Attachment(models.Model):
             return '%.2fMb' % (size / float(1024 * 1024))
 
     def get_absolute_path(self):
-        return os.path.join(MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO,
+        return os.path.join(MEDIA_ROOT, defaults.PYBB_ATTACHMENT_UPLOAD_TO,
                             self.path)
 
     class Meta(object):

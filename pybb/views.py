@@ -10,30 +10,28 @@ from django.core.urlresolvers import reverse
 from django.views.generic.list_detail import object_list
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic.simple import direct_to_template
 
 from pybb.util import  paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment, TopicReadTracker, ForumReadTracker
 from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, UserSearchForm
 
-import settings
+import defaults
 
-from annoying.decorators import render_to, ajax_request
 
-@render_to('pybb/index.html')
 def index(request):
     categories = Category.objects.all()
-    return {'categories': categories, }
+    return direct_to_template(request, 'pybb/index.html', {'categories': categories, })
 
-@render_to('pybb/index.html')
 def show_category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
-    return {'categories': [category, ]}
+    return direct_to_template(request, 'pybb/index.html', {'categories': [category, ]})
 
 def show_forum(request, forum_id):
     kwargs = {}
     forum = get_object_or_404(Forum, pk=forum_id)
     kwargs['queryset'] = forum.topics.order_by('-sticky', '-updated').select_related()
-    kwargs['paginate_by'] = settings.PYBB_FORUM_PAGE_SIZE
+    kwargs['paginate_by'] = defaults.PYBB_FORUM_PAGE_SIZE
     kwargs['template_name'] = 'pybb/forum.html'
     kwargs['extra_context'] = {'forum': forum}
     kwargs['template_object_name'] = 'topic'
@@ -59,7 +57,7 @@ def show_topic(request, topic_id):
             topic_mark, new = TopicReadTracker.objects.get_or_create(topic=topic, user=request.user)
             if not new:
                 topic_mark.save()
-            # Check, if there are any unread topics in forum
+                # Check, if there are any unread topics in forum
             try:
                 if forum_mark:
                     q_not_marked = Q(topicreadtracker=None, updated__gt=forum_mark.time_stamp)
@@ -68,7 +66,7 @@ def show_topic(request, topic_id):
                 qs = Topic.objects.filter(Q(forum=topic.forum) & (Q(
                         topicreadtracker__user=request.user,
                         topicreadtracker__time_stamp__lt=F('updated'),
-                        )|q_not_marked))
+                        ) | q_not_marked))
                 qs[0:1].get()
             except Topic.DoesNotExist:
                 # Clear all topic marks for this forum, mark forum as readed
@@ -76,30 +74,28 @@ def show_topic(request, topic_id):
                         user=request.user,
                         topic__forum=topic.forum
                         ).delete()
-                forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum,user=request.user)
+                forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum, user=request.user)
                 forum_mark.save()
-        # Set is_moderator / is_subscribed properties
+            # Set is_moderator / is_subscribed properties
         request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
         request.user.is_subscribed = request.user in topic.subscribers.all()
         if request.user.is_superuser:
             form = AdminPostForm(initial={'login': request.user.username}, topic=topic)
         else:
             form = PostForm(topic=topic)
-    if settings.PYBB_FREEZE_FIRST_POST:
+    if defaults.PYBB_FREEZE_FIRST_POST:
         first_post = topic.head
     else:
         first_post = None
     kwargs['queryset'] = topic.posts.all().select_related('user', 'user__pybb_profile')
-    kwargs['paginate_by'] = settings.PYBB_TOPIC_PAGE_SIZE
+    kwargs['paginate_by'] = defaults.PYBB_TOPIC_PAGE_SIZE
     kwargs['template_object_name'] = 'post'
     kwargs['extra_context'] = {'form': form, 'first_post': first_post, 'topic': topic}
     kwargs['template_name'] = 'pybb/topic.html'
     return object_list(request, **kwargs)
 
 
-
 @login_required
-@render_to('pybb/add_post.html')
 def add_post(request, forum_id, topic_id):
     forum = None
     topic = None
@@ -118,7 +114,7 @@ def add_post(request, forum_id, topic_id):
         quote = ''
     else:
         post = get_object_or_404(Post, pk=quote_id)
-        quote = settings.PYBB_QUOTE_ENGINES[request.user.pybb_profile.markup](post.body, post.user.username)
+        quote = defaults.PYBB_QUOTE_ENGINES[request.user.pybb_profile.markup](post.body, post.user.username)
 
     ip = request.META.get('REMOTE_ADDR', '')
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
@@ -137,41 +133,38 @@ def add_post(request, forum_id, topic_id):
         post = form.save()
         return HttpResponseRedirect(post.get_absolute_url())
 
-    return {'form': form,
-            'topic': topic,
-            'forum': forum,
-    }
+    return direct_to_template(request, 'pybb/add_post.html', {'form': form,
+                                                              'topic': topic,
+                                                              'forum': forum,
+                                                              })
 
-@render_to('pybb/user.html')
 def user(request, username):
     profile = get_object_or_404(User, username=username)
     topic_count = Topic.objects.filter(user=profile).count()
-    return {
+    return direct_to_template(request, 'pybb/user.html', {
         'profile': profile,
         'topic_count': topic_count,
-    }
+        })
 
-@render_to('pybb/user_topics.html')
 def user_topics(request, username):
     profile = get_object_or_404(User, username=username)
     topics = Topic.objects.filter(user=profile).order_by('-created')
-    page, paginator = paginate(topics, request, settings.PYBB_TOPIC_PAGE_SIZE)
-    return {
+    page, paginator = paginate(topics, request, defaults.PYBB_TOPIC_PAGE_SIZE)
+    return direct_to_template(request, 'pybb/user_topics.html', {
         'profile': profile,
         'page': page,
-    }
+        })
 
 
 def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     count = post.topic.posts.filter(created__lt=post.created).count() + 1
-    page = math.ceil(count / float(settings.PYBB_TOPIC_PAGE_SIZE))
+    page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
     url = '%s?page=%d#post-%d' % (reverse('pybb_topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
 
 
 @login_required
-@render_to('pybb/edit_profile.html')
 def edit_profile(request):
     form_kwargs = dict(instance=request.user.pybb_profile)
     if request.method == 'POST':
@@ -184,13 +177,12 @@ def edit_profile(request):
         profile.save()
         return HttpResponseRedirect(reverse('pybb_edit_profile'))
 
-    return {'form': form,
-            'profile': request.user.pybb_profile,
-    }
+    return direct_to_template(request, 'pybb/edit_profile.html', {'form': form,
+                                                                  'profile': request.user.pybb_profile,
+                                                                  })
 
 
 @login_required
-@render_to('pybb/edit_post.html')
 def edit_post(request, post_id):
     from pybb.templatetags.pybb_tags import pybb_editable_by
 
@@ -214,9 +206,9 @@ def edit_post(request, post_id):
         post = form.save()
         return HttpResponseRedirect(post.get_absolute_url())
 
-    return {'form': form,
-            'post': post,
-    }
+    return direct_to_template(request, 'pybb/edit_post.html', {'form': form,
+                                                               'post': post,
+                                                               })
 
 
 @login_required
@@ -244,7 +236,6 @@ def unstick_topic(request, topic_id):
 
 
 @login_required
-@render_to('pybb/delete_post.html')
 def delete_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     last_post = post.topic.posts.order_by('-created')[0]
@@ -271,8 +262,8 @@ def delete_post(request, post_id):
         else:
             return HttpResponseRedirect(topic.get_absolute_url())
     else:
-        return {'post': post,
-        }
+        return direct_to_template(request, 'pybb/delete_post.html', {'post': post,
+        })
 
 
 @login_required
@@ -300,7 +291,6 @@ def open_topic(request, topic_id):
 
 
 @login_required
-@render_to('pybb/merge_topics.html')
 def merge_topics(request):
     from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
@@ -339,21 +329,20 @@ def merge_topics(request):
 
         return HttpResponseRedirect(main_topic.get_absolute_url())
 
-    return {'posts': posts,
+    return direct_to_template(request, 'pybb/merge_topics.html', {'posts': posts,
             'topics': topics,
             'topic': topics[0],
-    }
+    })
 
-@render_to('pybb/users.html')
 def users(request):
     form = UserSearchForm(request.GET)
     all_users = form.filter(User.objects.order_by('username'))
 
-    page, paginator = paginate(all_users, request, settings.PYBB_USERS_PAGE_SIZE)
+    page, paginator = paginate(all_users, request, defaults.PYBB_USERS_PAGE_SIZE)
 
-    return {'page': page,
+    return direct_to_template(request, 'pybb/users.html', {'page': page,
             'form': form,
-    }
+    })
 
 
 @login_required
@@ -382,11 +371,10 @@ def show_attachment(request, hash):
 
 
 @login_required
-@ajax_request
 def post_ajax_preview(request):
     if request.user.is_authenticated():
         content = request.POST.get('data')
-        html = settings.PYBB_MARKUP_ENGINES[request.user.pybb_profile.markup](content)
+        html = defaults.PYBB_MARKUP_ENGINES[request.user.pybb_profile.markup](content)
         return HttpResponse(html)
     return Http404
 

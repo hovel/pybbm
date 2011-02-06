@@ -11,7 +11,7 @@
             {{ form.as_p }}
             <div id='emoticons'>
                 {% for smile, url in form.aviable_smiles.items %}
-                    <a href='#' title='{{ smile|safe }}'><img src='{{ MEDIA_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
+                    <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
                 {% endfor %}
             </div>
             <p class="submit">

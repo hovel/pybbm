@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.contrib.sites.models import Site
 from annoying.functions import get_config
 
-import settings
+import defaults
 MEDIA_URL = get_config('MEDIA_URL', None)
 
 def paginate(items, request, per_page, total_count=None):
@@ -80,13 +80,13 @@ def gravatar_url(email):
     """
 
     hash = md5(email).hexdigest()
-    size = max(settings.PYBB_AVATAR_WIDTH, settings.PYBB_AVATAR_HEIGHT)
-    url = settings.PYBB_DEFAULT_AVATAR_URL
+    size = max(defaults.PYBB_AVATAR_WIDTH, defaults.PYBB_AVATAR_HEIGHT)
+    url = defaults.PYBB_DEFAULT_AVATAR_URL
     hostname = Site.objects.get_current().domain
     if not url.startswith('http://'):
         url = 'http://%s%s%s' % (hostname,
                                  MEDIA_URL,
-                                 settings.PYBB_DEFAULT_AVATAR_URL)
+                                 defaults.PYBB_DEFAULT_AVATAR_URL)
     default = urllib.quote(url)
     url = 'http://www.gravatar.com/avatar/%s?s=%d&d=%s' % (hash, size, default)
     return url

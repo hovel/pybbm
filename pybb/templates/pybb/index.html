@@ -1,7 +1,7 @@
 {% extends 'pybb/base.html' %}
 {% load i18n %}
 {% block title %}
-    {{ request.pybb_title }}
+    {{ request.pybb_title|safe }}
 {% endblock title %}
 
 {% block content %}

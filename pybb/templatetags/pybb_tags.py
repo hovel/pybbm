@@ -21,13 +21,10 @@ from django.utils import dateformat
 from django.utils.translation import ungettext
 
 from pybb.models import Topic, TopicReadTracker, ForumReadTracker
-from annoying.functions import get_config
-MEDIA_URL = get_config('MEDIA_URL', None)
 
-import pybb.settings as settings
+from django.conf import settings
+from pybb import defaults
 
-MIDDLEWARE_CLASSES = get_config('MIDDLEWARE_CLASSES', None)
-LANGUAGE_CODE = get_config('LANGUAGE_CODE', None)
 
 register = template.Library()
 
@@ -38,7 +35,7 @@ def pybb_csrf(parser, token):
     This tag returns CsrfTokenNode if CsrfViewMiddleware is enabled, or empty string if not
     """
 
-    if 'django.middleware.csrf.CsrfViewMiddleware' in MIDDLEWARE_CLASSES:
+    if 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE_CLASSES:
         from django.template.defaulttags import CsrfTokenNode
 
         return CsrfTokenNode()
@@ -166,11 +163,11 @@ def pybb_topic_mini_pagination(topic):
     """
     Display links on topic pages.
     """
-    is_paginated = topic.post_count > settings.PYBB_TOPIC_PAGE_SIZE
+    is_paginated = topic.post_count > defaults.PYBB_TOPIC_PAGE_SIZE
     if not is_paginated:
         pagination = None
     else:
-        page_size = settings.PYBB_TOPIC_PAGE_SIZE
+        page_size = defaults.PYBB_TOPIC_PAGE_SIZE
         a_template = u'<a href="%s?page=%%(p)s">%%(p)s</a>' % topic.get_absolute_url()
         page_count = ((topic.post_count - 1) / page_size ) + 1
         if page_count > 4:
@@ -319,7 +316,7 @@ def pybb_render_post(post, mode='html'):
     def render_autojoin_message(match):
         time_diff = int(match.group(1)) / 60
 
-        if LANGUAGE_CODE.startswith('ru') and pytils_enabled:
+        if settings.LANGUAGE_CODE.startswith('ru') and pytils_enabled:
             minutes = pytils.numeral.choose_plural(time_diff,
                                                    (u'минуту', u'минуты', u'минут'))
             join_message = u'Добавлено через %s %s' % (time_diff, minutes)

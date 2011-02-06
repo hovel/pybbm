@@ -5,14 +5,13 @@ import inspect
 
 from django import forms
 from django.utils.translation import ugettext as _
-from annoying.functions import get_config
 from pybb.models import Topic, Post, Profile, Attachment
 from django.contrib.auth.models import User
 
-import settings
+import defaults
+from django.conf import settings
 
-MEDIA_ROOT = get_config('MEDIA_ROOT', '/media/')
-
+MEDIA_ROOT = settings.MEDIA_ROOT
 class PostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
     attachment = forms.FileField(label=_('Attachment'), required=False)
@@ -43,16 +42,16 @@ class PostForm(forms.ModelForm):
             self.fields['name'].widget = forms.HiddenInput()
             self.fields['name'].required = False
 
-        if not settings.PYBB_ATTACHMENT_ENABLE:
+        if not defaults.PYBB_ATTACHMENT_ENABLE:
             self.fields['attachment'].widget = forms.HiddenInput()
             self.fields['attachment'].required = False
 
-        self.aviable_smiles = settings.PYBB_SMILES
-        self.smiles_prefix = settings.PYBB_SMILES_PREFIX
+        self.aviable_smiles = defaults.PYBB_SMILES
+        self.smiles_prefix = defaults.PYBB_SMILES_PREFIX
 
     def clean_attachment(self):
         for f in self.files:
-            if self.files[f].size > settings.PYBB_ATTACHMENT_SIZE_LIMIT:
+            if self.files[f].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
                 raise forms.ValidationError(_('Attachment is too big'))
         return self.cleaned_data['attachment']
 
@@ -78,7 +77,7 @@ class PostForm(forms.ModelForm):
                     markup=self.user.pybb_profile.markup,
                     body=self.cleaned_data['body'])
         post.save()
-        if settings.PYBB_ATTACHMENT_ENABLE:
+        if defaults.PYBB_ATTACHMENT_ENABLE:
             for f in self.files:
                 self.save_attachment(post, self.files[f])
         return post
@@ -87,7 +86,7 @@ class PostForm(forms.ModelForm):
         if memfile:
             obj = Attachment(size=memfile.size, content_type=memfile.content_type,
                              name=memfile.name, post=post)
-            dir = os.path.join(MEDIA_ROOT, settings.PYBB_ATTACHMENT_UPLOAD_TO)
+            dir = os.path.join(MEDIA_ROOT, defaults.PYBB_ATTACHMENT_UPLOAD_TO)
             fname = '%d.0' % post.id
             path = os.path.join(dir, fname)
             file(path, 'w').write(memfile.read())
@@ -126,16 +125,16 @@ class EditProfileForm(forms.ModelForm):
                   'show_signatures', 'markup', 'avatar']
 
     def clean_avatar(self):
-        if self.cleaned_data['avatar'].size > settings.PYBB_MAX_AVATAR_SIZE:
-            forms.ValidationError(_('Avatar is too large, max size: %s bytes' % settings.PYBB_MAX_AVATAR_SIZE))
+        if self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE:
+            forms.ValidationError(_('Avatar is too large, max size: %s bytes' % defaults.PYBB_MAX_AVATAR_SIZE))
         return self.cleaned_data['avatar']
 
     def clean_signature(self):
         value = self.cleaned_data['signature'].strip()
-        if len(re.findall(r'\n', value)) > settings.PYBB_SIGNATURE_MAX_LINES:
-            raise forms.ValidationError('Number of lines is limited to %d' % settings.PYBB_SIGNATURE_MAX_LINES)
-        if len(value) > settings.PYBB_SIGNATURE_MAX_LENGTH:
-            raise forms.ValidationError('Length of signature is limited to %d' % settings.PYBB_SIGNATURE_MAX_LENGTH)
+        if len(re.findall(r'\n', value)) > defaults.PYBB_SIGNATURE_MAX_LINES:
+            raise forms.ValidationError('Number of lines is limited to %d' % defaults.PYBB_SIGNATURE_MAX_LINES)
+        if len(value) > defaults.PYBB_SIGNATURE_MAX_LENGTH:
+            raise forms.ValidationError('Length of signature is limited to %d' % defaults.PYBB_SIGNATURE_MAX_LENGTH)
         return value
 
 

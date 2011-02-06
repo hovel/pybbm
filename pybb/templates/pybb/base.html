@@ -1,9 +1,10 @@
-{% extends "base.html" %}
+{% extends PYBB_BASE_TEMPLATE|default:"base.html" %}
 {% load i18n %}
 {% load pybb_tags %}
 {%block title %}{% endblock title %}
 
 {%block head %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}pybb.css">
     {% block pybb_styles_extra %}{% endblock %}
     <!-- Feeds -->
     <link rel="alternate" type="application/atom+xml" href="{% url pybb_feed "posts" %}" title="{% trans "Latest posts on forum" %}" >
