@@ -9,11 +9,13 @@
     {% include "pybb/markitup.html" %}
 {% endblock head %}
 
-{% block content %}
-    <div class="crumbs">
-        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / <strong>{% pybb_link topic %}</strong>
-    </div>
+{% block breadcrumb %}
+    {{ block.super }}
+    {% pybb_link topic.forum.category %} &#187; {% pybb_link topic.forum %} &#187; {{ topic }}
+{% endblock %}
 
+{% block content %}
+    <h1>{{ topic.name }}</h1>
     {% with _('Posts') as label %}
     {% include "pybb/pagination/pagination.html" %}
     {% endwith %}

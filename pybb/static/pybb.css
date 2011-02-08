@@ -9,28 +9,35 @@ legend {
 }
 
 .category, .topic-list {
-    display: block;
-    float: left;
-    width: 100%;
+    /*width: 100%;*/
     padding: 5px;
     margin: 3px;
     clear: both;
 }
 
-
-.forum-row, .topic-row {
-    float: left;
+.topic-list {
     width: 100%;
-    clear: both;
-    border-bottom: 1px solid #CCCCCC;
 }
 
-.forum-name, .forum-topic-count, .forum-post-count, .forum-last-post {
-    display: block;
-    float: left;
-    padding: 5px;
+.category-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.category-table td, .category-table th, .topic-list td, .topic-list th {
     margin: 1px;
-    line-height: 2.4em;
+    padding: 10px 5px 10px 5px;
+    vertical-align: middle;
+
+}
+
+.forum-description {
+    margin: 5px;
+    font-size: 80%;
+}
+
+.forum-row, .topic-row {
+    width: 100%;
 }
 
 .forum-name {
@@ -46,31 +53,21 @@ legend {
     width: 20%;
 }
 
-.topic-name, .topic-post-count, .topic-view-count, .topic-last-post {
+#mark-all-as-read {
+    margin: 20px 0;
     display: block;
-    float: left;
+    width: 100%;
+    text-align: right;
+}
+
+.topic-name, .topic-post-count, .topic-view-count, .topic-last-post {
     padding: 5px;
     margin: 1px;
-    height: 2.4em;
     vertical-align: middle;
-}
-
-.topic-post-count, .topic-view-count, .topic-last-post {
-    line-height: 2.4em;
-}
-
-.head-row {
-    background:#EBF1F5;
-}
-
-.head-row div {
-    height: 1.1em;
-    line-height: 1.1em;
 }
 
 .topic-name {
     width: 40%;
-    line-height: 1.2em;
 }
 
 .topic-post-count, .topic-view-count {
@@ -83,25 +80,20 @@ legend {
 }
 
 .posts {
-    float: right;
     clear: both;
     width: 100%;
 }
 
 .post {
-    float: right;
     width: 99%;
-    margin: 3px;
+    margin: 3px 0 5px 0;
     clear: both;
-    margin-bottom: 5px;
-    border: 1px solid #CCC;
 }
 
+
 .post .info {
-    float: left;
     width: 200px;
-    display: block;
-    border-right: 1px solid #CCC;
+    border: 1px solid #CCC;
     padding: 10px;
 }
 
@@ -111,11 +103,27 @@ legend {
 }
 
 .post .content {
-    margin-left: 230px;
-    display: block;
+    vertical-align: top;
+    padding: 10px;
+    border: 1px solid #CCC;
+}
+
+.post-header {
+   padding: 5px 0 5px 20px;
+}
+
+.post-related {
+    margin-top: 20px;
+}
+
+.post .info .author {
+    font-size: 110%;
     padding: 5px;
 }
 
+.post .info .post-controls {
+    font-size: 80%;
+}
 .pagination {
     padding: 20px;
     font-size: 110%;
@@ -128,7 +136,6 @@ legend {
 }
 
 .pagination a {
-    font-weight: bold;
     padding-left: 3px;
 }
 

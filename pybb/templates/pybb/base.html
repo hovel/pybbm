@@ -13,5 +13,10 @@
     {% block pybb_head_extra %}{% endblock %}
 {% endblock head %}
 
+{% block breadcrumb %}
+    {{ block.super }} &#187;
+    <a href="{% url pybb_index %}">{% trans "Forum" %}</a>
+{% endblock %}
+
 {% block content %}{% endblock content %}
 

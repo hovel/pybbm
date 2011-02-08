@@ -2,75 +2,67 @@
 {% load pybb_tags %}
 {% load thumbnail %}
 
-<div class="post post-{% cycle 'odd' 'even' %}" id="post-{{ post.id }}">
-    <a name="post-{{ post.id }}"></a> <!-- may be remove this string? -->
-    <div class="inner">
-                <div class="info">
-                    <div class="avatar">
-                        <a href="{{ post.user.pybb_profile.get_absolute_url }}">
-                        {% comment %}
-                        <img src="{{ post.user.pybb_profile.avatar_url }}" alt="avatar" width="50px" height="50px">
-                        {% endcomment %}
-                        {% thumbnail post.user.pybb_profile.avatar request.pybb_avatar_dimensions as avatar %}
-                            <img src="{{ avatar.url }}" alt="avatar">
-                        {% empty %}
-                            <img src="{{ request.pybb_default_avatar }}" alt="avatar">
-                        {% endthumbnail %}
-                        </a>
-                    </div>
-                    <div class="author">{{ post.user|pybb_profile_link }}</div>
-                    {% if user.is_superuser %}
-                        <div class="extra-info">{{ post.user_ip }}</div>
-                    {% endif %}
-                    <div class="updated">
-                        <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
-                        <span class="updated">{% pybb_time post.created %}</span>
-                    </div>
 
-                    {% if post.user.pybb_profile.ban_status %}
-                        <div{% if post.user.pybb_profile.is_banned %}
+<a name="post-{{ post.id }}"></a> {# may be remove this string? #}
+<table class="post post-{% cycle 'odd' 'even' %}" id="post-{{ post.id }}">
+    <th class='post-header head-row' colspan="2">
+        <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
+        <span class="updated">{% pybb_time post.created %}</span>
+    </th>
+    <tr>
+        <td class="info">
+            {% include "pybb/avatar.html" %}
+            <div class="author">{{ post.user|pybb_profile_link }}</div>
+
+            {% if user.is_superuser %}
+                <div class="extra-info">{{ post.user_ip }}</div>
+            {% endif %}
+
+            {% if post.user.pybb_profile.ban_status %}
+                <div{% if post.user.pybb_profile.is_banned %}
                         title="{% trans 'Expire' %} {{ post.user.pybb_profile.ban_till }}"{% endif %}
                         class="banned">
-                            {{ post.user.pybb_profile.get_ban_status_display }}
-                        </div>
-                    {% endif %}
-
-                    <div class="post-controls">
-                        {% if user.is_moderator or post|pybb_posted_by:user %}
-                        <a href="{% url pybb_edit_post post.id %}">{% trans "Edit" %}</a>
-                        {% endif %}
-                        {% if user.is_moderator %}
-                         <a onclick="pybb_delete_post('{% url pybb_delete_post post.id %}',
-                            'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
-                         href="{% url pybb_delete_post post.id %}">{% trans "Delete" %}</a>
-                        {% endif %}
-
-                    </div>
+                    {{ post.user.pybb_profile.get_ban_status_display }}
                 </div>
-                <div class="content">
-                    {% pybb_render_post post %}
-                    {% if not user.is_authenticated or user.pybb_profile.show_signatures %}
-                    {% if post.user.pybb_profile.signature %}
+            {% endif %}
+
+            <div class="post-controls">
+                {% if user.is_moderator or post|pybb_posted_by:user %}
+                    <a href="{% url pybb_edit_post post.id %}">{% trans "Edit" %}</a>
+                {% endif %}
+                {% if user.is_moderator %}
+                    <a onclick="pybb_delete_post('{% url pybb_delete_post post.id %}',
+                            'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
+                       href="{% url pybb_delete_post post.id %}">{% trans "Delete" %}</a>
+                {% endif %}
+
+            </div>
+        </td>
+        <td class="content">
+            {% pybb_render_post post %}
+            {% if not user.is_authenticated or user.pybb_profile.show_signatures %}
+                {% if post.user.pybb_profile.signature %}
                     <div class="signature">
                         {{ post.user.pybb_profile.signature_html|safe }}
                     </div>
-                    {% endif %}
-                    {% endif %}
-                    {% if post.updated %}
-                    <div class="updated-message">{% trans "Edited" %} {% pybb_time post.updated %}</div>
-                    {% endif %}
+                {% endif %}
+            {% endif %}
+            {% if post.updated %}
+                <div class="updated-message">{% trans "Edited" %} {% pybb_time post.updated %}</div>
+            {% endif %}
 
+            {% comment %}
                     {% if post.attachment_cache %}
                     {% for attach in post.attachment_cache %}
                     <br/>
                     {% trans "Attachment" %}: <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
                     {% endfor %}
                     {% endif %}
+            {% endcomment %}
 
-                    <div class="post-related">
-                        <a href="{% url pybb_add_post topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
-                    </div>
-
-                </div>
-    </div>
-</div>
+            <div class="post-related">
+                <a href="{% url pybb_add_post topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
+            </div>
+        </td>
+    </tr>
+</table>

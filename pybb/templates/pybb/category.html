@@ -3,36 +3,41 @@
 
 <div class='category'>
     <h1>{{ category.name }}</h1>
-    <div class="forum-row head-row">
-            <div class="forum-name">
-                {% trans "Forum" %}
-            </div>
-            <div class="forum-topic-count">
-                {% trans "Topics" %}
-            </div>
-            <div class="forum-post-count">
-                {% trans "Posts" %}
-            </div>
-            <div class="forum-last-post">
-                {% trans "Last posts" %}
-            </div>
-    </div>
-    {% for forum in category.forums_extended.all|pybb_forum_unread:request.user %}
-        <div class="forum-row">
-            <div class="forum-name {% if forum.unread %} unread {% endif %}">
-                <a href='{{ forum.get_absolute_url }}'>{{ forum.name }}</a>
-            </div>
-            <div class="forum-topic-count">
-                {{ forum.topic_count }}
-            </div>
-            <div class="forum-post-count">
-                {{ forum.post_count }}
-            </div>
-            <div class="forum-last-post">
-                {% if forum.last_post %}
-                    {{ forum.last_post.created|date:"d.m.Y H.i" }}
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
+    <table class="category-table">
+        <tr class="forum-row head-row">
+                <th class="forum-name">
+                    {% trans "Forum" %}
+                </th>
+                <th class="forum-topic-count">
+                    {% trans "Topics" %}
+                </th>
+                <th class="forum-post-count">
+                    {% trans "Posts" %}
+                </th>
+                <th class="forum-last-post">
+                    {% trans "Last posts" %}
+                </th>
+        </tr>
+        {% for forum in category.forums_extended.all|pybb_forum_unread:request.user %}
+            <tr class="forum-row">
+                <td class="forum-name {% if forum.unread %} unread {% endif %}">
+                    <a href='{{ forum.get_absolute_url }}'>{{ forum.name }}</a>
+                    <div class='forum-description'>
+                        {{ forum.description|safe }}
+                    </div>
+                </td>
+                <td class="forum-topic-count">
+                    {{ forum.topic_count }}
+                </td>
+                <td class="forum-post-count">
+                    {{ forum.post_count }}
+                </td>
+                <td class="forum-last-post">
+                    {% if forum.last_post %}
+                        {{ forum.last_post.created|date:"d.m.Y H.i" }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 </div>

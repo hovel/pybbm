@@ -4,8 +4,8 @@ from django.conf import settings
 PYBB_TOPIC_PAGE_SIZE = getattr(settings, 'PYBB_TOPIC_PAGE_SIZE', 10)
 PYBB_FORUM_PAGE_SIZE = getattr(settings, 'PYBB_FORUM_PAGE_SIZE', 10)
 PYBB_USERS_PAGE_SIZE = getattr(settings, 'PYBB_USERS_PAGE_SZIE', 20)
-PYBB_AVATAR_WIDTH = getattr(settings, 'PYBB_AVATAR_WIDTH', 60)
-PYBB_AVATAR_HEIGHT = getattr(settings, 'PYBB_AVATAR_HEIGHT',60)
+PYBB_AVATAR_WIDTH = getattr(settings, 'PYBB_AVATAR_WIDTH', 80)
+PYBB_AVATAR_HEIGHT = getattr(settings, 'PYBB_AVATAR_HEIGHT',80)
 PYBB_MAX_AVATAR_SIZE = getattr(settings, 'PYBB_MAX_AVATAR_SIZE', 1024*50)
 PYBB_DEFAULT_TIME_ZONE = getattr(settings, 'PYBB_DEFAULT_TIME_ZONE', 3)
 
@@ -21,7 +21,7 @@ PYBB_ATTACHMENT_SIZE_LIMIT = getattr(settings, 'PYBB_ATTACHMENT_SIZE_LIMIT', 102
 PYBB_ATTACHMENT_ENABLE = getattr(settings, 'PYBB_ATTACHMENT_ENABLE', False)
 PYBB_ATTACHMENT_UPLOAD_TO = getattr(settings, 'PYBB_ATTACHMENT_UPLOAD_TO', join('pybb_upload', 'attachments'))
 
-PYBB_DEFAULT_AVATAR_URL = getattr(settings, 'MEDIA_URL', '') + 'pybb/img/default_avatar.jpg'
+PYBB_DEFAULT_AVATAR_URL = getattr(settings, 'STATIC_URL', '') + 'pybb/img/default_avatar.jpg'
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 

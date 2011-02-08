@@ -9,6 +9,6 @@
         {% include 'pybb/category.html' %}
     {% endfor %}
     {% if request.user.is_authenticated %}
-        <a href='{% url mark_all_as_read %}' id='mark-all-as-read'>{% trans "Mark all forums as read" %}</a>
+        <div id='mark-all-as-read'><a href='{% url mark_all_as_read %}'>{% trans "Mark all forums as read" %}</a></div>
     {% endif %}
 {% endblock content %}

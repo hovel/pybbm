@@ -5,57 +5,60 @@
 {{ forum.name }}
 {% endblock title %}
 
+{% block breadcrumb %}
+{{ block.super }} &#187;
+{% pybb_link forum.category %} &#187; {{ forum }}
+{% endblock %}
 
 {% block content %}
     <div class="crumbs">
-        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
+
     </div>
     <h1>{{ forum.name }}</h1>
-    <div class='topic-list'>
-        {% include "pybb/pagination/pagination.html" %}
-        <div class="topic-row head-row">
-            <div class="topic-name">
+    {% include "pybb/pagination/pagination.html" %}
+    <table class='topic-list'>
+        <tr class="topic-row head-row">
+            <th class="topic-name">
                 {% trans "Topic" %}
-            </div>
-            <div class="topic-post-count">
+            </th>
+            <th class="topic-post-count">
                 {% trans "Posts" %}
-            </div>
-            <div class="topic-view-count">
+            </th>
+            <th class="topic-view-count">
                 {% trans "Views" %}
-            </div>
-            <div class="topic-last-post">
+            </th>
+            <th class="topic-last-post">
                 {% trans "Last post" %}
-            </div>
-        </div>
+            </th>
+        </tr>
         {% for topic in topic_list|pybb_topic_unread:user  %}
-            <div class="topic-row {% if topic.sticky %} sticky {% endif %}">
-                <div class="topic-name{% if topic.unread %} unread {% endif %}">
+            <tr class="topic-row {% if topic.sticky %} sticky {% endif %}">
+                <td class="topic-name{% if topic.unread %} unread {% endif %}">
                     <a href='{{ topic.get_absolute_url }}'>
                       {{ topic.name }}
                     </a>
                     {% if topic.sticky %} &nbsp;[{% trans "Sticky" %}] {% endif %}
                     {% if topic.closed %} &nbsp;[{% trans "Closed" %}] {% endif %}
-                </div>
-                <div class="topic-post-count">
+                </td>
+                <td class="topic-post-count">
                     {{ topic.post_count }}
-                </div>
-                <div class="topic-view-count">
+                </td>
+                <td class="topic-view-count">
                     {{ topic.views }}
-                </div>
-                <div class="topic-last-post">
+                </td>
+                <td class="topic-last-post">
                     {% if topic.updated %}
                         {{ topic.updated|date:"d.m.Y H.i" }}
                     {% endif %}
-                </div>
-            </div>
+                </td>
+            </tr>
         {%  endfor %}
-        <div>&nbsp;</div>
-        {% include "pybb/pagination/pagination.html" %}
+    </table>
+    {% include "pybb/pagination/pagination.html" %}
 
-        {% if not user.pybb_profile.is_banned %}
-            <div class="controls">
-                <a href="{% url pybb_add_topic forum.id %}">{% trans "New topic" %}</a>
-            </div>
-        {% endif %}
-    </div>
+    {% if not user.pybb_profile.is_banned %}
+        <div class="controls">
+            <a href="{% url pybb_add_topic forum.id %}">{% trans "New topic" %}</a>
+        </div>
+    {% endif %}
 {% endblock content %}

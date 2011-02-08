@@ -253,9 +253,9 @@ def pybb_topic_unread(topics, user):
     Mark all topics in queryset/list with .unread for target user
     """
     topic_list = list(topics)
-    for topic in topic_list:
-        topic.unread = True
     if user.is_authenticated():
+        for topic in topic_list:
+            topic.unread = True
         try:
             forum_mark = ForumReadTracker.objects.get(user=user, forum=topic_list[0].forum)
         except:
@@ -284,9 +284,9 @@ def pybb_forum_unread(forums, user):
     Check if forum has unread messages.
     """
     forum_list = list(forums)
-    for forum in forum_list:
-        forum.unread = True
     if user.is_authenticated():
+        for forum in forum_list:
+            forum.unread = True
         forum_marks = ForumReadTracker.objects.filter(
                 user=user,
                 forum__in=forum_list
