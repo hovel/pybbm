@@ -52,7 +52,7 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
 def smile_it(str):
     s = str
     for smile, url in PYBB_SMILES.items():
-        s = s.replace(smile, '<img src="%s%s%s">' % (MEDIA_URL, PYBB_SMILES_PREFIX, url))
+        s = s.replace(smile, '<img src="%s%s%s">' % (settings.MEDIA_URL, PYBB_SMILES_PREFIX, url))
     return s
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
