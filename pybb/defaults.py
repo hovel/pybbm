@@ -46,8 +46,8 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
     ';)': 'wink.png'
 })
 
-MEDIA_URL = getattr(settings, 'MEDIA_URL', '/media/')
-STATIC_URL = getattr(settings, 'STATIC_URL', '')
+#MEDIA_URL = getattr(settings, 'MEDIA_URL', '/media/')
+#STATIC_URL = getattr(settings, 'STATIC_URL', '')
 
 def smile_it(str):
     s = str
@@ -64,3 +64,12 @@ PYBB_QUOTE_ENGINES = getattr(settings, 'PYBB_QUOTE_ENGINES', {
     'bbcode': lambda text, username="": '[quote="%s"]%s[/quote]\n' % (username, text),
     'markdown': lambda text, username="": '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
 })
+
+PYBB_BUTTONS = getattr(settings, 'PYBB_BUTTONS', {})
+#Dict of buttons that will be used, instead of text links if defined
+#Currently supported buttons:
+#  new_topic
+#  submit
+#
+
+PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")

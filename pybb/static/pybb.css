@@ -5,7 +5,7 @@ legend {
 }
 
 .controls {
-    padding: 10px 0 10px 0;
+    padding: 3px 0 3px 0;
 }
 
 .category, .topic-list {
@@ -125,7 +125,7 @@ legend {
     font-size: 80%;
 }
 .pagination {
-    padding: 20px;
+    padding: 5px;
     font-size: 110%;
     text-align: center;
 }

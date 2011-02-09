@@ -34,7 +34,7 @@ class Migration(SchemaMigration):
         
         # Adding model 'ReadTracking'
         db.create_table('pybb_readtracking', (
-            ('topics', self.gf('annoying.fields.JSONField')(null=True, blank=True)),
+            ('topics', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('last_read', self.gf('django.db.models.fields.DateTimeField')(null=True)),
             ('user', self.gf('annoying.fields.AutoOneToOneField')(to=orm['auth.User'], unique=True)),

@@ -107,7 +107,7 @@ class Migration:
         'pybb.readtracking': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_read': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'topics': ('JSONField', [], {'null': 'True'}),
+            'topics': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['auth.User']"})
         },
         'pybb.topic': {

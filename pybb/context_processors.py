@@ -3,11 +3,13 @@
 
 __author__ = 'zeus'
 
-from django.conf import settings
+import defaults
 
-def processor(self):
+def processor(request):
     context = {}
-    template = getattr(settings, 'PYBB_TEMPLATE', False)
-    if template:
-        context['PYBB_TEMPLATE'] = template
+    for i in (
+        'PYBB_TEMPLATE',
+        'PYBB_BUTTONS'
+        ):
+        context[i] = getattr(defaults, i, None)
     return context

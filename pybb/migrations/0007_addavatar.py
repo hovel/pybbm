@@ -116,7 +116,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'ReadTracking'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_read': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'topics': ('annoying.fields.JSONField', [], {'null': 'True', 'blank': 'True'}),
+            'topics': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('annoying.fields.AutoOneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'pybb.topic': {
