@@ -10,6 +10,7 @@ class CategoryAdmin(admin.ModelAdmin):
     list_per_page = 20
     ordering = ['position']
     search_fields = ['name']
+    list_editable = ['position']
 
 
 class ForumAdmin(admin.ModelAdmin):
