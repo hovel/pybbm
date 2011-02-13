@@ -92,8 +92,10 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-    last_post = models.ForeignKey('Post', related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True,
-                                  null=True)
+
+    #last_post = models.ForeignKey('Post', related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True,
+    #                              null=True)
+
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
 
     class Meta(object):
@@ -122,6 +124,10 @@ class Forum(models.Model):
         except IndexError:
             return None
 
+    @property
+    def last_post(self):
+        return self.get_last_post()
+
 
 class Topic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
@@ -134,8 +140,8 @@ class Topic(models.Model):
     closed = models.BooleanField(_('Closed'), blank=True, default=False)
     subscribers = models.ManyToManyField(User, related_name='subscriptions', verbose_name=_('Subscribers'), blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    last_post = models.ForeignKey('Post', related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True,
-                                  null=True)
+    #last_post = models.ForeignKey('Post', related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True,
+    #                              null=True)
     readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
 
     class Meta(object):
@@ -155,6 +161,10 @@ class Topic(models.Model):
     def get_last_post(self):
         return self.posts.order_by('-created').select_related()[0]
 
+    @property
+    def last_post(self):
+        return self.get_last_post()
+
     def get_absolute_url(self):
         return reverse('pybb_topic', args=[self.id])
 
@@ -167,15 +177,15 @@ class Topic(models.Model):
         self.post_count = self.posts.count()
         self.save()
 
-    def delete(self, *args, **kwargs):
-        #noinspection PyUnresolvedReferences
-        if self.forum.last_post.topic == self:
-            try:
-                self.forum.last_post = Post.objects.filter(topic__forum=self.forum).exclude(topic=self)[0]
-            except:
-                self.forum.last_post = None
-            self.forum.save()
-        super(Topic, self).delete(*args, **kwargs)
+#    def delete(self, *args, **kwargs):
+#        #noinspection PyUnresolvedReferences
+#        if self.forum.last_post.topic == self:
+#            try:
+#                self.forum.last_post = Post.objects.filter(topic__forum=self.forum).exclude(topic=self)[0]
+#            except:
+#                self.forum.last_post = None
+#            self.forum.save()
+#        super(Topic, self).delete(*args, **kwargs)
 
 
 class RenderableItem(models.Model):
@@ -232,10 +242,10 @@ class Post(RenderableItem):
 
         if new:
             self.topic.updated = now
-            self.topic.last_post = self
+            #self.topic.last_post = self
             self.topic.update_counters()
             self.topic.forum.updated = now
-            self.topic.forum.last_post = self
+            #self.topic.forum.last_post = self
             self.topic.forum.update_counters()
 
     def get_absolute_url(self):
@@ -249,13 +259,7 @@ class Post(RenderableItem):
 
         if self_id == head_post_id:
             self.topic.delete()
-        elif self_id == last_post_id:
-            self.topic.last_post = last_posts[-1]
-            self.topic.save()
-            self.topic.forum.last_post = self.topic.last_post
-            self.topic.forum.save()
-            super(Post, self).delete(*args, **kwargs)
-            self.topic.forum.last_post = self.topic.forum.get_last_post()
+        
         else:
             super(Post, self).delete(*args, **kwargs)
             self.topic.update_counters()
