@@ -122,5 +122,58 @@ class BasicFeaturesTest(TestCase):
         tree = html.fromstring(client.get(reverse('pybb_index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
 
+    def test_hidden(self):
+        client = Client()
+        category = Category(name='hcat', hidden=True)
+        category.save()
+        forum_in_hidden = Forum(name='in_hidden', category=category)
+        forum_in_hidden.save()
+        topic_in_hidden = Topic(forum=forum_in_hidden, name='in_hidden', user=self.user)
+        topic_in_hidden.save()
+
+        forum_hidden = Forum(name='hidden', category=self.category, hidden=True)
+        forum_hidden.save()
+        topic_hidden = Topic(forum=forum_hidden, name='hidden', user=self.user)
+        topic_hidden.save()
+
+        post_hidden = Post(topic=topic_hidden, user=self.user, body='hidden', markup='bbcode')
+        post_hidden.save()
+
+        post_in_hidden = Post(topic=topic_in_hidden, user=self.user, body='hidden', markup='bbcode')
+        post_in_hidden.save()
+
+        
+        self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb_index')).context['categories']])
+        self.assertTrue(client.get(category.get_absolute_url()).status_code==404)
+        self.assertTrue(client.get(forum_in_hidden.get_absolute_url()).status_code==404)
+        self.assertTrue(client.get(topic_in_hidden.get_absolute_url()).status_code==404)
+
+        self.assertNotContains(client.get(reverse('pybb_index')), forum_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'topics'})), topic_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'topics'})), topic_in_hidden.get_absolute_url())
+
+        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'posts'})), post_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'posts'})), post_in_hidden.get_absolute_url())
+        self.assertTrue(client.get(forum_hidden.get_absolute_url()).status_code==404)
+        self.assertTrue(client.get(topic_hidden.get_absolute_url()).status_code==404)
+
+        client.login(username='zeus', password='zeus')
+        self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb_index')).context['categories']])
+        self.assertNotContains(client.get(reverse('pybb_index')), forum_hidden.get_absolute_url())
+        self.assertTrue(client.get(category.get_absolute_url()).status_code==404)
+        self.assertTrue(client.get(forum_in_hidden.get_absolute_url()).status_code==404)
+        self.assertTrue(client.get(topic_in_hidden.get_absolute_url()).status_code==404)
+        self.assertTrue(client.get(forum_hidden.get_absolute_url()).status_code==404)
+        self.assertTrue(client.get(topic_hidden.get_absolute_url()).status_code==404)
+        self.user.is_staff = True
+        self.user.save()
+        self.assertTrue(category.id in [c.id for c in client.get(reverse('pybb_index')).context['categories']])
+        self.assertContains(client.get(reverse('pybb_index')), forum_hidden.get_absolute_url())
+        self.assertFalse(client.get(category.get_absolute_url()).status_code==404)
+        self.assertFalse(client.get(forum_in_hidden.get_absolute_url()).status_code==404)
+        self.assertFalse(client.get(topic_in_hidden.get_absolute_url()).status_code==404)
+        self.assertFalse(client.get(forum_hidden.get_absolute_url()).status_code==404)
+        self.assertFalse(client.get(topic_hidden.get_absolute_url()).status_code==404)
+
 
         

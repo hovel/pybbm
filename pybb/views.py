@@ -2,7 +2,7 @@
 import math
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F, Q
-from django.shortcuts import get_object_or_404, get_list_or_404, redirect
+from django.shortcuts import get_object_or_404, get_list_or_404, redirect, _get_queryset
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -18,29 +18,43 @@ from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, UserSearchForm
 
 import defaults
 
+def filter_hidden(request, queryset_or_model):
+    '''
+    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
+    '''
+    queryset = _get_queryset(queryset_or_model)
+    if request.user.is_staff:
+        return queryset
+    return queryset.filter(hidden=False)
 
 def index(request):
-    categories = Category.objects.all()
+    categories = list(filter_hidden(request, Category))
+    for category in categories:
+        category.forums_accessed = filter_hidden(request, category.forums.all())
     return direct_to_template(request, 'pybb/index.html', {'categories': categories, })
 
 def show_category(request, category_id):
-    category = get_object_or_404(Category, pk=category_id)
+    category = get_object_or_404(filter_hidden(request, Category), pk=category_id)
+    category.forums_accessed = filter_hidden(request, category.forums.all())
     return direct_to_template(request, 'pybb/index.html', {'categories': [category, ]})
 
 def show_forum(request, forum_id):
     kwargs = {}
-    forum = get_object_or_404(Forum, pk=forum_id)
+    forum = get_object_or_404(filter_hidden(request, Forum), pk=forum_id)
+    if forum.category.hidden and (not request.user.is_staff):
+        raise Http404()
     kwargs['queryset'] = forum.topics.order_by('-sticky', '-updated').select_related()
     kwargs['paginate_by'] = defaults.PYBB_FORUM_PAGE_SIZE
-    kwargs['template_name'] = 'pybb/forum.html'
     kwargs['extra_context'] = {'forum': forum}
     kwargs['template_object_name'] = 'topic'
-    return object_list(request, **kwargs)
+    return object_list(request, template_name='pybb/forum.html', **kwargs)
 
 def show_topic(request, topic_id):
     try:
         topic = Topic.objects.select_related('forum').get(pk=topic_id)
     except Topic.DoesNotExist:
+        raise Http404()
+    if (topic.forum.hidden or topic.forum.category.hidden) and (not request.user.is_staff):
         raise Http404()
     topic.views += 1
     topic.save()
@@ -76,7 +90,7 @@ def show_topic(request, topic_id):
                         ).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum, user=request.user)
                 forum_mark.save()
-            # Set is_moderator / is_subscribed properties
+                # Set is_moderator / is_subscribed properties
         request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
         request.user.is_subscribed = request.user in topic.subscribers.all()
         if request.user.is_superuser:
@@ -101,9 +115,11 @@ def add_post(request, forum_id, topic_id):
     topic = None
 
     if forum_id:
-        forum = get_object_or_404(Forum, pk=forum_id)
+        forum = get_object_or_404(filter_hidden(request, Forum), pk=forum_id)
     elif topic_id:
         topic = get_object_or_404(Topic, pk=topic_id)
+        if topic.forum.hidden and (not request.user.is_staff):
+            raise Http404()
 
     if (topic and topic.closed) or request.user.pybb_profile.is_banned():
         return HttpResponseRedirect(topic.get_absolute_url())
@@ -148,7 +164,7 @@ def user(request, username):
 
 def user_topics(request, username):
     profile = get_object_or_404(User, username=username)
-    topics = Topic.objects.filter(user=profile).order_by('-created')
+    topics = filter_hidden(request, Topic).objects.filter(user=profile).order_by('-created')
     page, paginator = paginate(topics, request, defaults.PYBB_TOPIC_PAGE_SIZE)
     return direct_to_template(request, 'pybb/user_topics.html', {
         'profile': profile,
@@ -263,7 +279,7 @@ def delete_post(request, post_id):
             return HttpResponseRedirect(topic.get_absolute_url())
     else:
         return direct_to_template(request, 'pybb/delete_post.html', {'post': post,
-        })
+                                                                     })
 
 
 @login_required
@@ -330,9 +346,9 @@ def merge_topics(request):
         return HttpResponseRedirect(main_topic.get_absolute_url())
 
     return direct_to_template(request, 'pybb/merge_topics.html', {'posts': posts,
-            'topics': topics,
-            'topic': topics[0],
-    })
+                                                                  'topics': topics,
+                                                                  'topic': topics[0],
+                                                                  })
 
 def users(request):
     form = UserSearchForm(request.GET)
@@ -341,8 +357,8 @@ def users(request):
     page, paginator = paginate(all_users, request, defaults.PYBB_USERS_PAGE_SIZE)
 
     return direct_to_template(request, 'pybb/users.html', {'page': page,
-            'form': form,
-    })
+                                                           'form': form,
+                                                           })
 
 
 @login_required
@@ -380,7 +396,7 @@ def post_ajax_preview(request):
 
 @login_required
 def mark_all_as_read(request):
-    for forum in Forum.objects.all():
+    for forum in filter_hidden(request, Forum):
         forum_mark, new = ForumReadTracker.objects.get_or_create(forum=forum, user=request.user)
         forum_mark.save()
     TopicReadTracker.objects.filter(user=request.user).delete()

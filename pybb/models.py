@@ -54,6 +54,7 @@ def get_file_path(instance, filename):
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
+    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
 
     class Meta(object):
         ordering = ['position']
@@ -77,12 +78,6 @@ class Category(models.Model):
     def posts(self):
         return Post.objects.filter(topic__forum__category=self).select_related()
 
-    @property
-    def forums_extended(self):
-        forums = self.forums.select_related('last_post').all()
-        return forums
-
-
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
     name = models.CharField(_('Name'), max_length=80)
@@ -92,10 +87,7 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-
-    #last_post = models.ForeignKey('Post', related_name='last_post_in_forum', verbose_name=_(u"last post"), blank=True,
-    #                              null=True)
-
+    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
 
     class Meta(object):

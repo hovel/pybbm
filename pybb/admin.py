@@ -3,10 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
-from pybb.models import Category, Forum, Topic, Post, Profile, Attachment
+from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, TopicReadTracker, ForumReadTracker
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'position', 'forum_count']
+    list_display = ['name', 'position', 'hidden', 'forum_count']
     list_per_page = 20
     ordering = ['position']
     search_fields = ['name']
@@ -14,19 +14,20 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ForumAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'position', 'topic_count']
+    list_display = ['name', 'category', 'hidden', 'position', 'topic_count']
     list_per_page = 20
     raw_id_fields = ['moderators']
     ordering = ['-category']
     search_fields = ['name', 'category__name']
+    list_editable = ['position']
     fieldsets = (
         (None, {
-                'fields': ('category', 'name', 'updated')
+                'fields': ('category', 'name', 'hidden', 'position')
                 }
          ),
         (_('Additional options'), {
                 'classes': ('collapse',),
-                'fields': ('position', 'description', 'post_count', 'moderators')
+                'fields': ('updated', 'description', 'post_count', 'moderators')
                 }
             ),
         )
@@ -51,6 +52,13 @@ class TopicAdmin(admin.ModelAdmin):
          ),
         )
 
+class TopicReadTrackerAdmin(admin.ModelAdmin):
+    list_display = ['topic', 'user', 'time_stamp']
+    search_fields = ['user__username']
+
+class ForumReadTrackerAdmin(admin.ModelAdmin):
+    list_display = ['forum', 'user', 'time_stamp']
+    search_fields = ['user__username']
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'created', 'updated', 'summary']
@@ -132,3 +140,6 @@ admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
+
+admin.site.register(TopicReadTracker, TopicReadTrackerAdmin)
+admin.site.register(ForumReadTracker, ForumReadTrackerAdmin)

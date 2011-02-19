@@ -26,7 +26,7 @@ class LastPosts(PybbFeed):
     description_template = 'pybb/feeds/posts_description.html'
 
     def items(self):
-        return Post.objects.order_by('-created')[:15]
+        return Post.objects.filter(topic__forum__hidden=False, topic__forum__category__hidden=False).order_by('-created')[:15]
 
 
 class LastTopics(PybbFeed):
@@ -36,4 +36,4 @@ class LastTopics(PybbFeed):
     description_template = 'pybb/feeds/topics_description.html'
 
     def items(self):
-        return Topic.objects.order_by('-created')[:15]
+        return Topic.objects.filter(forum__hidden=False, forum__category__hidden=False).order_by('-created')[:15]
