@@ -70,6 +70,6 @@ PYBB_BUTTONS = getattr(settings, 'PYBB_BUTTONS', {})
 #Currently supported buttons:
 #  new_topic
 #  submit
-#
+#  save
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")

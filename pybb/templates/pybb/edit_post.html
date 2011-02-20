@@ -21,7 +21,13 @@
         <fieldset>
             <legend>{% trans "Editing the post" %}</legend>
                 {{ form.as_p }}
-                <p><input type="submit" value="{% trans 'Save' %}" /></p>
+                <p>
+                {% if PYBB_BUTTONS.save %}
+                    <input type='image' src="{{ STATIC_URL }}{{ PYBB_BUTTONS.save }}" alt='{% trans "Save" %}'>
+                {% else %}
+                   <input type="submit" value="{% trans 'Save' %}" />
+                {% endif %}
+                </p>
         </fieldset>
     </form>
 {% endblock content %}
