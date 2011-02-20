@@ -31,10 +31,12 @@
             <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}.
             </div>
             <div>{% trans "Number of topics" %}: {{ topic_count }}.
+                {% comment %}
                 &nbsp;
                 <a href="{% url pybb_user_topics profile.username %}">
                     {% trans "Find all topics" %}
                 </a>
+                {% endcomment %}
             </div>
             <div>{% trans "Date of registration" %}: {% pybb_time profile.date_joined %}</div>
         </div>
