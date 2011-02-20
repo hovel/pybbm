@@ -5,6 +5,7 @@
 {% block content %}
 <h1>{% trans "Users" %}</h1>
     <form method="get" class="filter_form">
+        {% csrf_token %}
         {{ form.query }}
         <input type="submit" value="{% trans "Search" %}" />
     </form>

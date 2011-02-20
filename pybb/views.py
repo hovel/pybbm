@@ -11,6 +11,7 @@ from django.views.generic.list_detail import object_list
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.simple import direct_to_template
+from django.views.decorators.csrf import csrf_protect
 
 from pybb.util import  paginate
 from pybb.models import Category, Forum, Topic, Post, Attachment, TopicReadTracker, ForumReadTracker
@@ -111,6 +112,7 @@ def show_topic(request, topic_id):
 
 @login_required
 @permission_required('pybb.add_post')
+@csrf_protect
 def add_post(request, forum_id, topic_id):
     forum = None
     topic = None
@@ -185,6 +187,7 @@ def show_post(request, post_id):
 
 
 @login_required
+@csrf_protect
 def edit_profile(request):
     form_kwargs = dict(instance=request.user.pybb_profile)
     if request.method == 'POST':
@@ -203,6 +206,7 @@ def edit_profile(request):
 
 
 @login_required
+@csrf_protect
 def edit_post(request, post_id):
     from pybb.templatetags.pybb_tags import pybb_editable_by
 
@@ -256,6 +260,7 @@ def unstick_topic(request, topic_id):
 
 
 @login_required
+@csrf_protect
 def delete_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     last_post = post.topic.posts.order_by('-created')[0]
@@ -311,6 +316,7 @@ def open_topic(request, topic_id):
 
 
 @login_required
+@csrf_protect
 def merge_topics(request):
     from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
@@ -353,7 +359,7 @@ def merge_topics(request):
                                                                   'topics': topics,
                                                                   'topic': topics[0],
                                                                   })
-
+@csrf_protect
 def users(request):
     form = UserSearchForm(request.GET)
     all_users = form.filter(User.objects.order_by('username'))

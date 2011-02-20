@@ -7,6 +7,7 @@
         {% pybb_render_post post %}
     </div>
     <form method="post" action=".">
+        {% csrf_token %}
         <p><input type="submit" value="{% trans 'Yes, I am sure.' %}" /></p>
     </form>
 {% endblock content %}

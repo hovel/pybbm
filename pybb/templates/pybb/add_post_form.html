@@ -3,7 +3,7 @@
 
 
 <form class="post-form" action="{% if forum %}{% url pybb_add_topic forum.pk %}{% else %}{% url pybb_add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
-    {% pybb_csrf %}
+    {% csrf_token %}
        <fieldset>
             <legend>
                 {% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}

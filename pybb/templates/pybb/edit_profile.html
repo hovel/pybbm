@@ -15,6 +15,7 @@
     </div>
     <p><a href="{% url auth_password_change %}">{% trans "Change the password" %}</a></p>
     <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
         <fieldset>
             <legend>{% trans "Profile editing" %}</legend>
             {{ form.as_p }}

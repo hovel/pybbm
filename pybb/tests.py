@@ -185,6 +185,21 @@ class BasicFeaturesTest(TestCase):
         client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test ban 2'}, follow=True)
         self.assertTrue(len(Post.objects.filter(body='test ban 2'))==0)
 
+    def get_csrf(self, form):
+        return form.xpath('//input[@name="csrfmiddlewaretoken"]/@value')[0]
+
+    def test_csrf(self):
+        client = Client(enforce_csrf_checks=True)
+        client.login(username='zeus', password='zeus')
+        response = client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test csrf'}, follow=True)
+        #import pdb; pdb.set_trace()
+        self.assertFalse(response.status_code==200)
+        response = client.get(self.topic.get_absolute_url())
+        form = html.fromstring(response.content).xpath('//form[@class="post-form"]')[0]
+        token = self.get_csrf(form)
+        response = client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test csrf', 'csrfmiddlewaretoken': token}, follow=True)
+        self.assertTrue(response.status_code==200)
+
 
 
         
