@@ -5,7 +5,7 @@ from django.db.models import F, Q
 from django.shortcuts import get_object_or_404, get_list_or_404, redirect, _get_queryset
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.views.generic.list_detail import object_list
 from django.contrib import messages
@@ -110,11 +110,15 @@ def show_topic(request, topic_id):
 
 
 @login_required
+@permission_required('pybb.add_post')
 def add_post(request, forum_id, topic_id):
     forum = None
     topic = None
 
     if forum_id:
+        if not request.user.has_perm('pybb.add_topic'):
+            #TODO Should be Access Denied
+            return Http404
         forum = get_object_or_404(filter_hidden(request, Forum), pk=forum_id)
     elif topic_id:
         topic = get_object_or_404(Topic, pk=topic_id)
@@ -403,3 +407,13 @@ def mark_all_as_read(request):
     msg = _('All forums marked as read')
     messages.success(request, msg, fail_silently=True)
     return redirect(reverse('pybb_index'))
+
+@login_required
+@permission_required('pybb.block_users')
+def block_user(request, username):
+    user = get_object_or_404(User, username=username)
+    user.is_active = False
+    user.save()
+    msg = _('User successfuly blocked')
+    messages.success(request, msg, fail_silently=True)
+    return redirect('pybb_index')

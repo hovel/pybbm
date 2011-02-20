@@ -175,5 +175,16 @@ class BasicFeaturesTest(TestCase):
         self.assertFalse(client.get(forum_hidden.get_absolute_url()).status_code==404)
         self.assertFalse(client.get(topic_hidden.get_absolute_url()).status_code==404)
 
+    def test_inactive(self):
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test ban'}, follow=True)
+        self.assertTrue(len(Post.objects.filter(body='test ban'))==1)
+        self.user.is_active = False
+        self.user.save()
+        client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test ban 2'}, follow=True)
+        self.assertTrue(len(Post.objects.filter(body='test ban 2'))==0)
+
+
 
         

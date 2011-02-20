@@ -141,5 +141,5 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
 
-admin.site.register(TopicReadTracker, TopicReadTrackerAdmin)
-admin.site.register(ForumReadTracker, ForumReadTrackerAdmin)
+#admin.site.register(TopicReadTracker, TopicReadTrackerAdmin)
+#admin.site.register(ForumReadTracker, ForumReadTrackerAdmin)
