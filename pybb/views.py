@@ -94,7 +94,7 @@ def show_topic(request, topic_id):
                 # Set is_moderator / is_subscribed properties
         request.user.is_moderator = request.user.is_superuser or (request.user in topic.forum.moderators.all())
         request.user.is_subscribed = request.user in topic.subscribers.all()
-        if request.user.is_superuser:
+        if request.user.is_staff:
             form = AdminPostForm(initial={'login': request.user.username}, topic=topic)
         else:
             form = PostForm(topic=topic)
@@ -141,7 +141,7 @@ def add_post(request, forum_id, topic_id):
     ip = request.META.get('REMOTE_ADDR', '')
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
                        ip=ip, initial={'body': quote})
-    if request.user.is_superuser:
+    if request.user.is_staff:
         AForm = AdminPostForm
         form_kwargs['initial']['login'] = request.user.username
     else:
@@ -216,7 +216,7 @@ def edit_post(request, post_id):
     or request.user.pybb_profile.is_banned():
         return HttpResponseRedirect(post.get_absolute_url())
 
-    if request.user.is_superuser:
+    if request.user.is_staff:
         form_class = AdminPostForm
     else:
         form_class = PostForm
