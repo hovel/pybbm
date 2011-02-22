@@ -49,8 +49,9 @@
         {% else %}
         <a href="{% url pybb:close_topic topic.id %}">{% trans "Close topic" %}</a> /
         {% endif %}
-
+        {% comment %}
         <a href="{% url pybb:merge_topics %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
+        {% endcomment %}
     {% endif %}
 
         {% if user.is_subscribed %}
