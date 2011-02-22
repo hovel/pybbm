@@ -28,24 +28,10 @@ from pybb import defaults
 
 register = template.Library()
 
-#noinspection PyUnusedLocal
-@register.tag
-def pybb_csrf(parser, token):
-    """
-    This tag returns CsrfTokenNode if CsrfViewMiddleware is enabled, or empty string if not
-    """
-
-    if 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE_CLASSES:
-        from django.template.defaulttags import CsrfTokenNode
-
-        return CsrfTokenNode()
-    else:
-        return TextNode('')
-
 
 @register.filter
 def pybb_profile_link(user):
-    url = reverse('pybb_user', args=[user.username])
+    url = reverse('pybb:user', args=[user.username])
     return mark_safe(u'<a href="%s">%s</a>' % (url, user.username))
 
 
@@ -145,107 +131,7 @@ def pybb_posted_by(post, user):
     """
     Check if the post is writed by the user.
     """
-
     return post.user == user
-
-
-@register.filter
-def pybb_equal_to(obj1, obj2):
-    """
-    Check if objects are equal.
-    """
-
-    return obj1 == obj2
-
-
-@register.inclusion_tag('pybb/mini_pagination.html')
-def pybb_topic_mini_pagination(topic):
-    """
-    Display links on topic pages.
-    """
-    is_paginated = topic.post_count > defaults.PYBB_TOPIC_PAGE_SIZE
-    if not is_paginated:
-        pagination = None
-    else:
-        page_size = defaults.PYBB_TOPIC_PAGE_SIZE
-        a_template = u'<a href="%s?page=%%(p)s">%%(p)s</a>' % topic.get_absolute_url()
-        page_count = ((topic.post_count - 1) / page_size ) + 1
-        if page_count > 4:
-            pages = [1, 2, page_count - 1, page_count]
-            links = [a_template % {'p': page} for page in pages]
-            pagination = u"%s, %s ... %s, %s" % tuple(links)
-        else:
-            pages = range(1, page_count + 1)
-            links = [a_template % {'p': page} for page in pages]
-            pagination = u", ".join(links)
-
-    return {'pagination': pagination,
-            'is_paginated': is_paginated,
-    }
-
-
-#noinspection PyUnusedLocal
-@register.tag(name='pybb_load_last_topics')
-def do_pybb_load_last_topics(parser, token):
-    """
-    Create new context variable pointed to the list of topics.
-    
-    Usage examples:
-        
-        {% pybb_load_last_topics as last_topics %}
-        {% pybb_load_last_topics as last_topics with limit=10 %}
-        {% pybb_load_last_topics as last_topics with limit=10, category=cat.pk %}
-        {% pybb_load_last_topics as last_topics with forum=forum.pk,order_by="updated" %}
-
-    Available arguments for with clause:
-        limit: limitation of number of loaded items
-        category: primary key of category to load topics from
-        forum: primary key of forum to load topics from
-        order_by: the Topic field name to order the topic selection with. Default is "created"
-    """
-
-    try:
-        tag_name, arg = token.contents.split(None, 1)
-    except ValueError:
-        raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents.split()[0]
-
-    match = re.search(r'as\s+(\w+)(?:\s+with\s+(.+))?', arg)
-    if not match:
-        raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name
-    name = match.group(1)
-
-    limit = '10'
-    category = '0'
-    order_by = '"created"'
-
-    if match.group(2):
-        args = dict([x.strip().split('=') for x in match.group(2).split(',')])
-        if 'limit' in args:
-            limit = args['limit']
-        if 'category' in args:
-            category = args['category']
-        if 'order_by' in args:
-            order_by = args['order_by']
-
-    return PybbLoadLastTopicsNode(name, limit, category, order_by)
-
-
-class PybbLoadLastTopicsNode(template.Node):
-    def __init__(self, name, limit, category, order_by):
-        self.name = name
-        self.limit = template.Variable(limit)
-        self.category = template.Variable(category)
-        self.order_by = template.Variable(order_by)
-
-    def render(self, context):
-        limit = self.limit.resolve(context)
-        category = self.category.resolve(context)
-        order_by = self.order_by.resolve(context)
-        topics = Topic.objects.all().select_related().order_by('-' + order_by)
-        if category:
-            topics = topics.filter(forum__category__pk=category)
-        context[self.name] = topics[:limit]
-        return ''
 
 @register.filter
 def pybb_topic_unread(topics, user):

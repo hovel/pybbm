@@ -68,7 +68,7 @@ class Category(models.Model):
         return self.forums.all().count()
 
     def get_absolute_url(self):
-        return reverse('pybb_category', args=[self.id])
+        return reverse('pybb:category', args=[self.id])
 
     @property
     def topics(self):
@@ -104,7 +104,7 @@ class Forum(models.Model):
         self.save()
 
     def get_absolute_url(self):
-        return reverse('pybb_forum', args=[self.id])
+        return reverse('pybb:forum', args=[self.id])
 
     @property
     def posts(self):
@@ -158,7 +158,7 @@ class Topic(models.Model):
         return self.get_last_post()
 
     def get_absolute_url(self):
-        return reverse('pybb_topic', args=[self.id])
+        return reverse('pybb:topic', args=[self.id])
 
     def save(self, *args, **kwargs):
         if self.id is None:
@@ -241,7 +241,7 @@ class Post(RenderableItem):
             self.topic.forum.update_counters()
 
     def get_absolute_url(self):
-        return reverse('pybb_post', args=[self.id])
+        return reverse('pybb:post', args=[self.id])
 
     def delete(self, *args, **kwargs):
         self_id = self.id
@@ -307,7 +307,7 @@ class Profile(models.Model):
             return defaults.PYBB_DEFAULT_AVATAR_URL
 
     def get_absolute_url(self):
-        return reverse('pybb_user', args=[self.user.username])
+        return reverse('pybb:user', args=[self.user.username])
 
 
 class Attachment(models.Model):
@@ -328,7 +328,7 @@ class Attachment(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('pybb_attachment', args=[self.hash])
+        return reverse('pybb:attachment', args=[self.hash])
 
     def size_display(self):
         size = self.size

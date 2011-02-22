@@ -28,12 +28,12 @@
 
             <div class="post-controls">
                 {% if user.is_moderator or post|pybb_posted_by:user %}
-                    <a href="{% url pybb_edit_post post.id %}">{% trans "Edit" %}</a>
+                    <a href="{% url pybb:edit_post post.id %}">{% trans "Edit" %}</a>
                 {% endif %}
                 {% if user.is_moderator %}
-                    <a onclick="pybb_delete_post('{% url pybb_delete_post post.id %}',
+                    <a onclick="pybb_delete_post('{% url pybb:delete_post post.id %}',
                             'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
-                       href="{% url pybb_delete_post post.id %}">{% trans "Delete" %}</a>
+                       href="{% url pybb:delete_post post.id %}">{% trans "Delete" %}</a>
                 {% endif %}
 
             </div>
@@ -61,7 +61,7 @@
             {% endcomment %}
 
             <div class="post-related">
-                <a href="{% url pybb_add_post topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
+                <a href="{% url pybb:add_post topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
             </div>
         </td>
     </tr>

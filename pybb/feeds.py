@@ -10,7 +10,7 @@ class PybbFeed(Feed):
     feed_type = Atom1Feed
 
     def link(self):
-        return reverse('pybb_index')
+        return reverse('pybb:index')
 
     def item_guid(self, obj):
         return str(obj.id)

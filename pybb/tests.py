@@ -30,7 +30,7 @@ class BasicFeaturesTest(TestCase):
     def test_base(self):
         client = Client()
         # Check index page
-        url = reverse('pybb_index')
+        url = reverse('pybb:index')
         response = client.get(url)
         tree = html.fromstring(response.content)
         self.assertContains(response, u'foo')
@@ -39,7 +39,7 @@ class BasicFeaturesTest(TestCase):
         self.assertEqual(len(response.context['categories']), 1)
 
         # Check forum page
-        url = reverse('pybb_forum', args=[self.forum.id])
+        url = reverse('pybb:forum', args=[self.forum.id])
         response = client.get(url)
         tree = html.fromstring(response.content)
         self.assertTrue(tree.xpath('//a[@href="%s"]' % self.topic.get_absolute_url()))
@@ -47,12 +47,29 @@ class BasicFeaturesTest(TestCase):
         self.assertFalse(tree.xpath('//a[contains(@href,"?page=")]'))
         self.assertFalse(response.context['is_paginated'])
 
+        # User page
+        response = client.get(reverse('pybb:user', args=[self.user.username]))
+        self.assertTrue(response.status_code==200)
+
+        # Self profile edit
+        client.login(username='zeus', password='zeus')
+        response = client.get(reverse('pybb:edit_profile'))
+        self.assertTrue(response.status_code==200)
+        tree = html.fromstring(response.content)
+        values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
+        values['signature'] = 'test signature'
+        response = client.post(reverse('pybb:edit_profile'), data=values, follow=True)
+        self.assertTrue(response.status_code==200)
+        client.get(self.post.get_absolute_url(), follow=True)
+        self.assertContains(response, 'test signature')
+
+
     def test_pagination_and_topic_addition(self):
         client = Client()
         for i in range(0, defaults.PYBB_FORUM_PAGE_SIZE + 3):
             topic = Topic(name='topic_%s_' % i, forum=self.forum, user=self.user)
             topic.save()
-        url = reverse('pybb_forum', args=[self.forum.id])
+        url = reverse('pybb:forum', args=[self.forum.id])
         response = client.get(url)
         self.assertEqual(len(response.context['topic_list']), defaults.PYBB_FORUM_PAGE_SIZE)
         self.assertTrue(response.context['is_paginated'])
@@ -61,7 +78,7 @@ class BasicFeaturesTest(TestCase):
 
     def test_bbcode_and_topic_title(self):
         client = Client()
-        url = reverse('pybb_topic', args=[self.topic.id])
+        url = reverse('pybb:topic', args=[self.topic.id])
         response = client.get(url)
         tree = html.fromstring(response.content)
         self.assertTrue(self.topic.name in tree.xpath('//title')[0].text_content())
@@ -99,7 +116,7 @@ class BasicFeaturesTest(TestCase):
         tree = html.fromstring(client.get(topic.forum.get_absolute_url()).content)
         self.assertTrue(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.get_absolute_url()))
         # Forum status
-        tree = html.fromstring(client.get(reverse('pybb_index')).content)
+        tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertTrue(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
         # Visit it
         client.get(topic.get_absolute_url())
@@ -110,17 +127,23 @@ class BasicFeaturesTest(TestCase):
             client.get(t.get_absolute_url())
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.get_absolute_url()))
         # Forum status - readed
-        tree = html.fromstring(client.get(reverse('pybb_index')).content)
+        tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
         # Post message
-        response = client.post(reverse('pybb_add_post', args=[topic.id]), {'body': 'test tracking'}, follow=True)
+        response = client.post(reverse('pybb:add_post', args=[topic.id]), {'body': 'test tracking'}, follow=True)
         self.assertContains(response, 'test tracking')
         # Topic status - readed
         tree = html.fromstring(client.get(topic.forum.get_absolute_url()).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.get_absolute_url()))
         # Forum status - readed
-        tree = html.fromstring(client.get(reverse('pybb_index')).content)
+        tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
+        post = Post(topic=topic, user=self.user, body='one', markup='bbcode')
+        post.save()
+        client.get(reverse('pybb:mark_all_as_read'))
+        tree = html.fromstring(client.get(reverse('pybb:index')).content)
+        self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
+
 
     def test_hidden(self):
         client = Client()
@@ -143,23 +166,23 @@ class BasicFeaturesTest(TestCase):
         post_in_hidden.save()
 
         
-        self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb_index')).context['categories']])
+        self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
         self.assertTrue(client.get(category.get_absolute_url()).status_code==404)
         self.assertTrue(client.get(forum_in_hidden.get_absolute_url()).status_code==404)
         self.assertTrue(client.get(topic_in_hidden.get_absolute_url()).status_code==404)
 
-        self.assertNotContains(client.get(reverse('pybb_index')), forum_hidden.get_absolute_url())
-        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'topics'})), topic_hidden.get_absolute_url())
-        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'topics'})), topic_in_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'topics'})), topic_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'topics'})), topic_in_hidden.get_absolute_url())
 
-        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'posts'})), post_hidden.get_absolute_url())
-        self.assertNotContains(client.get(reverse('pybb_feed', kwargs={'url': 'posts'})), post_in_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'posts'})), post_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'posts'})), post_in_hidden.get_absolute_url())
         self.assertTrue(client.get(forum_hidden.get_absolute_url()).status_code==404)
         self.assertTrue(client.get(topic_hidden.get_absolute_url()).status_code==404)
 
         client.login(username='zeus', password='zeus')
-        self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb_index')).context['categories']])
-        self.assertNotContains(client.get(reverse('pybb_index')), forum_hidden.get_absolute_url())
+        self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
+        self.assertNotContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
         self.assertTrue(client.get(category.get_absolute_url()).status_code==404)
         self.assertTrue(client.get(forum_in_hidden.get_absolute_url()).status_code==404)
         self.assertTrue(client.get(topic_in_hidden.get_absolute_url()).status_code==404)
@@ -167,8 +190,8 @@ class BasicFeaturesTest(TestCase):
         self.assertTrue(client.get(topic_hidden.get_absolute_url()).status_code==404)
         self.user.is_staff = True
         self.user.save()
-        self.assertTrue(category.id in [c.id for c in client.get(reverse('pybb_index')).context['categories']])
-        self.assertContains(client.get(reverse('pybb_index')), forum_hidden.get_absolute_url())
+        self.assertTrue(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
+        self.assertContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
         self.assertFalse(client.get(category.get_absolute_url()).status_code==404)
         self.assertFalse(client.get(forum_in_hidden.get_absolute_url()).status_code==404)
         self.assertFalse(client.get(topic_in_hidden.get_absolute_url()).status_code==404)
@@ -178,11 +201,11 @@ class BasicFeaturesTest(TestCase):
     def test_inactive(self):
         client = Client()
         client.login(username='zeus', password='zeus')
-        client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test ban'}, follow=True)
+        client.post(reverse('pybb:add_post', args=[self.topic.id]), {'body': 'test ban'}, follow=True)
         self.assertTrue(len(Post.objects.filter(body='test ban'))==1)
         self.user.is_active = False
         self.user.save()
-        client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test ban 2'}, follow=True)
+        client.post(reverse('pybb:add_post', args=[self.topic.id]), {'body': 'test ban 2'}, follow=True)
         self.assertTrue(len(Post.objects.filter(body='test ban 2'))==0)
 
     def get_csrf(self, form):
@@ -191,13 +214,12 @@ class BasicFeaturesTest(TestCase):
     def test_csrf(self):
         client = Client(enforce_csrf_checks=True)
         client.login(username='zeus', password='zeus')
-        response = client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test csrf'}, follow=True)
-        #import pdb; pdb.set_trace()
+        response = client.post(reverse('pybb:add_post', args=[self.topic.id]), {'body': 'test csrf'}, follow=True)
         self.assertFalse(response.status_code==200)
         response = client.get(self.topic.get_absolute_url())
         form = html.fromstring(response.content).xpath('//form[@class="post-form"]')[0]
         token = self.get_csrf(form)
-        response = client.post(reverse('pybb_add_post', args=[self.topic.id]), {'body': 'test csrf', 'csrfmiddlewaretoken': token}, follow=True)
+        response = client.post(reverse('pybb:add_post', args=[self.topic.id]), {'body': 'test csrf', 'csrfmiddlewaretoken': token}, follow=True)
         self.assertTrue(response.status_code==200)
 
 

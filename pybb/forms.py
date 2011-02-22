@@ -125,7 +125,7 @@ class EditProfileForm(forms.ModelForm):
                   'show_signatures', 'markup', 'avatar']
 
     def clean_avatar(self):
-        if self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE:
+        if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):
             forms.ValidationError(_('Avatar is too large, max size: %s bytes' % defaults.PYBB_MAX_AVATAR_SIZE))
         return self.cleaned_data['avatar']
 

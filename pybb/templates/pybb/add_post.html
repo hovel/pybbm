@@ -13,9 +13,9 @@
 {% else %}
     <div class="crumbs">
     {% if forum %}
-        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
+        <a href="{% url pybb:index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
     {% else %}
-        <a href="{% url pybb_index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / {% pybb_link topic %}
+        <a href="{% url pybb:index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / {% pybb_link topic %}
     {% endif %}
     </div>
 

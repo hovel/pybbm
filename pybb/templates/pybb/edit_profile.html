@@ -35,7 +35,7 @@
                 {% pybb_link sub %}
                 &mdash;
                 <strong>
-                    <a href="{% url pybb_delete_subscription sub.id %}">{% trans "delete" %}</a>
+                    <a href="{% url pybb:delete_subscription sub.id %}">{% trans "delete" %}</a>
                 </strong>
             </li>
         {% endfor %}

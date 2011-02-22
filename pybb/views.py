@@ -168,21 +168,21 @@ def user(request, username):
         'topic_count': topic_count,
         })
 
-def user_topics(request, username):
-    profile = get_object_or_404(User, username=username)
-    topics = filter_hidden(request, Topic).objects.filter(user=profile).order_by('-created')
-    page, paginator = paginate(topics, request, defaults.PYBB_TOPIC_PAGE_SIZE)
-    return direct_to_template(request, 'pybb/user_topics.html', {
-        'profile': profile,
-        'page': page,
-        })
+#def user_topics(request, username):
+#    profile = get_object_or_404(User, username=username)
+#    topics = filter_hidden(request, Topic).objects.filter(user=profile).order_by('-created')
+#    page, paginator = paginate(topics, request, defaults.PYBB_TOPIC_PAGE_SIZE)
+#    return direct_to_template(request, 'pybb/user_topics.html', {
+#        'profile': profile,
+#        'page': page,
+#        })
 
 
 def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     count = post.topic.posts.filter(created__lt=post.created).count() + 1
     page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
-    url = '%s?page=%d#post-%d' % (reverse('pybb_topic', args=[post.topic.id]), page, post.id)
+    url = '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)
     return HttpResponseRedirect(url)
 
 
@@ -198,7 +198,7 @@ def edit_profile(request):
     if form.is_valid():
         profile = form.save()
         profile.save()
-        return HttpResponseRedirect(reverse('pybb_edit_profile'))
+        return HttpResponseRedirect(reverse('pybb:edit_profile'))
 
     return direct_to_template(request, 'pybb/edit_profile.html', {'form': form,
                                                                   'profile': request.user.pybb_profile,
@@ -315,60 +315,60 @@ def open_topic(request, topic_id):
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
-@login_required
-@csrf_protect
-def merge_topics(request):
-    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
-
-    topics_ids = request.GET.getlist('topic')
-    topics = get_list_or_404(Topic, pk__in=topics_ids)
-
-    for topic in topics:
-        if not pybb_topic_moderated_by(topic, request.user):
-        # TODO: show error message: no permitions for edit this topic
-            return HttpResponseRedirect(topic.get_absolute_url())
-
-    if len(topics) < 2:
-        return {'topics': topics}
-
-    posts = get_list_or_404(Post, topic__in=topics_ids)
-    main = int(request.POST.get("main", 0))
-
-    if main and main in (topic.id for topic in topics):
-        for topic in topics:
-            if topic.id == main:
-                main_topic = topic
-
-        for post in posts:
-            if post.topic_id != main_topic.id:
-                post.topic = main_topic
-                post.save()
-
-        main_topic.update_counters()
-        main_topic.forum.update_counters()
-
-        for topic in topics:
-            if topic.id != main:
-                forum = topic.forum
-                topic.delete()
-                forum.update_counters()
-
-        return HttpResponseRedirect(main_topic.get_absolute_url())
-
-    return direct_to_template(request, 'pybb/merge_topics.html', {'posts': posts,
-                                                                  'topics': topics,
-                                                                  'topic': topics[0],
-                                                                  })
-@csrf_protect
-def users(request):
-    form = UserSearchForm(request.GET)
-    all_users = form.filter(User.objects.order_by('username'))
-
-    page, paginator = paginate(all_users, request, defaults.PYBB_USERS_PAGE_SIZE)
-
-    return direct_to_template(request, 'pybb/users.html', {'page': page,
-                                                           'form': form,
-                                                           })
+#@login_required
+#@csrf_protect
+#def merge_topics(request):
+#    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
+#
+#    topics_ids = request.GET.getlist('topic')
+#    topics = get_list_or_404(Topic, pk__in=topics_ids)
+#
+#    for topic in topics:
+#        if not pybb_topic_moderated_by(topic, request.user):
+#        # TODO: show error message: no permitions for edit this topic
+#            return HttpResponseRedirect(topic.get_absolute_url())
+#
+#    if len(topics) < 2:
+#        return {'topics': topics}
+#
+#    posts = get_list_or_404(Post, topic__in=topics_ids)
+#    main = int(request.POST.get("main", 0))
+#
+#    if main and main in (topic.id for topic in topics):
+#        for topic in topics:
+#            if topic.id == main:
+#                main_topic = topic
+#
+#        for post in posts:
+#            if post.topic_id != main_topic.id:
+#                post.topic = main_topic
+#                post.save()
+#
+#        main_topic.update_counters()
+#        main_topic.forum.update_counters()
+#
+#        for topic in topics:
+#            if topic.id != main:
+#                forum = topic.forum
+#                topic.delete()
+#                forum.update_counters()
+#
+#        return HttpResponseRedirect(main_topic.get_absolute_url())
+#
+#    return direct_to_template(request, 'pybb/merge_topics.html', {'posts': posts,
+#                                                                  'topics': topics,
+#                                                                  'topic': topics[0],
+#                                                                  })
+#@csrf_protect
+#def users(request):
+#    form = UserSearchForm(request.GET)
+#    all_users = form.filter(User.objects.order_by('username'))
+#
+#    page, paginator = paginate(all_users, request, defaults.PYBB_USERS_PAGE_SIZE)
+#
+#    return direct_to_template(request, 'pybb/users.html', {'page': page,
+#                                                           'form': form,
+#                                                           })
 
 
 @login_required
@@ -376,24 +376,24 @@ def delete_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.remove(request.user)
     if 'from_topic' in request.GET:
-        return HttpResponseRedirect(reverse('pybb_topic', args=[topic.id]))
+        return HttpResponseRedirect(reverse('pybb:topic', args=[topic.id]))
     else:
-        return HttpResponseRedirect(reverse('pybb_edit_profile'))
+        return HttpResponseRedirect(reverse('pybb:edit_profile'))
 
 
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
-    return HttpResponseRedirect(reverse('pybb_topic', args=[topic.id]))
+    return HttpResponseRedirect(reverse('pybb:topic', args=[topic.id]))
 
 
-@login_required
-def show_attachment(request, hash):
-    attachment = get_object_or_404(Attachment, hash=hash)
-    file_obj = file(attachment.get_absolute_path())
-    # without it mod_python chokes with error that content_type must be string
-    return HttpResponse(file_obj, content_type=str(attachment.content_type))
+#@login_required
+#def show_attachment(request, hash):
+#    attachment = get_object_or_404(Attachment, hash=hash)
+#    file_obj = file(attachment.get_absolute_path())
+#    # without it mod_python chokes with error that content_type must be string
+#    return HttpResponse(file_obj, content_type=str(attachment.content_type))
 
 
 @login_required
@@ -412,7 +412,7 @@ def mark_all_as_read(request):
     TopicReadTracker.objects.filter(user=request.user).delete()
     msg = _('All forums marked as read')
     messages.success(request, msg, fail_silently=True)
-    return redirect(reverse('pybb_index'))
+    return redirect(reverse('pybb:index'))
 
 @login_required
 @permission_required('pybb.block_users')
@@ -422,4 +422,4 @@ def block_user(request, username):
     user.save()
     msg = _('User successfuly blocked')
     messages.success(request, msg, fail_silently=True)
-    return redirect('pybb_index')
+    return redirect('pybb:index')

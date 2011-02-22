@@ -2,7 +2,7 @@
 
 
 
-<form class="post-form" action="{% if forum %}{% url pybb_add_topic forum.pk %}{% else %}{% url pybb_add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
+<form class="post-form" action="{% if forum %}{% url pybb:add_topic forum.pk %}{% else %}{% url pybb:add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
        <fieldset>
             <legend>

@@ -58,7 +58,7 @@
 
     {% if not user.pybb_profile.is_banned %}
         <div class="controls">
-            <a href="{% url pybb_add_topic forum.id %}">
+            <a href="{% url pybb:add_topic forum.id %}">
                 {% if PYBB_BUTTONS.new_topic %}
                     <img src="{{ STATIC_URL }}{{ PYBB_BUTTONS.new_topic }}" alt='{% trans "New topic" %}'>
                 {% else %}

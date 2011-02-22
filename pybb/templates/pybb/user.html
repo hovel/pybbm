@@ -33,7 +33,7 @@
             <div>{% trans "Number of topics" %}: {{ topic_count }}.
                 {% comment %}
                 &nbsp;
-                <a href="{% url pybb_user_topics profile.username %}">
+                <a href="{% url pybb:user_topics profile.username %}">
                     {% trans "Find all topics" %}
                 </a>
                 {% endcomment %}
