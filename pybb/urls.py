@@ -23,6 +23,7 @@ urlpatterns += patterns('pybb.views',
                         # User
                         #url('^users/$', 'users', name='pybb_users'),
                         url('^users/([^/]+)/$', 'user', name='user'),
+                        url('^block_user/([^/]+)/$', 'block_user', name='block_user'),
                         #url('^users/([^/]+)/topics/$', 'user_topics', name='pybb_user_topics'),
 
                         # Profile

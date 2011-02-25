@@ -4,31 +4,22 @@
 {% load thumbnail %}
 
 {% block title %}
-{{ profile.username }}
+{{ target_user.username }}
 {% endblock %}
 
-
 {% block content %}
-    <h1>{{ profile.username }}</h1>
+    <h1>{{ target_user.username }}</h1>
     <div class="userinfo">
     <div class="avatar">
-        {% thumbnail profile.pybb_profile.avatar request.pybb_avatar_dimensions as avatar %}
+        {% thumbnail target_user.pybb_profile.avatar request.pybb_avatar_dimensions as avatar %}
             <img src="{{ avatar.url }}" alt="avatar">
         {% empty %}
             <img src="{{ request.pybb_default_avatar }}" alt="avatar">
         {% endthumbnail %}
         </div>
         <div class="info">
-            {% if profile.pybb_profile.ban_status %}
-                <div{% ifequal profile.pybb_profile.ban_status 2 %}
-                title="{% trans 'Expire' %} {{ profile.pybb_profile.ban_till }}"{% endifequal %}
-                class="banned">
-                    {{ profile.pybb_profile.get_ban_status_display }}
-                </div>
-            {% endif %}
-
             <div class="label">{% trans "Statistics" %}</div>
-            <div>{% trans "Number of posts" %}: {{ profile.posts.all.count }}.
+            <div>{% trans "Number of posts" %}: {{ target_user.posts.all.count }}.
             </div>
             <div>{% trans "Number of topics" %}: {{ topic_count }}.
                 {% comment %}
@@ -38,8 +29,17 @@
                 </a>
                 {% endcomment %}
             </div>
-            <div>{% trans "Date of registration" %}: {% pybb_time profile.date_joined %}</div>
+            <div>{% trans "Date of registration" %}: {% pybb_time target_user.date_joined %}</div>
         </div>
         <div class="clear"></div>
     </div>
+    <div class='controls'>
+        {% if perms.pybb.block_users %}
+            <a href='{% url pybb:block_user target_user.username %}'>{% trans 'Block' %}</a>
+        {% endif %}
+        {% if perms.pybb.can_edit %}
+            <a href='{% url admin:pybb_profile_change target_user.pybb_profile.id %}'>{% trans 'Edit' %}</a>
+        {% endif %}
+    </div>
+
 {% endblock %}

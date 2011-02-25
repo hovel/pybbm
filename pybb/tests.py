@@ -222,6 +222,16 @@ class BasicFeaturesTest(TestCase):
         response = client.post(reverse('pybb:add_post', args=[self.topic.id]), {'body': 'test csrf', 'csrfmiddlewaretoken': token}, follow=True)
         self.assertTrue(response.status_code==200)
 
+    def test_user_blocking(self):
+        user = User.objects.create_user('test', 'test@localhost', 'test')
+        self.user.is_superuser = True
+        self.user.save()
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        self.assertTrue(client.get(reverse('pybb:block_user', args=[user.username]), follow=True).status_code==200)
+        user = User.objects.get(username=user.username)
+        self.assertFalse(user.is_active)
+
 
 
         

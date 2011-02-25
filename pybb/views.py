@@ -161,10 +161,10 @@ def add_post(request, forum_id, topic_id):
                                                               })
 
 def user(request, username):
-    profile = get_object_or_404(User, username=username)
-    topic_count = Topic.objects.filter(user=profile).count()
+    user = get_object_or_404(User, username=username)
+    topic_count = Topic.objects.filter(user=user).count()
     return direct_to_template(request, 'pybb/user.html', {
-        'profile': profile,
+        'target_user': user,
         'topic_count': topic_count,
         })
 
@@ -386,15 +386,6 @@ def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(reverse('pybb:topic', args=[topic.id]))
-
-
-#@login_required
-#def show_attachment(request, hash):
-#    attachment = get_object_or_404(Attachment, hash=hash)
-#    file_obj = file(attachment.get_absolute_path())
-#    # without it mod_python chokes with error that content_type must be string
-#    return HttpResponse(file_obj, content_type=str(attachment.content_type))
-
 
 @login_required
 def post_ajax_preview(request):

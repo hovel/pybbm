@@ -284,6 +284,10 @@ class Profile(models.Model):
     class Meta(object):
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
+        
+        permissions = (
+            ("block_users", "Can block any user"),
+        )
 
     def save(self, *args, **kwargs):
         self.signature_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.signature)

@@ -21,6 +21,11 @@
         <fieldset>
             <legend>{% trans "Editing the post" %}</legend>
                 {{ form.as_p }}
+                <div id='emoticons'>
+                    {% for smile, url in form.aviable_smiles.items %}
+                        <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
+                    {% endfor %}
+                </div>
                 <p>
                 {% if PYBB_BUTTONS.save %}
                     <input type='image' src="{{ STATIC_URL }}{{ PYBB_BUTTONS.save }}" alt='{% trans "Save" %}'>
