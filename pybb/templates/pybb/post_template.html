@@ -35,6 +35,10 @@
                             'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
                        href="{% url pybb:delete_post post.id %}">{% trans "Delete" %}</a>
                 {% endif %}
+            
+                {% if perms.pybb.change_post and user.is_staff %}
+                    <a href="{% url admin:pybb_post_change post.id %}">{% trans 'Admin' %}</a>
+                {% endif %}
 
             </div>
         </td>

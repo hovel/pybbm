@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybb\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-25 01:18+0300\n"
+"POT-Creation-Date: 2011-02-25 10:03+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,7 +52,7 @@ msgstr "Последние темы на форуме"
 msgid "Subject"
 msgstr "Заголовок"
 
-#: forms.py:17 models.py:351 templates/pybb/post_template.html:58
+#: forms.py:17 models.py:351 templates/pybb/post_template.html:62
 msgid "Attachment"
 msgstr "Вложение"
 
@@ -324,7 +324,7 @@ msgstr "Да, хочу удалить."
 msgid "Editing the post"
 msgstr "Редактирование сообщения"
 
-#: templates/pybb/edit_post.html:26 templates/pybb/edit_post.html.py:28
+#: templates/pybb/edit_post.html:31 templates/pybb/edit_post.html.py:33
 #: templates/pybb/edit_profile.html:24 templates/pybb/edit_profile.html:26
 msgid "Save"
 msgstr "Сохранить"
@@ -402,11 +402,15 @@ msgstr "Удалить сообщение?"
 msgid "Delete"
 msgstr "Удалить"
 
-#: templates/pybb/post_template.html:51
+#: templates/pybb/post_template.html:40 templates/pybb/topic.html:53
+msgid "Admin"
+msgstr "Админка"
+
+#: templates/pybb/post_template.html:55
 msgid "Edited"
 msgstr "Отредактировано"
 
-#: templates/pybb/post_template.html:64
+#: templates/pybb/post_template.html:68
 msgid "quote"
 msgstr "цитировать"
 
@@ -426,15 +430,15 @@ msgstr "Открыть тему"
 msgid "Close topic"
 msgstr "Закрыть тему"
 
-#: templates/pybb/topic.html:53
+#: templates/pybb/topic.html:56
 msgid "Merge topics"
 msgstr "Объединить темы"
 
-#: templates/pybb/topic.html:58
+#: templates/pybb/topic.html:61
 msgid "Unsubscribe"
 msgstr "Запретить уведомления"
 
-#: templates/pybb/topic.html:60
+#: templates/pybb/topic.html:63
 msgid "Subscribe"
 msgstr "Получать уведомления"
 
@@ -581,9 +585,6 @@ msgstr[1] ""
 
 #~ msgid "My profile"
 #~ msgstr "Мой профиль"
-
-#~ msgid "Admincp"
-#~ msgstr "Админка"
 
 #~ msgid "Log out"
 #~ msgstr "Выйти"
