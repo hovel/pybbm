@@ -12,18 +12,10 @@
     <tr>
         <td class="info">
             {% include "pybb/avatar.html" %}
-            <div class="author">{{ post.user|pybb_profile_link }}</div>
+            <div class="author"><a href="{{ post.user.get_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
 
             {% if user.is_superuser %}
                 <div class="extra-info">{{ post.user_ip }}</div>
-            {% endif %}
-
-            {% if post.user.pybb_profile.ban_status %}
-                <div{% if post.user.pybb_profile.is_banned %}
-                        title="{% trans 'Expire' %} {{ post.user.pybb_profile.ban_till }}"{% endif %}
-                        class="banned">
-                    {{ post.user.pybb_profile.get_ban_status_display }}
-                </div>
             {% endif %}
 
             <div class="post-controls">
@@ -44,10 +36,10 @@
         </td>
         <td class="content">
             {% pybb_render_post post %}
-            {% if not user.is_authenticated or user.pybb_profile.show_signatures %}
-                {% if post.user.pybb_profile.signature %}
+            {% if not user.is_authenticated or user.get_profile.show_signatures %}
+                {% if post.user.get_profile.signature %}
                     <div class="signature">
-                        {{ post.user.pybb_profile.signature_html|safe }}
+                        {{ post.user.get_profile.signature_html|safe }}
                     </div>
                 {% endif %}
             {% endif %}

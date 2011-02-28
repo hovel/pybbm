@@ -56,7 +56,7 @@
     </table>
     {% include "pybb/pagination/pagination.html" %}
 
-    {% if not user.pybb_profile.is_banned %}
+    {% if not user.get_profile.is_banned %}
         <div class="controls">
             <a href="{% url pybb:add_topic forum.id %}">
                 {% if PYBB_BUTTONS.new_topic %}

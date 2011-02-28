@@ -29,12 +29,6 @@ from pybb import defaults
 register = template.Library()
 
 
-@register.filter
-def pybb_profile_link(user):
-    url = reverse('pybb:user', args=[user.username])
-    return mark_safe(u'<a href="%s">%s</a>' % (url, user.username))
-
-
 #noinspection PyUnusedLocal
 @register.tag
 def pybb_time(parser, token):

@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.models import ContentType
 import re
 from datetime import datetime
 import os.path
@@ -74,7 +75,7 @@ class PostForm(forms.ModelForm):
         else:
             topic = self.topic
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
-                    markup=self.user.pybb_profile.markup,
+                    markup=self.user.get_profile().markup,
                     body=self.cleaned_data['body'])
         post.save()
         if defaults.PYBB_ATTACHMENT_ENABLE:
@@ -117,10 +118,15 @@ class AdminPostForm(PostForm):
                                                  '%s@example.com' % self.cleaned_data['login'])
         return super(AdminPostForm, self).save(*args, **kwargs)
 
+try:
+    profile_app, profile_model = settings.AUTH_PROFILE_MODULE.split('.')
+    profile_model = ContentType.objects.get(app_label=profile_app, model=profile_model).model_class()
+except:
+    profile_model = Profile
 
 class EditProfileForm(forms.ModelForm):
     class Meta(object):
-        model = Profile
+        model = profile_model
         fields = ['signature', 'time_zone', 'language',
                   'show_signatures', 'markup', 'avatar']
 

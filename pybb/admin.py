@@ -100,11 +100,6 @@ class ProfileAdmin(admin.ModelAdmin):
                 'fields' : ('avatar', 'signature', 'show_signatures')
                 }
          ),
-        (_('Ban options'), {
-                'classes': ('collapse',),
-                'fields' : ('ban_status', 'ban_till')
-                }
-         ),
         )
 
 

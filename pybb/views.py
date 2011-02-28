@@ -102,7 +102,7 @@ def show_topic(request, topic_id):
         first_post = topic.head
     else:
         first_post = None
-    kwargs['queryset'] = topic.posts.all().select_related('user', 'user__pybb_profile')
+    kwargs['queryset'] = topic.posts.all().select_related('user')
     kwargs['paginate_by'] = defaults.PYBB_TOPIC_PAGE_SIZE
     kwargs['template_object_name'] = 'post'
     kwargs['extra_context'] = {'form': form, 'first_post': first_post, 'topic': topic}
@@ -127,7 +127,7 @@ def add_post(request, forum_id, topic_id):
         if topic.forum.hidden and (not request.user.is_staff):
             raise Http404()
 
-    if (topic and topic.closed) or request.user.pybb_profile.is_banned():
+    if (topic and topic.closed):
         return HttpResponseRedirect(topic.get_absolute_url())
 
     try:
@@ -136,7 +136,7 @@ def add_post(request, forum_id, topic_id):
         quote = ''
     else:
         post = get_object_or_404(Post, pk=quote_id)
-        quote = defaults.PYBB_QUOTE_ENGINES[request.user.pybb_profile.markup](post.body, post.user.username)
+        quote = defaults.PYBB_QUOTE_ENGINES[request.user.get_profile.markup](post.body, post.user.username)
 
     ip = request.META.get('REMOTE_ADDR', '')
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
@@ -162,6 +162,8 @@ def add_post(request, forum_id, topic_id):
 
 def user(request, username):
     user = get_object_or_404(User, username=username)
+    if user == request.user:
+        return HttpResponseRedirect(reverse('pybb:edit_profile'))
     topic_count = Topic.objects.filter(user=user).count()
     return direct_to_template(request, 'pybb/user.html', {
         'target_user': user,
@@ -189,7 +191,7 @@ def show_post(request, post_id):
 @login_required
 @csrf_protect
 def edit_profile(request):
-    form_kwargs = dict(instance=request.user.pybb_profile)
+    form_kwargs = dict(instance=request.user.get_profile())
     if request.method == 'POST':
         form = EditProfileForm(request.POST, request.FILES, **form_kwargs)
     else:
@@ -201,7 +203,7 @@ def edit_profile(request):
         return HttpResponseRedirect(reverse('pybb:edit_profile'))
 
     return direct_to_template(request, 'pybb/edit_profile.html', {'form': form,
-                                                                  'profile': request.user.pybb_profile,
+                                                                  'profile': request.user.get_profile,
                                                                   })
 
 
@@ -212,8 +214,7 @@ def edit_post(request, post_id):
 
     post = get_object_or_404(Post, pk=post_id)
 
-    if not pybb_editable_by(post, request.user)\
-    or request.user.pybb_profile.is_banned():
+    if not pybb_editable_by(post, request.user):
         return HttpResponseRedirect(post.get_absolute_url())
 
     if request.user.is_staff:
@@ -375,23 +376,19 @@ def open_topic(request, topic_id):
 def delete_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.remove(request.user)
-    if 'from_topic' in request.GET:
-        return HttpResponseRedirect(reverse('pybb:topic', args=[topic.id]))
-    else:
-        return HttpResponseRedirect(reverse('pybb:edit_profile'))
-
+    return HttpResponseRedirect(topic.get_absolute_url())
 
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
-    return HttpResponseRedirect(reverse('pybb:topic', args=[topic.id]))
+    return HttpResponseRedirect(topic.get_absolute_url())
 
 @login_required
 def post_ajax_preview(request):
     if request.user.is_authenticated():
         content = request.POST.get('data')
-        html = defaults.PYBB_MARKUP_ENGINES[request.user.pybb_profile.markup](content)
+        html = defaults.PYBB_MARKUP_ENGINES[request.user.get_profile.markup](content)
         return HttpResponse(html)
     return Http404
 

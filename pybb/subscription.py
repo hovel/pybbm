@@ -20,7 +20,7 @@ def notify_topic_subscribers(post):
         for user in topic.subscribers.all():
             if user != post.user:
                 old_lang = translation.get_language()
-                lang = user.pybb_profile.language or 'en'
+                lang = user.get_profile().language or 'en'
                 translation.activate(lang)
 
                 subject = u'RE: %s' % topic.name

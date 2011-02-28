@@ -8,7 +8,7 @@ from django.contrib.auth.models import User, Permission
 def post_saved(instance, **kwargs):
     notify_topic_subscribers(instance)
 
-    profile = instance.user.pybb_profile
+    profile = instance.user.get_profile()
     profile.post_count = instance.user.posts.count()
     profile.save()
 

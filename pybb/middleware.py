@@ -7,7 +7,7 @@ class PybbMiddleware(object):
         request.pybb_avatar_dimensions = '%sx%s' % (defaults.PYBB_AVATAR_WIDTH, defaults.PYBB_AVATAR_WIDTH)
         request.pybb_default_avatar = defaults.PYBB_DEFAULT_AVATAR_URL
         if request.user.is_authenticated():
-            profile = request.user.pybb_profile
+            profile = request.user.get_profile()
             language = translation.get_language_from_request(request)
 
             if not profile.language:

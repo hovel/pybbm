@@ -66,7 +66,7 @@
     {% endif %}
 
     {% if user.is_authenticated %}
-        {% if not user.pybb_profile.is_banned %}
+        {% if not user.get_profile.is_banned %}
             {% if not topic.closed %}
                 {% include "pybb/add_post_form.html" %}
             {% endif %}

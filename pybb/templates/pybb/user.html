@@ -11,10 +11,10 @@
     <h1>{{ target_user.username }}</h1>
     <div class="userinfo">
     <div class="avatar">
-        {% thumbnail target_user.pybb_profile.avatar request.pybb_avatar_dimensions as avatar %}
+        {% thumbnail target_user.get_profile.avatar request.pybb_avatar_dimensions as avatar %}
             <img src="{{ avatar.url }}" alt="avatar">
         {% empty %}
-            <img src="{{ request.pybb_default_avatar }}" alt="avatar">
+            <img src="{{ request.get_profile }}" alt="avatar">
         {% endthumbnail %}
         </div>
         <div class="info">

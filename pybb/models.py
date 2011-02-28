@@ -19,13 +19,13 @@ from pybb.util import unescape
 
 import defaults
 
-from annoying.functions import get_config
+from django.conf import settings
 
 # None is safe as default since django settings always have LANGUAGES, MEDIA_ROOT and SECRET_KEY variable set
-LANGUAGES = get_config('LANGUAGES', None)
-MEDIA_ROOT = get_config('MEDIA_ROOT', None)
-SECRET_KEY = get_config('SECRET_KEY', None)
-MEDIA_URL = get_config('MEDIA_URL', None)
+LANGUAGES = settings.LANGUAGES
+MEDIA_ROOT = settings.MEDIA_ROOT
+SECRET_KEY = settings.SECRET_KEY
+MEDIA_URL = settings.MEDIA_URL
 
 from south.modelsinspector import add_introspection_rules
 
@@ -77,6 +77,7 @@ class Category(models.Model):
     @property
     def posts(self):
         return Post.objects.filter(topic__forum__category=self).select_related()
+
 
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
@@ -132,8 +133,6 @@ class Topic(models.Model):
     closed = models.BooleanField(_('Closed'), blank=True, default=False)
     subscribers = models.ManyToManyField(User, related_name='subscriptions', verbose_name=_('Subscribers'), blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    #last_post = models.ForeignKey('Post', related_name="last_post_in_topic", verbose_name=_(u"last post"), blank=True,
-    #                              null=True)
     readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
 
     class Meta(object):
@@ -169,16 +168,6 @@ class Topic(models.Model):
         self.post_count = self.posts.count()
         self.save()
 
-#    def delete(self, *args, **kwargs):
-#        #noinspection PyUnresolvedReferences
-#        if self.forum.last_post.topic == self:
-#            try:
-#                self.forum.last_post = Post.objects.filter(topic__forum=self.forum).exclude(topic=self)[0]
-#            except:
-#                self.forum.last_post = None
-#            self.forum.save()
-#        super(Topic, self).delete(*args, **kwargs)
-
 
 class RenderableItem(models.Model):
     """
@@ -198,7 +187,7 @@ class RenderableItem(models.Model):
             self.body_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.body)
         else:
             raise Exception('Invalid markup property: %s' % self.markup)
-        # Remove tags which was generated with the markup processor
+            # Remove tags which was generated with the markup processor
         text = strip_tags(self.body_html)
         # Unescape entities which was generated with the markup processor
         self.body_text = unescape(text)
@@ -234,10 +223,8 @@ class Post(RenderableItem):
 
         if new:
             self.topic.updated = now
-            #self.topic.last_post = self
             self.topic.update_counters()
             self.topic.forum.updated = now
-            #self.topic.forum.last_post = self
             self.topic.forum.update_counters()
 
     def get_absolute_url(self):
@@ -246,12 +233,9 @@ class Post(RenderableItem):
     def delete(self, *args, **kwargs):
         self_id = self.id
         head_post_id = self.topic.posts.order_by('created')[0].id
-        last_posts = list(self.topic.posts.order_by('-created')[:2])
-        last_post_id = self.topic.get_last_post().id
 
         if self_id == head_post_id:
             self.topic.delete()
-        
         else:
             super(Post, self).delete(*args, **kwargs)
             self.topic.update_counters()
@@ -259,49 +243,30 @@ class Post(RenderableItem):
         self.topic.forum.update_counters()
 
 
-BAN_STATUS = (
-(0, _('No')),
-(1, _('Caution')),
-(2, _('Ban')))
-
-class Profile(models.Model):
-    user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
-    signature = models.TextField(_('Signature'), blank=True, max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH)
-    signature_html = models.TextField(_('Signature HTML Version'), blank=True,
-                                      max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH + 30)
-    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
-    language = models.CharField(_('Language'), max_length=10, blank=True,
-                                choices=LANGUAGES)
-    show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
-    markup = models.CharField(_('Default markup'), max_length=15, default=defaults.PYBB_DEFAULT_MARKUP,
-                              choices=MARKUP_CHOICES)
-    ban_status = models.SmallIntegerField(_('Ban status'), default=0, choices=BAN_STATUS)
-    ban_till = models.DateTimeField(_('Ban till'), blank=True, null=True, default=None)
-    post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    avatar = ImageField(_('Avatar'), blank=True, null=True, upload_to=get_file_path)
-    
-
+class PybbProfile(models.Model):
+    '''
+        Abstract class for user profile, site profile should be inherted from this class
+    '''
     class Meta(object):
-        verbose_name = _('Profile')
-        verbose_name_plural = _('Profiles')
-        
+        abstract = True
         permissions = (
             ("block_users", "Can block any user"),
         )
 
+    signature = models.TextField(_('Signature'), blank=True, max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH)
+    signature_html = models.TextField(_('Signature HTML Version'), blank=True,
+                                      max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH + 30)
+    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
+    language = models.CharField(_('Language'), max_length=10, blank=True, choices=settings.LANGUAGES, default=dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]])
+    show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
+    markup = models.CharField(_('Default markup'), max_length=15, default=defaults.PYBB_DEFAULT_MARKUP,
+                              choices=MARKUP_CHOICES)
+    post_count = models.IntegerField(_('Post count'), blank=True, default=0)
+    avatar = ImageField(_('Avatar'), blank=True, null=True, upload_to=get_file_path)
+
     def save(self, *args, **kwargs):
         self.signature_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.signature)
-        super(Profile, self).save(*args, **kwargs)
-
-    def is_banned(self):
-        if self.ban_status == 2:
-            if self.ban_till is None or self.ban_till < datetime.now():
-                self.ban_status = 0
-                self.ban_till = None
-                self.save()
-                return False
-            return True
-        return False
+        super(PybbProfile, self).save(*args, **kwargs)
 
     @property
     def avatar_url(self):
@@ -309,6 +274,14 @@ class Profile(models.Model):
             return self.avatar.url
         except:
             return defaults.PYBB_DEFAULT_AVATAR_URL
+
+
+class Profile(PybbProfile):
+    user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
+
+    class Meta(object):
+        verbose_name = _('Profile')
+        verbose_name_plural = _('Profiles')
 
     def get_absolute_url(self):
         return reverse('pybb:user', args=[self.user.username])
