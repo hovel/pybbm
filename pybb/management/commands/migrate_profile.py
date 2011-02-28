@@ -18,7 +18,7 @@ class Command(BaseCommand):
         profile_app, profile_model = settings.AUTH_PROFILE_MODULE.split('.')
         profile_model = ContentType.objects.get(app_label=profile_app, model=profile_model).model_class()
         for user in User.objects.all():
-            print(u'migrating profile for %s\n' % user.username)
+            #print(u'migrating profile for %s\n' % user.username)
             pybb_profile = user.pybb_profile
             try:
                 profile = user.get_profile()
