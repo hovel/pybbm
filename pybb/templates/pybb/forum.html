@@ -15,6 +15,11 @@
 
     </div>
     <h1>{{ forum.name }}</h1>
+    {% if forum.headline %}
+        <div class='forum-headline'>
+            {{ forum.headline|safe }}
+        </div>
+    {% endif %}
     {% include "pybb/pagination/pagination.html" %}
     <table class='topic-list'>
         <tr class="topic-row head-row">

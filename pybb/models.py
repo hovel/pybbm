@@ -90,6 +90,7 @@ class Forum(models.Model):
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
+    headline = models.TextField(_('Headline'), blank=True, null=True)
 
     class Meta(object):
         ordering = ['position']

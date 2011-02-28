@@ -136,7 +136,7 @@ def add_post(request, forum_id, topic_id):
         quote = ''
     else:
         post = get_object_or_404(Post, pk=quote_id)
-        quote = defaults.PYBB_QUOTE_ENGINES[request.user.get_profile.markup](post.body, post.user.username)
+        quote = defaults.PYBB_QUOTE_ENGINES[request.user.get_profile().markup](post.body, post.user.username)
 
     ip = request.META.get('REMOTE_ADDR', '')
     form_kwargs = dict(topic=topic, forum=forum, user=request.user,
@@ -388,7 +388,7 @@ def add_subscription(request, topic_id):
 def post_ajax_preview(request):
     if request.user.is_authenticated():
         content = request.POST.get('data')
-        html = defaults.PYBB_MARKUP_ENGINES[request.user.get_profile.markup](content)
+        html = defaults.PYBB_MARKUP_ENGINES[request.user.get_profile().markup](content)
         return HttpResponse(html)
     return Http404
 
