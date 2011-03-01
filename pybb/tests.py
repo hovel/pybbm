@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from pybb import defaults
+from django.core import mail
 
 try:
     from lxml import html
@@ -244,7 +245,87 @@ class BasicFeaturesTest(TestCase):
         client = Client()
         self.assertContains(client.get(self.forum.get_absolute_url()), 'test <b>headline</b>')
 
+    def test_quote(self):
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        response = client.get(reverse('pybb:add_post', args=[self.topic.id]), data={'quote_id': self.post.id, 'body': 'test tracking'}, follow=True)
+        self.assertTrue(response.status_code==200)
+        self.assertContains(response, self.post.body)
 
+    def test_edit_post(self):
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        response = client.get(reverse('pybb:edit_post', args=[self.post.id]))
+        self.assertTrue(response.status_code==200)
+        tree = html.fromstring(response.content)
+        values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
+        values['body'] = 'test edit'
+        response = client.post(reverse('pybb:edit_post', args=[self.post.id]), data=values, follow=True)
+        self.assertTrue(response.status_code==200)
+        self.assertContains(response, 'test edit')
+        # Check admin form
+        self.user.is_staff = True
+        response = client.get(reverse('pybb:edit_post', args=[self.post.id]))
+        self.assertTrue(response.status_code==200)
+        tree = html.fromstring(response.content)
+        values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
+        values['body'] = 'test edit'
+        values['login'] = 'new_login'
+        response = client.post(reverse('pybb:edit_post', args=[self.post.id]), data=values, follow=True)
+        self.assertTrue(response.status_code==200)
+        self.assertContains(response, 'test edit')
 
+    def test_stick(self):
+        self.user.is_superuser = True
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        self.assertTrue(client.get(reverse('pybb:stick_topic', args=[self.topic.id]), follow=True).status_code==200)
+        self.assertTrue(client.get(reverse('pybb:unstick_topic', args=[self.topic.id]), follow=True).status_code==200)
+
+    def test_delete_view(self):
+        post = Post(topic=self.topic, user=self.user, body='test to delete', markup='bbcode')
+        post.save()
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        response = client.post(reverse('pybb:delete_post', args=[post.id]), follow=True)
+        self.assertTrue(response.status_code==200)
+        # Check that topic and forum exists ;)
+        self.assertTrue(Topic.objects.filter(id=self.topic.id).count()==1)
+        self.assertTrue(Forum.objects.filter(id=self.forum.id).count()==1)
+
+        # Delete topic
+        response = client.post(reverse('pybb:delete_post', args=[self.post.id]), follow=True)
+        self.assertTrue(response.status_code==200)
+        self.assertTrue(Post.objects.filter(id=self.post.id).count()==0)
+        self.assertTrue(Topic.objects.filter(id=self.topic.id).count()==0)
+        self.assertTrue(Forum.objects.filter(id=self.forum.id).count()==1)
+
+    def test_open_close(self):
+        self.user.is_superuser = True
+        self.user.save()
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        response = client.get(reverse('pybb:close_topic', args=[self.topic.id]), follow=True)
+        self.assertTrue(response.status_code==200)
+        response = client.post(reverse('pybb:add_post', args=[self.topic.id]), {'body': 'test closed'}, follow=True)
+        self.assertTrue(response.status_code==403)
+        response = client.get(reverse('pybb:open_topic', args=[self.topic.id]), follow=True)
+        self.assertTrue(response.status_code==200)
+        response = client.post(reverse('pybb:add_post', args=[self.topic.id]), {'body': 'test closed'}, follow=True)
+        self.assertTrue(response.status_code==200)
+
+    def test_subscription(self):
+        user = User.objects.create_user(username='user2', password='user2', email='user2@example.com')
+        client = Client()
+        client.login(username='user2', password='user2')
+        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
+        self.assertTrue(response.status_code==200)
+        self.assertTrue(user in list(self.topic.subscribers.all()))
+        new_post = Post(topic=self.topic, user=self.user, body='test subscribtion', markup='bbcode')
+        new_post.save()
+        self.assertEquals(len(mail.outbox), 1)
+        response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
+        self.assertTrue(response.status_code==200)
+        self.assertTrue(user not in list(self.topic.subscribers.all()))
 
         

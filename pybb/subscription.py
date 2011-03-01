@@ -1,17 +1,9 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
+from django.template.loader import render_to_string
 from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
-
-
-TOPIC_SUBSCRIPTION_TEXT_TEMPLATE = lambda: _(u"""New reply from %(username)s to topic that you have subscribed on.
----
-%(message)s
----
-See topic: %(post_url)s
-Unsubscribe %(unsubscribe_url)s""")
 
 
 def notify_topic_subscribers(post):
@@ -20,21 +12,20 @@ def notify_topic_subscribers(post):
         for user in topic.subscribers.all():
             if user != post.user:
                 old_lang = translation.get_language()
-                lang = user.get_profile().language or 'en'
+                lang = user.get_profile().language or dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]]
                 translation.activate(lang)
-
-                subject = u'RE: %s' % topic.name
-                to_email = user.email
-                hostname = Site.objects.get_current().domain
                 delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
-
-                content = TOPIC_SUBSCRIPTION_TEXT_TEMPLATE() % {
-                    'username': post.user.username,
-                    'message': post.body_text,
-                    'post_url': 'http://%s%s' % (hostname, post.get_absolute_url()),
-                    'unsubscribe_url': 'http://%s%s' % (hostname, delete_url),
-                }
-
-                send_mail(subject, content, settings.DEFAULT_FROM_EMAIL,
-                          [to_email], fail_silently=True)
+                current_site = Site.objects.get_current()
+                subject = render_to_string('pybb/mail_templates/subscription_email_subject.html',
+                                           { 'site': current_site,
+                                             'post': post
+                                           })
+                # Email subject *must not* contain newlines
+                subject = ''.join(subject.splitlines())
+                message = render_to_string('pybb/mail_templates/subscription_email_body.html',
+                                           { 'site': current_site,
+                                             'post': post,
+                                             'delete_url': delete_url,
+                                             })
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
                 translation.activate(old_lang)

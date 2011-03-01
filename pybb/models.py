@@ -265,6 +265,8 @@ class PybbProfile(models.Model):
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     avatar = ImageField(_('Avatar'), blank=True, null=True, upload_to=get_file_path)
 
+    autosubscribe = models.BooleanField(_('Automatically subscribe'), help_text=_('Automatically subscribe to topics that you answer'), default=defaults.PYBB_DEFAULT_AUTOSUBSCRIBE)
+
     def save(self, *args, **kwargs):
         self.signature_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.signature)
         super(PybbProfile, self).save(*args, **kwargs)

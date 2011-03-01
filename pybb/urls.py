@@ -21,10 +21,8 @@ urlpatterns += patterns('pybb.views',
                         url('^forum/(\d+)/$', 'show_forum', name='forum'),
 
                         # User
-                        #url('^users/$', 'users', name='pybb_users'),
                         url('^users/([^/]+)/$', 'user', name='user'),
                         url('^block_user/([^/]+)/$', 'block_user', name='block_user'),
-                        #url('^users/([^/]+)/topics/$', 'user_topics', name='pybb_user_topics'),
 
                         # Profile
                         url('^profile/edit/$', 'edit_profile', name='edit_profile'),
@@ -35,7 +33,6 @@ urlpatterns += patterns('pybb.views',
                         url('^topic/(\d+)/unstick/$', 'unstick_topic', name='unstick_topic'),
                         url('^topic/(\d+)/close/$', 'close_topic', name='close_topic'),
                         url('^topic/(\d+)/open/$', 'open_topic', name='open_topic'),
-                        #url('^merge_topics/$', 'merge_topics', name='pybb_merge_topics'),
 
                         # Add topic/post
                         url('^forum/(?P<forum_id>\d+)/topic/add/$', 'add_post',

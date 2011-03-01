@@ -2,8 +2,8 @@
 import math
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import F, Q
-from django.shortcuts import get_object_or_404, get_list_or_404, redirect, _get_queryset
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.shortcuts import get_object_or_404, redirect, _get_queryset
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
@@ -13,9 +13,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.simple import direct_to_template
 from django.views.decorators.csrf import csrf_protect
 
-from pybb.util import  paginate
-from pybb.models import Category, Forum, Topic, Post, Attachment, TopicReadTracker, ForumReadTracker
-from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, UserSearchForm
+from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker
+from pybb.forms import  PostForm, AdminPostForm, EditProfileForm
 
 import defaults
 
@@ -119,8 +118,7 @@ def add_post(request, forum_id, topic_id):
 
     if forum_id:
         if not request.user.has_perm('pybb.add_topic'):
-            #TODO Should be Access Denied
-            return Http404
+            return HttpResponseForbidden()
         forum = get_object_or_404(filter_hidden(request, Forum), pk=forum_id)
     elif topic_id:
         topic = get_object_or_404(Topic, pk=topic_id)
@@ -128,7 +126,7 @@ def add_post(request, forum_id, topic_id):
             raise Http404()
 
     if (topic and topic.closed):
-        return HttpResponseRedirect(topic.get_absolute_url())
+        return HttpResponseForbidden()
 
     try:
         quote_id = int(request.GET.get('quote_id'))
@@ -169,16 +167,6 @@ def user(request, username):
         'target_user': user,
         'topic_count': topic_count,
         })
-
-#def user_topics(request, username):
-#    profile = get_object_or_404(User, username=username)
-#    topics = filter_hidden(request, Topic).objects.filter(user=profile).order_by('-created')
-#    page, paginator = paginate(topics, request, defaults.PYBB_TOPIC_PAGE_SIZE)
-#    return direct_to_template(request, 'pybb/user_topics.html', {
-#        'profile': profile,
-#        'page': page,
-#        })
-
 
 def show_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
@@ -297,10 +285,10 @@ def close_topic(request, topic_id):
     from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
-    if pybb_topic_moderated_by(topic, request.user):
-        if not topic.closed:
-            topic.closed = True
-            topic.save()
+    if not pybb_topic_moderated_by(topic, request.user):
+        return HttpResponseForbidden()
+    topic.closed = True
+    topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
@@ -309,68 +297,11 @@ def open_topic(request, topic_id):
     from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
     topic = get_object_or_404(Topic, pk=topic_id)
-    if pybb_topic_moderated_by(topic, request.user):
-        if topic.closed:
-            topic.closed = False
-            topic.save()
+    if not pybb_topic_moderated_by(topic, request.user):
+        return HttpResponseForbidden()
+    topic.closed = False
+    topic.save()
     return HttpResponseRedirect(topic.get_absolute_url())
-
-
-#@login_required
-#@csrf_protect
-#def merge_topics(request):
-#    from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
-#
-#    topics_ids = request.GET.getlist('topic')
-#    topics = get_list_or_404(Topic, pk__in=topics_ids)
-#
-#    for topic in topics:
-#        if not pybb_topic_moderated_by(topic, request.user):
-#        # TODO: show error message: no permitions for edit this topic
-#            return HttpResponseRedirect(topic.get_absolute_url())
-#
-#    if len(topics) < 2:
-#        return {'topics': topics}
-#
-#    posts = get_list_or_404(Post, topic__in=topics_ids)
-#    main = int(request.POST.get("main", 0))
-#
-#    if main and main in (topic.id for topic in topics):
-#        for topic in topics:
-#            if topic.id == main:
-#                main_topic = topic
-#
-#        for post in posts:
-#            if post.topic_id != main_topic.id:
-#                post.topic = main_topic
-#                post.save()
-#
-#        main_topic.update_counters()
-#        main_topic.forum.update_counters()
-#
-#        for topic in topics:
-#            if topic.id != main:
-#                forum = topic.forum
-#                topic.delete()
-#                forum.update_counters()
-#
-#        return HttpResponseRedirect(main_topic.get_absolute_url())
-#
-#    return direct_to_template(request, 'pybb/merge_topics.html', {'posts': posts,
-#                                                                  'topics': topics,
-#                                                                  'topic': topics[0],
-#                                                                  })
-#@csrf_protect
-#def users(request):
-#    form = UserSearchForm(request.GET)
-#    all_users = form.filter(User.objects.order_by('username'))
-#
-#    page, paginator = paginate(all_users, request, defaults.PYBB_USERS_PAGE_SIZE)
-#
-#    return direct_to_template(request, 'pybb/users.html', {'page': page,
-#                                                           'form': form,
-#                                                           })
-
 
 @login_required
 def delete_subscription(request, topic_id):
@@ -386,11 +317,9 @@ def add_subscription(request, topic_id):
 
 @login_required
 def post_ajax_preview(request):
-    if request.user.is_authenticated():
-        content = request.POST.get('data')
-        html = defaults.PYBB_MARKUP_ENGINES[request.user.get_profile().markup](content)
-        return HttpResponse(html)
-    return Http404
+    content = request.POST.get('data')
+    html = defaults.PYBB_MARKUP_ENGINES[request.user.get_profile().markup](content)
+    return HttpResponse(html)
 
 @login_required
 def mark_all_as_read(request):

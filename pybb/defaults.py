@@ -73,3 +73,5 @@ PYBB_BUTTONS = getattr(settings, 'PYBB_BUTTONS', {})
 #  save
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
+
+PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
