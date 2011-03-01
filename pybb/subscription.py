@@ -4,13 +4,20 @@ from django.template.loader import render_to_string
 from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
+from django import forms
 
+email_validator = forms.EmailField()
 
 def notify_topic_subscribers(post):
     topic = post.topic
     if post != topic.head:
         for user in topic.subscribers.all():
             if user != post.user:
+                try:
+                    email_validator.clean(user.email)
+                except:
+                    #invalid email
+                    continue
                 old_lang = translation.get_language()
                 lang = user.get_profile().language or dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]]
                 translation.activate(lang)
@@ -27,5 +34,5 @@ def notify_topic_subscribers(post):
                                              'post': post,
                                              'delete_url': delete_url,
                                              })
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=True)
                 translation.activate(old_lang)

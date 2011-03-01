@@ -321,7 +321,7 @@ class BasicFeaturesTest(TestCase):
         response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
         self.assertTrue(response.status_code==200)
         self.assertTrue(user in list(self.topic.subscribers.all()))
-        new_post = Post(topic=self.topic, user=self.user, body='test subscribtion', markup='bbcode')
+        new_post = Post(topic=self.topic, user=self.user, body='test subscribtion юникод', markup='bbcode')
         new_post.save()
         self.assertEquals(len(mail.outbox), 1)
         response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
