@@ -1,0 +1,8 @@
+{% load i18n %}
+
+{% trans "User" %} {{ post.user.username }} {% trans "replayed in topic that you subscribed." %} ({{ post.topic.name }})
+{% trans "Link to post:" %} http://{{site}}{{ post.get_absolute_url }}
+{% trans "Link to topic:" %} http://{{site}}{{ post.topic.get_absolute_url }}
+
+-----
+{% trans "If you don't want to recive notifications on new messages in this topic visit following link:" %} http://{{site}}{{ delete_url }}
