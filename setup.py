@@ -1,6 +1,4 @@
-from setuptools import setup
-
-PACKAGE = 'pybbm'
+from setuptools import setup, find_packages
 
 setup(
     version = '0.2.0',
@@ -8,7 +6,9 @@ setup(
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
     name = 'pybbm',
-    packages = ['pybb'],
+    packages = find_packages(),
+    include_package_data = True,
+    package_data = {'': ['pybb/templates', 'pybb/static']},
     install_requires = [
             'django',
             'markdown',
