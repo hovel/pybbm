@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 setup(
     version = '0.3.0',
     description = 'PyBB Modified. Django forum application',
+    long_description = open('README').read(),
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
     name = 'pybbm',
