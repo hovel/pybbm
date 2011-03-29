@@ -144,6 +144,11 @@ class BasicFeaturesTest(TestCase):
         client.get(reverse('pybb:mark_all_as_read'))
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
+        # Empty forum - readed
+        f = Forum(name='empty', category=self.category)
+        f.save()
+        tree = html.fromstring(client.get(reverse('pybb:index')).content)
+        self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % f.get_absolute_url()))
 
 
     def test_hidden(self):

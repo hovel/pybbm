@@ -103,6 +103,9 @@ class Forum(models.Model):
     def update_counters(self):
         self.post_count = Post.objects.filter(topic__forum=self).count()
         self.topic_count = Topic.objects.filter(forum=self).count()
+        last_post = self.get_last_post()
+        if last_post:
+            self.updated = self.last_post.updated
         self.save()
 
     def get_absolute_url(self):
@@ -167,6 +170,7 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
+        self.updated = self.head.updated or self.head.created
         self.save()
 
 
@@ -224,9 +228,10 @@ class Post(RenderableItem):
 
         if new:
             self.topic.updated = now
-            self.topic.update_counters()
             self.topic.forum.updated = now
-            self.topic.forum.update_counters()
+            
+        self.topic.update_counters()
+        self.topic.forum.update_counters()
 
     def get_absolute_url(self):
         return reverse('pybb:post', args=[self.id])

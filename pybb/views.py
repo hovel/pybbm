@@ -125,7 +125,7 @@ def add_post(request, forum_id, topic_id):
         if topic.forum.hidden and (not request.user.is_staff):
             raise Http404()
 
-    if (topic and topic.closed):
+    if topic and topic.closed:
         return HttpResponseForbidden()
 
     try:

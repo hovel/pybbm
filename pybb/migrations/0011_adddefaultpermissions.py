@@ -11,11 +11,11 @@ class Migration(DataMigration):
         try:
             add_post_permission = Permission.objects.get(codename='add_post', content_type__name='Post')
             add_topic_permission = Permission.objects.get(codename='add_topic', content_type__name='Topic')
-            for user in User.objects.all():
+        except Permission.DoesNotExist:
+            return # Testing mode?
+        for user in User.objects.all():
                 user.user_permissions.add(add_post_permission, add_topic_permission)
                 user.save()
-        except Permission.DoesNotExist:
-            pass # We are in test
             
 
     def backwards(self, orm):

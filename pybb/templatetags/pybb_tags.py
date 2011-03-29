@@ -165,7 +165,8 @@ def pybb_forum_unread(forums, user):
     forum_list = list(forums)
     if user.is_authenticated():
         for forum in forum_list:
-            forum.unread = True
+            if forum.topic_count:
+                forum.unread = True
         forum_marks = ForumReadTracker.objects.filter(
                 user=user,
                 forum__in=forum_list

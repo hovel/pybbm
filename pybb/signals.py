@@ -16,14 +16,15 @@ def post_saved(instance, **kwargs):
     profile.save()
 
 def user_saved(instance, created, **kwargs):
+    if not created:
+        return
     try:
         add_post_permission = Permission.objects.get(codename='add_post', content_type__name='Post')
         add_topic_permission = Permission.objects.get(codename='add_topic', content_type__name='Topic')
     except Permission.DoesNotExist:
         return
-    if created:
-        instance.user_permissions.add(add_post_permission, add_topic_permission)
-        instance.save()
+    instance.user_permissions.add(add_post_permission, add_topic_permission)
+    instance.save()
 
 def setup_signals():
     post_save.connect(post_saved, sender=Post)
