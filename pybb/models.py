@@ -170,7 +170,7 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        self.updated = self.head.updated or self.head.created
+        self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
 

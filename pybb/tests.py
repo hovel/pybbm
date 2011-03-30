@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # vim:fileencoding=utf-8
+from time import sleep
 
 __author__ = 'zeus'
 
@@ -16,7 +17,7 @@ try:
 except:
     raise Exception('PyBB requires lxml for self testing')
 
-class BasicFeaturesTest(TestCase):
+class FeaturesTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user('zeus', 'zeus@localhost', 'zeus')
         self.category = Category(name='foo')
@@ -332,5 +333,22 @@ class BasicFeaturesTest(TestCase):
         response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
         self.assertTrue(response.status_code==200)
         self.assertTrue(user not in list(self.topic.subscribers.all()))
+
+    def test_topic_updated(self):
+        topic = Topic(name='etopic', forum=self.forum, user=self.user)
+        topic.save()
+        sleep(1)
+        post = Post(topic=topic, user=self.user, body='bbcode [b]test[b]', markup='bbcode')
+        post.save()
+        client = Client()
+        response = client.get(self.forum.get_absolute_url())
+        self.assertTrue(response.context['topic_list'][0]==topic)
+        sleep(1)
+        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]', markup='bbcode')
+        post.save()
+        client = Client()
+        response = client.get(self.forum.get_absolute_url())
+        self.assertTrue(response.context['topic_list'][0]==self.topic)
+
 
         
