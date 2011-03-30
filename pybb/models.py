@@ -105,7 +105,7 @@ class Forum(models.Model):
         self.topic_count = Topic.objects.filter(forum=self).count()
         last_post = self.get_last_post()
         if last_post:
-            self.updated = self.last_post.updated
+            self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
     def get_absolute_url(self):
