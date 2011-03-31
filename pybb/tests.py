@@ -107,6 +107,16 @@ class FeaturesTest(TestCase):
         topic.delete()
         Forum.objects.get(id=self.forum.id)
 
+
+    def test_forum_updated(self):
+        sleep(1)
+        topic = Topic(name='xtopic', forum=self.forum, user=self.user)
+        topic.save()
+        post = Post(topic=topic, user=self.user, body='one', markup='bbcode')
+        post.save()
+        post = Post.objects.get(id=post.id)
+        self.assertTrue(self.forum.updated==post.created)
+
     def test_read_tracking(self):
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
