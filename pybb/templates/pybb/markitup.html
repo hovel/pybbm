@@ -1,20 +1,22 @@
-<script type="text/javascript" src="{{ STATIC_URL }}markitup/jquery.markitup.js"></script>
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/skins/simple/style.css">
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/sets/{{ request.user.get_profile.markup }}/style.css">
-<script type="text/javascript" src="{{ STATIC_URL }}markitup/sets/{{ request.user.get_profile.markup }}/set.js"></script>
+{#{% if request.user.is_authenticated %}#}
+    <script type="text/javascript" src="{{ STATIC_URL }}markitup/jquery.markitup.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/skins/simple/style.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/sets/{{ request.user.get_profile.markup|default:"bbcode" }}/style.css">
+    <script type="text/javascript" src="{{ STATIC_URL }}markitup/sets/{{ request.user.get_profile.markup|default:"bbcode" }}/set.js"></script>
 
-<script type="text/javascript">
-$(function() {
-    mySettings['previewParserPath'] = '{% url pybb:post_ajax_preview %}';
-    mySettings['previewPosition'] = 'before';
-    mySettings['resizeHandle'] = true;
-    mySettings['']
-    $('textarea').markItUp(mySettings);
+    <script type="text/javascript">
+    $(function() {
+        mySettings['previewParserPath'] = '{% url pybb:post_ajax_preview %}';
+        mySettings['previewPosition'] = 'before';
+        mySettings['resizeHandle'] = true;
+        mySettings['']
+        $('textarea').markItUp(mySettings);
 
-    $('#emoticons a').click(function() {
-        var emoticon = $(this).attr("title");
-        $.markItUp({replaceWith: emoticon});
-        return false;
+        $('#emoticons a').click(function() {
+            var emoticon = $(this).attr("title");
+            $.markItUp({replaceWith: emoticon});
+            return false;
+        });
     });
-});
-</script>
+    </script>
+{#{% endif %}#}
