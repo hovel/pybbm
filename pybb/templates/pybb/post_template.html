@@ -13,7 +13,17 @@
         <td class="info">
             {% include "pybb/avatar.html" %}
             <div class="author"><a href="{{ post.user.get_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
-
+            {% if post.user.get_profile.rank %}
+                {% with post.user.get_profile as profile %}
+                    <div class='rank'>
+                        {% trans "Rank" %}: {{ profile.rank }}
+                        {% if request.user.is_authenticated and request.user != post.user %}
+                            <a href='#' class='vote' rel='{{ profile.get_vote_up_url }}'>+</a>
+                            <a href='#' class='vote' rel='{{ profile.get_vote_down_url }}'>-</a>
+                        {% endif %}
+                    </div>
+                {% endwith %}
+            {% endif %}
             {% if user.is_superuser %}
                 <div class="extra-info">{{ post.user_ip }}</div>
             {% endif %}

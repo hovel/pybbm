@@ -179,5 +179,11 @@ blockquote {
     font-weight: bold;
 }
 
+/* --- Rank (if aviable) --- */
+
+.post .rank {
+    font-size: 80%;
+    padding: 3px 0;
+}
 
 
