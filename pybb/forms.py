@@ -14,8 +14,6 @@ from django.conf import settings
 
 MEDIA_ROOT = settings.MEDIA_ROOT
 
-BODY_CLEANER = getattr(settings, 'BODY_CLEANER', None)
-
 class PostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
     attachment = forms.FileField(label=_('Attachment'), required=False)
@@ -62,6 +60,7 @@ class PostForm(forms.ModelForm):
     def clean_body(self):
         body = self.cleaned_data['body']
         user = self.user or self.instance.user
+        BODY_CLEANER = getattr(settings, 'BODY_CLEANER', None)
         if BODY_CLEANER:
             BODY_CLEANER(user, body)
         return body
