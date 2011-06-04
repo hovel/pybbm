@@ -28,6 +28,7 @@ class FeaturesTest(TestCase):
         self.topic.save()
         self.post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]', markup='bbcode')
         self.post.save()
+        mail.outbox = []
 
     def test_base(self):
         client = Client()
@@ -339,7 +340,7 @@ class FeaturesTest(TestCase):
         self.assertTrue(user in list(self.topic.subscribers.all()))
         new_post = Post(topic=self.topic, user=self.user, body='test subscribtion юникод', markup='bbcode')
         new_post.save()
-        self.assertEquals(len(mail.outbox), 1)
+        self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
         response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
         self.assertTrue(response.status_code==200)
         self.assertTrue(user not in list(self.topic.subscribers.all()))
