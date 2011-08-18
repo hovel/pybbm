@@ -73,7 +73,7 @@
         {% endif %}
     {% endif %}
 
-    {% if request.user.is_staff %}
+    {% if user.is_staff %}
         <div class='subscriber-list'>
             {% trans "Subscribers" %}:
             {% for subscriber in topic.subscribers.all %}

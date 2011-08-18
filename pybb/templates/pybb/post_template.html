@@ -17,7 +17,7 @@
                 {% with post.user.get_profile as profile %}
                     <div class='rank'>
                         {% trans "Rank" %}: {{ profile.rank }}
-                        {% if request.user.is_authenticated and request.user != post.user %}
+                        {% if user.is_authenticated and user != post.user %}
                             <a href='#' class='vote' rel='{{ profile.get_vote_up_url }}'>+</a>
                             <a href='#' class='vote' rel='{{ profile.get_vote_down_url }}'>-</a>
                         {% endif %}
