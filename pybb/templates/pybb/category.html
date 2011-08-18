@@ -18,7 +18,7 @@
                     {% trans "Last posts" %}
                 </th>
         </tr>
-        {% for forum in category.forums_accessed|pybb_forum_unread:request.user %}
+        {% for forum in category.forums_accessed|pybb_forum_unread:user %}
             <tr class="forum-row">
                 <td class="forum-name {% if forum.unread %} unread {% endif %}">
                     <a href='{{ forum.get_absolute_url }}'>{{ forum.name }}</a> {% if forum.hidden %}[{% trans "Hidden" %}]{% endif %}
