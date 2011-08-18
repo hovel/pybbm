@@ -155,8 +155,10 @@ class Topic(models.Model):
     @property
     def head(self):
         if not hasattr(self, "_head"):
-            self._head = self.posts.all().order_by('created')[0]
-        return self._head
+            self._head = self.posts.all().order_by('created')
+        if not len(self._head):
+            return None
+        return self._head[0]
 
     def get_last_post(self):
         return self.posts.order_by('-created').select_related()[0]
