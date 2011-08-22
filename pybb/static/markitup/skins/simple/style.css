@@ -23,7 +23,7 @@
 	padding:5px;
 	width:690px;
 	height:320px;
-	clear:both;
+	clear:both; display:block;
 	line-height:18px;
 	overflow:auto;
 }
