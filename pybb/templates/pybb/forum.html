@@ -1,19 +1,15 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_tags i18n %}
 
-{% block title %}
-{{ forum.name }}
-{% endblock title %}
+{% block title %}{{ forum.name }}{% endblock title %}
 
 {% block breadcrumb %}
-{{ block.super }} &#187;
-{% pybb_link forum.category %} &#187; {{ forum }}
+{{ block.super }} /
+{% pybb_link forum.category %} /
+{{ forum }}
 {% endblock %}
 
 {% block content %}
-    <div class="crumbs">
-
-    </div>
     <h1>{{ forum.name }}</h1>
     {% if forum.headline %}
         <div class='forum-headline'>

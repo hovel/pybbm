@@ -1,20 +1,16 @@
 {% extends 'pybb/base.html' %}
-{% load pybb_tags %}
-{% load i18n %}
-{% load thumbnail %}
+{% load pybb_tags i18n thumbnail %}
 
-{% block title %}
-{{ target_user.username }}
-{% endblock %}
+{% block title %}{{ target_user.username }}{% endblock %}
 
 {% block content %}
     <h1>{{ target_user.username }}</h1>
     <div class="userinfo">
     <div class="avatar">
-        {% thumbnail target_user.get_profile.avatar request.pybb_avatar_dimensions as avatar %}
+        {% thumbnail target_user.get_profile.avatar "80x80" as avatar %}
             <img src="{{ avatar.url }}" alt="avatar">
         {% empty %}
-            <img src="{{ request.get_profile }}" alt="avatar">
+            <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="avatar">
         {% endthumbnail %}
         </div>
         <div class="info">

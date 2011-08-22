@@ -85,7 +85,6 @@ class PostForm(forms.ModelForm):
         else:
             topic = self.topic
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
-                    markup=self.user.get_profile().markup,
                     body=self.cleaned_data['body'])
         post.save()
         if defaults.PYBB_ATTACHMENT_ENABLE:
@@ -138,7 +137,7 @@ class EditProfileForm(forms.ModelForm):
     class Meta(object):
         model = profile_model
         fields = ['signature', 'time_zone', 'language',
-                  'show_signatures', 'markup', 'avatar']
+                  'show_signatures', 'avatar']
 
     def clean_avatar(self):
         if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):

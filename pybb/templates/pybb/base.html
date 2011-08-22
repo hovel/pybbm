@@ -1,7 +1,7 @@
 {% extends PYBB_TEMPLATE|default:"base.html" %}
-{% load i18n %}
-{% load pybb_tags %}
-{%block title %}{% endblock title %}
+{% load i18n pybb_tags %}
+
+{%block title %}{% trans "Forums" %}{% endblock title %}
 
 {%block head %}
     <link rel="stylesheet" href="{{ STATIC_URL }}pybb.css">
