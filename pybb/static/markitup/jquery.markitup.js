@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 // markItUp! Universal MarkUp Engine, JQuery plugin
-// v 1.1.x
+// v 1.1.6.2
 // Dual licensed under the MIT and GPL licenses.
 // ----------------------------------------------------------------------------
 // Copyright (C) 2007-2010 Jay Salvat
@@ -28,7 +28,7 @@
 	$.fn.markItUp = function(settings, extraSettings) {
 		var options, ctrlKey, shiftKey, altKey;
 		ctrlKey = shiftKey = altKey = false;
-	
+
 		options = {	id:						'',
 					nameSpace:				'',
 					root:					'',
@@ -162,8 +162,6 @@
 							return false;
 						}).click(function() {
 							return false;
-						}).bind("focusin", function(){
-                            $$.focus();
 						}).mousedown(function() {
 							if (button.call) {
 								eval(button.call)();
@@ -288,7 +286,7 @@
 					}
 					string = { block:lines.join('\n')};
 					start = caretPosition;
-					len = string.block.length + (($.browser.opera) ? n-1 : 0);
+					len = string.block.length + (($.browser.opera) ? n : 0);
 				} else if (ctrlKey === true) {
 					string = build(selection);
 					start = caretPosition + string.openWith.length;
@@ -352,7 +350,7 @@
 			// Substract linefeed in IE
 			function fixIeBug(string) {
 				if ($.browser.msie) {
-					return string.length - string.replace(/\r/g, '').length;
+					return string.length - string.replace(/\r*/g, '').length;
 				}
 				return 0;
 			}
@@ -363,7 +361,7 @@
 					var newSelection = document.selection.createRange();
 					newSelection.text = block;
 				} else {
-					textarea.value =  textarea.value.substring(0, caretPosition)  + block + textarea.value.substring(caretPosition + selection.length, textarea.value.length);
+					$$.val($$.val().substring(0, caretPosition)	+ block + $$.val().substring(caretPosition + selection.length, $$.val().length));
 				}
 			}
 
@@ -392,22 +390,21 @@
 
 				scrollPosition = textarea.scrollTop;
 				if (document.selection) {
-					selection = document.selection;	
-					if ($.browser.msie) { // ie	
-						var range = selection.createRange();
-						var stored_range = range.duplicate();
-						stored_range.moveToElementText(textarea);
-						stored_range.setEndPoint('EndToEnd', range);
-						var s = stored_range.text.length - range.text.length;
-	
-						caretPosition = s - (textarea.value.substr(0, s).length - textarea.value.substr(0, s).replace(/\r/g, '').length);
-						selection = range.text;
+					selection = document.selection.createRange().text;
+					if ($.browser.msie) { // ie
+						var range = document.selection.createRange(), rangeCopy = range.duplicate();
+						rangeCopy.moveToElementText(textarea);
+						caretPosition = -1;
+						while(rangeCopy.inRange(range)) { // fix most of the ie bugs with linefeeds...
+							rangeCopy.moveStart('character');
+							caretPosition ++;
+						}
 					} else { // opera
 						caretPosition = textarea.selectionStart;
 					}
 				} else { // gecko & webkit
 					caretPosition = textarea.selectionStart;
-					selection = textarea.value.substring(caretPosition, textarea.selectionEnd);
+					selection = $$.val().substring(caretPosition, textarea.selectionEnd);
 				} 
 				return selection;
 			}
@@ -417,9 +414,6 @@
 				if (!previewWindow || previewWindow.closed) {
 					if (options.previewInWindow) {
 						previewWindow = window.open('', 'preview', options.previewInWindow);
-						$(window).unload(function() {
-							previewWindow.close();
-						});
 					} else {
 						iFrame = $('<iframe class="markItUpPreviewFrame"></iframe>');
 						if (options.previewPosition == 'after') {
@@ -430,6 +424,7 @@
 						previewWindow = iFrame[iFrame.length - 1].contentWindow || frame[iFrame.length - 1];
 					}
 				} else if (altKey === true) {
+					// Thx Stephen M. Redd for the IE8 fix
 					if (iFrame) {
 						iFrame.remove();
 					} else {
@@ -439,9 +434,6 @@
 				}
 				if (!options.previewAutoRefresh) {
 					refreshPreview(); 
-				}
-				if (options.previewInWindow) {
-					previewWindow.focus();
 				}
 			}
 
@@ -486,6 +478,9 @@
 					previewWindow.document.close();
 					previewWindow.document.documentElement.scrollTop = sp;
 				}
+				if (options.previewInWindow) {
+					previewWindow.focus();
+				}
 			}
 			
 			// set keys pressed
@@ -520,7 +515,7 @@
 						}
 					}
 					if (e.keyCode === 9) { // Tab key
-						if (shiftKey == true || ctrlKey == true || altKey == true) {
+						if (shiftKey == true || ctrlKey == true || altKey == true) { // Thx Dr Floob.
 							return false; 
 						}
 						if (caretOffset !== -1) {

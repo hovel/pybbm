@@ -11,7 +11,7 @@
 // Feel free to add more tags
 // -------------------------------------------------------------------
 mySettings = {
-	previewParserPath:	'',
+	previewParserPath:	'/markitup/preview/',
 	onShiftEnter:		{keepDefault:false, openWith:'\n\n'},
 	markupSet: [
 		{name:'First Level Heading', key:'1', placeHolder:'Your title here...', closeWith:function(markItUp) { return miu.markdownTitle(markItUp, '=') } },
@@ -44,6 +44,8 @@ miu = {
 	markdownTitle: function(markItUp, char) {
 		heading = '';
 		n = $.trim(markItUp.selection||markItUp.placeHolder).length;
+		// work around bug in python-markdown where header underlines must be at least 3 chars
+		if (n < 3) { n = 3; }
 		for(i = 0; i < n; i++) {
 			heading += char;
 		}
