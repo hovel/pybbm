@@ -1,6 +1,5 @@
 {% extends 'pybb/base.html' %}
-{% load pybb_tags %}
-{% load i18n %}
+{% load pybb_tags i18n %}
 
 {% block title %}{{ topic }}{% endblock %}
 
@@ -10,8 +9,10 @@
 {% endblock head %}
 
 {% block breadcrumb %}
-    {{ block.super }}
-    &#187; {% pybb_link topic.forum.category %} &#187; {% pybb_link topic.forum %} &#187; {{ topic }}
+{{ block.super }} /
+{% pybb_link topic.forum.category %} /
+{% pybb_link topic.forum %} /
+{{ topic }}
 {% endblock %}
 
 {% block content %}

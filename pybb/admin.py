@@ -69,7 +69,7 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ['body']
     fieldsets = (
         (None, {
-                'fields': ('topic', 'user', 'markup')
+                'fields': ('topic', 'user')
                 }
          ),
         (_('Additional options'), {
@@ -92,7 +92,7 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__first_name', 'user__last_name']
     fieldsets = (
         (None, {
-                'fields': ('user', 'time_zone', 'markup', 'language')
+                'fields': ('user', 'time_zone', 'language')
                 }
          ),
         (_('Additional options'), {

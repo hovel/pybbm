@@ -1,14 +1,17 @@
 {% extends 'pybb/base.html' %}
 {% load i18n %}
-{% block title %}
-    {{ request.pybb_title|safe }}
-{% endblock title %}
+
+{% block title %}{% trans "Forums" %}{% endblock title %}
 
 {% block content %}
     {% for category in categories %}
         {% include 'pybb/category.html' %}
     {% endfor %}
-    {% if request.user.is_authenticated %}
-        <div id='mark-all-as-read'><a href='{% url pybb:mark_all_as_read %}'>{% trans "Mark all forums as read" %}</a></div>
+    {% if user.is_authenticated %}
+        <div id='mark-all-as-read'>
+            <a href='{% url pybb:mark_all_as_read %}'>
+                {% trans "Mark all forums as read" %}
+            </a>
+        </div>
     {% endif %}
 {% endblock content %}

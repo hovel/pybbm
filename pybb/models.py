@@ -43,8 +43,6 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
 )]
 
-MARKUP_CHOICES = [(i, i) for i in defaults.PYBB_MARKUP_ENGINES.keys()]
-
 #noinspection PyUnusedLocal
 def get_file_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -189,17 +187,13 @@ class RenderableItem(models.Model):
     class Meta(object):
         abstract = True
 
-    markup = models.CharField(_('Markup'), max_length=15, default=defaults.PYBB_DEFAULT_MARKUP, choices=MARKUP_CHOICES)
     body = models.TextField(_('Message'))
     body_html = models.TextField(_('HTML version'))
     body_text = models.TextField(_('Text version'))
 
     def render(self):
-        if self.markup in defaults.PYBB_MARKUP_ENGINES:
-            self.body_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.body)
-        else:
-            raise Exception('Invalid markup property: %s' % self.markup)
-            # Remove tags which was generated with the markup processor
+        self.body_html = defaults.PYBB_MARKUP_ENGINES[defaults.PYBB_MARKUP](self.body)
+        # Remove tags which was generated with the markup processor
         text = strip_tags(self.body_html)
         # Unescape entities which was generated with the markup processor
         self.body_text = unescape(text)
@@ -266,21 +260,26 @@ class PybbProfile(models.Model):
             ("block_users", "Can block any user"),
         )
 
-    signature = models.TextField(_('Signature'), blank=True, max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH)
+    signature = models.TextField(_('Signature'), blank=True,
+        max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH)
     signature_html = models.TextField(_('Signature HTML Version'), blank=True,
-                                      max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH + 30)
-    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
-    language = models.CharField(_('Language'), max_length=10, blank=True, choices=settings.LANGUAGES, default=dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]])
-    show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
-    markup = models.CharField(_('Default markup'), max_length=15, default=defaults.PYBB_DEFAULT_MARKUP,
-                              choices=MARKUP_CHOICES)
+        max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH + 30)
+    time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES,
+        default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
+    language = models.CharField(_('Language'), max_length=10, blank=True,
+        choices=settings.LANGUAGES,
+        default=dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]])
+    show_signatures = models.BooleanField(_('Show signatures'), blank=True,
+        default=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    avatar = ImageField(_('Avatar'), blank=True, null=True, upload_to=get_file_path)
-
-    autosubscribe = models.BooleanField(_('Automatically subscribe'), help_text=_('Automatically subscribe to topics that you answer'), default=defaults.PYBB_DEFAULT_AUTOSUBSCRIBE)
+    avatar = ImageField(_('Avatar'), blank=True, null=True,
+        upload_to=get_file_path)
+    autosubscribe = models.BooleanField(_('Automatically subscribe'),
+        help_text=_('Automatically subscribe to topics that you answer'),
+        default=defaults.PYBB_DEFAULT_AUTOSUBSCRIBE)
 
     def save(self, *args, **kwargs):
-        self.signature_html = defaults.PYBB_MARKUP_ENGINES[self.markup](self.signature)
+        self.signature_html = defaults.PYBB_MARKUP_ENGINES[defaults.PYBB_MARKUP](self.signature)
         super(PybbProfile, self).save(*args, **kwargs)
 
     @property

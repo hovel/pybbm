@@ -1,8 +1,8 @@
-{#{% if request.user.is_authenticated %}#}
+{#{% if user.is_authenticated %}#}
     <script type="text/javascript" src="{{ STATIC_URL }}markitup/jquery.markitup.js"></script>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/skins/simple/style.css">
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/sets/{{ request.user.get_profile.markup|default:"bbcode" }}/style.css">
-    <script type="text/javascript" src="{{ STATIC_URL }}markitup/sets/{{ request.user.get_profile.markup|default:"bbcode" }}/set.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/sets/{{ PYBB_MARKUP }}/style.css">
+    <script type="text/javascript" src="{{ STATIC_URL }}markitup/sets/{{ PYBB_MARKUP }}/set.js"></script>
 
     <script type="text/javascript">
     $(function() {

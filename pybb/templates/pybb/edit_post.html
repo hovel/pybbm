@@ -1,8 +1,7 @@
 {% extends 'pybb/base.html' %}
-{% load pybb_tags %}
-{% load i18n %}
+{% load pybb_tags i18n %}
 
-{% block title %} {% trans "Editing the post" %} {% endblock title %}
+{% block title %}{% trans "Editing the post" %}{% endblock title %}
 
 {% block head %}
     {{ block.super }}
@@ -10,10 +9,6 @@
 {% endblock head %}
 
 {% block content %}
-    <div class="crumbs">
-    <a href="{% url pybb:index %}">{% trans "Root" %}</a> / {% pybb_link post.topic.forum.category %} / {% pybb_link post.topic.forum %} / {% pybb_link post.topic %}
-    </div>
-
     <h1>{% trans "Editing the post" %}</h1>
 
     <form method="post" action=".">
@@ -36,3 +31,10 @@
         </fieldset>
     </form>
 {% endblock content %}
+
+{% block breadcrumbs %}
+    {{block.super}} /
+    {% pybb_link post.topic.forum.category %} /
+    {% pybb_link post.topic.forum %} /
+    {% pybb_link post.topic %}
+{% endblock %}
