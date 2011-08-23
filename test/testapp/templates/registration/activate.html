@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if account %}
+        Activation complete
+    {% else %}
+        Activation failed
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+    {% if account %}
+        <h2>Activation complete</h2>
+        Your account is ready to use!
+    {% else %}
+        <h2>Activation failed</h2>
+    {% endif %}
+
+{% endblock %}

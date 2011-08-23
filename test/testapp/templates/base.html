@@ -1,0 +1,98 @@
+{% load pytils_numeral %}
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html>
+    <head>
+        <meta http-equiv="content-type" content="application/html; charset=utf-8">
+        <meta name='yandex-verification' content='633a4de29e46a949'>
+        <link rel="icon" type="image/png" href="{{ STATIC_URL }}images/favicon.png" />
+
+        <link rel="stylesheet" href="{{ STATIC_URL }}reset.css">
+        {% block layout %}
+            <link rel="stylesheet" href="{{ STATIC_URL }}layout.css">
+        {% endblock %}
+
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/smoothness/jquery-ui.css" type="text/css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/i18n/jquery-ui-i18n.min.js"></script>
+        <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+        <script src="http://yandex.st/json2/2011-01-18/json2.min.js"></script>
+        <script src="{{ STATIC_URL }}csrf.js"></script>
+        
+        <title>{% block title %}{% endblock %}</title>
+
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        <div id="header">
+            <div id="login">
+                <div id="login-menu">
+                    {% if request.user.is_authenticated %}
+                        <ul>
+                            <li>
+                                Вы - {{ request.user.username }}
+                            </li>
+                            <li>
+                                <a href="{% url pybb:edit_profile %}">Профиль</a>
+                            </li>
+                            <li>
+                                <a href="{% url auth_logout %}">Выйти</a>
+                            </li>
+                            {% if request.user.is_superuser %}
+                                <li>
+                                    <a href="{% url admin:index %}">Админка</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    {% else %}
+                        <ul>
+                            <li>
+                                <a href="{% url auth_login %}">Войти</a>
+                            </li>
+                        </ul>
+                    {% endif %}
+                </div>
+                <div id="unicorn"></div>
+            </div>
+        <div class="colmask {% block layout-menu %}fullpage {% endblock %}">
+            {% block full-content %} {% endblock %}
+            <div class="{% block layout-type %}colone{% endblock %}">
+                <div class="col1wrap">
+                    <div class="col1">
+                        {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages %}
+                                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <div id="breadcrumb">
+                            {% block breadcrumb %}
+                                <a href="/">Главная</a>
+                            {% endblock breadcrumb %}
+                        </div>
+                        <div id="content">
+                            {% block content %}
+                            {% endblock content %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col2">
+                    {% block content-related %}
+                    {% endblock %}
+                    {% block banner %}
+                    {% endblock %}
+                </div>
+            </div>
+            {% block end-full-content %} {% endblock %}
+
+            </div>
+            <div id="django-logo">
+                <a href="http://djangoproject.com/" class="ponybadge" title="Magic! Ponies! Django! Whee!"><img src="http://media.djangopony.com/img/small/badge.png" width="210" height="65" alt="pony powered"></a>
+            </div>
+        </div>
+    </body>
+
+</html>

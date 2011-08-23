@@ -60,7 +60,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'pybb',
+    'pytils',
+    'registration',
+    'sorl.thumbnail',
+    'south',
 
+)
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

@@ -1,0 +1,5 @@
+Someone (probaly you) register on {{site}} with this e-mail address. If it's not you ignore this e-mail.
+
+To activate your account follow this link:
+http://{{site}}/accounts/activate/{{activation_key}}/
+with next {{expiration_days}} days.

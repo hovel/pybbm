@@ -5,7 +5,16 @@ Installation
   * Install pybb with easy_install or pip tools
   * Clone pybb repository from http://bitbucket.org/zeus/pybb and place it in your project
 
-* Put `pybb` into settings.INSTALLED_APPS
+* Put `pybb`, `srol.thumbnail' and `pytils` into settings.INSTALLED_APPS::
+
+    INSTALLED_APPS = (
+        ....
+        'pydev',
+        'pytils',
+        'sorl.thumbnail',
+        ...
+    )
+
 * Put `include('pybb.urls', namespace='pybb'))` into main project urls.py file::
 
     urlpatterns = patterns('',

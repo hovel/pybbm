@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Регистрация на сайте
+{% endblock %}
+
+
+{% block content %}
+
+    <h2>Register</h2>
+
+    <form action='' method=POST>
+    <table>
+	    {{form.as_table}}
+    </table>
+    {% csrf_token %}
+	<input type=submit>
+    </form>
+
+{% endblock %}
