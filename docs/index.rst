@@ -9,6 +9,8 @@ Contents:
    install
    settings
    example
+   pybbmigrate
+   testing
 
 Indices and tables
 ==================
