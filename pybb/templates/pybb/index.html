@@ -1,7 +1,7 @@
 {% extends 'pybb/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Forums" %}{% endblock title %}
+{% block title %}{{ PYBB_DEFAULT_TITLE }}{% endblock title %}
 
 {% block content %}
     {% for category in categories %}

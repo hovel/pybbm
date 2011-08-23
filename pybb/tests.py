@@ -26,7 +26,7 @@ class FeaturesTest(TestCase):
         self.forum.save()
         self.topic = Topic(name='etopic', forum=self.forum, user=self.user)
         self.topic.save()
-        self.post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]', markup='bbcode')
+        self.post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
         self.post.save()
         mail.outbox = []
 
@@ -89,7 +89,7 @@ class FeaturesTest(TestCase):
         self.assertContains(response, u'bbcode <strong>test</strong>')
 
     def test_post_deletion(self):
-        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]', markup='bbcode')
+        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
         post.save()
         post.delete()
         Topic.objects.get(id=self.topic.id)
@@ -98,9 +98,9 @@ class FeaturesTest(TestCase):
     def test_topic_deletion(self):
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
-        post = Post(topic=topic, user=self.user, body='one', markup='bbcode')
+        post = Post(topic=topic, user=self.user, body='one')
         post.save()
-        post = Post(topic=topic, user=self.user, body='two', markup='bbcode')
+        post = Post(topic=topic, user=self.user, body='two')
         post.save()
         post.delete()
         Topic.objects.get(id=topic.id)
@@ -113,7 +113,7 @@ class FeaturesTest(TestCase):
         sleep(1)
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
-        post = Post(topic=topic, user=self.user, body='one', markup='bbcode')
+        post = Post(topic=topic, user=self.user, body='one')
         post.save()
         post = Post.objects.get(id=post.id)
         self.assertTrue(self.forum.updated==post.created)
@@ -121,7 +121,7 @@ class FeaturesTest(TestCase):
     def test_read_tracking(self):
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
-        post = Post(topic=topic, user=self.user, body='one', markup='bbcode')
+        post = Post(topic=topic, user=self.user, body='one')
         post.save()
         client = Client()
         client.login(username='zeus', password='zeus')
@@ -151,7 +151,7 @@ class FeaturesTest(TestCase):
         # Forum status - readed
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
-        post = Post(topic=topic, user=self.user, body='one', markup='bbcode')
+        post = Post(topic=topic, user=self.user, body='one')
         post.save()
         client.get(reverse('pybb:mark_all_as_read'))
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
@@ -177,10 +177,10 @@ class FeaturesTest(TestCase):
         topic_hidden = Topic(forum=forum_hidden, name='hidden', user=self.user)
         topic_hidden.save()
 
-        post_hidden = Post(topic=topic_hidden, user=self.user, body='hidden', markup='bbcode')
+        post_hidden = Post(topic=topic_hidden, user=self.user, body='hidden')
         post_hidden.save()
 
-        post_in_hidden = Post(topic=topic_in_hidden, user=self.user, body='hidden', markup='bbcode')
+        post_in_hidden = Post(topic=topic_in_hidden, user=self.user, body='hidden')
         post_in_hidden.save()
 
         
@@ -300,7 +300,7 @@ class FeaturesTest(TestCase):
         self.assertTrue(client.get(reverse('pybb:unstick_topic', args=[self.topic.id]), follow=True).status_code==200)
 
     def test_delete_view(self):
-        post = Post(topic=self.topic, user=self.user, body='test to delete', markup='bbcode')
+        post = Post(topic=self.topic, user=self.user, body='test to delete')
         post.save()
         client = Client()
         client.login(username='zeus', password='zeus')
@@ -338,7 +338,7 @@ class FeaturesTest(TestCase):
         response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
         self.assertTrue(response.status_code==200)
         self.assertTrue(user in list(self.topic.subscribers.all()))
-        new_post = Post(topic=self.topic, user=self.user, body='test subscribtion юникод', markup='bbcode')
+        new_post = Post(topic=self.topic, user=self.user, body='test subscribtion юникод')
         new_post.save()
         self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
         response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
@@ -349,13 +349,13 @@ class FeaturesTest(TestCase):
         topic = Topic(name='etopic', forum=self.forum, user=self.user)
         topic.save()
         sleep(1)
-        post = Post(topic=topic, user=self.user, body='bbcode [b]test[b]', markup='bbcode')
+        post = Post(topic=topic, user=self.user, body='bbcode [b]test[b]')
         post.save()
         client = Client()
         response = client.get(self.forum.get_absolute_url())
         self.assertTrue(response.context['topic_list'][0]==topic)
         sleep(1)
-        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]', markup='bbcode')
+        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
         post.save()
         client = Client()
         response = client.get(self.forum.get_absolute_url())
