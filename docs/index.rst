@@ -8,6 +8,7 @@ Contents:
 
    install
    settings
+   example
 
 Indices and tables
 ==================
