@@ -22,6 +22,8 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = ''
 STATIC_URL = '/media/static/'
 
+LOGIN_REDIRECT_URL = '/profile/edit/'
+
 ADMIN_MEDIA_PREFIX = '/media/static/admin/'
 
 STATICFILES_FINDERS = (

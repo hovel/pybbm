@@ -1,5 +1,7 @@
 from django.utils import translation
 import defaults
+from signals import user_saved
+from django.db.models import ObjectDoesNotExist
 
 class PybbMiddleware(object):
     def process_request(self, request):
@@ -7,7 +9,17 @@ class PybbMiddleware(object):
         request.pybb_avatar_dimensions = '%sx%s' % (defaults.PYBB_AVATAR_WIDTH, defaults.PYBB_AVATAR_WIDTH)
         request.pybb_default_avatar = defaults.PYBB_DEFAULT_AVATAR_URL
         if request.user.is_authenticated():
-            profile = request.user.get_profile()
+            try:
+                # Here we try to load profile, but can get error
+                # if user created during syncdb but profile model
+                # under south control. (Like pybb.Profile).
+                profile = request.user.get_profile()
+            except ObjectDoesNotExist:
+                # Ok, we should create new profile for this user
+                # and grant permissions for add posts
+                user_saved(request.user, created=True)
+                profile = request.user.get_profile()
+
             language = translation.get_language_from_request(request)
 
             if not profile.language:
