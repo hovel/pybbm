@@ -45,6 +45,12 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 
 #noinspection PyUnusedLocal
 def get_file_path(instance, filename):
+    """
+    This function generate filename with uuid4
+    it's useful if:
+    - you don't want to allow others to see original uploaded filenames
+    - users can upload images with unicode in filenames wich can confuse browsers and fs
+    """
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join('pybb/avatar', filename)
@@ -52,7 +58,9 @@ def get_file_path(instance, filename):
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
+    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
+        help_text = _('If checked, this category will be visible only for staff')
+    )
 
     class Meta(object):
         ordering = ['position']
@@ -152,6 +160,9 @@ class Topic(models.Model):
 
     @property
     def head(self):
+        """
+        Get first post and cache it for request
+        """
         if not hasattr(self, "_head"):
             self._head = self.posts.all().order_by('created')
         if not len(self._head):
@@ -251,9 +262,10 @@ class Post(RenderableItem):
 
 
 class PybbProfile(models.Model):
-    '''
-        Abstract class for user profile, site profile should be inherted from this class
-    '''
+    """
+    Abstract class for user profile, site profile should be inherted from this class
+    """
+
     class Meta(object):
         abstract = True
         permissions = (
@@ -291,6 +303,10 @@ class PybbProfile(models.Model):
 
 
 class Profile(PybbProfile):
+    """
+    Profile class that can be used if you doesn't have
+    your site profile.
+    """
     user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
 
     class Meta(object):
@@ -340,9 +356,9 @@ class Attachment(models.Model):
 
 
 class TopicReadTracker(models.Model):
-    '''
+    """
     Save per user topic read tracking
-    '''
+    """
     class Meta(object):
         verbose_name = _('Topic read tracker')
         verbose_name_plural = _('Topic read trackers')
@@ -352,9 +368,9 @@ class TopicReadTracker(models.Model):
     time_stamp = models.DateTimeField(auto_now=True)
 
 class ForumReadTracker(models.Model):
-    '''
+    """
     Save per user forum read tracking
-    '''
+    """
     class Meta(object):
         verbose_name = _('Forum read tracker')
         verbose_name_plural = _('Forum read trackers')

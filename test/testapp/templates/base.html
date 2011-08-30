@@ -12,7 +12,7 @@
         {% block layout %}
             <link rel="stylesheet" href="{{ STATIC_URL }}layout.css">
         {% endblock %}
-
+        <link rel="stylesheet" href="{{ STATIC_URL }}style.css">
         <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/smoothness/jquery-ui.css" type="text/css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
@@ -32,30 +32,28 @@
                     {% if request.user.is_authenticated %}
                         <ul>
                             <li>
-                                Вы - {{ request.user.username }}
+                                <a href="{% url pybb:edit_profile %}">Profile [logged as {{ request.user.username }}]</a>
                             </li>
                             <li>
-                                <a href="{% url pybb:edit_profile %}">Профиль</a>
-                            </li>
-                            <li>
-                                <a href="{% url auth_logout %}">Выйти</a>
+                                <a href="{% url auth_logout %}">Logout</a>
                             </li>
                             {% if request.user.is_superuser %}
                                 <li>
-                                    <a href="{% url admin:index %}">Админка</a>
+                                    <a href="{% url admin:index %}">Admin interface</a>
                                 </li>
                             {% endif %}
                         </ul>
                     {% else %}
                         <ul>
                             <li>
-                                <a href="{% url auth_login %}">Войти</a>
+                                <a href="{% url auth_login %}">Login</a>
                             </li>
                         </ul>
                     {% endif %}
                 </div>
                 <div id="unicorn"></div>
             </div>
+        </div>
         <div class="colmask {% block layout-menu %}fullpage {% endblock %}">
             {% block full-content %} {% endblock %}
             <div class="{% block layout-type %}colone{% endblock %}">

@@ -37,6 +37,9 @@
                     {% endif %}
                 </td>
             </tr>
+        {% empty %}
+            <h3>{% trans "No forums created" %}</h3>
+            <a href="{% url admin:pybb_forum_add %}">{% trans "Add forum now" %}</a>
         {% endfor %}
     </table>
 </div>

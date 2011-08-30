@@ -4,7 +4,7 @@ Example project
 Project tree contains `test/testapp` folder, it is fully deployed and ready to use forum application.
 If you starting from scratch it's probaly the best way to begin.
 
-Running test project
+Running example project
 --------------------
 
 You need to install next packages for running testapp:

@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    version = '0.3.1',
+    version = '0.3.2',
     description = 'PyBB Modified. Django forum application',
-    long_description = open('README').read(),
+    long_description = open('README.rst').read(),
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
     name = 'pybbm',

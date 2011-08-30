@@ -6,14 +6,14 @@
     {% include "pybb/markitup.html" %}
 {% endblock head %}
 
+{% block breadcrumbs %}
+    {{block.super}} 
+    {% pybb_link post.topic.forum.category %} /
+    {% pybb_link post.topic.forum %} /
+    {% pybb_link post.topic %}
+{% endblock %}
+
 {% block content %}
-<div class="crumbs">
-{% if forum %}
-    <a href="{% url pybb:index %}">{% trans "Root" %}</a> / {% pybb_link forum.category %} / {% pybb_link forum %}
-{% else %}
-    <a href="{% url pybb:index %}">{% trans "Root" %}</a> / {% pybb_link topic.forum.category %} / {% pybb_link topic.forum %} / {% pybb_link topic %}
-{% endif %}
-</div>
 
 <h1>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</h1>
 
