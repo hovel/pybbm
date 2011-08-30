@@ -11,6 +11,7 @@ Contents:
    example
    pybbmigrate
    testing
+   originalpybb
 
 Indices and tables
 ==================
