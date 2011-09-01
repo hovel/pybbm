@@ -18,7 +18,6 @@ setup(
             'pytils',
             'django-annoying',
             'sorl-thumbnail',
-            'PIL',
             ],
 
     license = "BSD",

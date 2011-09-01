@@ -8,6 +8,7 @@ PyBBM has good unittest coverage. To test PyBBM you need:
 
 * Django > 1.3
 * lxml
+* PIL
 * All PyBBM dependencies
 
 Go to to `test/testapp` directory and run::

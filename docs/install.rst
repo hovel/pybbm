@@ -13,11 +13,14 @@ PyBBM required next packages to be installed:
 * pytils
 * django-annoying
 * sorl-thumbnail
-* PIL
 
 All packages can be installed as a dependency for PyBBM if you install it with pip or easy_install::
 
     pip install pybbm
+
+* PIL (Python Imaging Library) is optional if you configure sorl.thumbnail to use different backend,
+  but remmember, that using an ImageField in forms requires that the Python Imaging Library is
+  installed (e.g. you should install it if you use buildin profile).
 
 Enable applications and edit settings
 -------------------------------------
