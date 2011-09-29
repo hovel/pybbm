@@ -6,10 +6,10 @@
     {% include "pybb/markitup.html" %}
 {% endblock head %}
 
-{% block breadcrumbs %}
-    {{block.super}} 
-    {% pybb_link post.topic.forum.category %} /
-    {% pybb_link post.topic.forum %} /
+{% block breadcrumb %}
+    {{block.super}} »
+    {% pybb_link post.topic.forum.category %} »
+    {% pybb_link post.topic.forum %} »
     {% pybb_link post.topic %}
 {% endblock %}
 
