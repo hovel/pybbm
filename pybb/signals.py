@@ -2,7 +2,6 @@ from django.db.models.signals import post_save
 from django.conf import settings
 
 from pybb.subscription import notify_topic_subscribers
-from pybb.models import Post, Profile
 from django.contrib.auth.models import User, Permission
 
 
@@ -27,8 +26,9 @@ def user_saved(instance, created, **kwargs):
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()
     if settings.AUTH_PROFILE_MODULE == 'pybb.Profile':
-        Profile(user=instance).save()
+        instance.get_profile().save()
 
 def setup_signals():
+    from models import Post
     post_save.connect(post_saved, sender=Post)
     post_save.connect(user_saved, sender=User)
