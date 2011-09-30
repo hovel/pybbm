@@ -26,7 +26,8 @@ def user_saved(instance, created, **kwargs):
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()
     if settings.AUTH_PROFILE_MODULE == 'pybb.Profile':
-        instance.get_profile().save()
+        from models import Profile
+        Profile(user=instance).save()
 
 def setup_signals():
     from models import Post
