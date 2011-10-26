@@ -19,8 +19,8 @@ def user_saved(instance, created, **kwargs):
     if not created:
         return
     try:
-        add_post_permission = Permission.objects.get(codename='add_post', content_type__name='Post')
-        add_topic_permission = Permission.objects.get(codename='add_topic', content_type__name='Topic')
+        add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
+        add_topic_permission = Permission.objects.get_by_natural_key('add_topic', 'pybb', 'topic')
     except Permission.DoesNotExist:
         return
     instance.user_permissions.add(add_post_permission, add_topic_permission)
