@@ -63,7 +63,7 @@ Enable your site profile
 
 If you have no site profile, add next line to your settings::
 
-    AUTH_PROFILE = 'pybb.Profile'
+    AUTH_PROFILE_MODULE = 'pybb.Profile'
 
 If you have custom site profile check that it inherits from `pybb.models.PybbProfile` or
 contains all field from this class.
