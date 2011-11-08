@@ -12,6 +12,7 @@ Contents:
    pybbmigrate
    testing
    originalpybb
+   problems
 
 Indices and tables
 ==================

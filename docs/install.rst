@@ -71,9 +71,18 @@ contains all field from this class.
 Sync/Migrate database
 ---------------------
 
-Run `syncdb` and `migrate` commands::
+If you first time install pybbm and have south installed, run::
+
+    python manage.py syncdb --all
+
+or just::
 
     python manage.py syncdb
+
+if south is not installed.
+
+Run `migrate` command to update pybbm or if you migrate from pybb to pybbm::
+
     python manage.py migrate
 
 WARNING
