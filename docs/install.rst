@@ -74,6 +74,7 @@ Sync/Migrate database
 If you first time install pybbm and have south installed, run::
 
     python manage.py syncdb --all
+    python manage.py migrate pybb --fake
 
 or just::
 
