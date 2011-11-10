@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.conf import settings
+from django.db.models import ObjectDoesNotExist
 
 from pybb.subscription import notify_topic_subscribers
 from django.contrib.auth.models import User, Permission
@@ -21,7 +22,7 @@ def user_saved(instance, created, **kwargs):
     try:
         add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
         add_topic_permission = Permission.objects.get_by_natural_key('add_topic', 'pybb', 'topic')
-    except Permission.DoesNotExist:
+    except ObjectDoesNotExist:
         return
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()

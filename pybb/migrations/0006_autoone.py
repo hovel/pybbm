@@ -7,15 +7,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+        pass
         # Changing field 'ReadTracking.user'
-        db.alter_column('pybb_readtracking', 'user_id', self.gf('annoying.fields.AutoOneToOneField')(to=orm['auth.User'], unique=True))
+        #db.alter_column('pybb_readtracking', 'user_id', self.gf('annoying.fields.AutoOneToOneField')(to=orm['auth.User'], unique=True))
 
 
     def backwards(self, orm):
-        
+        pass
         # Changing field 'ReadTracking.user'
-        db.alter_column('pybb_readtracking', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True))
+        #db.alter_column('pybb_readtracking', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True))
 
 
     models = {

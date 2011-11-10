@@ -7,15 +7,11 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
-        # Changing field 'Profile.user'
-        db.alter_column('pybb_profile', 'user_id', self.gf('annoying.fields.AutoOneToOneField')(unique=True, to=orm['auth.User']))
+        pass
 
 
     def backwards(self, orm):
-        
-        # Changing field 'Profile.user'
-        db.alter_column('pybb_profile', 'user_id', self.gf('django.db.models.fields.related.OneToOneField')(unique=True, to=orm['auth.User']))
+        pass
 
 
     models = {
