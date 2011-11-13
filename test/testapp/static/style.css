@@ -42,7 +42,7 @@ p {
     padding: 0;
 }
 
-img {
+.avatar img {
     margin: 10px 0 5px;
 }
 
@@ -159,10 +159,12 @@ img {
 
 /* Footer styles */
 #footer {
+    color: #AAAAAA;
     clear: both;
     float: left;
     width: 100%;
-    border-top: 1px solid #000;
+    border-top: 1px solid #AAAAAA;
+    padding: 3px 5px 5px 30px;
 }
 
 #footer p {

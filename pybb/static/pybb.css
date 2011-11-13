@@ -16,7 +16,7 @@ legend {
 }
 
 .topic-list {
-    width: 100%;
+    width: 99%;
 }
 
 .category-table {
@@ -109,7 +109,10 @@ legend {
 }
 
 .post-header {
-   padding: 5px 0 5px 20px;
+   padding: 3px 0 3px 20px;
+   font-size: 80%;
+   background-color: #EEE;
+   border: 1px solid #CCC;
 }
 
 .post-related {
@@ -130,12 +133,12 @@ legend {
     text-align: center;
 }
 
-.pagination.mini {
-    padding: 3px;
-    font-size: 90%;
+.mini-pagination {
+    padding: 3px 0 3px 10px;
+    font-size: 80%;
 }
 
-.pagination a {
+.pagination a, .pagination .page {
     padding-left: 3px;
 }
 
@@ -145,7 +148,7 @@ legend {
 }
 
 .pages-of {
-    border-bottom: 1px dashed #CCC;
+    border-bottom: 1px dashed #e4e3e3;
     cursor: pointer;
 }
 
@@ -155,6 +158,13 @@ legend {
 
 .pagination .last {
     margin-left: 20px;
+}
+
+.forum-headline {
+    background-color: #EEE;
+    padding: 10px;
+    margin: 3px;
+    color: #777777;
 }
 /* ----- Quoting ---- */
 
@@ -179,11 +189,34 @@ blockquote {
     font-weight: bold;
 }
 
+.state-indicator {
+    display: block;
+    float: left;
+    background-color: #CCC;
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin: 3px 5px;
+}
+
+.unread .state-indicator {
+    background-color: #369;
+}
+
 /* --- Rank (if aviable) --- */
 
 .post .rank {
     font-size: 80%;
     padding: 3px 0;
+}
+
+/* --- Signature --- */
+
+.signature {
+    color: #CCC;
+    margin-top: 15px;
+    border-top: 1px dotted #CCC;
+    display: block;
 }
 
 

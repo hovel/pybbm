@@ -53,7 +53,7 @@ def smile_it(str):
     return s
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
-    'bbcode': lambda str: urlize(smile_it(render_bbcode(str))),
+    'bbcode': lambda str: urlize(smile_it(render_bbcode(str, exclude_tags=['size', 'center']))),
     'markdown': lambda str: urlize(smile_it(Markdown(safe_mode='escape').convert(str)))
 })
 

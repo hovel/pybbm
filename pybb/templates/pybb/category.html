@@ -20,6 +20,7 @@
         {% for forum in category.forums_accessed|pybb_forum_unread:user %}
             <tr class="forum-row">
                 <td class="forum-name {% if forum.unread %} unread {% endif %}">
+                    <div class='state-indicator'></div>
                     <a href='{{ forum.get_absolute_url }}'>{{ forum.name }}</a> {% if forum.hidden %}[{% trans "Hidden" %}]{% endif %}
                     <div class='forum-description'>
                         {{ forum.description|safe }}

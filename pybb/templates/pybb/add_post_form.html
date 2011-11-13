@@ -3,9 +3,6 @@
 <form class="post-form" action="{% if forum %}{% url pybb:add_topic forum.pk %}{% else %}{% url pybb:add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
        <fieldset>
-            <legend>
-                {% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}
-            </legend>
             {{ form.as_p }}
             <div id='emoticons'>
                 {% for smile, url in form.aviable_smiles.items %}

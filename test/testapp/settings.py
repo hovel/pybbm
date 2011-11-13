@@ -66,6 +66,7 @@ INSTALLED_APPS = (
     'registration',
     'sorl.thumbnail',
     'south',
+    'pure_pagination',
 
 )
 

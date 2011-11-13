@@ -35,11 +35,26 @@
         {% for topic in topic_list|pybb_topic_unread:user  %}
             <tr class="topic-row {% if topic.sticky %} sticky {% endif %}">
                 <td class="topic-name{% if topic.unread %} unread {% endif %}">
-                    <a href='{{ topic.get_absolute_url }}'>
-                      {{ topic.name }}
-                    </a>
+                    <div class='state-indicator'></div>
+                    <a href='{{ topic.get_absolute_url }}'>{{ topic.name }}</a>
                     {% if topic.sticky %} &nbsp;[{% trans "Sticky" %}] {% endif %}
                     {% if topic.closed %} &nbsp;[{% trans "Closed" %}] {% endif %}
+                    {% with topic|pybb_topic_inline_pagination as pages %}
+                        {% if pages|length > 1 %}
+                            <span class='mini-pagination'>
+                                {% trans "pages" %}:
+                                {% for page in pages %}
+                                    <span class='page'>
+                                    {% if page == "..." %}
+                                        ...
+                                    {% else %}
+                                        <a href="{{ topic.get_absolute_url }}?page={{ page }}">{{ page }}</a>
+                                    {% endif %}
+                                    </span>
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                    {% endwith %}
                 </td>
                 <td class="topic-post-count">
                     {{ topic.post_count }}

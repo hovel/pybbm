@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import math
 import re
 from datetime import datetime, timedelta
 import time as time
@@ -215,3 +216,10 @@ def pybb_render_post(post, mode='html'):
     body = getattr(post, 'body_%s' % mode)
     re_tag = re.compile(r'@@@AUTOJOIN-(\d+)@@@')
     return re_tag.sub(render_autojoin_message, body)
+
+@register.filter
+def pybb_topic_inline_pagination(topic):
+    page_count = int(math.ceil(topic.post_count / float(defaults.PYBB_TOPIC_PAGE_SIZE)))
+    if page_count <= 5:
+        return range(1, page_count+1)
+    return range(1, 5) + ['...', page_count]

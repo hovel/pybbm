@@ -1,11 +1,13 @@
 {% load i18n pybb_tags thumbnail %}
 
 <a name="post-{{ post.id }}"></a> {# may be remove this string? #}
-<table class="post post-{% cycle 'odd' 'even' %}" id="post-{{ post.id }}">
+<table class="post post-{{ rowcolors }}" id="post-{{ post.id }}">
+    <tr>
     <th class='post-header head-row' colspan="2">
         <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
         <span class="updated">{% pybb_time post.created %}</span>
     </th>
+    </tr>
     <tr>
         <td class="info">
             {% include "pybb/avatar.html" %}
@@ -27,7 +29,7 @@
 
             <div class="post-controls">
                 {% if user.is_moderator or post|pybb_posted_by:user %}
-                    <a href="{% url pybb:edit_post post.id %}">{% trans "Edit" %}</a>
+                    <a href="{% url pybb:edit_post pk=post.id %}">{% trans "Edit" %}</a>
                 {% endif %}
                 {% if user.is_moderator %}
                     <a onclick="pybb_delete_post('{% url pybb:delete_post post.id %}',

@@ -1,6 +1,9 @@
 from django.conf.urls.defaults import *
 
 from pybb.feeds import LastPosts, LastTopics
+from views import IndexView, CategoryView, ForumView, TopicView, AddPostView, EditPostView,\
+    UserView, PostView, ProfileEditView, DeletePostView, StickTopicView, UnstickTopicView,\
+    CloseTopicView, OpenTopicView
 
 
 feeds = {
@@ -16,34 +19,32 @@ urlpatterns = patterns('',
 
 urlpatterns += patterns('pybb.views',
                         # Index, Category, Forum
-                        url('^$', 'index', name='index'),
-                        url('^category/(\d+)/$', 'show_category', name='category'),
-                        url('^forum/(\d+)/$', 'show_forum', name='forum'),
+                        url('^$', IndexView.as_view(), name='index'),
+                        url('^category/(?P<pk>\d+)/$', CategoryView.as_view(), name='category'),
+                        url('^forum/(?P<pk>\d+)/$', ForumView.as_view(), name='forum'),
 
                         # User
-                        url('^users/([^/]+)/$', 'user', name='user'),
+                        url('^users/(?P<username>[^/]+)/$', UserView.as_view(), name='user'),
                         url('^block_user/([^/]+)/$', 'block_user', name='block_user'),
 
                         # Profile
-                        url('^profile/edit/$', 'edit_profile', name='edit_profile'),
+                        url('^profile/edit/$', ProfileEditView.as_view(), name='edit_profile'),
 
                         # Topic
-                        url('^topic/(\d+)/$', 'show_topic', name='topic'),
-                        url('^topic/(\d+)/stick/$', 'stick_topic', name='stick_topic'),
-                        url('^topic/(\d+)/unstick/$', 'unstick_topic', name='unstick_topic'),
-                        url('^topic/(\d+)/close/$', 'close_topic', name='close_topic'),
-                        url('^topic/(\d+)/open/$', 'open_topic', name='open_topic'),
+                        url('^topic/(?P<pk>\d+)/$', TopicView.as_view(), name='topic'),
+                        url('^topic/(?P<pk>\d+)/stick/$', StickTopicView.as_view(), name='stick_topic'),
+                        url('^topic/(?P<pk>\d+)/unstick/$', UnstickTopicView.as_view(), name='unstick_topic'),
+                        url('^topic/(?P<pk>\d+)/close/$', CloseTopicView.as_view(), name='close_topic'),
+                        url('^topic/(?P<pk>\d+)/open/$', OpenTopicView.as_view(), name='open_topic'),
 
                         # Add topic/post
-                        url('^forum/(?P<forum_id>\d+)/topic/add/$', 'add_post',
-                            {'topic_id': None}, name='add_topic'),
-                        url('^topic/(?P<topic_id>\d+)/post/add/$', 'add_post',
-                            {'forum_id': None}, name='add_post'),
+                        url('^forum/(?P<forum_id>\d+)/topic/add/$', AddPostView.as_view(), name='add_topic'),
+                        url('^topic/(?P<topic_id>\d+)/post/add/$', AddPostView.as_view(), name='add_post'),
 
                         # Post
-                        url('^post/(\d+)/$', 'show_post', name='post'),
-                        url('^post/(\d+)/edit/$', 'edit_post', name='edit_post'),
-                        url('^post/(\d+)/delete/$', 'delete_post', name='delete_post'),
+                        url('^post/(?P<pk>\d+)/$', PostView.as_view(), name='post'),
+                        url('^post/(?P<pk>\d+)/edit/$', EditPostView.as_view(), name='edit_post'),
+                        url('^post/(?P<pk>\d+)/delete/$', DeletePostView.as_view(), name='delete_post'),
 
                         # Attachment
                         #url('^attachment/(\w+)/$', 'show_attachment', name='pybb_attachment'),

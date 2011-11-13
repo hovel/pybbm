@@ -5,12 +5,19 @@ from django.core.urlresolvers import reverse
 
 from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, TopicReadTracker, ForumReadTracker
 
+class ForumInlineAdmin(admin.TabularInline):
+    model = Forum
+    fields = ['name', 'hidden', 'position']
+    extra = 0
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'position', 'hidden', 'forum_count']
     list_per_page = 20
     ordering = ['position']
     search_fields = ['name']
     list_editable = ['position']
+
+    inlines = [ForumInlineAdmin]
 
 
 class ForumAdmin(admin.ModelAdmin):
@@ -19,7 +26,7 @@ class ForumAdmin(admin.ModelAdmin):
     raw_id_fields = ['moderators']
     ordering = ['-category']
     search_fields = ['name', 'category__name']
-    list_editable = ['position']
+    list_editable = ['position', 'hidden']
     fieldsets = (
         (None, {
                 'fields': ('category', 'name', 'hidden', 'position')
@@ -135,6 +142,8 @@ admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
+
+# This can be used to debug read/unread trackers
 
 #admin.site.register(TopicReadTracker, TopicReadTrackerAdmin)
 #admin.site.register(ForumReadTracker, ForumReadTrackerAdmin)

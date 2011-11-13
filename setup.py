@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    version = '0.3.6',
+    version = '0.4.0',
     description = 'PyBB Modified. Django forum application',
     long_description = open('README.rst').read(),
     author = 'Pavel Zhukov',
@@ -18,6 +18,7 @@ setup(
             'pytils',
             'django-annoying',
             'sorl-thumbnail',
+            'django-pure-pagination'
             ],
 
     license = "BSD",

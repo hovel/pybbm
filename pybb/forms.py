@@ -33,7 +33,7 @@ class PostForm(forms.ModelForm):
         if not (self.topic or self.forum or ('instance' in kwargs)):
             raise ValueError('You should provide topic, forum or instance')
         #Handle topic subject if editing topic head
-        if ('instance' in kwargs) and (kwargs['instance'].topic.head == kwargs['instance']):
+        if ('instance' in kwargs) and kwargs['instance'] and (kwargs['instance'].topic.head == kwargs['instance']):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
 
         super(PostForm, self).__init__(**kwargs)
@@ -105,16 +105,16 @@ class PostForm(forms.ModelForm):
 
 
 class AdminPostForm(PostForm):
-    '''
+    """
     Superusers can post messages from any user and from any time
     If no user with specified name - new user will be created
-    '''
+    """
     login = forms.CharField(label=_('User'))
 
     def __init__(self, *args, **kwargs):
         if args:
             kwargs.update(dict(zip(inspect.getargspec(forms.ModelForm.__init__)[0][1:], args)))
-        if 'instance' in kwargs:
+        if 'instance' in kwargs and kwargs['instance']:
             kwargs.setdefault('initial', {}).update({'login': kwargs['instance'].user.username})
         super(AdminPostForm, self).__init__(**kwargs)
         self.fields.keyOrder = ['name', 'login', 'body', 'attachment']
@@ -122,7 +122,7 @@ class AdminPostForm(PostForm):
     def save(self, *args, **kwargs):
         try:
             self.user = User.objects.filter(username=self.cleaned_data['login']).get()
-        except:
+        except User.DoesNotExist:
             self.user = User.objects.create_user(self.cleaned_data['login'],
                                                  '%s@example.com' % self.cleaned_data['login'])
         return super(AdminPostForm, self).save(*args, **kwargs)

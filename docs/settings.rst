@@ -150,9 +150,11 @@ related emoticons.
 by default PyBBM support `bbcode` and `markdown` markup::
 
     {
-        'bbcode': lambda str: urlize(smile_it(render_bbcode(str))),
+        'bbcode': lambda str: urlize(smile_it(render_bbcode(str, exclude_tags=['size', 'center']))),
         'markdown': lambda str: urlize(smile_it(Markdown(safe_mode='escape').convert(str)))
     })
+
+Please note, that `size` and `center` tags are disabled by default, enable them if you have right markup for them.
 
 PYBB_QUOTE_ENGINES
 ..................

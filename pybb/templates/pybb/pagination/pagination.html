@@ -3,13 +3,21 @@
 {% if is_paginated %}
 <div class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page=1" class="first"> {% trans "first page" %}</a>
             <a href="?page={{ page_obj.previous_page_number }}" class="previous">← {% trans "previous page" %}</a>
         {% endif %}
-        {% trans "page" %}: {{ page_obj.number }}  {% trans "of" %} {{ paginator.num_pages }}
+        {% for page in page_obj.pages %}
+        {% if page %}
+            {% ifequal page page_obj.number %}
+                <span class="current page">{{ page }}</span>
+            {% else %}
+                <a href="?{{ page.querystring }}" class="page">{{ page }}</a>
+            {% endifequal %}
+        {% else %}
+            ...
+        {% endif %}
+        {% endfor %}
         {% if page_obj.has_next%}
             <a href="?page={{ page_obj.next_page_number }}" class="next">{% trans "next page" %} →</a>
-            <a href="?page=last" class="last">{% trans "last page" %}</a>
         {% endif %}
 </div>
 {% endif %}

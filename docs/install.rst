@@ -13,6 +13,9 @@ PyBBM required next packages to be installed:
 * pytils
 * django-annoying
 * sorl-thumbnail
+* django-pure-pagination
+
+* django-cbv (for django versions < 1.3)
 
 All packages can be installed as a dependency for PyBBM if you install it with pip or easy_install::
 
@@ -30,6 +33,7 @@ Enable applications and edit settings
     * pybb
     * pytils
     * sorl.thumbnail
+    * pure_pagination
 
   ::
 
@@ -38,6 +42,7 @@ Enable applications and edit settings
         'pybb',
         'pytils',
         'sorl.thumbnail',
+        'pure_pagination',
         ...
     )
 
