@@ -1,3 +1,6 @@
+0.4.1
+    * Fix category view context
+    * Add test for category view
 0.4.0
     * Most views are now class-based
     * Tests code cleanup

@@ -50,6 +50,11 @@ class FeaturesTest(TestCase):
         self.assertFalse(tree.xpath('//a[contains(@href,"?page=")]'))
         self.assertFalse(response.context['is_paginated'])
 
+    def test_category_page(self):
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.forum.get_absolute_url())
+
     def test_profile_edit(self):
         # Self profile edit
         self.client.login(username='zeus', password='zeus')
