@@ -5,7 +5,7 @@ Project tree contains `test/testapp` folder, it is fully deployed and ready to u
 If you starting from scratch it's probaly the best way to begin.
 
 Running example project
---------------------
+-----------------------
 
 You need to install next packages for running testapp:
 

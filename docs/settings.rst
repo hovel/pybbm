@@ -168,3 +168,28 @@ default is::
         'markdown': lambda text, username="": '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
     }
 
+BODY_CLEANER
+............
+
+Extra form validation for body of post.
+
+Called as::
+
+    BODY_CLEANER(user, body)
+
+at `clean_body` method of `PostForm` Here you can do various checks based on user stats. E.g. allow moderators to post links and don't allow others. By raising::
+
+    forms.ValidationError('Here Error Message')
+
+You can show user what is going wrong during validation.
+
+PYBB_ENABLE_ANONYMOUS_POST
+..........................
+
+Allow post for not-authenticated users. False by default.
+See :doc:` anonymous posting </anonymous>` for details.
+
+PYBB_ANONYMOUS_USERNAME
+.......................
+
+Username for anonymous posts. If no user with this username exists it will be created on first anonymous post.

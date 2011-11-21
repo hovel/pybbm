@@ -19,6 +19,8 @@ except:
 
 class FeaturesTest(TestCase):
     def setUp(self):
+        self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
+        self.PYBB_ENABLE_ANONYMOUS_POST = False
         self.user = User.objects.create_user('zeus', 'zeus@localhost', 'zeus')
         self.category = Category(name='foo')
         self.category.save()
@@ -375,5 +377,31 @@ class FeaturesTest(TestCase):
         resp = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
         self.assertEqual(resp.status_code, 200)
 
+    def tearDown(self):
+        defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
 
-        
+
+
+class AnonymousTest(TestCase):
+
+    def setUp(self):
+        self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
+        self.ORIG_PYBB_ANONYMOUS_USERNAME = defaults.PYBB_ANONYMOUS_USERNAME
+        defaults.PYBB_ENABLE_ANONYMOUS_POST = True
+        defaults.PYBB_ANONYMOUS_USERNAME = 'Anonymous'
+        self.user = User.objects.create_user('Anonymous', 'Anonymous@localhost', 'Anonymous')
+        self.category = Category(name='foo')
+        self.category.save()
+        self.forum = Forum(name='xfoo', description='bar', category=self.category)
+        self.forum.save()
+        self.topic = Topic(name='etopic', forum=self.forum, user=self.user)
+        self.topic.save()
+
+    def test_anonymous_posting(self):
+        response = self.client.post(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}), {'body': 'test anonymous'}, follow=True)
+        self.assertEqual(len(Post.objects.filter(body='test anonymous')), 1)
+        self.assertEqual(Post.objects.get(body='test anonymous').user, self.user)
+
+    def tearDown(self):
+        defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
+        defaults.PYBB_ANONYMOUS_USERNAME = self.ORIG_PYBB_ANONYMOUS_USERNAME

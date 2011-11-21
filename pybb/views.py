@@ -115,6 +115,8 @@ class TopicView(generic.ListView):
             else:
                 ctx['form'] = PostForm(topic=self.topic)
             self.mark_read(self.request, self.topic)
+        elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
+            ctx['form'] = PostForm(topic=self.topic)
         else:
             ctx['form'] = None
         if defaults.PYBB_FREEZE_FIRST_POST:
@@ -173,17 +175,17 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         forum = None
         topic = None
         if 'forum_id' in self.kwargs:
-            if not self.request.user.has_perm('pybb.add_topic'):
+            if not self.user.has_perm('pybb.add_topic'):
                 raise PermissionDenied
             forum = get_object_or_404(filter_hidden(self.request, Forum), pk=self.kwargs['forum_id'])
         elif 'topic_id' in self.kwargs:
             topic = get_object_or_404(Topic, pk=self.kwargs['topic_id'])
-            if topic.forum.hidden and (not self.request.user.is_staff):
+            if topic.forum.hidden and (not self.user.is_staff):
                 raise Http404
             if topic.closed:
                 raise PermissionDenied
         form_kwargs = super(AddPostView, self).get_form_kwargs()
-        form_kwargs.update(dict(topic=topic, forum=forum, user=self.request.user,
+        form_kwargs.update(dict(topic=topic, forum=forum, user=self.user,
                        ip=ip, initial={}))
         if 'quote_id' in self.request.GET:
             try:
@@ -194,8 +196,8 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
                 post = get_object_or_404(Post, pk=quote_id)
                 quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, post.user.username)
                 form_kwargs['initial']['body'] = quote
-        if self.request.user.is_staff:
-            form_kwargs['initial']['login'] = self.request.user.username
+        if self.user.is_staff:
+            form_kwargs['initial']['login'] = self.user.username
         self.forum = forum
         self.topic = topic
         return form_kwargs
@@ -206,10 +208,18 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         ctx['topic'] = self.topic
         return ctx
 
-    @method_decorator(login_required)
     @method_decorator(csrf_protect)
-    @method_decorator(permission_required('pybb.add_post'))
     def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            self.user = request.user
+        else:
+            if defaults.PYBB_ENABLE_ANONYMOUS_POST:
+                self.user, new = User.objects.get_or_create(username=defaults.PYBB_ANONYMOUS_USERNAME)
+            else:
+                from django.contrib.auth.views import redirect_to_login
+                return redirect_to_login(request.get_full_path())
+        if not self.user.has_perm('pybb.add_post'):
+            raise PermissionDenied
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
 class UserView(generic.DetailView):

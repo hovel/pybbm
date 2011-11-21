@@ -74,3 +74,9 @@ PYBB_BUTTONS = getattr(settings, 'PYBB_BUTTONS', {})
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
 
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
+
+PYBB_ENABLE_ANONYMOUS_POST = getattr(settings, 'PYBB_ANONYMOUS_POST', False)
+
+PYBB_ENABLE_ANONYMOUS_POST = True
+
+PYBB_ANONYMOUS_USERNAME = getattr(settings, 'PYBB_ANONYMOUS_USERNAME', 'Anonymous')

@@ -8,6 +8,7 @@ Contents:
 
    install
    settings
+   anonymous
    example
    pybbmigrate
    testing
