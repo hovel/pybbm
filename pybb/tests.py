@@ -20,7 +20,9 @@ except:
 class FeaturesTest(TestCase):
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
-        self.PYBB_ENABLE_ANONYMOUS_POST = False
+        self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = False
+        defaults.PYBB_ENABLE_ANONYMOUS_POST = False
         self.user = User.objects.create_user('zeus', 'zeus@localhost', 'zeus')
         self.category = Category(name='foo')
         self.category.save()
@@ -70,7 +72,6 @@ class FeaturesTest(TestCase):
         self.client.get(self.post.get_absolute_url(), follow=True)
         self.assertContains(response, 'test signature')
 
-
     def test_pagination_and_topic_addition(self):
         client = Client()
         for i in range(0, defaults.PYBB_FORUM_PAGE_SIZE + 3):
@@ -89,6 +90,12 @@ class FeaturesTest(TestCase):
         self.assertTrue(self.topic.name in tree.xpath('//title')[0].text_content())
         self.assertContains(response, self.post.body_html)
         self.assertContains(response, u'bbcode <strong>test</strong>')
+
+    def test_topic_addition(self):
+        self.client.login(username='zeus', password='zeus')
+        response = self.client.post(reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id}), data={'body': 'new topic test', 'name': 'new topic name'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'new topic test')
 
     def test_post_deletion(self):
         post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
@@ -379,6 +386,7 @@ class FeaturesTest(TestCase):
 
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
+        defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
 
 
@@ -399,9 +407,122 @@ class AnonymousTest(TestCase):
 
     def test_anonymous_posting(self):
         response = self.client.post(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}), {'body': 'test anonymous'}, follow=True)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(Post.objects.filter(body='test anonymous')), 1)
         self.assertEqual(Post.objects.get(body='test anonymous').user, self.user)
 
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
         defaults.PYBB_ANONYMOUS_USERNAME = self.ORIG_PYBB_ANONYMOUS_USERNAME
+
+
+def premoderate_test(user, post):
+    """
+    Test premoderate function
+    Allow post without moderation for staff users only
+    """
+    if user.username.startswith('allowed'):
+        return True
+    return False
+
+class PreModerationTest(TestCase):
+
+    def setUp(self):
+        self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = premoderate_test
+        self.user = User.objects.create_user('zeus', 'zeus@localhost', 'zeus')
+        self.category = Category(name='foo')
+        self.category.save()
+        self.forum = Forum(name='xfoo', description='bar', category=self.category)
+        self.forum.save()
+        self.topic = Topic(name='etopic', forum=self.forum, user=self.user)
+        self.topic.save()
+        mail.outbox = []
+
+    def test_premoderation(self):
+        self.client.login(username='zeus', password='zeus')
+        response = self.client.post(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}), {'body': 'test premoderation'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        post = Post.objects.get(body='test premoderation')
+        self.assertEqual(post.on_moderation, True)
+
+        # Post is visible by author
+        response = self.client.get(post.get_absolute_url(), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'test premoderation')
+
+        # Post is not visible by others
+        client = Client()
+        response = client.get(post.get_absolute_url(), follow=True)
+        self.assertEqual(response.status_code, 403)
+        response = client.get(self.topic.get_absolute_url(), follow=True)
+        self.assertNotContains(response, 'test premoderation')
+
+        # But visible by superuser (with permissions)
+        user = User.objects.create_user('admin', 'zeus@localhost', 'admin')
+        user.is_superuser = True
+        user.save()
+        client.login(username='admin', password='admin')
+        response = client.get(post.get_absolute_url(), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'test premoderation')
+
+        # user with names stats with allowed can post without premoderation
+        user = User.objects.create_user('allowed_zeus', 'zeus@localhost', 'allowed_zeus')
+        client.login(username='allowed_zeus', password='allowed_zeus')
+        response = client.post(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}), {'body': 'test premoderation staff'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        post = Post.objects.get(body='test premoderation staff')
+        client = Client()
+        response = client.get(post.get_absolute_url(), follow=True)
+        self.assertContains(response, 'test premoderation staff')
+
+        # Superuser can moderate
+        user.is_superuser = True
+        user.save()
+        admin_client = Client()
+        admin_client.login(username='admin', password='admin')
+        post = Post.objects.get(body='test premoderation')
+        response = admin_client.get(reverse('pybb:moderate_post', kwargs={'pk': post.id}), follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Now all can see this post:
+        client = Client()
+        response = client.get(post.get_absolute_url(), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'test premoderation')
+
+        # Other users can't moderate
+        post.on_moderation = True
+        post.save()
+        client.login(username='zeus', password='zeus')
+        response = client.get(reverse('pybb:moderate_post', kwargs={'pk': post.id}), follow=True)
+        self.assertEqual(response.status_code, 403)
+
+        # If user create new topic it goes to moderation if MODERATION_ENABLE
+        # When first post is moderated, topic becomes moderated too
+        self.client.login(username='zeus', password='zeus')
+        response = self.client.post(reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id}), data={'body': 'new topic test', 'name': 'new topic name'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'new topic test')
+
+        client = Client()
+        response = client.get(self.forum.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'new topic name')
+        response = client.get(Topic.objects.get(name='new topic name').get_absolute_url())
+        self.assertEqual(response.status_code, 403)
+        response = admin_client.get(reverse('pybb:moderate_post',
+                                     kwargs={'pk': Post.objects.get(body='new topic test').id}),
+                                     follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        response = client.get(self.forum.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'new topic name')
+        response = client.get(Topic.objects.get(name='new topic name').get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+
+
+    def tearDown(self):
+        defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION

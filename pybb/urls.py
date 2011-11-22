@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 from pybb.feeds import LastPosts, LastTopics
 from views import IndexView, CategoryView, ForumView, TopicView, AddPostView, EditPostView,\
     UserView, PostView, ProfileEditView, DeletePostView, StickTopicView, UnstickTopicView,\
-    CloseTopicView, OpenTopicView
+    CloseTopicView, OpenTopicView, ModeratePost
 
 
 feeds = {
@@ -45,6 +45,7 @@ urlpatterns += patterns('pybb.views',
                         url('^post/(?P<pk>\d+)/$', PostView.as_view(), name='post'),
                         url('^post/(?P<pk>\d+)/edit/$', EditPostView.as_view(), name='edit_post'),
                         url('^post/(?P<pk>\d+)/delete/$', DeletePostView.as_view(), name='delete_post'),
+                        url('^post/(?P<pk>\d+)/moderate/$', ModeratePost.as_view(), name='moderate_post'),
 
                         # Attachment
                         #url('^attachment/(\w+)/$', 'show_attachment', name='pybb_attachment'),

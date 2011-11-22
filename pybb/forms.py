@@ -77,15 +77,22 @@ class PostForm(forms.ModelForm):
                 post.topic.save()
             post.save()
             return post
+        allow_post = True
+        if defaults.PYBB_PREMODERATION:
+                allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'])
         if self.forum:
             topic = Topic(forum=self.forum,
                           user=self.user,
                           name=self.cleaned_data['name'])
+            if not allow_post:
+                topic.on_moderation = True
             topic.save()
         else:
             topic = self.topic
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
                     body=self.cleaned_data['body'])
+        if not allow_post:
+            post.on_moderation = True
         post.save()
         if defaults.PYBB_ATTACHMENT_ENABLE:
             for f in self.files:

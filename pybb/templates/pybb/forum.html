@@ -33,7 +33,7 @@
             </th>
         </tr>
         {% for topic in topic_list|pybb_topic_unread:user  %}
-            <tr class="topic-row {% if topic.sticky %} sticky {% endif %}">
+            <tr class="topic-row {% if topic.sticky %} sticky {% endif %} {% cycle "odd" "even" %} {% if topic.on_moderation %} on-moderation {% endif %}">
                 <td class="topic-name{% if topic.unread %} unread {% endif %}">
                     <div class='state-indicator'></div>
                     <a href='{{ topic.get_absolute_url }}'>{{ topic.name }}</a>

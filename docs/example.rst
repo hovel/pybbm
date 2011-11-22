@@ -20,3 +20,4 @@ you can do it by running this command::
 or with easy_install::
 
     easy_install pybbm django-registration south
+

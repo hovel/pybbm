@@ -88,7 +88,13 @@ class ForumView(generic.ListView):
         self.forum = get_object_or_404(filter_hidden(self.request, Forum), pk=self.kwargs['pk'])
         if self.forum.category.hidden and (not self.request.user.is_staff):
             raise Http404()
-        return self.forum.topics.order_by('-sticky', '-updated').select_related()
+        qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
+        if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
+            if self.request.user.is_authenticated():
+                qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
+            else:
+                qs = qs.filter(on_moderation=False)
+        return qs
 
 
 class TopicView(generic.ListView):
@@ -99,11 +105,21 @@ class TopicView(generic.ListView):
 
     def get_queryset(self):
         self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=self.kwargs['pk'])
+        if self.topic.on_moderation and\
+           not pybb_topic_moderated_by(self.topic, self.request.user) and\
+           not self.request.user == self.topic.user:
+            raise PermissionDenied
         if (self.topic.forum.hidden or self.topic.forum.category.hidden) and (not self.request.user.is_staff):
             raise Http404()
         self.topic.views += 1
         self.topic.save()
-        return self.topic.posts.all().select_related('user')
+        qs = self.topic.posts.all().select_related('user')
+        if not pybb_topic_moderated_by(self.topic, self.request.user):
+            if self.request.user.is_authenticated():
+                qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
+            else:
+                qs = qs.filter(on_moderation=False)
+        return qs
 
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
@@ -208,6 +224,11 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         ctx['topic'] = self.topic
         return ctx
 
+    def get_success_url(self):
+        if (not self.request.user.is_authenticated()) and defaults.PYBB_PREMODERATION:
+            return reverse('pybb:index')
+        return super(AddPostView, self).get_success_url()
+
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated():
@@ -241,10 +262,23 @@ class UserView(generic.DetailView):
 class PostView(generic.RedirectView):
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        if defaults.PYBB_PREMODERATION and\
+            post.on_moderation and\
+            (not pybb_topic_moderated_by(post.topic, self.request.user)) and\
+            (not post.user==self.request.user):
+            raise PermissionDenied
         count = post.topic.posts.filter(created__lt=post.created).count() + 1
         page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
         return '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)
 
+class ModeratePost(generic.RedirectView):
+    def get_redirect_url(self, **kwargs):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        if not pybb_topic_moderated_by(post.topic, self.request.user):
+            raise PermissionDenied
+        post.on_moderation = False
+        post.save()
+        return post.get_absolute_url()
 
 class ProfileEditView(generic.UpdateView):
 

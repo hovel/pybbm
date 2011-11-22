@@ -149,6 +149,7 @@ class Topic(models.Model):
     )
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
+    on_moderation = models.BooleanField(_('On moderation'), default=False)
 
     class Meta(object):
         ordering = ['-created']
@@ -215,6 +216,7 @@ class Post(RenderableItem):
     created = models.DateTimeField(_('Created'), blank=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     user_ip = models.IPAddressField(_('User IP'), blank=True, default='0.0.0.0')
+    on_moderation = models.BooleanField(_('On moderation'), default=False)
 
     class Meta(object):
         ordering = ['created']
@@ -241,7 +243,9 @@ class Post(RenderableItem):
         if new:
             self.topic.updated = now
             self.topic.forum.updated = now
-            
+        # If post is topic head and moderated, moderate topic too
+        if self.topic.head == self and self.on_moderation == False and self.topic.on_moderation == True:
+            self.topic.on_moderation = False
         self.topic.update_counters()
         self.topic.forum.update_counters()
 
