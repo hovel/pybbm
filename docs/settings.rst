@@ -187,9 +187,14 @@ PYBB_ENABLE_ANONYMOUS_POST
 ..........................
 
 Allow post for not-authenticated users. False by default.
-See :doc:` anonymous posting </anonymous>` for details.
+See :doc:`anonymous posting</anonymous>` for details.
 
 PYBB_ANONYMOUS_USERNAME
 .......................
 
 Username for anonymous posts. If no user with this username exists it will be created on first anonymous post.
+
+PYBB_PREMODERATION
+..................
+
+Filter for messages that require pre-moderation. See :doc:`Pre-moderation</premoderation>` for details.

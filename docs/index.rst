@@ -8,6 +8,7 @@ Contents:
 
    install
    settings
+   premoderation
    anonymous
    example
    pybbmigrate
