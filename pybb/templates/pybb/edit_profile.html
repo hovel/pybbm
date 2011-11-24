@@ -6,7 +6,7 @@
 {% block content %}
     <h1>{% trans "Profile editing" %}</h1>
     <div class="avatar">
-    {% thumbnail self.instance.avatar "80x80" as avatar %}
+    {% thumbnail form.instance.avatar "80x80" as avatar %}
         <img src="{{ avatar.url }}" alt="avatar">
     {% empty %}
         <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="avatar">
