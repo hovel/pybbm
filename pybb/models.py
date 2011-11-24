@@ -44,16 +44,16 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 )]
 
 #noinspection PyUnusedLocal
-def get_file_path(instance, filename):
+def get_file_path(instance, filename, to='pybb/avatar'):
     """
     This function generate filename with uuid4
     it's useful if:
     - you don't want to allow others to see original uploaded filenames
-    - users can upload images with unicode in filenames wich can confuse browsers and fs
+    - users can upload images with unicode in filenames wich can confuse browsers and filesystem
     """
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
-    return os.path.join('pybb/avatar', filename)
+    return os.path.join(to, filename)
 
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
@@ -328,6 +328,8 @@ class Attachment(models.Model):
     path = models.CharField(_('Path'), max_length=255)
     name = models.TextField(_('Name'))
     hash = models.CharField(_('Hash'), max_length=40, blank=True, db_index=True)
+    file = models.FileField(_('File'),
+                            upload_to=lambda instance, filename: get_file_path(instance, filename, to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
 
     def save(self, *args, **kwargs):
         super(Attachment, self).save(*args, **kwargs)
@@ -349,10 +351,6 @@ class Attachment(models.Model):
             return '%dKb' % int(size / 1024)
         else:
             return '%.2fMb' % (size / float(1024 * 1024))
-
-    def get_absolute_path(self):
-        return os.path.join(MEDIA_ROOT, defaults.PYBB_ATTACHMENT_UPLOAD_TO,
-                            self.path)
 
     class Meta(object):
         verbose_name = _('Attachment')

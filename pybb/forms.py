@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 import re
 from datetime import datetime
 import os.path
@@ -14,9 +15,19 @@ from django.conf import settings
 
 MEDIA_ROOT = settings.MEDIA_ROOT
 
+class AttachmentForm(forms.ModelForm):
+    class Meta(object):
+        model = Attachment
+        fields = ('file',)
+
+    def clean_file(self):
+        if self.cleaned_data['file'].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
+                raise forms.ValidationError(_('Attachment is too big'))
+        return self.cleaned_data['file']
+
+    
 class PostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
-    attachment = forms.FileField(label=_('Attachment'), required=False)
 
     class Meta(object):
         model = Post
@@ -38,24 +49,14 @@ class PostForm(forms.ModelForm):
 
         super(PostForm, self).__init__(**kwargs)
 
-        self.fields.keyOrder = ['name', 'body', 'attachment']
+        self.fields.keyOrder = ['name', 'body']
 
         if not (self.forum or (self.instance.pk and (self.instance.topic.head == self.instance))):
             self.fields['name'].widget = forms.HiddenInput()
             self.fields['name'].required = False
 
-        if not defaults.PYBB_ATTACHMENT_ENABLE:
-            self.fields['attachment'].widget = forms.HiddenInput()
-            self.fields['attachment'].required = False
-
         self.aviable_smiles = defaults.PYBB_SMILES
         self.smiles_prefix = defaults.PYBB_SMILES_PREFIX
-
-    def clean_attachment(self):
-        for f in self.files:
-            if self.files[f].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
-                raise forms.ValidationError(_('Attachment is too big'))
-        return self.cleaned_data['attachment']
 
     def clean_body(self):
         body = self.cleaned_data['body']
@@ -94,22 +95,7 @@ class PostForm(forms.ModelForm):
         if not allow_post:
             post.on_moderation = True
         post.save()
-        if defaults.PYBB_ATTACHMENT_ENABLE:
-            for f in self.files:
-                self.save_attachment(post, self.files[f])
         return post
-
-    def save_attachment(self, post, memfile):
-        if memfile:
-            obj = Attachment(size=memfile.size, content_type=memfile.content_type,
-                             name=memfile.name, post=post)
-            dir = os.path.join(MEDIA_ROOT, defaults.PYBB_ATTACHMENT_UPLOAD_TO)
-            fname = '%d.0' % post.id
-            path = os.path.join(dir, fname)
-            file(path, 'w').write(memfile.read())
-            obj.path = fname
-            obj.save()
-
 
 class AdminPostForm(PostForm):
     """
@@ -136,8 +122,8 @@ class AdminPostForm(PostForm):
 
 try:
     profile_app, profile_model = settings.AUTH_PROFILE_MODULE.split('.')
-    profile_model = ContentType.objects.get(app_label=profile_app, model=profile_model).model_class()
-except:
+    profile_model = ContentType.objects.get_by_natural_key(profile_app, profile_model).model_class()
+except (AttributeError, ValueError, ObjectDoesNotExist):
     profile_model = Profile
 
 class EditProfileForm(forms.ModelForm):
