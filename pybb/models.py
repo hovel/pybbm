@@ -322,26 +322,19 @@ class Profile(PybbProfile):
 
 
 class Attachment(models.Model):
+
+    class Meta(object):
+        verbose_name = _('Attachment')
+        verbose_name_plural = _('Attachments')
+
     post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
-    content_type = models.CharField(_('Content type'), max_length=255)
-    path = models.CharField(_('Path'), max_length=255)
-    name = models.TextField(_('Name'))
-    hash = models.CharField(_('Hash'), max_length=40, blank=True, db_index=True)
     file = models.FileField(_('File'),
                             upload_to=lambda instance, filename: get_file_path(instance, filename, to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
 
     def save(self, *args, **kwargs):
+        self.size = self.file.size
         super(Attachment, self).save(*args, **kwargs)
-        if not self.hash:
-            self.hash = sha1(str(self.id) + SECRET_KEY).hexdigest()
-        super(Attachment, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('pybb:attachment', kwargs={'pk': self.hash})
 
     def size_display(self):
         size = self.size
@@ -351,10 +344,6 @@ class Attachment(models.Model):
             return '%dKb' % int(size / 1024)
         else:
             return '%.2fMb' % (size / float(1024 * 1024))
-
-    class Meta(object):
-        verbose_name = _('Attachment')
-        verbose_name_plural = _('Attachments')
 
 
 class TopicReadTracker(models.Model):

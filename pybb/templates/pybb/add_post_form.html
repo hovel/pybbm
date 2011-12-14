@@ -9,6 +9,7 @@
                     <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
                 {% endfor %}
             </div>
+            {% include "pybb/attachments_formset.html" %}
             <p class="submit">
                 {% if PYBB_BUTTONS.submit %}
                     <input type='image' src="{{ STATIC_URL }}{{ PYBB_BUTTONS.submit }}" alt='{% trans "Submit" %}'>

@@ -13,7 +13,7 @@
     {% endthumbnail %}
     </div>
     <p><a href="{% url auth_password_change %}">{% trans "Change the password" %}</a></p>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="profile-edit">
         {% csrf_token %}
         <fieldset>
             <legend>{% trans "Profile editing" %}</legend>

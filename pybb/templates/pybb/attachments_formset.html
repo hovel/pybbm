@@ -1,0 +1,15 @@
+{% if PYBB_ATTACHMENT_ENABLE %}
+    {% load i18n %}
+    <div class='attachments-form'>
+        <h3>{% trans "Add attachments:" %}</h3>
+        {{ aformset.management_form }}
+            <table>
+            {% for form in aformset %}
+                <tr>
+                    <td>{{ form.id }} {{ form.file }}</td>
+                    <td>{{ form.DELETE }} {% trans "delete" %}</td>
+                </tr>
+            {% endfor %}
+            </table>
+    </div>
+{% endif %}

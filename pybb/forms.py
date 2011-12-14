@@ -110,7 +110,7 @@ class AdminPostForm(PostForm):
         if 'instance' in kwargs and kwargs['instance']:
             kwargs.setdefault('initial', {}).update({'login': kwargs['instance'].user.username})
         super(AdminPostForm, self).__init__(**kwargs)
-        self.fields.keyOrder = ['name', 'login', 'body', 'attachment']
+        self.fields.keyOrder = ['name', 'login', 'body']
 
     def save(self, *args, **kwargs):
         try:
