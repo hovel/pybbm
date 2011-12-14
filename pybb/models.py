@@ -44,16 +44,16 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 )]
 
 #noinspection PyUnusedLocal
-def get_file_path(instance, filename):
+def get_file_path(instance, filename, to='pybb/avatar'):
     """
     This function generate filename with uuid4
     it's useful if:
     - you don't want to allow others to see original uploaded filenames
-    - users can upload images with unicode in filenames wich can confuse browsers and fs
+    - users can upload images with unicode in filenames wich can confuse browsers and filesystem
     """
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
-    return os.path.join('pybb/avatar', filename)
+    return os.path.join(to, filename)
 
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
@@ -322,24 +322,19 @@ class Profile(PybbProfile):
 
 
 class Attachment(models.Model):
+
+    class Meta(object):
+        verbose_name = _('Attachment')
+        verbose_name_plural = _('Attachments')
+
     post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
-    content_type = models.CharField(_('Content type'), max_length=255)
-    path = models.CharField(_('Path'), max_length=255)
-    name = models.TextField(_('Name'))
-    hash = models.CharField(_('Hash'), max_length=40, blank=True, db_index=True)
+    file = models.FileField(_('File'),
+                            upload_to=lambda instance, filename: get_file_path(instance, filename, to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
 
     def save(self, *args, **kwargs):
+        self.size = self.file.size
         super(Attachment, self).save(*args, **kwargs)
-        if not self.hash:
-            self.hash = sha1(str(self.id) + SECRET_KEY).hexdigest()
-        super(Attachment, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('pybb:attachment', kwargs={'pk': self.hash})
 
     def size_display(self):
         size = self.size
@@ -349,14 +344,6 @@ class Attachment(models.Model):
             return '%dKb' % int(size / 1024)
         else:
             return '%.2fMb' % (size / float(1024 * 1024))
-
-    def get_absolute_path(self):
-        return os.path.join(MEDIA_ROOT, defaults.PYBB_ATTACHMENT_UPLOAD_TO,
-                            self.path)
-
-    class Meta(object):
-        verbose_name = _('Attachment')
-        verbose_name_plural = _('Attachments')
 
 
 class TopicReadTracker(models.Model):

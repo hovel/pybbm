@@ -10,7 +10,9 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
+from django.views.generic.edit import ModelFormMixin
 from pure_pagination import Paginator
+from django.forms.models import inlineformset_factory, modelformset_factory
 
 try:
     from django.views import generic
@@ -21,11 +23,10 @@ except ImportError:
         raise ImportError('If you using django version < 1.3 you should install django-cbv for pybb')
 
 
-from django.views.generic.simple import direct_to_template
 from django.views.decorators.csrf import csrf_protect
 
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker
-from pybb.forms import  PostForm, AdminPostForm, EditProfileForm
+from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, Attachment
+from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentForm
 from pybb.templatetags.pybb_tags import pybb_editable_by
 from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 
@@ -95,7 +96,7 @@ class ForumView(generic.ListView):
             else:
                 qs = qs.filter(on_moderation=False)
         return qs
-
+    
 
 class TopicView(generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
@@ -135,6 +136,10 @@ class TopicView(generic.ListView):
             ctx['form'] = PostForm(topic=self.topic)
         else:
             ctx['form'] = None
+        if defaults.PYBB_ATTACHMENT_ENABLE:
+            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
+            aformset = AttachmentFormSet()
+            ctx['aformset'] = aformset
         if defaults.PYBB_FREEZE_FIRST_POST:
             ctx['first_post'] = self.topic.head
         else:
@@ -222,6 +227,9 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         ctx = super(AddPostView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
         ctx['topic'] = self.topic
+        if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
+            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
+            ctx['aformset'] = AttachmentFormSet()
         return ctx
 
     def get_success_url(self):
@@ -229,6 +237,19 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
             return reverse('pybb:index')
         return super(AddPostView, self).get_success_url()
 
+    def form_valid(self, form):
+        if defaults.PYBB_ATTACHMENT_ENABLE:
+            self.object = form.save(commit=False)
+            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
+            aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            if aformset.is_valid():
+                self.object.save()
+                aformset.save()
+                return super(ModelFormMixin, self).form_valid(form)
+            else:
+                return self.render_to_response(self.get_context_data(form=form, aforormset=aformset))
+        return super(AddPostView, self).form_valid(form)
+        
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated():
@@ -314,6 +335,26 @@ class EditPostView(FormChoiceMixin, generic.UpdateView):
         if not pybb_editable_by(post, self.request.user):
             raise PermissionDenied
         return post
+
+    def get_context_data(self, **kwargs):
+        ctx = super(EditPostView, self).get_context_data(**kwargs)
+        if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
+            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
+            ctx['aformset'] = AttachmentFormSet(instance=self.object)
+        return ctx
+
+    def form_valid(self, form):
+        if defaults.PYBB_ATTACHMENT_ENABLE:
+            self.object = form.save(commit=False)
+            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
+            aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            if aformset.is_valid():
+                self.object.save()
+                aformset.save()
+                return super(ModelFormMixin, self).form_valid(form)
+            else:
+                return self.render_to_response(self.get_context_data(form=form, aforormset=aformset))
+        return super(EditPostView, self).form_valid(form)
 
 
 

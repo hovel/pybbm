@@ -47,7 +47,7 @@
             </div>
         </td>
         <td class="content">
-            {% pybb_render_post post %}
+            {{ post.body_html|safe }}
             {% if not user.is_authenticated or user.get_profile.show_signatures %}
                 {% if post.user.get_profile.signature %}
                     <div class="signature">
@@ -67,9 +67,13 @@
                     {% endfor %}
                     {% endif %}
             {% endcomment %}
-
             <div class="post-related">
                 <a href="{% url pybb:add_post topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
+                <div class='attachments'>
+                    {% for attachment in post.attachments.all %}
+                        <a href="{{ attachment.file.url }}"><img src="{{ STATIC_URL }}pybb/img/attachment.png"> {{ attachment.size_display }}</a>
+                    {% endfor %}
+                </div>
             </div>
         </td>
     </tr>

@@ -111,19 +111,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 class AttachmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'size', 'content_type',
-                    'admin_url', 'admin_path',
-                    'admin_view_post', 'admin_edit_post']
-
-    def admin_url(self, obj):
-        return u'<a href="%s">view</span>' % (obj.get_absolute_url())
-    admin_url.allow_tags = True
-    admin_url.short_description = _('Path')
-
-    def admin_path(self, obj):
-        return u'<span title="%s">%s</span>' % (obj.get_absolute_path(), obj.path)
-    admin_path.allow_tags = True
-    admin_path.short_description = _('Path')
+    list_display = ['file', 'size', 'admin_view_post', 'admin_edit_post']
 
     def admin_view_post(self, obj):
         return u'<a href="%s">view</a>' % obj.post.get_absolute_url()

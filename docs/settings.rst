@@ -183,6 +183,9 @@ at `clean_body` method of `PostForm` Here you can do various checks based on use
 
 You can show user what is going wrong during validation.
 
+Anonymous/guest posting
+-----------------------
+
 PYBB_ENABLE_ANONYMOUS_POST
 ..........................
 
@@ -194,7 +197,28 @@ PYBB_ANONYMOUS_USERNAME
 
 Username for anonymous posts. If no user with this username exists it will be created on first anonymous post.
 
+Premoderation
+-------------
+
 PYBB_PREMODERATION
 ..................
 
 Filter for messages that require pre-moderation. See :doc:`Pre-moderation</premoderation>` for details.
+
+Attachments
+-----------
+
+PYBB_ATTACHMENT_ENABLE
+......................
+
+Enable attahcments for all users. `False` by default.
+
+PYBB_ATTACHMENT_SIZE_LIMIT
+..........................
+
+Maximum attachment limit (in bytes), `1024*1024` (1MB) by default.
+
+PYBB_ATTACHMENT_UPLOAD_TO
+.........................
+
+Directory in your media path for uploaded attacments. `pybb_upload/attachments` by default.

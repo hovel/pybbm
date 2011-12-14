@@ -11,7 +11,7 @@
 {% block content %}
     <h1>{% trans "Editing the post" %}</h1>
 
-    <form method="post" action=".">
+    <form method="post" enctype="multipart/form-data" action="{% url pybb:edit_post pk=object.pk %}">
         {% csrf_token %}
         <fieldset>
             <legend>{% trans "Editing the post" %}</legend>
@@ -21,6 +21,7 @@
                         <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
                     {% endfor %}
                 </div>
+                {% include "pybb/attachments_formset.html" %}
                 <p>
                 {% if PYBB_BUTTONS.save %}
                     <input type='image' src="{{ STATIC_URL }}{{ PYBB_BUTTONS.save }}" alt='{% trans "Save" %}'>
