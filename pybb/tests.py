@@ -342,7 +342,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.user.save()
         self.login_client()
         self.assertEqual(self.client.get(reverse('pybb:stick_topic', kwargs={'pk': self.topic.id}), follow=True).status_code, 200)
-        self.assertEqual(self.client.get(reverse('pybb:unstick_topic', kwargs={'pk': self.post.id}), follow=True).status_code, 200)
+        self.assertEqual(self.client.get(reverse('pybb:unstick_topic', kwargs={'pk': self.topic.id}), follow=True).status_code, 200)
 
     def test_delete_view(self):
         post = Post(topic=self.topic, user=self.user, body='test to delete')
@@ -580,6 +580,7 @@ class AttachmentTest(TestCase, SharedTestModule):
 
     def test_attachment(self):
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
+        self.login_client()
         response = self.client.get(add_post_url)
         values = self.get_form_values(response)
         values['body'] = 'test attachment'
