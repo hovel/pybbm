@@ -247,7 +247,7 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
                 aformset.save()
                 return super(ModelFormMixin, self).form_valid(form)
             else:
-                return self.render_to_response(self.get_context_data(form=form, aforormset=aformset))
+                return self.render_to_response(self.get_context_data(form=form, aformset=aformset))
         return super(AddPostView, self).form_valid(form)
         
     @method_decorator(csrf_protect)
