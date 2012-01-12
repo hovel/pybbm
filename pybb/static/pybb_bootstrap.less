@@ -1,0 +1,186 @@
+@import "pybb_twitter_bootstrap/bootstrap.less";
+
+body {
+    padding-top: -60px;
+}
+
+.post-preview{
+    .well
+}
+
+.forum-headline {
+    .alert-message;
+    .alert-message.block-message;
+    margin-top: 10px;
+}
+
+.main-block {
+  background-color: #f5f5f5;
+  margin-bottom: 30px;
+  padding: 60px;
+  .border-radius(6px)
+}
+
+.main-block h1{
+    font-size: 24px;
+}
+
+/* --- Topic/Forum table --- */
+.forum-description {
+    margin: 5px;
+    font-size: 80%;
+}
+
+.forum-row, .topic-row {
+    width: 100%;
+}
+
+.forum-name, .topic-name {
+    width: 40%;
+}
+
+.forum-topic-count, .forum-post-count, .topic-post-count, .topic-view-count {
+    width: 16%;
+    text-align: center;
+}
+
+.forum-last-post, .topic-last-post {
+    width: 20%;
+}
+
+/* --- Posts ---*/
+
+.posts {
+    clear: both;
+    width: 100%;
+}
+
+.post {
+    width: 99%;
+    margin: 3px 0 5px 0;
+    clear: both;
+}
+
+
+.post .info {
+    width: 200px;
+    border: 1px solid #CCC;
+    padding: 10px;
+}
+
+.post .info .extra-info {
+    font-size: 80%;
+    color: #CCC;
+}
+
+.post .content {
+    vertical-align: top;
+    padding: 10px;
+    border: 1px solid #CCC;
+}
+
+.post-header {
+   padding: 3px 0 3px 20px;
+   font-size: 80%;
+   background-color: #EEE;
+   border: 1px solid #CCC;
+}
+
+.post-related {
+    margin-top: 20px;
+}
+
+.post .info .author {
+    font-size: 110%;
+    padding: 5px;
+}
+
+.post .info .post-controls {
+    font-size: 80%;
+}
+
+.attachments-form {
+    padding-bottom: 15px;
+}
+
+.attachment-link {
+    border-bottom: 1px dotted;
+}
+
+blockquote{
+    margin-top: 5px;
+}
+
+/* --- Unread --- */
+
+.unread a{
+    font-weight: bold;
+}
+
+.state-indicator {
+    display: block;
+    float: left;
+    background-color: #CCC;
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin: 3px 5px;
+}
+
+.unread .state-indicator {
+    background-color: #369;
+}
+
+/* --- Signature --- */
+.signature {
+    color: #CCC;
+    margin-top: 15px;
+    border-top: 1px dotted #CCC;
+    display: block;
+}
+
+/* --- Moderation --- */
+.on-moderation {
+    background: #ffcccc;
+}
+
+/* --- Mini pagination --- */
+.mini-pagination {
+    padding: 3px 0 3px 10px;
+    font-size: 80%;
+}
+
+/* --- Controls --- */
+
+input[type=submit] {
+    .btn;
+    .btn.success;
+    &:hover{
+            color: #FFF;
+        }
+}
+
+.new-topic {
+    .btn;
+    .btn.primary;
+    &:hover{
+        color: #FFF;
+    }
+}
+
+ul.errorlist {
+    margin: 20px 0 0 0;
+    display: block;
+    clear: both;
+}
+
+.errorlist li{
+    .label;
+    .label.important;
+    color: white;
+}
+
+.post-form, .profile-edit {
+    .form-stacked;
+}
+

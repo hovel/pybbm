@@ -1,3 +1,17 @@
+0.6.0
+    * CSS file is now build with less
+    * You can disable default css inclusion in templates with PYBB_DISABLE_CSS settings
+      and manually include pybb.less file or build pybb.less to your styles.
+    * Default style and templates revisied, new templates system
+      is cleaned and fully compatible with twitter bootstrap
+      Be aware of next changes:
+          * pagination template moved from `templates/pybb/pagination/` to `templates/pybb`
+          * pagination template changed from plain links to ul/li list
+          * breadcrumb now live in separated template and changed from plain links to ul/li list
+          * `add_post_form.html` template renamed to `post_form.html`
+          * PYBB_FORUM_PAGE_SIZE default value changed from 10 to 20
+
+
 0.5.1
     * Attachment system now fully worked and ready for usage
 0.5.0

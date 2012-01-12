@@ -4,7 +4,6 @@
 {%block title %}{% trans "Forums" %}{% endblock title %}
 
 {%block head %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}pybb.css">
     {% block pybb_styles_extra %}{% endblock %}
     <!-- Feeds -->
     <link rel="alternate" type="application/atom+xml" href="{% url pybb:feed "posts" %}" title="{% trans "Latest posts on forum" %}" >
@@ -14,8 +13,7 @@
 {% endblock head %}
 
 {% block breadcrumb %}
-    {{ block.super }} »
-    <a href="{% url pybb:index %}">{% trans "Forum" %}</a>
+    {% include "pybb/breadcrumb.html" %}
 {% endblock %}
 
 {% block content %}{% endblock content %}

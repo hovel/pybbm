@@ -7,9 +7,9 @@
 
     <h2>Login on site</h2>
 
-    <form action="" method=POST>
+    <form action='' method=POST class="form-stacked">
     <table>
-            {{form.as_table}}
+            {{form.as_p}}
     </table>
     {% csrf_token %}
        <input type="submit">

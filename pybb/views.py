@@ -304,7 +304,7 @@ class ModeratePost(generic.RedirectView):
 class ProfileEditView(generic.UpdateView):
 
     template_name = 'pybb/edit_profile.html'
-    form = EditProfileForm
+    form_class = EditProfileForm
 
     def get_object(self, queryset=None):
         return self.request.user.get_profile()

@@ -1,6 +1,15 @@
 {% load i18n pybb_tags %}
 
-<form class="post-form" action="{% if forum %}{% url pybb:add_topic forum.pk %}{% else %}{% url pybb:add_post topic.pk %}{% endif %}" method="post" enctype="multipart/form-data">
+<form class="post-form" action="
+    {% if forum %}
+        {% url pybb:add_topic forum.pk %}
+    {% else %}
+        {% if topic %}
+            {% url pybb:add_post topic.pk %}
+        {% else %}
+            {% url pybb:edit_post pk=object.pk %}
+        {% endif %}
+    {% endif %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
        <fieldset>
             {{ form.as_p }}
