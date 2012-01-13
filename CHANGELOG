@@ -1,3 +1,5 @@
+0.6.1
+    * Russian translation updated
 0.6.0
     * CSS file is now build with less
     * You can disable default css inclusion in templates with PYBB_DISABLE_CSS settings
