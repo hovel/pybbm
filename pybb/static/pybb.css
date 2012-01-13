@@ -1,0 +1,227 @@
+/* Forum styles */
+
+legend {
+    font-size: 110%;
+}
+
+.controls {
+    padding: 3px 0 3px 0;
+}
+
+.category, .topic-list {
+    /*width: 100%;*/
+    padding: 5px;
+    margin: 3px;
+    clear: both;
+}
+
+.topic-list {
+    width: 99%;
+}
+
+.category-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.category-table td, .category-table th, .topic-list td, .topic-list th {
+    margin: 1px;
+    padding: 10px 5px 10px 5px;
+    vertical-align: middle;
+
+}
+
+.forum-description {
+    margin: 5px;
+    font-size: 80%;
+}
+
+.forum-row, .topic-row {
+    width: 100%;
+}
+
+.forum-name {
+    width: 40%;
+}
+
+.forum-topic-count, .forum-post-count {
+    width: 16%;
+    text-align: center;
+}
+
+.forum-last-post {
+    width: 20%;
+}
+
+#mark-all-as-read {
+    margin: 20px 0;
+    display: block;
+    width: 100%;
+    text-align: right;
+}
+
+.topic-name, .topic-post-count, .topic-view-count, .topic-last-post {
+    padding: 5px;
+    margin: 1px;
+    vertical-align: middle;
+}
+
+.topic-name {
+    width: 40%;
+}
+
+.topic-post-count, .topic-view-count {
+    width: 16%;
+    text-align: center;
+}
+
+.topic-last-post {
+    width: 20%;
+}
+
+.posts {
+    clear: both;
+    width: 100%;
+}
+
+.post {
+    width: 99%;
+    margin: 3px 0 5px 0;
+    clear: both;
+}
+
+
+.post .info {
+    width: 200px;
+    border: 1px solid #CCC;
+    padding: 10px;
+}
+
+.post .info .extra-info {
+    font-size: 80%;
+    color: #CCC;
+}
+
+.post .content {
+    vertical-align: top;
+    padding: 10px;
+    border: 1px solid #CCC;
+}
+
+.post-header {
+   padding: 3px 0 3px 20px;
+   font-size: 80%;
+   background-color: #EEE;
+   border: 1px solid #CCC;
+}
+
+.post-related {
+    margin-top: 20px;
+}
+
+.post .info .author {
+    font-size: 110%;
+    padding: 5px;
+}
+
+.post .info .post-controls {
+    font-size: 80%;
+}
+.pagination {
+    padding: 5px;
+    font-size: 110%;
+    text-align: center;
+}
+
+.mini-pagination {
+    padding: 3px 0 3px 10px;
+    font-size: 80%;
+}
+
+.pagination a, .pagination .page {
+    padding-left: 3px;
+}
+
+.pagination.mini a{
+    font-weight: normal;
+    padding-left: 2px;
+}
+
+.pages-of {
+    border-bottom: 1px dashed #e4e3e3;
+    cursor: pointer;
+}
+
+.pagination .first {
+    margin-right: 20px;
+}
+
+.pagination .last {
+    margin-left: 20px;
+}
+
+.forum-headline {
+    background-color: #EEE;
+    padding: 10px;
+    margin: 3px;
+    color: #777777;
+}
+/* ----- Quoting ---- */
+
+blockquote {
+    background: #FFF;
+    border: 1px solid #CCC;
+    margin-left: 20px;
+    padding: 5px;
+}
+
+/* ---- Special features --- */
+
+.updated-message {
+    font-size: 80%;
+    padding: 5px;
+    color: #CCC;
+}
+
+/* --- Unread --- */
+
+.unread a{
+    font-weight: bold;
+}
+
+.state-indicator {
+    display: block;
+    float: left;
+    background-color: #CCC;
+    height: 10px;
+    width: 10px;
+    border-radius: 5px;
+    margin: 3px 5px;
+}
+
+.unread .state-indicator {
+    background-color: #369;
+}
+
+/* --- Rank (if aviable) --- */
+
+.post .rank {
+    font-size: 80%;
+    padding: 3px 0;
+}
+
+/* --- Signature --- */
+
+.signature {
+    color: #CCC;
+    margin-top: 15px;
+    border-top: 1px dotted #CCC;
+    display: block;
+}
+
+
+/* --- Moderation --- */
+
+.on-moderation {
+    background: #ffcccc;
+}

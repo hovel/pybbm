@@ -49,8 +49,21 @@ Enable applications and edit settings
   It is highly recommended that you also enable `south` application for properly
   migrate future updates
 
-* Add `pybb.context_processors.processor` to your `settings.CONTEXT_PROCESSORS`
-* Add `pybb.middleware.PybbMiddleware` to your `settings.MIDDLEWARE_CLASSES`
+* Add `pybb.context_processors.processor` to your `settings.CONTEXT_PROCESSORS`::
+
+    CONTEXT_PROCESSORS = (
+        ...
+        'pybb.context_processors.processor',
+        ...
+        )
+
+* Add `pybb.middleware.PybbMiddleware` to your `settings.MIDDLEWARE_CLASSES`::
+
+    MIDDLEWARE_CLASSES = (
+        ...
+        'pybb.middleware.PybbMiddleware',
+        ...
+    )
 
 Enable PyBBM urlconf
 --------------------
