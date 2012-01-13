@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Регистрация на сайте
+    Register on site
 {% endblock %}
 
 
@@ -9,10 +9,8 @@
 
     <h2>Register</h2>
 
-    <form action='' method=POST>
-    <table>
-	    {{form.as_table}}
-    </table>
+    <form action='' method=POST class="form-stacked">
+    {{ form.as_p }}
     {% csrf_token %}
 	<input type=submit>
     </form>

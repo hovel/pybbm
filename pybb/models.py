@@ -131,6 +131,12 @@ class Forum(models.Model):
     def last_post(self):
         return self.get_last_post()
 
+    def get_parents(self):
+        """
+        Used in templates for breadcrumb building
+        """
+        return self.category,
+
 
 class Topic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
@@ -189,6 +195,12 @@ class Topic(models.Model):
         self.post_count = self.posts.count()
         self.updated = self.last_post.updated or self.last_post.created
         self.save()
+
+    def get_parents(self):
+        """
+        Used in templates for breadcrumb building
+        """
+        return self.forum.category, self.forum
 
 
 class RenderableItem(models.Model):
@@ -264,6 +276,11 @@ class Post(RenderableItem):
 
         self.topic.forum.update_counters()
 
+    def get_parents(self):
+        """
+        Used in templates for breadcrumb building
+        """
+        return self.topic.forum.category, self.topic.forum, self.topic,
 
 class PybbProfile(models.Model):
     """

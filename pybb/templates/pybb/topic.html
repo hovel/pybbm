@@ -9,16 +9,15 @@
 {% endblock head %}
 
 {% block breadcrumb %}
-{{ block.super }} »
-{% pybb_link topic.forum.category %} »
-{% pybb_link topic.forum %} »
-{{ topic }}
+    {% with object=topic %}
+        {% include "pybb/breadcrumb.html" %}
+    {% endwith %}
 {% endblock %}
 
 {% block content %}
     <h1>{{ topic.name }}</h1>
     {% with _('Posts') as label %}
-        {% include "pybb/pagination/pagination.html" %}
+        {% include "pybb/pagination.html" %}
     {% endwith %}
 
     <div class="posts">
@@ -34,7 +33,7 @@
     </div>
     <div>&nbsp;</div>
     {% with _('Posts') as label %}
-        {% include "pybb/pagination/pagination.html" %}
+        {% include "pybb/pagination.html" %}
     {% endwith %}
 
     {% if user.is_authenticated %}
@@ -70,9 +69,11 @@
     {% if user.is_authenticated or PYBB_ENABLE_ANONYMOUS_POST %}
         {% if not user.get_profile.is_banned %}
             {% if not topic.closed %}
-                {% include "pybb/add_post_form.html" %}
+                {% include "pybb/post_form.html" %}
             {% endif %}
         {% endif %}
+    {% else %}
+        <a href="{% url registration_register %}">{% trans "Register" %}</a> {% trans "or" %} <a href="{% url auth_login %}">{% trans "login" %}</a> {% trans "to create to post a reply" %}.
     {% endif %}
 
     {% if user.is_staff %}

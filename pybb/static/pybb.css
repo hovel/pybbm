@@ -166,19 +166,6 @@ legend {
     margin: 3px;
     color: #777777;
 }
-.post .attachments {
-    padding: 10px 0 5px;
-}
-
-.attachments-form {
-    padding: 5px;
-    background: #edecec;
-}
-
-.attachments-form td{
-    padding: 5px 0;
-}
-
 /* ----- Quoting ---- */
 
 blockquote {
@@ -237,42 +224,4 @@ blockquote {
 
 .on-moderation {
     background: #ffcccc;
-}
-
-/* ---------- Error styles ------- */
-ul.errorlist {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.errorlist li {
-    font-size: 12px !important;
-    display: block;
-    padding: 4px 5px 4px 25px;
-    margin: 0 0 3px 0;
-    border: 1px solid red;
-    color: white;
-    background: red 5px .3em no-repeat;
-}
-
-.errorlist li a {
-    color: white;
-    text-decoration: underline;
-}
-
-td ul.errorlist {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-td ul.errorlist li {
-    margin: 0 !important;
-}
-
-.errors {
-    background: #ffc;
-}
-
-.errors input, .errors select {
-    border: 1px solid red;
 }

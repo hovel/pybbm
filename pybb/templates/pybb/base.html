@@ -4,18 +4,19 @@
 {%block title %}{% trans "Forums" %}{% endblock title %}
 
 {%block head %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}pybb.css">
     {% block pybb_styles_extra %}{% endblock %}
     <!-- Feeds -->
     <link rel="alternate" type="application/atom+xml" href="{% url pybb:feed "posts" %}" title="{% trans "Latest posts on forum" %}" >
     <link rel="alternate" type="application/atom+xml" href="{% url pybb:feed "topics" %}" title="{% trans "Latest topics on forum" %}" >
     {% block pybb_scripts_extra %}{% endblock %}
     {% block pybb_head_extra %}{% endblock %}
+    {% if PYBB_ENABLE_SELF_CSS %}
+        <link rel="stylesheet" href="{{ STATIC_URL }}pybb.css" type="text/css" />
+    {% endif %}
 {% endblock head %}
 
 {% block breadcrumb %}
-    {{ block.super }} »
-    <a href="{% url pybb:index %}">{% trans "Forum" %}</a>
+    {% include "pybb/breadcrumb.html" %}
 {% endblock %}
 
 {% block content %}{% endblock content %}

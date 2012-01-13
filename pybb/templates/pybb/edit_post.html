@@ -10,33 +10,12 @@
 
 {% block content %}
     <h1>{% trans "Editing the post" %}</h1>
-
-    <form method="post" enctype="multipart/form-data" action="{% url pybb:edit_post pk=object.pk %}">
-        {% csrf_token %}
-        <fieldset>
-            <legend>{% trans "Editing the post" %}</legend>
-                {{ form.as_p }}
-                <div id='emoticons'>
-                    {% for smile, url in form.aviable_smiles.items %}
-                        <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
-                    {% endfor %}
-                </div>
-                {% include "pybb/attachments_formset.html" %}
-                <p>
-                {% if PYBB_BUTTONS.save %}
-                    <input type='image' src="{{ STATIC_URL }}{{ PYBB_BUTTONS.save }}" alt='{% trans "Save" %}'>
-                {% else %}
-                   <input type="submit" value="{% trans 'Save' %}" />
-                {% endif %}
-                </p>
-        </fieldset>
-    </form>
+    {% include "pybb/post_form.html" %}
 {% endblock content %}
 
 {% block breadcrumb %}
-    {{block.super}} »
-    {% pybb_link post.topic.forum.category %} »
-    {% pybb_link post.topic.forum %} »
-    {% pybb_link post.topic %} »
+    {% with extra_crumb="Edit post" %}
+        {% include "pybb/breadcrumb.html" %}
+    {% endwith %}
     
 {% endblock %}

@@ -7,6 +7,7 @@ Contents:
    :maxdepth: 2
 
    install
+   updates
    settings
    premoderation
    anonymous

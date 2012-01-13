@@ -8,6 +8,9 @@
     </div>
     <form method="post" action=".">
         {% csrf_token %}
-        <p><input type="submit" value="{% trans 'Yes, I am sure.' %}" /></p>
+        <p>
+            <a class='btn' href="{{ post.get_absolute_url }}">← {% trans "No, take me back" %}</a>
+            <input type="submit" class='btn danger' value="{% trans 'Yes, I am sure' %}" />
+        </p>
     </form>
 {% endblock content %}

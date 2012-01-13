@@ -1,9 +1,9 @@
 {% if PYBB_ATTACHMENT_ENABLE %}
     {% load i18n %}
     <div class='attachments-form'>
-        <h3>{% trans "Add attachments:" %}</h3>
+        <a class='attachment-link' onclick='$("div.attachments-form table").toggle();return false;' href='#'>{% trans "Add attachments" %}</a>
         {{ aformset.management_form }}
-            <table>
+            <table style='display:none;'>
             {% for form in aformset %}
                 <tr>
                     <td>{{ form.id }} {{ form.file }}</td>

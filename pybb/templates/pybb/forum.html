@@ -4,9 +4,9 @@
 {% block title %}{{ forum.name }}{% endblock title %}
 
 {% block breadcrumb %}
-{{ block.super }} »
-{% pybb_link forum.category %} »
-{{ forum }}
+    {% with forum as object %}
+        {% include "pybb/breadcrumb.html" %}
+    {% endwith %}
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,7 @@
             {{ forum.headline|safe }}
         </div>
     {% endif %}
-    {% include "pybb/pagination/pagination.html" %}
+    {% include "pybb/pagination.html" %}
     <table class='topic-list'>
         <tr class="topic-row head-row">
             <th class="topic-name">
@@ -36,7 +36,7 @@
             <tr class="topic-row {% if topic.sticky %} sticky {% endif %} {% cycle "odd" "even" %} {% if topic.on_moderation %} on-moderation {% endif %}">
                 <td class="topic-name{% if topic.unread %} unread {% endif %}">
                     <div class='state-indicator'></div>
-                    <a href='{{ topic.get_absolute_url }}'>{{ topic.name }}</a>
+                    <a href='{{ topic.get_absolute_url }}'>{{ topic.name|truncatewords:10 }}</a>
                     {% if topic.sticky %} &nbsp;[{% trans "Sticky" %}] {% endif %}
                     {% if topic.closed %} &nbsp;[{% trans "Closed" %}] {% endif %}
                     {% with topic|pybb_topic_inline_pagination as pages %}
@@ -70,11 +70,11 @@
             </tr>
         {%  endfor %}
     </table>
-    {% include "pybb/pagination/pagination.html" %}
+    {% include "pybb/pagination.html" %}
 
     {% if PYBB_ENABLE_ANONYMOUS_POST or not user.get_profile.is_banned %}
         <div class="controls">
-            <a href="{% url pybb:add_topic forum.id %}">
+            <a href="{% url pybb:add_topic forum.id %}" class='new-topic'>
                 {% if PYBB_BUTTONS.new_topic %}
                     <img src="{{ STATIC_URL }}{{ PYBB_BUTTONS.new_topic }}" alt='{% trans "New topic" %}'>
                 {% else %}
