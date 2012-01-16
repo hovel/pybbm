@@ -3,6 +3,10 @@
 
 {% block title %}{{ PYBB_DEFAULT_TITLE }}{% endblock title %}
 
+{% block breadcrumb %}
+    {% with extra_crumb="Forum" %}{% include "pybb/breadcrumb.html" %}{% endwith %}
+{% endblock %}
+
 {% block content %}
     {% if categories %}
         {% for category in categories %}
