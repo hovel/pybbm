@@ -1,7 +1,7 @@
 {% extends PYBB_TEMPLATE|default:"base.html" %}
 {% load i18n pybb_tags %}
 
-{%block title %}{% trans "Forums" %}{% endblock title %}
+{%block title %}{{ PYBB_DEFAULT_TITLE }}{% endblock title %}
 
 {%block head %}
     {% block pybb_styles_extra %}{% endblock %}

@@ -54,7 +54,8 @@ class FeaturesTest(TestCase, SharedTestModule):
         # Check index page
         url = reverse('pybb:index')
         response = self.client.get(url)
-        tree = html.fromstring(response.content)
+        parser = html.HTMLParser(encoding='utf8')
+        tree = html.fromstring(response.content, parser=parser)
         self.assertContains(response, u'foo')
         self.assertContains(response, self.forum.get_absolute_url())
         self.assertTrue(defaults.PYBB_DEFAULT_TITLE in tree.xpath('//title')[0].text_content())
