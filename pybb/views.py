@@ -40,7 +40,7 @@ def filter_hidden(request, queryset_or_model):
     if request.user.is_staff:
         return queryset
     if queryset_or_model is Category:
-        user_groups = request.user.groups.all()
+        user_groups = request.user.groups.all() or []
         queryset = queryset.filter(Q(groups__in=user_groups) |
                                    Q(groups__isnull=True))
     return queryset.filter(hidden=False)
