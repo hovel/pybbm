@@ -8,7 +8,7 @@ except ImportError:
     from sha import sha as sha1
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
@@ -61,6 +61,7 @@ class Category(models.Model):
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
         help_text = _('If checked, this category will be visible only for staff')
     )
+    groups = models.ManyToManyField(Group, blank=True, null=True, verbose_name=_('Groups'), help_text=_('Only users from these groups can see this category'))
 
     class Meta(object):
         ordering = ['position']
@@ -69,6 +70,15 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def has_access(self, user):
+        if self.groups.exists():
+            if user.is_authenticated(): 
+                    if not self.groups.filter(user__pk=user.pk).exists():
+                        return False
+            else:
+                return False
+        return True
 
     def forum_count(self):
         return self.forums.all().count()
