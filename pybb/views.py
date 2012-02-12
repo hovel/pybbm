@@ -51,7 +51,7 @@ class IndexView(generic.ListView):
         categories = list(ctx['categories'])
         for category in categories:
             category.forums_accessed = filter_hidden(self.request, category.forums.all())
-        ctx['categoires'] = categories
+        ctx['categories'] = categories
         return ctx
 
     def get_queryset(self):
