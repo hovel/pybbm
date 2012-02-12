@@ -97,6 +97,7 @@ class Forum(models.Model):
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
+    last_post = models.ForeignKey('Post', related_name='last_forum_post', blank=True, null=True)
 
     class Meta(object):
         ordering = ['position']
@@ -111,6 +112,7 @@ class Forum(models.Model):
         self.topic_count = Topic.objects.filter(forum=self).count()
         last_post = self.get_last_post()
         if last_post:
+            self.last_post = last_post
             self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
@@ -126,10 +128,6 @@ class Forum(models.Model):
             return self.posts.order_by('-created').select_related()[0]
         except IndexError:
             return None
-
-    @property
-    def last_post(self):
-        return self.get_last_post()
 
     def get_parents(self):
         """
@@ -156,6 +154,7 @@ class Topic(models.Model):
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
+    last_post = models.ForeignKey('Post', related_name='last_topic_post', blank=True, null=True)
 
     class Meta(object):
         ordering = ['-created']
@@ -179,10 +178,6 @@ class Topic(models.Model):
     def get_last_post(self):
         return self.posts.order_by('-created').select_related()[0]
 
-    @property
-    def last_post(self):
-        return self.get_last_post()
-
     def get_absolute_url(self):
         return reverse('pybb:topic', kwargs={'pk': self.id})
 
@@ -193,7 +188,10 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        self.updated = self.last_post.updated or self.last_post.created
+        last_post = self.get_last_post()
+        if last_post:
+            self.last_post = last_post
+            self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
     def get_parents(self):
