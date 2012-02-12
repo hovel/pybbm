@@ -1,0 +1,5 @@
+.idea
+*.pyc
+local_path.py
+settings_local.py
+
