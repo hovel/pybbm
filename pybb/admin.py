@@ -2,6 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, TopicReadTracker, ForumReadTracker
 
@@ -94,12 +95,11 @@ class PostAdmin(admin.ModelAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'time_zone', 'language']
     list_per_page = 20
-    raw_id_fields = ['user']
     ordering = ['-user']
     search_fields = ['user__username', 'user__first_name', 'user__last_name']
     fieldsets = (
         (None, {
-                'fields': ('user', 'time_zone', 'language')
+                'fields': ('time_zone', 'language')
                 }
          ),
         (_('Additional options'), {
@@ -128,8 +128,10 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Forum, ForumAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
-admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
+
+if settings.AUTH_PROFILE_MODULE == 'pybb.Profile':
+    admin.site.register(Profile, ProfileAdmin)
 
 # This can be used to debug read/unread trackers
 

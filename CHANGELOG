@@ -1,3 +1,8 @@
+0.6.3
+    * Changed pybbTimeNode to use get_profile # (thanks Shon)
+    * Disable admin for 'pybb.Profile' if different AUTH_PROFILE_MODULE is set
+    * Disable editing of 'user' field in Profile admin
+    * French translation (thanks Eric)
 0.6.1
     * Russian translation updated
 0.6.0
