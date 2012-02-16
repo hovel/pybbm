@@ -2,4 +2,5 @@
 *.pyc
 local_path.py
 settings_local.py
-
+dist
+*.egg-info
