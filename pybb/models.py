@@ -8,7 +8,7 @@ except ImportError:
     from sha import sha as sha1
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
@@ -61,6 +61,7 @@ class Category(models.Model):
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
         help_text = _('If checked, this category will be visible only for staff')
     )
+    groups = models.ManyToManyField(Group, blank=True, null=True, verbose_name=_('Groups'), help_text=_('Only users from these groups can see this category'))
 
     class Meta(object):
         ordering = ['position']
@@ -69,6 +70,15 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def has_access(self, user):
+        if self.groups.exists():
+            if user.is_authenticated(): 
+                    if not self.groups.filter(user__pk=user.pk).exists():
+                        return False
+            else:
+                return False
+        return True
 
     def forum_count(self):
         return self.forums.all().count()
@@ -97,6 +107,7 @@ class Forum(models.Model):
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
+    last_post = models.ForeignKey('Post', related_name='last_forum_post', blank=True, null=True)
 
     class Meta(object):
         ordering = ['position']
@@ -111,6 +122,7 @@ class Forum(models.Model):
         self.topic_count = Topic.objects.filter(forum=self).count()
         last_post = self.get_last_post()
         if last_post:
+            self.last_post = last_post
             self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
@@ -126,10 +138,6 @@ class Forum(models.Model):
             return self.posts.order_by('-created').select_related()[0]
         except IndexError:
             return None
-
-    @property
-    def last_post(self):
-        return self.get_last_post()
 
     def get_parents(self):
         """
@@ -156,6 +164,7 @@ class Topic(models.Model):
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
+    last_post = models.ForeignKey('Post', related_name='last_topic_post', blank=True, null=True)
 
     class Meta(object):
         ordering = ['-created']
@@ -179,10 +188,6 @@ class Topic(models.Model):
     def get_last_post(self):
         return self.posts.order_by('-created').select_related()[0]
 
-    @property
-    def last_post(self):
-        return self.get_last_post()
-
     def get_absolute_url(self):
         return reverse('pybb:topic', kwargs={'pk': self.id})
 
@@ -193,7 +198,10 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        self.updated = self.last_post.updated or self.last_post.created
+        last_post = self.get_last_post()
+        if last_post:
+            self.last_post = last_post
+            self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
     def get_parents(self):
@@ -301,7 +309,7 @@ class PybbProfile(models.Model):
         default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
         choices=settings.LANGUAGES,
-        default=dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]])
+        default=settings.LANGUAGE_CODE.split('-')[0])
     show_signatures = models.BooleanField(_('Show signatures'), blank=True,
         default=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)

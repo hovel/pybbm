@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<p>{% trans "User" %} {{ post.user.profile }} {% trans "replayed in topic that you subscribed." %} ({{ post.topic.name }})
+<ul class="unstyled">
+<li>{% trans "Link to post:" %} <a href="{{ post.get_absolute_url }}">http://{{site}}{{ post.get_absolute_url }}</a></li>
+<li>{% trans "Link to topic:" %} <a href="{{ post.topic.get_absolute_url }}">http://{{site}}{{ post.topic.get_absolute_url }}</a></li>
+</ul>
+
+-----
+<a href="{{ delete_url }}">{% trans "Unsubscribe from this topic" %}</a>
+</p>

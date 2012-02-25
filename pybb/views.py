@@ -39,6 +39,10 @@ def filter_hidden(request, queryset_or_model):
     queryset = _get_queryset(queryset_or_model)
     if request.user.is_staff:
         return queryset
+    if queryset_or_model is Category:
+        user_groups = request.user.groups.all() or []
+        queryset = queryset.filter(Q(groups__in=user_groups) |
+                                   Q(groups__isnull=True))
     return queryset.filter(hidden=False)
 
 class IndexView(generic.ListView):
@@ -87,7 +91,7 @@ class ForumView(generic.ListView):
 
     def get_queryset(self):
         self.forum = get_object_or_404(filter_hidden(self.request, Forum), pk=self.kwargs['pk'])
-        if self.forum.category.hidden and (not self.request.user.is_staff):
+        if (self.forum.category.hidden or not self.forum.category.has_access(self.request.user)) and (not self.request.user.is_staff):
             raise Http404()
         qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
         if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
@@ -110,7 +114,7 @@ class TopicView(generic.ListView):
            not pybb_topic_moderated_by(self.topic, self.request.user) and\
            not self.request.user == self.topic.user:
             raise PermissionDenied
-        if (self.topic.forum.hidden or self.topic.forum.category.hidden) and (not self.request.user.is_staff):
+        if (self.topic.forum.hidden or self.topic.forum.category.hidden or not self.topic.forum.category.has_access(self.request.user)) and (not self.request.user.is_staff):
             raise Http404()
         self.topic.views += 1
         self.topic.save()
@@ -199,9 +203,11 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
             if not self.user.has_perm('pybb.add_topic'):
                 raise PermissionDenied
             forum = get_object_or_404(filter_hidden(self.request, Forum), pk=self.kwargs['forum_id'])
+            if not forum.category.has_access(self.request.user) and (not self.request.user.is_staff):
+                raise Http404
         elif 'topic_id' in self.kwargs:
             topic = get_object_or_404(Topic, pk=self.kwargs['topic_id'])
-            if topic.forum.hidden and (not self.user.is_staff):
+            if (topic.forum.hidden or not topic.forum.category.has_access(self.request.user)) and (not self.user.is_staff):
                 raise Http404
             if topic.closed:
                 raise PermissionDenied

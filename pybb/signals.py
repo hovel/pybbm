@@ -7,14 +7,17 @@ from django.contrib.auth.models import User, Permission
 
 
 def post_saved(instance, **kwargs):
-    notify_topic_subscribers(instance)
-
-    if instance.user.get_profile().autosubscribe:
-        instance.topic.subscribers.add(instance.user)
-
-    profile = instance.user.get_profile()
-    profile.post_count = instance.user.posts.count()
-    profile.save()
+    created = kwargs.get('created')
+    
+    if created:
+        notify_topic_subscribers(instance)
+    
+        if instance.user.get_profile().autosubscribe:
+            instance.topic.subscribers.add(instance.user)
+    
+        profile = instance.user.get_profile()
+        profile.post_count = instance.user.posts.count()
+        profile.save()
 
 def user_saved(instance, created, **kwargs):
     if not created:
