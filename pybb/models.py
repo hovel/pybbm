@@ -309,7 +309,7 @@ class PybbProfile(models.Model):
         default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True,
         choices=settings.LANGUAGES,
-        default=dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]])
+        default=settings.LANGUAGE_CODE.split('-')[0])
     show_signatures = models.BooleanField(_('Show signatures'), blank=True,
         default=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
