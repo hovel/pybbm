@@ -132,7 +132,7 @@ class EditProfileForm(forms.ModelForm):
         fields = ['signature', 'time_zone', 'language',
                   'show_signatures', 'avatar']
 
-    signature = forms.CharField(widget=forms.Textarea(attrs={'rows': 2, 'cols:': 60}))
+    signature = forms.CharField(widget=forms.Textarea(attrs={'rows': 2, 'cols:': 60}), required=False)
 
     def clean_avatar(self):
         if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):

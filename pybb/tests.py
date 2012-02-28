@@ -87,6 +87,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.client.get(self.post.get_absolute_url(), follow=True)
         self.assertContains(response, 'test signature')
+        # Test empty signature
+        values['signature'] = ''
+        response = self.client.post(reverse('pybb:edit_profile'), data=values, follow=True)
+        self.assertEqual(len(response.context['form'].errors), 0)
 
     def test_pagination_and_topic_addition(self):
         for i in range(0, defaults.PYBB_FORUM_PAGE_SIZE + 3):
