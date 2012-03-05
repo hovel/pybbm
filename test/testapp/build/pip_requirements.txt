@@ -1,0 +1,11 @@
+Django
+Markdown
+South
+django-annoying
+django-pure-pagination
+django-registration
+postmarkup
+pybbm
+pytils
+sorl-thumbnail
+wsgiref
