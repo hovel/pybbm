@@ -1,0 +1,23 @@
+Six steps before run your test forum:
+
+1. Create virtual environment:
+
+    virtualenv --clear --no-site-packages /your/path/to/environment
+
+2. Activate virtual environment:
+
+    source /your/path/to/environment/bin/activate
+    
+3. Install project requirements:
+
+    pip install -r build/pip_requirements.txt
+    
+4. Sync project applications with test database:
+
+    ./manage.py syncdb --all
+    
+5. Run development server:
+
+    ./manage.py runserver
+
+6. Open browser tab with address 127.0.0.1:8000
