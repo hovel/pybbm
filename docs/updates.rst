@@ -1,6 +1,11 @@
 Updating PyBBM Version
 ======================
 
+0.6 -> 0.7
+----------
+
+If you use custom BODY_CLEANER in your settings, rename this setting to PYBB_BODY_VALIDATOR
+
 0.5 -> 0.6
 ----------
 

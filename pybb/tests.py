@@ -597,3 +597,18 @@ class AttachmentTest(TestCase, SharedTestModule):
     def tearDown(self):
         defaults.PYBB_ATTACHMENT_ENABLE = self.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
+
+class FiltersTest(TestCase, SharedTestModule):
+    def setUp(self):
+        self.create_user()
+        self.create_initial(post=False)
+
+    def test_filters(self):
+        add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
+        self.login_client()
+        response = self.client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = u'test\n \n \n\nmultiple empty lines\n'
+        response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Post.objects.all()[0].body, u'test\nmultiple empty lines')

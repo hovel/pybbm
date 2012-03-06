@@ -168,20 +168,49 @@ default is::
         'markdown': lambda text, username="": '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
     }
 
-BODY_CLEANER
-............
+Post cleaning/validation
+------------------------
+
+PYBB_BODY_CLEANERS
+..................
+
+List of 'cleaner' functions for body post to automatically remove undesirable content from posts.
+Cleaners are user-aware, so you can disable them for some types of users.
+
+Each function in list should accept `auth.User` instance as first argument and `string` instance as second, returned value will be sended to next function on list or saved and rendered as post body.
+
+for example this is enabled by default `rstrip_str` cleaner::
+
+    def rstrip_str(user, str):
+        if user.is_staff:
+            return str
+        return '\n'.join([s.rstrip() for s in str.splitlines()])
+
+default is::
+
+    [
+        pybb.util.rstrip_str, #Replace strings with spaces (tabs, etc..) only with newlines
+        pybb.util.filter_blanks, # Replace more than 3 blank lines with only 1 blank line
+    ]
+
+PYBB_BODY_VALIDATOR
+...................
 
 Extra form validation for body of post.
 
 Called as::
 
-    BODY_CLEANER(user, body)
+    PYBB_BODY_VALIDATOR(user, body)
 
 at `clean_body` method of `PostForm` Here you can do various checks based on user stats. E.g. allow moderators to post links and don't allow others. By raising::
 
     forms.ValidationError('Here Error Message')
 
 You can show user what is going wrong during validation.
+
+You can use it for example for time limit between posts, preventing URLs, ...
+
+default is None
 
 Anonymous/guest posting
 -----------------------

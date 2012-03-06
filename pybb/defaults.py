@@ -1,5 +1,6 @@
 from os.path import join
 from django.conf import settings
+from util import filter_blanks, rstrip_str
 
 PYBB_TOPIC_PAGE_SIZE = getattr(settings, 'PYBB_TOPIC_PAGE_SIZE', 10)
 PYBB_FORUM_PAGE_SIZE = getattr(settings, 'PYBB_FORUM_PAGE_SIZE', 20)
@@ -77,3 +78,7 @@ PYBB_ENABLE_ANONYMOUS_POST = getattr(settings, 'PYBB_ENABLE_ANONYMOUS_POST', Fal
 PYBB_ANONYMOUS_USERNAME = getattr(settings, 'PYBB_ANONYMOUS_USERNAME', 'Anonymous')
 PYBB_PREMODERATION = getattr(settings, 'PYBB_PREMODERATION', False)
 PYBB_ENABLE_SELF_CSS = getattr(settings, 'PYBB_ENABLE_SELF_CSS', False)
+
+PYBB_BODY_CLEANERS = getattr(settings, 'PYBB_BODY_CLEANERS', [rstrip_str, filter_blanks])
+
+PYBB_BODY_VALIDATOR = getattr(settings, 'PYBB_BODY_VALIDATOR', None)

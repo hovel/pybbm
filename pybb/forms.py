@@ -61,9 +61,11 @@ class PostForm(forms.ModelForm):
     def clean_body(self):
         body = self.cleaned_data['body']
         user = self.user or self.instance.user
-        BODY_CLEANER = getattr(settings, 'BODY_CLEANER', None)
-        if BODY_CLEANER:
-            BODY_CLEANER(user, body)
+        if defaults.PYBB_BODY_VALIDATOR:
+            defaults.PYBB_BODY_VALIDATOR(user, body)
+
+        for cleaner in defaults.PYBB_BODY_CLEANERS:
+            body = cleaner(user, body)
         return body
         
 

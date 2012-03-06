@@ -1,5 +1,5 @@
 PyBBM - Django forum solution
-=================================
+=============================
 
 Contents:
 
@@ -12,8 +12,9 @@ Contents:
    premoderation
    anonymous
    example
-   pybbmigrate
+   filters
    testing
+   pybbmigrate
    originalpybb
    problems
 
