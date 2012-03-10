@@ -55,7 +55,7 @@ class PostForm(forms.ModelForm):
             self.fields['name'].widget = forms.HiddenInput()
             self.fields['name'].required = False
 
-        self.aviable_smiles = defaults.PYBB_SMILES
+        self.available_smiles = defaults.PYBB_SMILES
         self.smiles_prefix = defaults.PYBB_SMILES_PREFIX
 
     def clean_body(self):
