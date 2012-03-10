@@ -6,15 +6,10 @@ from views import IndexView, CategoryView, ForumView, TopicView, AddPostView, Ed
     CloseTopicView, OpenTopicView, ModeratePost
 
 
-feeds = {
-    'posts': LastPosts,
-    'topics': LastTopics
-}
-
 urlpatterns = patterns('',
                        # Syndication feeds
-                       url('^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
-                           {'feed_dict': feeds}, name='feed'),
+                       url('^feeds/posts/$', LastPosts(), name='feed_posts'),
+                       url('^feeds/topics/$', LastTopics(), name='feed_topics'),
                        )
 
 urlpatterns += patterns('pybb.views',

@@ -227,11 +227,11 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 404)
 
         self.assertNotContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
-        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'topics'})), topic_hidden.get_absolute_url())
-        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'topics'})), topic_in_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed_topics')), topic_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed_topics')), topic_in_hidden.get_absolute_url())
 
-        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'posts'})), post_hidden.get_absolute_url())
-        self.assertNotContains(client.get(reverse('pybb:feed', kwargs={'url': 'posts'})), post_in_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed_posts')), post_hidden.get_absolute_url())
+        self.assertNotContains(client.get(reverse('pybb:feed_posts')), post_in_hidden.get_absolute_url())
         self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 404)
         self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 404)
 
