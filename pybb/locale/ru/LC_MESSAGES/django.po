@@ -458,7 +458,7 @@ msgid "Search"
 msgstr "Поиск"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:3
-msgid "replayed in topic that you subscribed."
+msgid "replied in topic to which you are subscribed."
 msgstr "ответил в теме, на которую вы подписаны"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:4
