@@ -1,3 +1,6 @@
+0.8.0
+    * Django 1.4 support (by djw)
+    * Fix misspellings (by djw)
 0.7.0
     * Code cleanup
     * Add post cleaners
