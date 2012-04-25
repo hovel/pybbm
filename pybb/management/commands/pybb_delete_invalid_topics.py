@@ -3,7 +3,8 @@ try:
     from django.utils.timezone import now, timedelta
 except:
     from datetime import timedelta
-    from datetime.datetime import now
+    from datetime import datetime
+    now = datetime.now
 
 
 from django.core.management.base import BaseCommand, CommandError

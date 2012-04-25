@@ -8,7 +8,8 @@ except ImportError:
 try:
     from django.utils.timezone import now
 except:
-    from datetime.datetime import now
+    from datetime import datetime
+    now = datetime.now
 
 from django.db import models
 from django.contrib.auth.models import User

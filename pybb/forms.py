@@ -4,7 +4,8 @@ import re
 try:
     from django.utils.timezone import now
 except:
-    from datetime.datetime import now
+    from datetime import datetime
+    now = datetime.now
 import inspect
 
 from django import forms
