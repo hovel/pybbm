@@ -1,5 +1,10 @@
 from optparse import make_option
-from datetime import datetime, timedelta
+try:
+    from django.utils.timezone import now, timedelta
+except:
+    from datetime import timedelta
+    from datetime.datetime import now
+
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
@@ -10,7 +15,7 @@ class Command(BaseCommand):
     help = 'Resave all posts.'
 
     def handle(self, *args, **kwargs):
-        check_time = datetime.now() - timedelta(seconds=10)
+        check_time = now() - timedelta(seconds=10)
         topics = Topic.objects.filter(created__lt=check_time)\
                       .annotate(counter=Count('posts'))\
                       .filter(counter=0)

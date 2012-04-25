@@ -1,4 +1,3 @@
-from datetime import datetime
 import os.path
 import uuid
 
@@ -6,6 +5,10 @@ try:
     from hashlib import sha1
 except ImportError:
     from sha import sha as sha1
+try:
+    from django.utils.timezone import now
+except:
+    from datetime.datetime import now
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -188,7 +191,7 @@ class Topic(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.created = datetime.now()
+            self.created = now()
         super(Topic, self).save(*args, **kwargs)
 
     def update_counters(self):
@@ -243,9 +246,9 @@ class Post(RenderableItem):
     __unicode__ = summary
 
     def save(self, *args, **kwargs):
-        now = datetime.now()
+        nnow = now()
         if self.created is None:
-            self.created = now
+            self.created = nnow
         self.render()
 
         new = self.pk is None
@@ -253,8 +256,8 @@ class Post(RenderableItem):
         super(Post, self).save(*args, **kwargs)
 
         if new:
-            self.topic.updated = now
-            self.topic.forum.updated = now
+            self.topic.updated = nnow
+            self.topic.forum.updated = nnow
         # If post is topic head and moderated, moderate topic too
         if self.topic.head == self and self.on_moderation == False and self.topic.on_moderation == True:
             self.topic.on_moderation = False

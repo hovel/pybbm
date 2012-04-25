@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
-import re
-from datetime import datetime, timedelta
+from datetime import timedelta
 import time as time
 
 try:
@@ -12,19 +11,21 @@ except ImportError:
     pytils_enabled = False
 
 from django import template
-from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
-from django.template import TextNode
 from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
-from django.utils.translation import ungettext
 
-from pybb.models import Topic, TopicReadTracker, ForumReadTracker
+from pybb.models import TopicReadTracker, ForumReadTracker
 
-from django.conf import settings
 from pybb import defaults
+
+try:
+    from django.utils.timezone import now, timedelta
+except:
+    from datetime import timedelta
+    from datetime.datetime import now
 
 
 register = template.Library()
@@ -49,8 +50,8 @@ class PybbTimeNode(template.Node):
     def render(self, context):
         context_time = self.time.resolve(context)
 
-        delta = datetime.now() - context_time
-        today = datetime.now().replace(hour=0, minute=0, second=0)
+        delta = now() - context_time
+        today = now().replace(hour=0, minute=0, second=0)
         yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
 

@@ -1,8 +1,10 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 import re
-from datetime import datetime
-import os.path
+try:
+    from django.utils.timezone import now
+except:
+    from datetime.datetime import now
 import inspect
 
 from django import forms
@@ -76,7 +78,7 @@ class PostForm(forms.ModelForm):
                 post.user = self.user
             if post.topic.head == post:
                 post.topic.name = self.cleaned_data['name']
-                post.topic.updated = datetime.now()
+                post.topic.updated = now()
                 post.topic.save()
             post.save()
             return post
