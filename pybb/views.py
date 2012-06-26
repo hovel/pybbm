@@ -158,18 +158,12 @@ class TopicView(generic.ListView):
             topic_mark, new = TopicReadTracker.objects.get_or_create(topic=topic, user=request.user)
             if not new:
                 topic_mark.save()
-                # Check, if there are any unread topics in forum
-            try:
-                if forum_mark:
-                    q_not_marked = Q(topicreadtracker=None, updated__gt=forum_mark.time_stamp)
-                else:
-                    q_not_marked = Q(topicreadtracker=None)
-                qs = Topic.objects.filter(Q(forum=topic.forum) & (Q(
-                        topicreadtracker__user=request.user,
-                        topicreadtracker__time_stamp__lt=F('updated'),
-                        ) | q_not_marked))
-                qs[0:1].get()
-            except Topic.DoesNotExist:
+
+            # Check, if there are any unread topics in forum
+            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
+                                                                Q(forum__forumreadtracker__user=request.user,forum__forumreadtracker__time_stamp__gt=F('updated')))
+            unread = Topic.objects.exclude(id__in=read)
+            if unread.count() == 0:
                 # Clear all topic marks for this forum, mark forum as readed
                 TopicReadTracker.objects.filter(
                         user=request.user,
