@@ -251,6 +251,9 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 2)
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
 
+        topic_3 = Topic.objects.order_by('-updated')[0]
+        self.assertEqual(topic_3.name, 'topic_3')
+
         # user_ann posts to topic_1, a topic they've already read, no new trackers should be created
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': topic_1.id})
         response = client_ann.get(add_post_url)
@@ -261,26 +264,12 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 2)
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
 
-        # Ok, here comes the bug.
-        # State: 
-        #   The forum now has three topics.  
-        #   user_bob has two unread topics, 'topic_1' and 'topic_3'.
-        #      This is because user_ann created a new topic and posted to an existing topic,
-        #      after user_bob got his forum read tracker.
-        # Action:
-        #   user_bob reads 'topic_1'
-        #
-        # Expected result:
+        # user_bob has two unread topics, 'topic_1' and 'topic_3'.
+        #   This is because user_ann created a new topic and posted to an existing topic,
+        #   after user_bob got his forum read tracker.
+        # user_bob reads 'topic_1'
         #   user_bob gets a new topic read tracker, and the existing forum read tracker stays the same.
         #   'topic_3' appears unread for user_bob
-        #
-        # Actual result:
-        #   Existing forum read tracker for user_bob is updated to now, causing 'topic_3' to appear read
-        #
-        # Reason for the bug:
-        #   When we try to query for unread topics, we incorrectly account for the ForumReadMarker by saying:
-        #   "topicreadtracker=None", this requires there are no other topic read trackers for any users for this topic,
-        #   and because user_ann has a topicreadmarker for topic_3, this query returns an empty set.  
         #
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         previous_time = ForumReadTracker.objects.all()[0].time_stamp
@@ -291,6 +280,17 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.all().count(), 3)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
 
+        # user_bob reads the last unread topic, 'topic_3'.
+        # user_bob's existing forum read tracker updates and his topic read tracker disappears
+        #
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+        previous_time = ForumReadTracker.objects.all()[0].time_stamp
+
+        client_bob.get(topic_3.get_absolute_url())
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+        self.assertGreater(ForumReadTracker.objects.all()[0].time_stamp, previous_time)
+        self.assertEqual(TopicReadTracker.objects.all().count(), 2)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 0)
 
     def test_hidden(self):
         client = Client()
