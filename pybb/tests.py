@@ -199,6 +199,98 @@ class FeaturesTest(TestCase, SharedTestModule):
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % f.get_absolute_url()))
 
+    def test_read_tracking_multi_user(self):
+        topic_1 = self.topic
+        topic_2 = Topic(name='topic_2', forum=self.forum, user=self.user)
+        topic_2.save()
+       
+        Post(topic=topic_2, user=self.user, body='one').save()
+
+        user_ann = User.objects.create_user('ann', 'ann@localhost', 'ann')
+        client_ann = Client()
+        client_ann.login(username='ann', password='ann')
+
+        user_bob = User.objects.create_user('bob', 'bob@localhost', 'bob')
+        client_bob = Client()
+        client_bob.login(username='bob', password='bob')
+
+
+        # Two topics, each with one post. everything is unread, so the db should reflect that:
+        self.assertEqual(TopicReadTracker.objects.all().count(), 0)
+        self.assertEqual(ForumReadTracker.objects.all().count(), 0)
+
+        # user_ann reads topic_1, she should get one topic read tracker, there should be no forum read trackers
+        client_ann.get(topic_1.get_absolute_url())
+        self.assertEqual(TopicReadTracker.objects.all().count(), 1)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 1)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_ann, topic=topic_1).count(), 1)
+        self.assertEqual(ForumReadTracker.objects.all().count(), 0)
+
+        # user_bob reads topic_1, he should get one topic read tracker, there should be no forum read trackers
+        client_bob.get(topic_1.get_absolute_url())
+        self.assertEqual(TopicReadTracker.objects.all().count(), 2)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_bob, topic=topic_1).count(), 1)
+
+        # user_bob reads topic_2, he should get a forum read tracker, 
+        #  there should be no topic read trackers for user_bob
+        client_bob.get(topic_2.get_absolute_url())
+        self.assertEqual(TopicReadTracker.objects.all().count(), 1)
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+        self.assertEqual(ForumReadTracker.objects.filter(user=user_bob).count(), 1)
+        self.assertEqual(ForumReadTracker.objects.filter(user=user_bob, forum=self.forum).count(), 1)
+
+        # user_ann creates topic_3, they should get a new topic read tracker in the db 
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
+        response = client_ann.get(add_topic_url)
+        values = self.get_form_values(response)
+        values['body'] = 'topic_3'
+        values['name'] = 'topic_3'
+        response = client_ann.post(add_topic_url, data=values, follow=True)
+        self.assertEqual(TopicReadTracker.objects.all().count(), 2)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 2)
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+
+        # user_ann posts to topic_1, a topic they've already read, no new trackers should be created
+        add_post_url = reverse('pybb:add_post', kwargs={'topic_id': topic_1.id})
+        response = client_ann.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test tracking'
+        response = client_ann.post(add_post_url, values, follow=True)
+        self.assertEqual(TopicReadTracker.objects.all().count(), 2)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 2)
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+
+        # Ok, here comes the bug.
+        # State: 
+        #   The forum now has three topics.  
+        #   user_bob has two unread topics, 'topic_1' and 'topic_3'.
+        #      This is because user_ann created a new topic and posted to an existing topic,
+        #      after user_bob got his forum read tracker.
+        # Action:
+        #   user_bob reads 'topic_1'
+        #
+        # Expected result:
+        #   user_bob gets a new topic read tracker, and the existing forum read tracker stays the same.
+        #   'topic_3' appears unread for user_bob
+        #
+        # Actual result:
+        #   Existing forum read tracker for user_bob is updated to now, causing 'topic_3' to appear read
+        #
+        # Reason for the bug:
+        #   When we try to query for unread topics, we incorrectly account for the ForumReadMarker by saying:
+        #   "topicreadtracker=None", this requires there are no other topic read trackers for any users for this topic,
+        #   and because user_ann has a topicreadmarker for topic_3, this query returns an empty set.  
+        #
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+        previous_time = ForumReadTracker.objects.all()[0].time_stamp
+
+        client_bob.get(topic_1.get_absolute_url())
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+        self.assertEqual(ForumReadTracker.objects.all()[0].time_stamp, previous_time)
+        self.assertEqual(TopicReadTracker.objects.all().count(), 3)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
+
 
     def test_hidden(self):
         client = Client()
