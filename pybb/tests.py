@@ -214,7 +214,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         client_bob = Client()
         client_bob.login(username='bob', password='bob')
 
-
         # Two topics, each with one post. everything is unread, so the db should reflect that:
         self.assertEqual(TopicReadTracker.objects.all().count(), 0)
         self.assertEqual(ForumReadTracker.objects.all().count(), 0)
@@ -291,6 +290,42 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertGreater(ForumReadTracker.objects.all()[0].time_stamp, previous_time)
         self.assertEqual(TopicReadTracker.objects.all().count(), 2)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 0)
+
+    def test_read_tracking_multi_forum(self):
+        topic_1 = self.topic
+        topic_2 = Topic(name='topic_2', forum=self.forum, user=self.user)
+        topic_2.save()
+       
+        Post(topic=topic_2, user=self.user, body='one').save()
+
+        forum_1 = self.forum
+        forum_2 = Forum(name='forum_2', description='bar', category=self.category)
+        forum_2.save()
+
+        Topic(name='garbage', forum=forum_2, user=self.user).save()
+
+        client = Client()
+        client.login(username='zeus', password='zeus')
+
+        # everything starts unread
+        self.assertEqual(ForumReadTracker.objects.all().count(), 0)
+        self.assertEqual(TopicReadTracker.objects.all().count(), 0)
+
+        # user reads topic_1, they should get one topic read tracker, there should be no forum read trackers
+        client.get(topic_1.get_absolute_url())
+        self.assertEqual(TopicReadTracker.objects.all().count(), 1)
+        self.assertEqual(TopicReadTracker.objects.filter(user=self.user).count(), 1)
+        self.assertEqual(TopicReadTracker.objects.filter(user=self.user, topic=topic_1).count(), 1)
+
+        # user reads topic_2, they should get a forum read tracker, 
+        #  there should be no topic read trackers for the user
+        client.get(topic_2.get_absolute_url())
+        self.assertEqual(TopicReadTracker.objects.all().count(), 0)
+        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
+        self.assertEqual(ForumReadTracker.objects.filter(user=self.user).count(), 1)
+        self.assertEqual(ForumReadTracker.objects.filter(user=self.user, forum=self.forum).count(), 1)
+
+
 
     def test_hidden(self):
         client = Client()
