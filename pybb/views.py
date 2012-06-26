@@ -162,7 +162,7 @@ class TopicView(generic.ListView):
             # Check, if there are any unread topics in forum
             read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
                                                                 Q(forum__forumreadtracker__user=request.user,forum__forumreadtracker__time_stamp__gt=F('updated')))
-            unread = Topic.objects.exclude(id__in=read)
+            unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
             if unread.count() == 0:
                 # Clear all topic marks for this forum, mark forum as readed
                 TopicReadTracker.objects.filter(
