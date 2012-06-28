@@ -1,3 +1,7 @@
+0.8.2
+    * Docs touchup
+    * Fix links to project
+    * Fix read/unread tracking (by lpetre)
 0.8.1
     * Support for django 1.4 timezones
 0.8.0

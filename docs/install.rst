@@ -25,6 +25,12 @@ All packages can be installed as a dependency for PyBBM if you install it with p
   but remmember, that using an ImageField in forms requires that the Python Imaging Library is
   installed (e.g. you should install it if you use buildin profile).
 
+Fresh project
+-------------
+
+If you start a new project based on pybbm, checkout pybbm.org website codebase form https://github.com/hovel/pybbm_org
+and skip next steps )
+
 Enable applications and edit settings
 -------------------------------------
 
