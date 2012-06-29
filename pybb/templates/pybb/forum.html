@@ -78,7 +78,7 @@
 
     {% if PYBB_ENABLE_ANONYMOUS_POST or not user.get_profile.is_banned %}
         <div class="controls">
-            <a href="{% url pybb:add_topic forum.id %}" class='new-topic'>
+            <a href="{% url pybb:add_topic forum.id %}" class='btn btn-primary btn-new-topic'>
                 {% if PYBB_BUTTONS.new_topic %}
                     <img src="{{ STATIC_URL }}{{ PYBB_BUTTONS.new_topic }}" alt='{% trans "New topic" %}'>
                 {% else %}

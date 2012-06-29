@@ -22,7 +22,7 @@
             {% if PYBB_BUTTONS.save %}
                 <input type='image' src="{{ STATIC_URL }}{{ PYBB_BUTTONS.save }}" alt='{% trans "Save" %}'>
             {% else %}
-               <input type="submit" value="{% trans 'Save' %}" />
+               <input type="submit" class="btn btn-primary btn-save" value="{% trans 'Save' %}" />
             {% endif %}
             </p>
         </fieldset>
