@@ -1,13 +1,16 @@
 {% load i18n pybb_tags thumbnail %}
 
 <a name="post-{{ post.id }}"></a> {# may be remove this string? #}
-<table class="post post-{{ rowcolors }} {% if post.on_moderation %}on-moderation{% endif %}" id="post-{{ post.id }}">
+<table class="table post post-{{ rowcolors }} {% if post.on_moderation %}on-moderation{% endif %}" id="post-{{ post.id }}">
+    <thead>
     <tr>
     <th class='post-header head-row' colspan="2">
         <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
         <span class="updated">{% pybb_time post.created %}</span>
     </th>
     </tr>
+    </thead>
+    <tbody>
     <tr>
         <td class="info">
             {% include "pybb/avatar.html" %}
@@ -39,7 +42,7 @@
                     <a href="{% url pybb:moderate_post pk=post.id %}">{% trans "Approve post" %}</a>
                     {% endif %}
                 {% endif %}
-            
+
                 {% if perms.pybb.change_post and user.is_staff %}
                     <a href="{% url admin:pybb_post_change post.id %}">{% trans 'Admin' %}</a>
                 {% endif %}
@@ -77,4 +80,5 @@
             </div>
         </td>
     </tr>
+    </tbody>
 </table>

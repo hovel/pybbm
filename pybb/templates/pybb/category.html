@@ -2,8 +2,9 @@
 
 <div class='category'>
     <h1>{{ category.name }} {% if category.hidden %}[{% trans "Hidden" %}]{% endif %}</h1>
-    <table class="category-table">
-        <tr class="forum-row head-row">
+    <table class="table category-table">
+        <thead>
+            <tr class="forum-row head-row">
                 <th class="forum-name">
                     {% trans "Forum" %}
                 </th>
@@ -16,7 +17,9 @@
                 <th class="forum-last-post">
                     {% trans "Last posts" %}
                 </th>
-        </tr>
+            </tr>
+        </thead>
+        <tbody>
         {% for forum in category.forums_accessed|pybb_forum_unread:user %}
             <tr class="forum-row">
                 <td class="forum-name {% if forum.unread %} unread {% endif %}">
@@ -42,5 +45,6 @@
             <h3>{% trans "No forums created" %}</h3>
             <a href="{% url admin:pybb_forum_add %}">{% trans "Add forum now" %}</a>
         {% endfor %}
+        </tbody>
     </table>
 </div>
