@@ -1,7 +1,7 @@
 /* --- Topic/Forum table --- */
 .forum-description {
     margin: 5px;
-    font-size: 80%;
+    font-size: @baseFontSize - 2;
 }
 
 .forum-row, .topic-row {
@@ -24,50 +24,51 @@
 /* --- Posts ---*/
 
 .posts {
-    clear: both;
-    width: 100%;
 }
 
 .post {
-    width: 99%;
     margin: 3px 0 5px 0;
-    clear: both;
-}
-
-
-.post .info {
-    width: 200px;
-    border: 1px solid #CCC;
-    padding: 10px;
-}
-
-.post .info .extra-info {
-    font-size: 80%;
-    color: #CCC;
-}
-
-.post .content {
-    vertical-align: top;
-    padding: 10px;
-    border: 1px solid #CCC;
 }
 
 .post-header {
    padding: 3px 0 3px 20px;
-   font-size: 80%;
-   background-color: #EEE;
-   border: 1px solid #CCC;
+   font-size: @baseFontSize - 2;
+   background-color: @tableBackgroundHover;
 }
+
+.post tbody tr:hover td {
+    background-color: inherit; // Cancel bootstrap's on-hover highlight
+}
+
+.post-info {
+    width: 200px;
+    padding: 10px;
+
+    .avatar {
+
+    }
+
+    .post-author {
+        font-size: @baseFontSize + 1;
+        padding: 5px 0;
+    }
+
+    .post-extra-info {
+        font-size: @baseFontSize - 2;
+        color: @grayLight;
+    }
+
+    .post-controls {
+        font-size: @baseFontSize - 2;
+    }
+}
+
+.post-content {
+    vertical-align: top;
+    padding: 10px;
+}
+
 
 .post-related {
     margin-top: 20px;
-}
-
-.post .info .author {
-    font-size: 110%;
-    padding: 5px;
-}
-
-.post .info .post-controls {
-    font-size: 80%;
 }

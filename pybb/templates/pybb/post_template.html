@@ -1,10 +1,10 @@
 {% load i18n pybb_tags thumbnail %}
 
 <a name="post-{{ post.id }}"></a> {# may be remove this string? #}
-<table class="table post post-{{ rowcolors }} {% if post.on_moderation %}on-moderation{% endif %}" id="post-{{ post.id }}">
-    <thead>
+<table class="table table-bordered post {% if post.on_moderation %}on-moderation{% endif %}" id="post-{{ post.id }}">
+    <thead class="post-header">
     <tr>
-    <th class='post-header head-row' colspan="2">
+    <th colspan="2">
         <a class="permalink" href="{{ post.get_absolute_url }}">#</a>
         <span class="updated">{% pybb_time post.created %}</span>
     </th>
@@ -12,9 +12,9 @@
     </thead>
     <tbody>
     <tr>
-        <td class="info">
+        <td class="post-info">
             {% include "pybb/avatar.html" %}
-            <div class="author"><a href="{{ post.user.get_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
+            <div class="post-author"><a href="{{ post.user.get_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
             {% if post.user.get_profile.rank %}
                 {% with post.user.get_profile as profile %}
                     <div class='rank'>
@@ -27,7 +27,7 @@
                 {% endwith %}
             {% endif %}
             {% if user.is_superuser %}
-                <div class="extra-info">{{ post.user_ip }}</div>
+                <div class="post-extra-info">{{ post.user_ip }}</div>
             {% endif %}
 
             <div class="post-controls">
@@ -49,7 +49,7 @@
 
             </div>
         </td>
-        <td class="content">
+        <td class="post-content">
             {{ post.body_html|safe }}
             {% if not user.is_authenticated or user.get_profile.show_signatures %}
                 {% if post.user.get_profile.signature %}
