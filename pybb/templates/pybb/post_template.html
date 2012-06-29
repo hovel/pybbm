@@ -53,7 +53,7 @@
             {{ post.body_html|safe }}
             {% if not user.is_authenticated or user.get_profile.show_signatures %}
                 {% if post.user.get_profile.signature %}
-                    <div class="signature">
+                    <div class="post-signature">
                         {{ post.user.get_profile.signature_html|safe }}
                     </div>
                 {% endif %}

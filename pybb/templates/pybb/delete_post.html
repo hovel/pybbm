@@ -3,7 +3,7 @@
 
 {% block content %}
     <h1>{% trans "Are you sure you want to delete this message?" %}</h1>
-    <div class="post-preview">
+    <div class="post-preview well">
         {{ post.body_html|safe }}
     </div>
     <form method="post" action=".">
