@@ -1,21 +1,23 @@
-#!/usr/bin/env python
-# vim:fileencoding=utf-8
-from time import sleep
+# -*- coding: utf-8 -*-
 
-__author__ = 'zeus'
+import time
 
-from django.test import TestCase
-from pybb.models import *
 from django.contrib.auth.models import User
-from django.test.client import Client
-from django.core.urlresolvers import reverse
-from pybb import defaults
 from django.core import mail
+from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.client import Client
 
 try:
     from lxml import html
-except:
+except ImportError:
     raise Exception('PyBB requires lxml for self testing')
+
+from pybb import defaults
+from pybb.models import *
+
+__author__ = 'zeus'
+
 
 class SharedTestModule(object):
 
@@ -143,7 +145,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
 
     def test_forum_updated(self):
-        sleep(1)
+        time.sleep(1)
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
         post = Post(topic=topic, user=self.user, body='one')
@@ -529,13 +531,13 @@ class FeaturesTest(TestCase, SharedTestModule):
     def test_topic_updated(self):
         topic = Topic(name='etopic', forum=self.forum, user=self.user)
         topic.save()
-        sleep(1)
+        time.sleep(1)
         post = Post(topic=topic, user=self.user, body='bbcode [b]test[b]')
         post.save()
         client = Client()
         response = client.get(self.forum.get_absolute_url())
         self.assertEqual(response.context['topic_list'][0], topic)
-        sleep(1)
+        time.sleep(1)
         post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
         post.save()
         client = Client()

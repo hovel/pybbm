@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 from django.utils import translation
-import defaults
-from signals import user_saved
 from django.db.models import ObjectDoesNotExist
+
+from pybb.signals import user_saved
+
 
 class PybbMiddleware(object):
     def process_request(self, request):

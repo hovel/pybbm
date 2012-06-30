@@ -1,5 +1,18 @@
+# -*- coding: utf-8 -*-
+
 import os.path
 import uuid
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.utils.html import strip_tags
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+
+from annoying.fields import AutoOneToOneField
+from sorl.thumbnail import ImageField
+from pybb.util import unescape
 
 try:
     from hashlib import sha1
@@ -12,24 +25,15 @@ except ImportError:
     import datetime
     tznow = datetime.datetime.now
 
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.utils.html import strip_tags
-from django.utils.translation import ugettext_lazy as _
+try:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ["^annoying\.fields\.JSONField"])
+    add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
+except ImportError:
+    pass
 
-from annoying.fields import AutoOneToOneField
-from sorl.thumbnail import ImageField
-from pybb.util import unescape
+from pybb import defaults
 
-import defaults
-
-from django.conf import settings
-
-from south.modelsinspector import add_introspection_rules
-
-add_introspection_rules([], ["^annoying\.fields\.JSONField"])
-add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),

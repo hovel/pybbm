@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
+
 import math
-from datetime import timedelta
-import time as time
-
-try:
-    import pytils
-
-    pytils_enabled = True
-except ImportError:
-    pytils_enabled = False
+import time
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -17,16 +10,22 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
 
-from pybb.models import TopicReadTracker, ForumReadTracker
-
-from pybb import defaults
+try:
+    from django.utils.timezone import timedelta
+    from django.utils.timezone import now as tznow
+except ImportError:
+    import datetime
+    from datetime import timedelta
+    tznow = datetime.datetime.now
 
 try:
-    from django.utils.timezone import now, timedelta
-except:
-    from datetime import timedelta
-    from datetime import datetime
-    now = datetime.now
+    import pytils
+    pytils_enabled = True
+except ImportError:
+    pytils_enabled = False
+
+from pybb.models import TopicReadTracker, ForumReadTracker
+from pybb import defaults
 
 
 register = template.Library()
@@ -51,8 +50,8 @@ class PybbTimeNode(template.Node):
     def render(self, context):
         context_time = self.time.resolve(context)
 
-        delta = now() - context_time
-        today = now().replace(hour=0, minute=0, second=0)
+        delta = tznow() - context_time
+        today = tznow().replace(hour=0, minute=0, second=0)
         yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
 

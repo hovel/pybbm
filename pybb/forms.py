@@ -1,20 +1,23 @@
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
+# -*- coding: utf-8 -*-
+
 import re
-try:
-    from django.utils.timezone import now
-except:
-    from datetime import datetime
-    now = datetime.now
 import inspect
 
 from django import forms
-from django.utils.translation import ugettext as _
-from pybb.models import Topic, Post, Profile, Attachment
-from django.contrib.auth.models import User
-
-import defaults
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
+
+try:
+    from django.utils.timezone import now as tznow
+except ImportError:
+    import datetime
+    tznow = datetime.datetime.now
+
+from pybb.models import Topic, Post, Profile, Attachment
+from pybb import defaults
 
 
 class AttachmentForm(forms.ModelForm):
@@ -78,7 +81,7 @@ class PostForm(forms.ModelForm):
                 post.user = self.user
             if post.topic.head == post:
                 post.topic.name = self.cleaned_data['name']
-                post.topic.updated = now()
+                post.topic.updated = tznow()
                 post.topic.save()
             post.save()
             return post
