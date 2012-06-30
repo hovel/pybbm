@@ -3,10 +3,10 @@
 
 {% block title %}{{ topic }}{% endblock %}
 
-{% block head %}
+{% block extra_script %}
     {{ block.super }}
-    {% include "pybb/markitup.html" %}
-{% endblock head %}
+    {% include "pybb/_markitup.html" %}
+{% endblock %}
 
 {% block breadcrumb %}
     {% with object=topic %}
