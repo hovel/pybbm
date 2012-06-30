@@ -63,7 +63,7 @@
 <div class="container">
 
     <!-- Main hero unit for a primary marketing message or call to action -->
-    <div class="main-block">
+    <div class="hero-unit">
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
@@ -79,7 +79,7 @@
             </div>
         {% endif %}
         {% if request.path == '/' %}
-            <div class='forum-headline'>
+            <div class='forum-headline alert alert-block'>
                 This is a default installation of PyBBModified with default theme from example.
             </div>
         {% endif %}

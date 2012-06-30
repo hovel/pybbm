@@ -6,7 +6,7 @@
     <form method="get" class="filter_form">
         {% csrf_token %}
         {{ form.query }}
-        <input type="submit" value="{% trans "Search" %}" />
+        <input type="submit" class="btn btn-primary" value="{% trans "Search" %}" />
     </form>
 <ul class="users">
     {% for profile in page.object_list %}
