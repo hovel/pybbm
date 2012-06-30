@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 import defaults
 from django.conf import settings
 
-MEDIA_ROOT = settings.MEDIA_ROOT
 
 class AttachmentForm(forms.ModelForm):
     class Meta(object):

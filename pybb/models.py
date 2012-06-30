@@ -25,12 +25,6 @@ import defaults
 
 from django.conf import settings
 
-# None is safe as default since django settings always have LANGUAGES, MEDIA_ROOT and SECRET_KEY variable set
-LANGUAGES = settings.LANGUAGES
-MEDIA_ROOT = settings.MEDIA_ROOT
-SECRET_KEY = settings.SECRET_KEY
-MEDIA_URL = settings.MEDIA_URL
-
 from south.modelsinspector import add_introspection_rules
 
 add_introspection_rules([], ["^annoying\.fields\.JSONField"])

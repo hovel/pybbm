@@ -45,9 +45,6 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
     ';)': 'wink.png'
 })
 
-#MEDIA_URL = getattr(settings, 'MEDIA_URL', '/media/')
-#STATIC_URL = getattr(settings, 'STATIC_URL', '')
-
 def smile_it(str):
     s = str
     for smile, url in PYBB_SMILES.items():
