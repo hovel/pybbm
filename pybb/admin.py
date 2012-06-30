@@ -1,10 +1,12 @@
 # -*- coding: utf-8
+
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, TopicReadTracker, ForumReadTracker
+from pybb.models import Category, Forum, Topic, Post, Profile, Attachment
+
 
 class ForumInlineAdmin(admin.TabularInline):
     model = Forum

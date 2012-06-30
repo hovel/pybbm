@@ -1,9 +1,9 @@
-#!/usr/bin/env python
-# vim:fileencoding=utf-8
+# -*- coding: utf-8 -*-
+
+from pybb import defaults
 
 __author__ = 'zeus'
 
-import defaults
 
 def processor(request):
     context = {}
