@@ -106,27 +106,12 @@ Will be used if user doesn't upload avatar
 Style
 -----
 
-You can use buildin templates with custom basic template and custom images for
-`save`, `new topic` and `submit` buttons.
+You can use builtin templates with custom basic template.
 
 PYBB_TEMPLATE
 .............
 
-Buildin templates will inherit this template (default "base.html")
-
-PYBB_BUTTONS
-............
-
-Dict with images for `save`, `new topic` and `submit` buttons.
-Empty by default.
-
-Example of usage::
-
-    PYBB_BUTTONS = {
-        'new_topic': 'images/new_topic.png',
-        'submit': 'images/submit.png',
-        'save': 'images/save.png'
-    }
+Builtin templates will inherit this template (default "base.html")
 
 
 Markup engines

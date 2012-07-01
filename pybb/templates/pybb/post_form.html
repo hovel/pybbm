@@ -18,12 +18,6 @@
                 {% endfor %}
             </div>
             {% include "pybb/attachments_formset.html" %}
-            <p class="submit">
-                {% if PYBB_BUTTONS.submit %}
-                    <input type='image' src="{{ STATIC_URL }}{{ PYBB_BUTTONS.submit }}" alt='{% trans "Submit" %}'>
-                {% else %}
-                   <input type="submit" value="{% trans 'Submit' %}" />
-                {% endif %}
-            </p>
+            <p class="submit">{% include "pybb/_button_submit.html" %}</p>
     </fieldset>
 </form>
