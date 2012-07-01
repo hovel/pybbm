@@ -1,9 +1,12 @@
-from django.conf.urls.defaults import *
+# -*- coding: utf-8 -*-
+
+from django.conf.urls import *
 
 from pybb.feeds import LastPosts, LastTopics
-from views import IndexView, CategoryView, ForumView, TopicView, AddPostView, EditPostView,\
-    UserView, PostView, ProfileEditView, DeletePostView, StickTopicView, UnstickTopicView,\
-    CloseTopicView, OpenTopicView, ModeratePost
+from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
+    AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
+    DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
+    OpenTopicView, ModeratePost
 
 
 urlpatterns = patterns('',

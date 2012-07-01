@@ -1,18 +1,20 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
 import math
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.db.models import F, Q
-from django.shortcuts import get_object_or_404, redirect, _get_queryset
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseForbidden
+
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.db.models import F, Q
+from django.forms.models import inlineformset_factory
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.shortcuts import get_object_or_404, redirect, _get_queryset
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
-from pure_pagination import Paginator
-from django.forms.models import inlineformset_factory, modelformset_factory
+from django.views.decorators.csrf import csrf_protect
 
 try:
     from django.views import generic
@@ -22,15 +24,14 @@ except ImportError:
     except ImportError:
         raise ImportError('If you using django version < 1.3 you should install django-cbv for pybb')
 
-
-from django.views.decorators.csrf import csrf_protect
+from pure_pagination import Paginator
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, Attachment
 from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentForm
 from pybb.templatetags.pybb_tags import pybb_editable_by
 from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
+from pybb import defaults
 
-import defaults
 
 def filter_hidden(request, queryset_or_model):
     """
