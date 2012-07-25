@@ -98,8 +98,6 @@ TEMPLATE_CONTEXT_PROCESSORS = [
 ]
 AUTH_PROFILE_MODULE = 'pybb.Profile'
 
-PYBB_TEMPLATE = "pybb/bootstrap_base.html"
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
