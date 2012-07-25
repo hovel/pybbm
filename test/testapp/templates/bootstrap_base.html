@@ -7,7 +7,7 @@
     <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link rel="stylesheet" href="{{ STATIC_URL }}pybb_bootstrap.css" type='text/css'>
+    <link rel="stylesheet" href="{{ STATIC_URL }}example_bootstrap.css" type='text/css'>
 
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/smoothness/jquery-ui.css" type="text/css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
@@ -74,7 +74,7 @@
         {% if request.path != '/' %}
             <div id="breadcrumb">
                 {% block breadcrumb %}
-                    <a href="/">Main</a>
+                    <a href="/test">Main</a>
                 {% endblock breadcrumb %}
             </div>
         {% endif %}
