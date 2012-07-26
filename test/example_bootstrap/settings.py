@@ -1,4 +1,4 @@
-# Django settings for testapp project.
+# Django settings for example_bootstrap project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -17,14 +17,17 @@ DATABASES = {
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = '/media/'
-STATIC_ROOT = ''
-STATIC_URL = '/media/static/'
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static_collected')
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
 
 LOGIN_REDIRECT_URL = '/profile/edit/'
-
-ADMIN_MEDIA_PREFIX = '/media/static/admin/'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -47,7 +50,7 @@ MIDDLEWARE_CLASSES = (
     'pybb.middleware.PybbMiddleware',
 )
 
-ROOT_URLCONF = 'testapp.urls'
+ROOT_URLCONF = 'example_bootstrap.urls'
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, 'templates')

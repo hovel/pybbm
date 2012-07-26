@@ -58,9 +58,9 @@ MIDDLEWARE_CLASSES = (
     'pybb.middleware.PybbMiddleware',
 )
 
-ROOT_URLCONF = 'example.urls'
+ROOT_URLCONF = 'example_thirdparty.urls'
 
-WSGI_APPLICATION = 'example.wsgi.application'
+WSGI_APPLICATION = 'example_thirdparty.wsgi.application'
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, 'templates')
