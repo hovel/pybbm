@@ -10,29 +10,40 @@ from pybb.models import Category, Forum, Topic, Post, Profile, Attachment
 
 class ForumInlineAdmin(admin.TabularInline):
     model = Forum
-    fields = ['name', 'hidden', 'position']
+    fields = ['name', 'position']
     extra = 0
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'position', 'hidden', 'forum_count']
+    list_display = ['name', 'position', 'forum_count']
     list_per_page = 20
     ordering = ['position']
     search_fields = ['name']
     list_editable = ['position']
-
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'position')
+        }
+            ),
+        (_('Access settings'), {
+            'classes': ('collapse',),
+            'fields': ('access_loggedin', 'access_restricted', 'access_groups', 'access_type')
+        }
+            ),
+    )
+    filter_horizontal = ('access_groups',)
     inlines = [ForumInlineAdmin]
 
 
 class ForumAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'hidden', 'position', 'topic_count']
+    list_display = ['name', 'category', 'position', 'topic_count']
     list_per_page = 20
     raw_id_fields = ['moderators']
     ordering = ['-category']
     search_fields = ['name', 'category__name']
-    list_editable = ['position', 'hidden']
+    list_editable = ['position',]
     fieldsets = (
         (None, {
-                'fields': ('category', 'name', 'hidden', 'position')
+                'fields': ('category', 'name', 'position')
                 }
          ),
         (_('Additional options'), {
@@ -40,7 +51,13 @@ class ForumAdmin(admin.ModelAdmin):
                 'fields': ('updated', 'description', 'headline', 'post_count', 'moderators')
                 }
             ),
+        (_('Access settings'), {
+                'classes': ('collapse',),
+                'fields': ('access_loggedin', 'access_restricted', 'access_groups', 'access_type')
+                }
+            ),
         )
+    filter_horizontal = ('access_groups',)
 
 
 class TopicAdmin(admin.ModelAdmin):
