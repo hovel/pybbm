@@ -33,14 +33,46 @@ from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 from pybb import defaults
 
 
+#def filter_hidden(request, queryset_or_model):
+#    """
+#    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
+#    """
+#    queryset = _get_queryset(queryset_or_model)
+#    if request.user.is_staff:
+#        return queryset
+#    return queryset.filter(hidden=False)
+
 def filter_hidden(request, queryset_or_model):
     """
     Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
     """
+    def check_groups(model, access_type):
+        check = False
+        for group in model.access_groups.all():
+            if group in request.user.groups.all():
+                if access_type:
+                    check = True
+                    break
+                else:
+                    check = True
+            else:
+                if not access_type:
+                    check = False
+                    break
+        return check
+
     queryset = _get_queryset(queryset_or_model)
+    if not request.user.is_authenticated():
+        queryset = queryset.exclude(access_loggedin=True)
     if request.user.is_staff:
         return queryset
-    return queryset.filter(hidden=False)
+    else:
+        for restricted in queryset.filter(access_restricted=True):
+            check = check_groups(restricted, restricted.access_type)
+            if not check:
+                queryset = queryset.exclude(id=restricted.id)
+    return queryset
+
 
 class IndexView(generic.ListView):
 

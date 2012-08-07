@@ -4,7 +4,7 @@ import os.path
 import uuid
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
@@ -59,11 +59,21 @@ def get_file_path(instance, filename, to='pybb/avatar'):
     return os.path.join(to, filename)
 
 class Category(models.Model):
+    PERM_TYPE_ANY = True
+    PERM_TYPE_ALL = False
+
+    PERM_TYPE_CHOICES = (
+        (PERM_TYPE_ANY, _('Any')),
+        (PERM_TYPE_ALL, _('All'))
+    )
+
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
-        help_text = _('If checked, this category will be visible only for staff')
-    )
+    access_loggedin = models.BooleanField(_('Logged in only'), help_text=_('Check it to grant access to this item to authenticated users only.'), db_index=True, default=True)
+    access_restricted = models.BooleanField(_('Restrict access to groups'), help_text=_('Check it to restrict user access to this item, using Django groups system.'), db_index=True, default=False)
+    access_groups = models.ManyToManyField(Group, verbose_name=_('Groups granting access'), blank=True)
+    access_type = models.BooleanField(_('Groups interpretation'), help_text='<b>Any</b> &mdash; user should have any of chosen groups. <b>All</b> &mdash; user should have all chosen groups.', choices=PERM_TYPE_CHOICES, default=PERM_TYPE_ANY)
+
 
     class Meta(object):
         ordering = ['position']
@@ -89,6 +99,14 @@ class Category(models.Model):
 
 
 class Forum(models.Model):
+    PERM_TYPE_ANY = True
+    PERM_TYPE_ALL = False
+
+    PERM_TYPE_CHOICES = (
+        (PERM_TYPE_ANY, _('Any')),
+        (PERM_TYPE_ALL, _('All'))
+    )
+
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -97,9 +115,12 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
+    access_loggedin = models.BooleanField(_('Logged in only'), help_text=_('Check it to grant access to this item to authenticated users only.'), db_index=True, default=True)
+    access_restricted = models.BooleanField(_('Restrict access to groups'), help_text=_('Check it to restrict user access to this item, using Django groups system.'), db_index=True, default=False)
+    access_groups = models.ManyToManyField(Group, verbose_name=_('Groups granting access'), blank=True)
+    access_type = models.BooleanField(_('Groups interpretation'), help_text='<b>Any</b> &mdash; user should have any of chosen groups. <b>All</b> &mdash; user should have all chosen groups.', choices=PERM_TYPE_CHOICES, default=PERM_TYPE_ANY)
 
     class Meta(object):
         ordering = ['position']
