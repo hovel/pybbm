@@ -16,4 +16,4 @@ This is a list of differences between PyBB and PyBBM as of mid 2011.
 * Views rewritten to use as many generics as possible
 * Number of external dependencies significantly reduced
 * `PyBBM well documented <http://readthedocs.org/projects/pybbm/>`_
-* PyBBM included example project for fast start.
+* PyBBM included two example projects for fast start.
