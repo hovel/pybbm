@@ -3,10 +3,10 @@
 
 {% block title %}{% trans "Editing the post" %}{% endblock title %}
 
-{% block head %}
+{% block extra_script %}
     {{ block.super }}
-    {% include "pybb/markitup.html" %}
-{% endblock head %}
+    {% include "pybb/_markitup.html" %}
+{% endblock %}
 
 {% block content %}
     <h1>{% trans "Editing the post" %}</h1>

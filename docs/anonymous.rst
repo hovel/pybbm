@@ -11,6 +11,6 @@ Enable `PYBB_ENABLE_ANONYMOUS_POST` and set `PYBB_ANONYMOUS_USERNAME` for enabli
     PYBB_ENABLE_ANONYMOUS_POST = True
     PYBB_ANONYMOUS_USERNAME = 'Anonymous'
 
-Carefully set `PYBB_ANONYMOUS_USERNAME`. It is better to create user with this username yourself raiser than left
+Carefully set `PYBB_ANONYMOUS_USERNAME`. It is better to create user with this username yourself rather than left
 it to autoregister on first anonymous post, somemone may want to use this username and register before first
-ananonymous post will be posted, in that case anonymous post will share same account with this user.
+anonymous post will be posted, in that case anonymous post will share same account with this user.

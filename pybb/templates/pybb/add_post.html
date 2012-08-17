@@ -1,10 +1,10 @@
 {% extends 'pybb/base.html' %}
 {% load i18n pybb_tags %}
 
-{% block head %}
+{% block extra_script %}
     {{ block.super }}
-    {% include "pybb/markitup.html" %}
-{% endblock head %}
+    {% include "pybb/_markitup.html" %}
+{% endblock %}
 
 {% block breadcrumb %}
     {% if forum %}
