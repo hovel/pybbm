@@ -1,40 +1,39 @@
+# -*- coding: utf-8 -*-
+
 import os.path
 import uuid
-
-try:
-    from hashlib import sha1
-except ImportError:
-    from sha import sha as sha1
-try:
-    from django.utils.timezone import now
-except:
-    from datetime import datetime
-    now = datetime.now
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from annoying.fields import AutoOneToOneField
 from sorl.thumbnail import ImageField
 from pybb.util import unescape
 
-import defaults
+try:
+    from hashlib import sha1
+except ImportError:
+    from sha import sha as sha1
 
-from django.conf import settings
+try:
+    from django.utils.timezone import now as tznow
+except ImportError:
+    import datetime
+    tznow = datetime.datetime.now
 
-# None is safe as default since django settings always have LANGUAGES, MEDIA_ROOT and SECRET_KEY variable set
-LANGUAGES = settings.LANGUAGES
-MEDIA_ROOT = settings.MEDIA_ROOT
-SECRET_KEY = settings.SECRET_KEY
-MEDIA_URL = settings.MEDIA_URL
+try:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ["^annoying\.fields\.JSONField"])
+    add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
+except ImportError:
+    pass
 
-from south.modelsinspector import add_introspection_rules
+from pybb import defaults
 
-add_introspection_rules([], ["^annoying\.fields\.JSONField"])
-add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
@@ -192,7 +191,7 @@ class Topic(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.created = now()
+            self.created = tznow()
         super(Topic, self).save(*args, **kwargs)
 
     def update_counters(self):
@@ -247,9 +246,9 @@ class Post(RenderableItem):
     __unicode__ = summary
 
     def save(self, *args, **kwargs):
-        nnow = now()
+        created_at = tznow()
         if self.created is None:
-            self.created = nnow
+            self.created = created_at
         self.render()
 
         new = self.pk is None
@@ -257,8 +256,8 @@ class Post(RenderableItem):
         super(Post, self).save(*args, **kwargs)
 
         if new:
-            self.topic.updated = nnow
-            self.topic.forum.updated = nnow
+            self.topic.updated = created_at
+            self.topic.forum.updated = created_at
         # If post is topic head and moderated, moderate topic too
         if self.topic.head == self and self.on_moderation == False and self.topic.on_moderation == True:
             self.topic.on_moderation = False

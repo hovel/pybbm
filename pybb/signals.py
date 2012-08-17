@@ -1,9 +1,11 @@
-from django.db.models.signals import post_save
+# -*- coding: utf-8 -*-
+
+from django.contrib.auth.models import User, Permission
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
+from django.db.models.signals import post_save
 
 from pybb.subscription import notify_topic_subscribers
-from django.contrib.auth.models import User, Permission
 
 
 def post_saved(instance, **kwargs):

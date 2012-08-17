@@ -1,6 +1,13 @@
 Updating PyBBM Version
 ======================
 
+0.8 -> 0.9
+----------
+
+The PYBB_BUTTONS setting is removed and overridable `pybb/_button_*.html`
+templates for `save`, `new topic` and `submit` buttons are provided in case
+css styling methods are not enough.
+
 0.6 -> 0.7
 ----------
 
