@@ -22,7 +22,7 @@ All packages can be installed as a dependency for PyBBM if you install it with p
     pip install pybbm
 
 * PIL (Python Imaging Library) is optional if you configure sorl.thumbnail to use different backend,
-  but remmember, that using an ImageField in forms requires that the Python Imaging Library is
+  but remember, that using an ImageField in forms requires that the Python Imaging Library is
   installed (e.g. you should install it if you use buildin profile).
 
 Fresh project
@@ -90,7 +90,7 @@ If you have no site profile, add next line to your settings::
     AUTH_PROFILE_MODULE = 'pybb.Profile'
 
 If you have custom site profile check that it inherits from `pybb.models.PybbProfile` or
-contains all field from this class.
+contains all fields from this class.
 
 Sync/Migrate database
 ---------------------
@@ -125,5 +125,5 @@ Check that:
 * your templates directory contains "base.html" template or you
   set custom base template with `PYBB_TEMPLATE`
 
-* Basic template contains at last `content` block.
+* Basic template contains at least `content` block.
 

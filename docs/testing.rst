@@ -11,7 +11,7 @@ PyBBM has good unittest coverage. To test PyBBM you need:
 * PIL
 * All PyBBM dependencies
 
-Go to to `test/testapp` directory and run::
+Go to `test/example_bootstrap` or `test/example_thirdparty` directory and run::
 
     python manage.py test pybb
 
@@ -19,6 +19,6 @@ Go to to `test/testapp` directory and run::
 Extending
 ---------
 
-Development happens on bitbucket, with main repo: http://bitbucket.org/zeus/pybb
+Development happens on bitbucket, with main repo: http://github.com/hovel/pybbm
 
 Forks, patch and pull changes ;)
