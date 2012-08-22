@@ -7,7 +7,7 @@
             {% for form in aformset %}
                 <tr>
                     <td>{{ form.id }} {{ form.file }}</td>
-                    <td>{{ form.DELETE }} {% trans "delete" %}</td>
+                    <td>{% if form.instance.pk %}{{ form.DELETE }} {% trans "delete" %}{% endif %}</td>
                 </tr>
             {% endfor %}
             </table>

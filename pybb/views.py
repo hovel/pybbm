@@ -8,7 +8,6 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
-from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, _get_queryset
 from django.utils.translation import ugettext_lazy as _
@@ -26,8 +25,8 @@ except ImportError:
 
 from pure_pagination import Paginator
 
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, Attachment
-from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentForm
+from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker
+from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet
 from pybb.templatetags.pybb_tags import pybb_editable_by
 from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 from pybb import defaults
@@ -138,7 +137,6 @@ class TopicView(generic.ListView):
         else:
             ctx['form'] = None
         if defaults.PYBB_ATTACHMENT_ENABLE:
-            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
             aformset = AttachmentFormSet()
             ctx['aformset'] = aformset
         if defaults.PYBB_FREEZE_FIRST_POST:
@@ -164,7 +162,7 @@ class TopicView(generic.ListView):
             read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
                                                                 Q(forum__forumreadtracker__user=request.user,forum__forumreadtracker__time_stamp__gt=F('updated')))
             unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
-            if unread.count() == 0:
+            if not unread.exists():
                 # Clear all topic marks for this forum, mark forum as readed
                 TopicReadTracker.objects.filter(
                         user=request.user,
@@ -188,20 +186,8 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
 
     def get_form_kwargs(self):
         ip = self.request.META.get('REMOTE_ADDR', '')
-        forum = None
-        topic = None
-        if 'forum_id' in self.kwargs:
-            if not self.user.has_perm('pybb.add_topic'):
-                raise PermissionDenied
-            forum = get_object_or_404(filter_hidden(self.request, Forum), pk=self.kwargs['forum_id'])
-        elif 'topic_id' in self.kwargs:
-            topic = get_object_or_404(Topic, pk=self.kwargs['topic_id'])
-            if topic.forum.hidden and (not self.user.is_staff):
-                raise Http404
-            if topic.closed:
-                raise PermissionDenied
         form_kwargs = super(AddPostView, self).get_form_kwargs()
-        form_kwargs.update(dict(topic=topic, forum=forum, user=self.user,
+        form_kwargs.update(dict(topic=self.topic, forum=self.forum, user=self.user,
                        ip=ip, initial={}))
         if 'quote_id' in self.request.GET:
             try:
@@ -214,8 +200,6 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
                 form_kwargs['initial']['body'] = quote
         if self.user.is_staff:
             form_kwargs['initial']['login'] = self.user.username
-        self.forum = forum
-        self.topic = topic
         return form_kwargs
 
     def get_context_data(self, **kwargs):
@@ -223,8 +207,8 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         ctx['forum'] = self.forum
         ctx['topic'] = self.topic
         if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
-            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
             ctx['aformset'] = AttachmentFormSet()
+        ctx['pollformset'] = PollAnswerFormSet()
         return ctx
 
     def get_success_url(self):
@@ -235,7 +219,6 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
     def form_valid(self, form):
         if defaults.PYBB_ATTACHMENT_ENABLE:
             self.object = form.save(commit=False)
-            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
             aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
             if aformset.is_valid():
                 self.object.save()
@@ -255,8 +238,20 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
             else:
                 from django.contrib.auth.views import redirect_to_login
                 return redirect_to_login(request.get_full_path())
+
         if not self.user.has_perm('pybb.add_post'):
             raise PermissionDenied
+
+        self.forum = None
+        self.topic = None
+        if 'forum_id' in kwargs:
+            self.forum = get_object_or_404(filter_hidden(request, Forum), pk=kwargs['forum_id'])
+        elif 'topic_id' in kwargs:
+            self.topic = get_object_or_404(Topic, pk=kwargs['topic_id'])
+            if self.topic.forum.hidden and (not self.user.is_staff):
+                raise Http404
+            if self.topic.closed:
+                raise PermissionDenied
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
 class UserView(generic.DetailView):
@@ -334,14 +329,12 @@ class EditPostView(FormChoiceMixin, generic.UpdateView):
     def get_context_data(self, **kwargs):
         ctx = super(EditPostView, self).get_context_data(**kwargs)
         if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
-            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
             ctx['aformset'] = AttachmentFormSet(instance=self.object)
         return ctx
 
     def form_valid(self, form):
         if defaults.PYBB_ATTACHMENT_ENABLE:
             self.object = form.save(commit=False)
-            AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
             aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
             if aformset.is_valid():
                 self.object.save()

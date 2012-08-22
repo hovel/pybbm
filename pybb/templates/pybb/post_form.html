@@ -9,15 +9,21 @@
             {% url pybb:edit_post pk=object.pk %}
         {% endif %}
     {% endif %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-       <fieldset>
-            {{ form.as_p }}
-            <div id='emoticons'>
-                {% for smile, url in form.available_smiles.items %}
-                    <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
-                {% endfor %}
-            </div>
-            {% include "pybb/attachments_formset.html" %}
-            <p class="submit">{% include "pybb/_button_submit.html" %}</p>
-    </fieldset>
+  {% csrf_token %}
+  <fieldset>
+    {% if form.name %} {{ form.name.errors }} {{ form.name.label_tag }} {{ form.name }} {% endif %}
+    {% if form.login %} {{ form.login.errors }} {{ form.login.label_tag }} {{ form.login }}  {% endif %}
+    {% if form.body %} {{ form.body.errors }} {{ form.body.label_tag }} {{ form.body }}  {% endif %}
+    <div id='emoticons'>
+      {% for smile, url in form.available_smiles.items %}
+        <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
+      {% endfor %}
+    </div>
+    {% if forum and not form.instance.ok %}
+      {{ form.body.errors }} {{ form.poll_type.label_tag }} {{ form.poll_type }}
+      {% include "pybb/pollanswer_formset.html" %}
+    {% endif %}
+    {% include "pybb/attachments_formset.html" %}
+    <p class="submit">{% include "pybb/_button_submit.html" %}</p>
+  </fieldset>
 </form>

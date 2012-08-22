@@ -247,6 +247,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         values = self.get_form_values(response)
         values['body'] = 'topic_3'
         values['name'] = 'topic_3'
+        values['poll_type'] = 0
         response = client_ann.post(add_topic_url, data=values, follow=True)
         self.assertEqual(TopicReadTracker.objects.all().count(), 2)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 2)
@@ -677,6 +678,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         values = self.get_form_values(response)
         values['body'] = 'new topic test'
         values['name'] = 'new topic name'
+        values['poll_type'] = 0
         response = self.client.post(add_topic_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'new topic test')

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.forms.models import inlineformset_factory
 
 import re
 import inspect
@@ -14,25 +15,37 @@ try:
     from django.utils.timezone import now as tznow
 except ImportError:
     import datetime
+
     tznow = datetime.datetime.now
 
-from pybb.models import Topic, Post, Profile, Attachment
+from pybb.models import Topic, Post, Profile, Attachment, PollAnswer
 from pybb import defaults
 
 
 class AttachmentForm(forms.ModelForm):
     class Meta(object):
         model = Attachment
-        fields = ('file',)
+        fields = ('file', )
 
     def clean_file(self):
         if self.cleaned_data['file'].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
-                raise forms.ValidationError(_('Attachment is too big'))
+            raise forms.ValidationError(_('Attachment is too big'))
         return self.cleaned_data['file']
 
-    
+AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
+
+
+class PollAnswerForm(forms.ModelForm):
+    class Meta:
+        model = PollAnswer
+        fields = ('text', )
+
+PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=1, form=PollAnswerForm)
+
+
 class PostForm(forms.ModelForm):
     name = forms.CharField(label=_('Subject'))
+    poll_type = forms.ChoiceField(label=_('Poll type'), choices=Topic.POLL_TYPE_CHOICES)
 
     class Meta(object):
         model = Post
@@ -48,17 +61,17 @@ class PostForm(forms.ModelForm):
         self.forum = kwargs.pop('forum', None)
         if not (self.topic or self.forum or ('instance' in kwargs)):
             raise ValueError('You should provide topic, forum or instance')
-        #Handle topic subject if editing topic head
+            #Handle topic subject if editing topic head
         if ('instance' in kwargs) and kwargs['instance'] and (kwargs['instance'].topic.head == kwargs['instance']):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
 
         super(PostForm, self).__init__(**kwargs)
 
-        self.fields.keyOrder = ['name', 'body']
-
         if not (self.forum or (self.instance.pk and (self.instance.topic.head == self.instance))):
-            self.fields['name'].widget = forms.HiddenInput()
-            self.fields['name'].required = False
+            del self.fields['name']
+
+        if not (self.forum and not self.instance.pk):
+            del self.fields['poll_type']
 
         self.available_smiles = defaults.PYBB_SMILES
         self.smiles_prefix = defaults.PYBB_SMILES_PREFIX
@@ -72,7 +85,7 @@ class PostForm(forms.ModelForm):
         for cleaner in defaults.PYBB_BODY_CLEANERS:
             body = cleaner(user, body)
         return body
-        
+
 
     def save(self, commit=True):
         if self.instance.pk:
@@ -87,22 +100,23 @@ class PostForm(forms.ModelForm):
             return post
         allow_post = True
         if defaults.PYBB_PREMODERATION:
-                allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'])
+            allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'])
         if self.forum:
             topic = Topic(forum=self.forum,
-                          user=self.user,
-                          name=self.cleaned_data['name'])
+                user=self.user,
+                name=self.cleaned_data['name'])
             if not allow_post:
                 topic.on_moderation = True
             topic.save()
         else:
             topic = self.topic
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
-                    body=self.cleaned_data['body'])
+            body=self.cleaned_data['body'])
         if not allow_post:
             post.on_moderation = True
         post.save()
         return post
+
 
 class AdminPostForm(PostForm):
     """
@@ -117,14 +131,13 @@ class AdminPostForm(PostForm):
         if 'instance' in kwargs and kwargs['instance']:
             kwargs.setdefault('initial', {}).update({'login': kwargs['instance'].user.username})
         super(AdminPostForm, self).__init__(**kwargs)
-        self.fields.keyOrder = ['name', 'login', 'body']
 
     def save(self, *args, **kwargs):
         try:
             self.user = User.objects.filter(username=self.cleaned_data['login']).get()
         except User.DoesNotExist:
             self.user = User.objects.create_user(self.cleaned_data['login'],
-                                                 '%s@example.com' % self.cleaned_data['login'])
+                '%s@example.com' % self.cleaned_data['login'])
         return super(AdminPostForm, self).save(*args, **kwargs)
 
 try:

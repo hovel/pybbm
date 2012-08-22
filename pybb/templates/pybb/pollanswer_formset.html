@@ -1,0 +1,13 @@
+{% load i18n %}
+<div>
+  {% trans 'Poll answers' %}
+  {{ pollformset.management_form }}
+  <table>
+    {% for form in pollformset %}
+      <tr>
+        <td>{{ form.id }} {{ form.text }}</td>
+        <td>{% if form.instance.pk %}{{ form.DELETE }} {% trans "delete" %}{% endif %}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
