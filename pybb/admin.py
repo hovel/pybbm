@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from pybb.models import Category, Forum, Topic, Post, Profile, Attachment
+from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer
 
 
 class ForumInlineAdmin(admin.TabularInline):
@@ -43,6 +43,12 @@ class ForumAdmin(admin.ModelAdmin):
         )
 
 
+class PollAnswerAdmin(admin.TabularInline):
+    model = PollAnswer
+    fields = ['text', ]
+    extra = 0
+
+
 class TopicAdmin(admin.ModelAdmin):
     list_display = ['name', 'forum', 'created', 'head', 'post_count']
     list_per_page = 20
@@ -61,6 +67,7 @@ class TopicAdmin(admin.ModelAdmin):
                 }
          ),
         )
+    inlines = [PollAnswerAdmin, ]
 
 class TopicReadTrackerAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'time_stamp']
