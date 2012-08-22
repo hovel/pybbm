@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import time
+import os
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -562,12 +563,11 @@ class AnonymousTest(TestCase, SharedTestModule):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = True
         defaults.PYBB_ANONYMOUS_USERNAME = 'Anonymous'
         self.user = User.objects.create_user('Anonymous', 'Anonymous@localhost', 'Anonymous')
-        self.category = Category(name='foo')
-        self.category.save()
-        self.forum = Forum(name='xfoo', description='bar', category=self.category)
-        self.forum.save()
-        self.topic = Topic(name='etopic', forum=self.forum, user=self.user)
-        self.topic.save()
+        self.category = Category.objects.create(name='foo')
+        self.forum = Forum.objects.create(name='xfoo', description='bar', category=self.category)
+        self.topic = Topic.objects.create(name='etopic', forum=self.forum, user=self.user)
+        add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
+        self.user.user_permissions.add(add_post_permission)
 
     def test_anonymous_posting(self):
         post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
