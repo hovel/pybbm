@@ -1,6 +1,13 @@
 Updating PyBBM Version
 ======================
 
+0.9 -> 0.10
+-----------
+
+* Templates are updated for 2nd version of twitter bootstrap
+* Example app now splitted with two versions, in one case you have buildin twitter bootstrap, in second case you just use pinax-theme-bootstrap and django-forms-bootstrap that provides bootstrap for you and simplify templates development.
+
+
 0.8 -> 0.9
 ----------
 
