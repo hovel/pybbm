@@ -120,9 +120,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         values = self.get_form_values(response)
         values['body'] = 'new topic test'
         values['name'] = 'new topic name'
+        values['poll_type'] = 0
         response = self.client.post(add_topic_url, data=values, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'new topic test')
+        self.assertTrue(Topic.objects.filter(name='new topic name').exists())
 
     def test_post_deletion(self):
         post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
@@ -723,11 +724,42 @@ class AttachmentTest(TestCase, SharedTestModule):
         values['attachments-0-file'] = self.file
         response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'test attachment')
+        self.assertTrue(Post.objects.filter(body='test attachment').exists())
 
     def tearDown(self):
         defaults.PYBB_ATTACHMENT_ENABLE = self.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
+
+class PollTest(TestCase, SharedTestModule):
+    def setUp(self):
+        self.create_user()
+        self.create_initial()
+
+    def test_poll_answers_add(self):
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
+        self.login_client()
+        response = self.client.get(add_topic_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test poll body'
+        values['name'] = 'test poll name'
+        values['poll_type'] = 0
+        values['poll_answers-0-text'] = 'answer1'
+        values['poll_answers-1-text'] = 'answer2'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_topic = Topic.objects.get(name='test poll name')
+        self.assertFalse(PollAnswer.objects.filter(topic=new_topic).exists())
+
+        values['name'] = 'test poll name 1'
+        values['poll_type'] = 1
+        values['poll_answers-0-text'] = 'answer1'
+        values['poll_answers-1-text'] = 'answer2'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_topic = Topic.objects.get(name='test poll name 1')
+        self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
 
 class FiltersTest(TestCase, SharedTestModule):
     def setUp(self):

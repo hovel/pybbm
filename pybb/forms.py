@@ -102,9 +102,12 @@ class PostForm(forms.ModelForm):
         if defaults.PYBB_PREMODERATION:
             allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'])
         if self.forum:
-            topic = Topic(forum=self.forum,
+            topic = Topic(
+                forum=self.forum,
                 user=self.user,
-                name=self.cleaned_data['name'])
+                name=self.cleaned_data['name'],
+                poll_type=int(self.cleaned_data['poll_type']),
+            )
             if not allow_post:
                 topic.on_moderation = True
             topic.save()

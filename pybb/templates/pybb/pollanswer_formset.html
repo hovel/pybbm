@@ -1,7 +1,6 @@
 {% load i18n %}
-<div>
+<div id="poll-answers-formset" style="display: none;">
   {% trans 'Poll answers' %}
-  {{ pollformset.management_form }}
   <table>
     {% for form in pollformset %}
       <tr>
@@ -10,4 +9,29 @@
       </tr>
     {% endfor %}
   </table>
+  {{ pollformset.management_form }}
 </div>
+
+<script type="text/javascript">
+  $(function () {
+    $('div#poll-answers-formset table tr').formset({
+      deleteText:'{% trans 'remove answer' %}',
+      addText:'{% trans 'add answer' %}',
+      prefix: 'poll_answers'
+    });
+
+    var toggle_poll_answers_formset = function (poll_type) {
+      if (poll_type == 0) {
+        $('div#poll-answers-formset').hide();
+      } else {
+        $('div#poll-answers-formset').show();
+      }
+    }
+
+    $('#id_poll_type').each(function () {
+      toggle_poll_answers_formset($(this).val());
+    }).change(function () {
+      toggle_poll_answers_formset($(this).val());
+    });
+  });
+</script>

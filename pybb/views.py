@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.db import transaction
 from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, _get_queryset
@@ -208,7 +209,8 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         ctx['topic'] = self.topic
         if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
             ctx['aformset'] = AttachmentFormSet()
-        ctx['pollformset'] = PollAnswerFormSet()
+        if 'pollformset' not in kwargs:
+            ctx['pollformset'] = PollAnswerFormSet()
         return ctx
 
     def get_success_url(self):
@@ -217,17 +219,35 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         return super(AddPostView, self).get_success_url()
 
     def form_valid(self, form):
-        if defaults.PYBB_ATTACHMENT_ENABLE:
-            self.object = form.save(commit=False)
-            aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
-            if aformset.is_valid():
-                self.object.save()
-                aformset.save()
+        success = True
+        with transaction.commit_manually():
+            self.object = form.save()
+
+            if defaults.PYBB_ATTACHMENT_ENABLE:
+                aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+                if aformset.is_valid():
+                    aformset.save()
+                else:
+                    success = False
+            else:
+                aformset = AttachmentFormSet()
+
+            if self.object.topic.poll_type != Topic.POLL_TYPE_NONE and self.object.topic.head == self.object:
+                pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                if pollformset.is_valid():
+                    pollformset.save()
+                else:
+                    success = False
+            else:
+                pollformset = PollAnswerFormSet()
+
+            if success:
+                transaction.commit()
                 return super(ModelFormMixin, self).form_valid(form)
             else:
-                return self.render_to_response(self.get_context_data(form=form, aformset=aformset))
-        return super(AddPostView, self).form_valid(form)
-        
+                transaction.rollback()
+                return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated():
