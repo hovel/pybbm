@@ -1,6 +1,15 @@
 Updating PyBBM Version
 ======================
 
+0.9 -> ?.?
+-----------
+
+* Bootstrap less files removed from pybb.
+* Refactored example projects. `test` folder now contains two examples:
+    * `example_bootstrap` shows how to include bootstrap files in your project
+    * `example_thirdparty` shows how to use another project like `pinax-theme-bootstrap <https://github.com/pinax/pinax-theme-bootstrap>`_ to style forum
+* Dropped support for self containing CSS in pybb.css file and PYBB_ENABLE_SELF_CSS setting.
+
 0.8 -> 0.9
 ----------
 

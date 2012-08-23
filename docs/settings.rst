@@ -236,11 +236,3 @@ PYBB_ATTACHMENT_UPLOAD_TO
 .........................
 
 Directory in your media path for uploaded attacments. `pybb_upload/attachments` by default.
-
-PYBB_ENABLE_SELF_CSS
-....................
-
-Include `{{ STATIC_URL }}pybb.css` file for every pybbm page, this is useful when you have special css
-only for forum pages (and which should not be included in other pages).
-
-Be aware than this file in current project tree are legacy and can provide strange markup with current templates.
