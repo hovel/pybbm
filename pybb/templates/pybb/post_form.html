@@ -19,8 +19,9 @@
         <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
       {% endfor %}
     </div>
-    {% if forum and not form.instance.ok %}
-      {{ form.body.errors }} {{ form.poll_type.label_tag }} {{ form.poll_type }}
+
+    {% if form.poll_type %}
+      {{ form.poll_type.errors }} {{ form.poll_type.label_tag }} {{ form.poll_type }}
       {% include "pybb/pollanswer_formset.html" %}
     {% endif %}
     {% include "pybb/attachments_formset.html" %}

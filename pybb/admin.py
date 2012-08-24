@@ -24,7 +24,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ForumAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'hidden', 'position', 'topic_count']
+    list_display = ['name', 'category', 'hidden', 'position', 'topic_count', ]
     list_per_page = 20
     raw_id_fields = ['moderators']
     ordering = ['-category']
@@ -32,7 +32,7 @@ class ForumAdmin(admin.ModelAdmin):
     list_editable = ['position', 'hidden']
     fieldsets = (
         (None, {
-                'fields': ('category', 'name', 'hidden', 'position')
+                'fields': ('category', 'name', 'hidden', 'position', )
                 }
          ),
         (_('Additional options'), {
@@ -50,7 +50,7 @@ class PollAnswerAdmin(admin.TabularInline):
 
 
 class TopicAdmin(admin.ModelAdmin):
-    list_display = ['name', 'forum', 'created', 'head', 'post_count']
+    list_display = ['name', 'forum', 'created', 'head', 'post_count', 'poll_type',]
     list_per_page = 20
     raw_id_fields = ['user', 'subscribers']
     ordering = ['-created']
@@ -58,7 +58,7 @@ class TopicAdmin(admin.ModelAdmin):
     search_fields = ['name']
     fieldsets = (
         (None, {
-                'fields': ('forum', 'name', 'user', ('created', 'updated'))
+                'fields': ('forum', 'name', 'user', ('created', 'updated'), 'poll_type',)
                 }
          ),
         (_('Additional options'), {

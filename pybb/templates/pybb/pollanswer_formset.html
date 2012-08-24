@@ -6,7 +6,7 @@
     {% for form in pollformset %}
       <tr>
         <td>{{ form.id }} {{ form.text }}</td>
-        <td>{% if form.instance.pk %}{{ form.DELETE }} {% trans "delete" %}{% endif %}</td>
+        <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
       </tr>
     {% endfor %}
   </table>

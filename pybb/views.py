@@ -173,15 +173,55 @@ class TopicView(generic.ListView):
                 forum_mark.save()
 
 
-class FormChoiceMixin(object):
+class PostEditMixin(object):
+
     def get_form_class(self):
         if self.request.user.is_staff:
             return AdminPostForm
         else:
             return PostForm
 
+    def get_context_data(self, **kwargs):
+        ctx = super(PostEditMixin, self).get_context_data(**kwargs)
+        if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
+            ctx['aformset'] = AttachmentFormSet(instance=self.object if getattr(self, 'object') else None)
+        if 'pollformset' not in kwargs:
+            ctx['pollformset'] = PollAnswerFormSet(instance=self.object.topic if getattr(self, 'object') else None)
+        return ctx
 
-class AddPostView(FormChoiceMixin, generic.CreateView):
+    def form_valid(self, form):
+        success = True
+        with transaction.commit_manually():
+            self.object = form.save()
+
+            if defaults.PYBB_ATTACHMENT_ENABLE:
+                aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+                if aformset.is_valid():
+                    aformset.save()
+                else:
+                    success = False
+            else:
+                aformset = AttachmentFormSet()
+
+            if self.object.topic.poll_type != Topic.POLL_TYPE_NONE and self.object.topic.head == self.object:
+                pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                if pollformset.is_valid():
+                    pollformset.save()
+                else:
+                    success = False
+            else:
+                self.object.topic.poll_answers.all().delete()
+                pollformset = PollAnswerFormSet()
+
+            if success:
+                transaction.commit()
+                return super(ModelFormMixin, self).form_valid(form)
+            else:
+                transaction.rollback()
+                return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+
+
+class AddPostView(PostEditMixin, generic.CreateView):
 
     template_name = 'pybb/add_post.html'
 
@@ -207,46 +247,12 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
         ctx = super(AddPostView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
         ctx['topic'] = self.topic
-        if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
-            ctx['aformset'] = AttachmentFormSet()
-        if 'pollformset' not in kwargs:
-            ctx['pollformset'] = PollAnswerFormSet()
         return ctx
 
     def get_success_url(self):
         if (not self.request.user.is_authenticated()) and defaults.PYBB_PREMODERATION:
             return reverse('pybb:index')
         return super(AddPostView, self).get_success_url()
-
-    def form_valid(self, form):
-        success = True
-        with transaction.commit_manually():
-            self.object = form.save()
-
-            if defaults.PYBB_ATTACHMENT_ENABLE:
-                aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
-                if aformset.is_valid():
-                    aformset.save()
-                else:
-                    success = False
-            else:
-                aformset = AttachmentFormSet()
-
-            if self.object.topic.poll_type != Topic.POLL_TYPE_NONE and self.object.topic.head == self.object:
-                pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
-                if pollformset.is_valid():
-                    pollformset.save()
-                else:
-                    success = False
-            else:
-                pollformset = PollAnswerFormSet()
-
-            if success:
-                transaction.commit()
-                return super(ModelFormMixin, self).form_valid(form)
-            else:
-                transaction.rollback()
-                return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
@@ -273,6 +279,26 @@ class AddPostView(FormChoiceMixin, generic.CreateView):
             if self.topic.closed:
                 raise PermissionDenied
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
+
+
+class EditPostView(PostEditMixin, generic.UpdateView):
+
+    model = Post
+
+    context_object_name = 'post'
+    template_name = 'pybb/edit_post.html'
+
+    @method_decorator(login_required)
+    @method_decorator(csrf_protect)
+    def dispatch(self, request, *args, **kwargs):
+        return super(EditPostView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        post = super(EditPostView, self).get_object(queryset)
+        if not pybb_editable_by(post, self.request.user):
+            raise PermissionDenied
+        return post
+
 
 class UserView(generic.DetailView):
     model = User
@@ -302,6 +328,7 @@ class PostView(generic.RedirectView):
         page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
         return '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)
 
+
 class ModeratePost(generic.RedirectView):
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
@@ -310,6 +337,7 @@ class ModeratePost(generic.RedirectView):
         post.on_moderation = False
         post.save()
         return post.get_absolute_url()
+
 
 class ProfileEditView(generic.UpdateView):
 
@@ -326,44 +354,6 @@ class ProfileEditView(generic.UpdateView):
 
     def get_success_url(self):
         return reverse('pybb:edit_profile')
-
-
-class EditPostView(FormChoiceMixin, generic.UpdateView):
-
-    model = Post
-
-    context_object_name = 'post'
-    template_name = 'pybb/edit_post.html'
-
-    @method_decorator(login_required)
-    @method_decorator(csrf_protect)
-    def dispatch(self, request, *args, **kwargs):
-        return super(EditPostView, self).dispatch(request, *args, **kwargs)
-
-    def get_object(self, queryset=None):
-        post = super(EditPostView, self).get_object(queryset)
-        if not pybb_editable_by(post, self.request.user):
-            raise PermissionDenied
-        return post
-
-    def get_context_data(self, **kwargs):
-        ctx = super(EditPostView, self).get_context_data(**kwargs)
-        if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
-            ctx['aformset'] = AttachmentFormSet(instance=self.object)
-        return ctx
-
-    def form_valid(self, form):
-        if defaults.PYBB_ATTACHMENT_ENABLE:
-            self.object = form.save(commit=False)
-            aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
-            if aformset.is_valid():
-                self.object.save()
-                aformset.save()
-                return super(ModelFormMixin, self).form_valid(form)
-            else:
-                return self.render_to_response(self.get_context_data(form=form, aforormset=aformset))
-        return super(EditPostView, self).form_valid(form)
-
 
 
 class DeletePostView(generic.DeleteView):

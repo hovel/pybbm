@@ -76,13 +76,12 @@ class PostForm(forms.ModelForm):
             #Handle topic subject if editing topic head
         if ('instance' in kwargs) and kwargs['instance'] and (kwargs['instance'].topic.head == kwargs['instance']):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
+            kwargs.setdefault('initial', {})['poll_type'] = kwargs['instance'].topic.poll_type
 
         super(PostForm, self).__init__(**kwargs)
 
         if not (self.forum or (self.instance.pk and (self.instance.topic.head == self.instance))):
             del self.fields['name']
-
-        if not (self.forum and not self.instance.pk):
             del self.fields['poll_type']
 
         self.available_smiles = defaults.PYBB_SMILES
@@ -106,6 +105,7 @@ class PostForm(forms.ModelForm):
                 post.user = self.user
             if post.topic.head == post:
                 post.topic.name = self.cleaned_data['name']
+                post.topic.poll_type = int(self.cleaned_data['poll_type'])
                 post.topic.updated = tznow()
                 post.topic.save()
             post.save()

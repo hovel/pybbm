@@ -737,7 +737,7 @@ class PollTest(TransactionTestCase, SharedTestModule):
         self.PYBB_POLL_MAX_ANSWERS = defaults.PYBB_POLL_MAX_ANSWERS
         defaults.PYBB_POLL_MAX_ANSWERS = 2
 
-    def test_poll_answers_add(self):
+    def test_poll_add(self):
         add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
         self.login_client()
         response = self.client.get(add_topic_url)
@@ -778,6 +778,42 @@ class PollTest(TransactionTestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         new_topic = Topic.objects.get(name='test poll name 1')
         self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
+
+    def test_poll_edit(self):
+        edit_topic_url = reverse('pybb:edit_post', kwargs={'pk': self.post.id})
+        self.login_client()
+        response = self.client.get(edit_topic_url)
+        values = self.get_form_values(response)
+        values['poll_type'] = 1 # add_poll
+        values['poll_answers-0-text'] = 'answer1'
+        values['poll_answers-1-text'] = 'answer2'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(edit_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).poll_type, 1)
+        self.assertEqual(PollAnswer.objects.filter(topic=self.topic).count(), 2)
+
+        values = self.get_form_values(self.client.get(edit_topic_url))
+        values['poll_type'] = 2 # change_poll
+        values['poll_answers-0-text'] = 'answer100'
+        values['poll_answers-1-text'] = 'answer200'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(edit_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).poll_type, 2)
+        self.assertEqual(PollAnswer.objects.filter(topic=self.topic).count(), 2)
+        self.assertTrue(PollAnswer.objects.filter(text='answer100').exists())
+        self.assertTrue(PollAnswer.objects.filter(text='answer200').exists())
+        self.assertFalse(PollAnswer.objects.filter(text='answer1').exists())
+        self.assertFalse(PollAnswer.objects.filter(text='answer2').exists())
+
+        values['poll_type'] = 0 # remove poll
+        values['poll_answers-0-text'] = 'answer100' # no matter how many answers we provide
+        values['poll_answers-TOTAL_FORMS'] = 1
+        response = self.client.post(edit_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).poll_type, 0)
+        self.assertEqual(PollAnswer.objects.filter(topic=self.topic).count(), 0)
 
     def tearDown(self):
         defaults.PYBB_POLL_MAX_ANSWERS = self.PYBB_POLL_MAX_ANSWERS
