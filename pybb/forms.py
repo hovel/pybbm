@@ -210,3 +210,27 @@ class UserSearchForm(forms.Form):
             return qs.filter(username__contains=query)
         else:
             return qs
+
+
+class PollForm(forms.Form):
+    def __init__(self, topic,  *args, **kwargs):
+        self.topic = topic
+
+        super(PollForm, self).__init__(*args, **kwargs)
+
+        qs = PollAnswer.objects.filter(topic=topic)
+        if topic.poll_type == Topic.POLL_TYPE_SINGLE:
+            self.fields['answers'] = forms.ModelChoiceField(
+                label='', queryset=qs, empty_label=None,
+                widget=forms.RadioSelect())
+        elif topic.poll_type == Topic.POLL_TYPE_MULTIPLE:
+            self.fields['answers'] = forms.ModelMultipleChoiceField(
+                label='', queryset=qs,
+                widget=forms.CheckboxSelectMultiple())
+
+    def clean_answers(self):
+        answers = self.cleaned_data['answers']
+        if self.topic.poll_type == Topic.POLL_TYPE_SINGLE:
+            return [answers]
+        else:
+            return answers

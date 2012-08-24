@@ -425,6 +425,7 @@ class PollAnswerUser(models.Model):
     class Meta:
         verbose_name = _('Poll answer user')
         verbose_name_plural = _('Polls answers users')
+        unique_together = (('poll_answer', 'user', ), )
 
     def __unicode__(self):
         return u'%s - %s' % (self.poll_answer.topic, self.user)

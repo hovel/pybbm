@@ -21,6 +21,10 @@
         {% include "pybb/pagination.html" %}
     {% endwith %}
 
+    {% if topic.poll_type != 0 %}
+      {% include 'pybb/poll.html' %}
+    {% endif %}
+
     <div class="posts">
         {% if first_post %}{% ifnotequal first_post post_list.0 %}
             {% with first_post as post %}

@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import F, Q
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, _get_queryset
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -26,9 +26,9 @@ except ImportError:
 
 from pure_pagination import Paginator
 
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker
-from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet
-from pybb.templatetags.pybb_tags import pybb_editable_by
+from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
+from pybb.templatetags.pybb_tags import pybb_editable_by, pybb_topic_poll_not_voted
 from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 from pybb import defaults
 
@@ -145,6 +145,9 @@ class TopicView(generic.ListView):
         else:
             ctx['first_post'] = None
         ctx['topic'] = self.topic
+
+        if self.topic.poll_type != Topic.POLL_TYPE_NONE and pybb_topic_poll_not_voted(self.topic, self.request.user):
+            ctx['poll_form'] = PollForm(self.topic)
 
         return ctx
 
@@ -416,6 +419,41 @@ class OpenTopicView(TopicActionBaseView):
     def action(self, topic):
         topic.closed = False
         topic.save()
+
+class TopicPollVoteView(generic.UpdateView):
+    model = Topic
+    http_method_names = ['post', ]
+    form_class = PollForm
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(TopicPollVoteView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(ModelFormMixin, self).get_form_kwargs()
+        kwargs['topic'] = self.object
+        return kwargs
+
+    def form_valid(self, form):
+        # already voted
+        if not pybb_topic_poll_not_voted(self.object, self.request.user):
+            return HttpResponseBadRequest()
+
+        answers = form.cleaned_data['answers']
+        for answer in answers:
+            # poll answer from another topic
+            if answer.topic != self.object:
+                return HttpResponseBadRequest()
+
+            PollAnswerUser.objects.create(poll_answer=answer, user=self.request.user)
+        return super(ModelFormMixin, self).form_valid(form)
+
+    def form_invalid(self, form):
+        return self.object.get_absolute_url()
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
 
 @login_required
 def delete_subscription(request, topic_id):
