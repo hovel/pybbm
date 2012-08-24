@@ -445,7 +445,7 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
     def test_edit_post(self):
         self.login_client()
         edit_post_url = reverse('pybb:edit_post', kwargs={'pk': self.post.id})
-        response = self.client.get(edip_post_url)
+        response = self.client.get(edit_post_url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content)
         values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
