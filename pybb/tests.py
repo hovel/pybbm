@@ -444,25 +444,28 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
 
     def test_edit_post(self):
         self.login_client()
-        response = self.client.get(reverse('pybb:edit_post', kwargs={'pk': self.post.id}))
+        edit_post_url = reverse('pybb:edit_post', kwargs={'pk': self.post.id})
+        response = self.client.get(edip_post_url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content)
         values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
         values['body'] = 'test edit'
-        response = self.client.post(reverse('pybb:edit_post', kwargs={'pk': self.post.id}), data=values, follow=True)
+        response = self.client.post(edit_post_url, data=values, follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(Post.objects.get(pk=self.post.id).body, 'test edit')
         response = self.client.get(self.post.get_absolute_url(), follow=True)
         self.assertContains(response, 'test edit')
+
         # Check admin form
         self.user.is_staff = True
         self.user.save()
-        response = self.client.get(reverse('pybb:edit_post', kwargs={'pk': self.post.id}))
+        response = self.client.get(edit_post_url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content)
         values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
         values['body'] = 'test edit'
         values['login'] = 'new_login'
-        response = self.client.post(reverse('pybb:edit_post', kwargs={'pk': self.post.id}), data=values, follow=True)
+        response = self.client.post(edit_post_url, data=values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'test edit')
 
@@ -744,13 +747,15 @@ class PollTest(TransactionTestCase, SharedTestModule):
         values = self.get_form_values(response)
         values['body'] = 'test poll body'
         values['name'] = 'test poll name'
-        values['poll_type'] = 0 # poll_type = None, create topic without poll answer
+        values['poll_type'] = 0 # poll_type = None, create topic without poll answers
+        values['poll_question'] = 'q1'
         values['poll_answers-0-text'] = 'answer1'
         values['poll_answers-1-text'] = 'answer2'
         values['poll_answers-TOTAL_FORMS'] = 2
         response = self.client.post(add_topic_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         new_topic = Topic.objects.get(name='test poll name')
+        self.assertIsNone(new_topic.poll_question)
         self.assertFalse(PollAnswer.objects.filter(topic=new_topic).exists()) # no answers here
 
         values['name'] = 'test poll name 1'
@@ -771,12 +776,14 @@ class PollTest(TransactionTestCase, SharedTestModule):
 
         values['name'] = 'test poll name 1'
         values['poll_type'] = 1 # poll type = single choice, create answers
+        values['poll_question'] = 'q1'
         values['poll_answers-0-text'] = 'answer1' # two answers - what do we need to create poll
         values['poll_answers-1-text'] = 'answer2'
         values['poll_answers-TOTAL_FORMS'] = 2
         response = self.client.post(add_topic_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         new_topic = Topic.objects.get(name='test poll name 1')
+        self.assertEqual(new_topic.poll_question, 'q1')
         self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
 
     def test_poll_edit(self):
@@ -785,22 +792,26 @@ class PollTest(TransactionTestCase, SharedTestModule):
         response = self.client.get(edit_topic_url)
         values = self.get_form_values(response)
         values['poll_type'] = 1 # add_poll
+        values['poll_question'] = 'q1'
         values['poll_answers-0-text'] = 'answer1'
         values['poll_answers-1-text'] = 'answer2'
         values['poll_answers-TOTAL_FORMS'] = 2
         response = self.client.post(edit_topic_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Topic.objects.get(id=self.topic.id).poll_type, 1)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).poll_question, 'q1')
         self.assertEqual(PollAnswer.objects.filter(topic=self.topic).count(), 2)
 
         values = self.get_form_values(self.client.get(edit_topic_url))
-        values['poll_type'] = 2 # change_poll
-        values['poll_answers-0-text'] = 'answer100'
+        values['poll_type'] = 2 # change_poll type
+        values['poll_question'] = 'q100' # change poll question
+        values['poll_answers-0-text'] = 'answer100' # change poll answers
         values['poll_answers-1-text'] = 'answer200'
         values['poll_answers-TOTAL_FORMS'] = 2
         response = self.client.post(edit_topic_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Topic.objects.get(id=self.topic.id).poll_type, 2)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).poll_question, 'q100')
         self.assertEqual(PollAnswer.objects.filter(topic=self.topic).count(), 2)
         self.assertTrue(PollAnswer.objects.filter(text='answer100').exists())
         self.assertTrue(PollAnswer.objects.filter(text='answer200').exists())
@@ -813,6 +824,7 @@ class PollTest(TransactionTestCase, SharedTestModule):
         response = self.client.post(edit_topic_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Topic.objects.get(id=self.topic.id).poll_type, 0)
+        self.assertIsNone(Topic.objects.get(id=self.topic.id).poll_question)
         self.assertEqual(PollAnswer.objects.filter(topic=self.topic).count(), 0)
 
     def tearDown(self):

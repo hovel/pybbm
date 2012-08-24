@@ -166,6 +166,7 @@ class Topic(models.Model):
     readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
     poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
+    poll_question = models.TextField(_('Poll question'), blank=True, null=True)
 
     class Meta(object):
         ordering = ['-created']

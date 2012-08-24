@@ -1,6 +1,8 @@
 {% load i18n %}
+{{ form.poll_type.errors }} {{ form.poll_type.label_tag }} {{ form.poll_type }}
 <div id="poll-answers-formset" style="display: none;">
-  {% trans 'Poll answers' %}
+  {{ form.poll_question.errors }} {{ form.poll_question.label_tag }} {{ form.poll_question }}
+  <br>{% trans 'Poll answers' %}
   {{ pollformset.non_form_errors }}
   <table>
     {% for form in pollformset %}

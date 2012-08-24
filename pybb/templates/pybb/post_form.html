@@ -21,8 +21,7 @@
     </div>
 
     {% if form.poll_type %}
-      {{ form.poll_type.errors }} {{ form.poll_type.label_tag }} {{ form.poll_type }}
-      {% include "pybb/pollanswer_formset.html" %}
+      {% include "pybb/polledit_form.html" %}
     {% endif %}
     {% include "pybb/attachments_formset.html" %}
     <p class="submit">{% include "pybb/_button_submit.html" %}</p>

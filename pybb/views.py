@@ -210,6 +210,8 @@ class PostEditMixin(object):
                 else:
                     success = False
             else:
+                self.object.topic.poll_question = None
+                self.object.topic.save()
                 self.object.topic.poll_answers.all().delete()
                 pollformset = PollAnswerFormSet()
 
