@@ -6,7 +6,7 @@ import os
 from django.contrib.auth.models import User, Permission
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.test.client import Client
 
 try:
@@ -43,7 +43,7 @@ class SharedTestModule(object):
         return dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % form)[0].form_values())
 
 
-class FeaturesTest(TestCase, SharedTestModule):
+class FeaturesTest(TransactionTestCase, SharedTestModule):
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
@@ -557,7 +557,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
 
 
-class AnonymousTest(TestCase, SharedTestModule):
+class AnonymousTest(TransactionTestCase, SharedTestModule):
 
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
@@ -595,7 +595,7 @@ def premoderate_test(user, post):
         return True
     return False
 
-class PreModerationTest(TestCase, SharedTestModule):
+class PreModerationTest(TransactionTestCase, SharedTestModule):
 
     def setUp(self):
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
@@ -705,7 +705,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
         
-class AttachmentTest(TestCase, SharedTestModule):
+class AttachmentTest(TransactionTestCase, SharedTestModule):
     def setUp(self):
         self.PYBB_ATTACHMENT_ENABLE = defaults.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_ATTACHMENT_ENABLE = True
@@ -730,10 +730,12 @@ class AttachmentTest(TestCase, SharedTestModule):
         defaults.PYBB_ATTACHMENT_ENABLE = self.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
-class PollTest(TestCase, SharedTestModule):
+class PollTest(TransactionTestCase, SharedTestModule):
     def setUp(self):
         self.create_user()
         self.create_initial()
+        self.PYBB_POLL_MAX_ANSWERS = defaults.PYBB_POLL_MAX_ANSWERS
+        defaults.PYBB_POLL_MAX_ANSWERS = 2
 
     def test_poll_answers_add(self):
         add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
@@ -742,18 +744,34 @@ class PollTest(TestCase, SharedTestModule):
         values = self.get_form_values(response)
         values['body'] = 'test poll body'
         values['name'] = 'test poll name'
-        values['poll_type'] = 0
+        values['poll_type'] = 0 # poll_type = None, create topic without poll answer
         values['poll_answers-0-text'] = 'answer1'
         values['poll_answers-1-text'] = 'answer2'
         values['poll_answers-TOTAL_FORMS'] = 2
         response = self.client.post(add_topic_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         new_topic = Topic.objects.get(name='test poll name')
-        self.assertFalse(PollAnswer.objects.filter(topic=new_topic).exists())
+        self.assertFalse(PollAnswer.objects.filter(topic=new_topic).exists()) # no answers here
 
         values['name'] = 'test poll name 1'
         values['poll_type'] = 1
-        values['poll_answers-0-text'] = 'answer1'
+        values['poll_answers-0-text'] = 'answer1' # not enough answers
+        values['poll_answers-TOTAL_FORMS'] = 1
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertFalse(Topic.objects.filter(name='test poll name 1').exists())
+
+        values['name'] = 'test poll name 1'
+        values['poll_type'] = 1
+        values['poll_answers-0-text'] = 'answer1' # too many answers
+        values['poll_answers-1-text'] = 'answer2'
+        values['poll_answers-2-text'] = 'answer3'
+        values['poll_answers-TOTAL_FORMS'] = 3
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertFalse(Topic.objects.filter(name='test poll name 1').exists())
+
+        values['name'] = 'test poll name 1'
+        values['poll_type'] = 1 # poll type = single choice, create answers
+        values['poll_answers-0-text'] = 'answer1' # two answers - what do we need to create poll
         values['poll_answers-1-text'] = 'answer2'
         values['poll_answers-TOTAL_FORMS'] = 2
         response = self.client.post(add_topic_url, values, follow=True)
@@ -761,7 +779,11 @@ class PollTest(TestCase, SharedTestModule):
         new_topic = Topic.objects.get(name='test poll name 1')
         self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
 
-class FiltersTest(TestCase, SharedTestModule):
+    def tearDown(self):
+        defaults.PYBB_POLL_MAX_ANSWERS = self.PYBB_POLL_MAX_ANSWERS
+
+
+class FiltersTest(TransactionTestCase, SharedTestModule):
     def setUp(self):
         self.create_user()
         self.create_initial(post=False)

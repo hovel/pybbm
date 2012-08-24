@@ -83,3 +83,5 @@ PYBB_PREMODERATION = getattr(settings, 'PYBB_PREMODERATION', False)
 PYBB_BODY_CLEANERS = getattr(settings, 'PYBB_BODY_CLEANERS', [rstrip_str, filter_blanks])
 
 PYBB_BODY_VALIDATOR = getattr(settings, 'PYBB_BODY_VALIDATOR', None)
+
+PYBB_POLL_MAX_ANSWERS = getattr(settings, 'PYBB_POLL_MAX_ANSWERS', 10)

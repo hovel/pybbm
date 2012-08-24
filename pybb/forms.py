@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.forms.models import inlineformset_factory
-
 import re
 import inspect
 
 from django import forms
+from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -40,7 +39,20 @@ class PollAnswerForm(forms.ModelForm):
         model = PollAnswer
         fields = ('text', )
 
-PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=1, form=PollAnswerForm)
+class BasePollAnswerFormset(BaseInlineFormSet):
+    def clean(self):
+        if any(self.errors):
+            return
+        forms_cnt = len(self.initial_forms) + len([form for form in self.extra_forms if form.has_changed()]) - \
+                    len(self.deleted_forms)
+        if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
+            raise forms.ValidationError(_('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
+        if forms_cnt < 2:
+            raise forms.ValidationError(_('Add two or more answers to this poll'))
+
+
+PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=defaults.PYBB_POLL_MAX_ANSWERS,
+    form=PollAnswerForm, formset=BasePollAnswerFormset)
 
 
 class PostForm(forms.ModelForm):

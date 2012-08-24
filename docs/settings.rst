@@ -236,3 +236,11 @@ PYBB_ATTACHMENT_UPLOAD_TO
 .........................
 
 Directory in your media path for uploaded attacments. `pybb_upload/attachments` by default.
+
+Polls
+-----
+
+PYBB_POLL_MAX_ANSWERS
+.....................
+
+Max count of answers, thar user can add to topic. 10 by default.

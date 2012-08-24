@@ -1,6 +1,7 @@
 {% load i18n %}
 <div id="poll-answers-formset" style="display: none;">
   {% trans 'Poll answers' %}
+  {{ pollformset.non_form_errors }}
   <table>
     {% for form in pollformset %}
       <tr>

@@ -409,6 +409,9 @@ class PollAnswer(models.Model):
         verbose_name = _('Poll answer')
         verbose_name_plural = _('Polls answers')
 
+    def __unicode__(self):
+        return self.text
+
     def votes(self):
         return self.users.count()
 
@@ -421,6 +424,9 @@ class PollAnswerUser(models.Model):
     class Meta:
         verbose_name = _('Poll answer user')
         verbose_name_plural = _('Polls answers users')
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.poll_answer.topic, self.user)
 
 
 from pybb import signals
