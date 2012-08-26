@@ -1,7 +1,7 @@
 PyBBM - Django forum solution
 =============================
 
-PyBBM is a full-featured django forum solution with these features::
+PyBBM is a full-featured django forum solution with these features:
 
 * Avatars
 * Custom profiles
@@ -13,7 +13,7 @@ PyBBM is a full-featured django forum solution with these features::
 * Polls
 * ...
 
-All features is based on::
+All features is based on:
 
 * 95% tests covered code
 * Twitter bootstrap 2 default theme
