@@ -2,7 +2,7 @@ PyBBM Django forum solution
 ===========================
 PyBBM - modified version of pybb (developed by lorien and dropped in mid 2010).
 
-`Documentation aviable on ReadTheDocs <http://readthedocs.org/projects/pybbm/>`_
+`Documentation available on ReadTheDocs <http://pybbm.readthedocs.org/en/latest/>`_
 
 PyBBM includes ready to use `example/test project with instructions <http://readthedocs.org/docs/pybbm/en/latest/example.html>`_
 

@@ -27,7 +27,7 @@
             {name:'Clean', className:"clean", replaceWith:function(markitup) { return markitup.selection.replace(/\[(.*?)\]/g, "") } },
             {name:'Preview', className:"preview", call:'preview' }
 	    ];
-        $('textarea').markItUp(mySettings);
+        $('textarea:not([class="no-markitup"])').markItUp(mySettings);
 
         $('#emoticons a').click(function() {
             var emoticon = $(this).attr("title");

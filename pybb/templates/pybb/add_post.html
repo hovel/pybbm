@@ -4,6 +4,7 @@
 {% block extra_script %}
     {{ block.super }}
     {% include "pybb/_markitup.html" %}
+    <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/jquery.formset.min.js"></script>
 {% endblock %}
 
 {% block breadcrumb %}
