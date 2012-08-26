@@ -1,5 +1,7 @@
+0.11.0
+    * Polls (by Geyser)
 0.10.0
-    * Bootstrap 2 (by nigma and geyser) (WARNING!! - BACKWARD INCOMPATIBLE TEMPLATES)
+    * Bootstrap 2 (by nigma and Geyser) (WARNING!! - BACKWARD INCOMPATIBLE TEMPLATES)
 0.9.0
     * Button in templates restyling (by nigma)
     * Code cleanup (by nigma)
