@@ -146,7 +146,8 @@ class TopicView(generic.ListView):
             ctx['first_post'] = None
         ctx['topic'] = self.topic
 
-        if self.topic.poll_type != Topic.POLL_TYPE_NONE and pybb_topic_poll_not_voted(self.topic, self.request.user):
+        if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
+           pybb_topic_poll_not_voted(self.topic, self.request.user):
             ctx['poll_form'] = PollForm(self.topic)
 
         return ctx
