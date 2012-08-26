@@ -108,3 +108,5 @@ LOGGING = {
         },
     }
 }
+
+PYBB_ATTACHMENT_ENABLE = False

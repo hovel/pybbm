@@ -6,6 +6,7 @@
 {% block extra_script %}
     {{ block.super }}
     {% include "pybb/_markitup.html" %}
+    <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/jquery.formset.min.js"></script>
 {% endblock %}
 
 {% block breadcrumb %}
@@ -19,6 +20,10 @@
     {% with _('Posts') as label %}
         {% include "pybb/pagination.html" %}
     {% endwith %}
+
+    {% if topic.poll_type != 0 %}
+      {% include 'pybb/poll.html' %}
+    {% endif %}
 
     <div class="posts">
         {% if first_post %}{% ifnotequal first_post post_list.0 %}
