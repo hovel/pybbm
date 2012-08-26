@@ -827,6 +827,36 @@ class PollTest(TransactionTestCase, SharedTestModule):
         self.assertIsNone(Topic.objects.get(id=self.topic.id).poll_question)
         self.assertEqual(PollAnswer.objects.filter(topic=self.topic).count(), 0)
 
+    def test_poll_voting(self):
+        def recreate_poll(poll_type):
+            self.topic.poll_type = poll_type
+            self.topic.save()
+            PollAnswer.objects.filter(topic=self.topic).delete()
+            PollAnswer.objects.create(topic=self.topic, text='answer1')
+            PollAnswer.objects.create(topic=self.topic, text='answer2')
+
+        self.login_client()
+        recreate_poll(poll_type=Topic.POLL_TYPE_SINGLE)
+        vote_url = reverse('pybb:topic_poll_vote', kwargs={'pk': self.topic.id})
+        my_answer = PollAnswer.objects.all()[0]
+        values = {'answers': my_answer.id}
+        response = self.client.post(vote_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).poll_votes(), 1)
+        self.assertEqual(PollAnswer.objects.get(id=my_answer.id).votes(), 1)
+        self.assertEqual(PollAnswer.objects.get(id=my_answer.id).votes_percent(), 100.0)
+
+        # already voted
+        response = self.client.post(vote_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 400) # bad request status
+
+        recreate_poll(poll_type=Topic.POLL_TYPE_MULTIPLE)
+        values = {'answers': [a.id for a in PollAnswer.objects.all()]}
+        response = self.client.post(vote_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual([a.votes() for a in PollAnswer.objects.all()], [1, 1, ])
+        self.assertListEqual([a.votes_percent() for a in PollAnswer.objects.all()], [50.0, 50.0, ])
+
     def tearDown(self):
         defaults.PYBB_POLL_MAX_ANSWERS = self.PYBB_POLL_MAX_ANSWERS
 
