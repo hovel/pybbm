@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from pybb.models import Category, Forum, Topic, Post, Profile, Attachment
+from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer
 
 
 class ForumInlineAdmin(admin.TabularInline):
@@ -24,7 +24,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ForumAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'hidden', 'position', 'topic_count']
+    list_display = ['name', 'category', 'hidden', 'position', 'topic_count', ]
     list_per_page = 20
     raw_id_fields = ['moderators']
     ordering = ['-category']
@@ -32,7 +32,7 @@ class ForumAdmin(admin.ModelAdmin):
     list_editable = ['position', 'hidden']
     fieldsets = (
         (None, {
-                'fields': ('category', 'name', 'hidden', 'position')
+                'fields': ('category', 'name', 'hidden', 'position', )
                 }
          ),
         (_('Additional options'), {
@@ -43,8 +43,14 @@ class ForumAdmin(admin.ModelAdmin):
         )
 
 
+class PollAnswerAdmin(admin.TabularInline):
+    model = PollAnswer
+    fields = ['text', ]
+    extra = 0
+
+
 class TopicAdmin(admin.ModelAdmin):
-    list_display = ['name', 'forum', 'created', 'head', 'post_count']
+    list_display = ['name', 'forum', 'created', 'head', 'post_count', 'poll_type',]
     list_per_page = 20
     raw_id_fields = ['user', 'subscribers']
     ordering = ['-created']
@@ -52,7 +58,7 @@ class TopicAdmin(admin.ModelAdmin):
     search_fields = ['name']
     fieldsets = (
         (None, {
-                'fields': ('forum', 'name', 'user', ('created', 'updated'))
+                'fields': ('forum', 'name', 'user', ('created', 'updated'), 'poll_type',)
                 }
          ),
         (_('Additional options'), {
@@ -61,6 +67,7 @@ class TopicAdmin(admin.ModelAdmin):
                 }
          ),
         )
+    inlines = [PollAnswerAdmin, ]
 
 class TopicReadTrackerAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'time_stamp']
