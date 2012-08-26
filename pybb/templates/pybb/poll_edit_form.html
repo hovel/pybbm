@@ -16,7 +16,7 @@
 </div>
 
 <script type="text/javascript">
-  $(function () {
+  window.onload = function () {
     $('div#poll-answers-formset table tr').formset({
       deleteText:'{% trans 'remove answer' %}',
       addText:'{% trans 'add answer' %}',
@@ -29,12 +29,12 @@
       } else {
         $('div#poll-answers-formset').show();
       }
-    }
+    };
 
     $('#id_poll_type').each(function () {
       toggle_poll_answers_formset($(this).val());
     }).change(function () {
       toggle_poll_answers_formset($(this).val());
     });
-  });
+  };
 </script>
