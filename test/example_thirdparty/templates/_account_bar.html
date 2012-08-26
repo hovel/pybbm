@@ -16,8 +16,8 @@
                 <ul class="dropdown-menu">
                     <li><a href="{% url "account_settings" %}"><i class="icon-user"></i> {% trans "Settings" %}</a></li>
                     <li><a href="{% url "pybb:edit_profile" %}"><i class="icon-user"></i> {% trans "Forum Profile" %}</a></li>
-                    {% if THEME_ACCOUNT_ADMIN_URL and request.user.is_staff %}
-                        <li><a href="{% url THEME_ACCOUNT_ADMIN_URL %}"><i class="icon-cog"></i> {% trans "Admin" %}</a></li>
+                    {% if request.user.is_staff %}
+                        <li><a href="{% url "admin:index" %}"><i class="icon-cog"></i> {% trans "Admin" %}</a></li>
                     {% endif %}
                     <li class="divider"></li>
                     <li><a href="{% url "account_logout" %}"><i class="icon-off"></i> {% trans "Log out" %}</a></li>
@@ -25,10 +25,8 @@
             </li>
         {% else %}
             <li><a href="{% url "account_login" %}">{% trans "Log in" %}</a></li>
-            {% if ACCOUNT_OPEN_SIGNUP %}
-                <li class="navbar-text">{% trans "or" %}</li>
-                <li><a href="{% url "account_signup" %}">{% trans "Sign up" %}</a></li>
-            {% endif %}
+            <li class="navbar-text">{% trans "or" %}</li>
+            <li><a href="{% url "account_signup" %}">{% trans "Sign up" %}</a></li>
         {% endif %}
     </ul>
 </div>
