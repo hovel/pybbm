@@ -213,6 +213,12 @@ class Topic(models.Model):
         """
         return self.forum.category, self.forum
 
+    def poll_votes(self):
+        if self.poll_type != self.POLL_TYPE_NONE:
+            return PollAnswerUser.objects.filter(poll_answer__topic=self).count()
+        else:
+            return None
+
 
 class RenderableItem(models.Model):
     """
@@ -415,6 +421,11 @@ class PollAnswer(models.Model):
 
     def votes(self):
         return self.users.count()
+
+    def votes_percent(self):
+        topic_votes = self.topic.poll_votes()
+        if topic_votes > 0:
+            return 1.0 * self.votes() / topic_votes * 100
 
 
 class PollAnswerUser(models.Model):
