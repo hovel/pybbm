@@ -1,6 +1,13 @@
 Updating PyBBM Version
 ======================
 
+0.10 - 0.11
+-----------
+
+* Ability to override standard message when user doesn't login and not alowed anonymous posts by
+``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
+and/or ``auth_login`` url names in ``urls.py``
+
 0.9 -> 0.10
 -----------
 

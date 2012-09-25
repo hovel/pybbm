@@ -78,7 +78,7 @@
             {% endif %}
         {% endif %}
     {% else %}
-        <a href="{% url registration_register %}">{% trans "Register" %}</a> {% trans "or" %} <a href="{% url auth_login %}">{% trans "login" %}</a> {% trans "to create to post a reply" %}.
+        {% include 'pybb/_need_to_login_message.html' %}
     {% endif %}
 
     {% if user.is_staff %}
