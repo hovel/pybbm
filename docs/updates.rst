@@ -8,6 +8,9 @@ Updating PyBBM Version
 ``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
 and/or ``auth_login`` url names in ``urls.py``
 
+* Content in each ``topic.html`` and ``forum.html`` is wrapped in ``<div>`` tag with ``topic`` and ``forum`` classes
+accordingly
+
 0.9 -> 0.10
 -----------
 
