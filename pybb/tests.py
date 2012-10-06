@@ -6,6 +6,7 @@ import os
 from django.contrib.auth.models import User, Permission
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 from django.test import TransactionTestCase
 from django.test.client import Client
 
@@ -144,7 +145,6 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         Forum.objects.get(id=self.forum.id)
         topic.delete()
         Forum.objects.get(id=self.forum.id)
-
 
     def test_forum_updated(self):
         time.sleep(1)
@@ -329,8 +329,6 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user, forum=self.forum).count(), 1)
-
-
 
     def test_hidden(self):
         client = Client()
@@ -559,7 +557,6 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
 
-
 class AnonymousTest(TransactionTestCase, SharedTestModule):
 
     def setUp(self):
@@ -729,9 +726,22 @@ class AttachmentTest(TransactionTestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Post.objects.filter(body='test attachment').exists())
 
+    def test_attachment(self):
+        add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
+        self.login_client()
+        response = self.client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test attachment'
+        values['attachments-0-file'] = self.file
+        del values['attachments-INITIAL_FORMS']
+        del values['attachments-TOTAL_FORMS']
+        with self.assertRaises(ValidationError):
+            self.client.post(add_post_url, values, follow=True)
+
     def tearDown(self):
         defaults.PYBB_ATTACHMENT_ENABLE = self.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
+
 
 class PollTest(TransactionTestCase, SharedTestModule):
     def setUp(self):

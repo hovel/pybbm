@@ -196,35 +196,39 @@ class PostEditMixin(object):
     def form_valid(self, form):
         success = True
         with transaction.commit_manually():
-            self.object = form.save()
+            try:
+                self.object = form.save()
 
-            if defaults.PYBB_ATTACHMENT_ENABLE:
-                aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
-                if aformset.is_valid():
-                    aformset.save()
+                if defaults.PYBB_ATTACHMENT_ENABLE:
+                    aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+                    if aformset.is_valid():
+                        aformset.save()
+                    else:
+                        success = False
                 else:
-                    success = False
-            else:
-                aformset = AttachmentFormSet()
+                    aformset = AttachmentFormSet()
 
-            if self.object.topic.poll_type != Topic.POLL_TYPE_NONE and self.object.topic.head == self.object:
-                pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
-                if pollformset.is_valid():
-                    pollformset.save()
+                if self.object.topic.poll_type != Topic.POLL_TYPE_NONE and self.object.topic.head == self.object:
+                    pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                    if pollformset.is_valid():
+                        pollformset.save()
+                    else:
+                        success = False
                 else:
-                    success = False
-            else:
-                self.object.topic.poll_question = None
-                self.object.topic.save()
-                self.object.topic.poll_answers.all().delete()
-                pollformset = PollAnswerFormSet()
+                    self.object.topic.poll_question = None
+                    self.object.topic.save()
+                    self.object.topic.poll_answers.all().delete()
+                    pollformset = PollAnswerFormSet()
 
-            if success:
-                transaction.commit()
-                return super(ModelFormMixin, self).form_valid(form)
-            else:
+                if success:
+                    transaction.commit()
+                    return super(ModelFormMixin, self).form_valid(form)
+                else:
+                    transaction.rollback()
+                    return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+            except Exception:
                 transaction.rollback()
-                return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+                raise
 
 
 class AddPostView(PostEditMixin, generic.CreateView):
