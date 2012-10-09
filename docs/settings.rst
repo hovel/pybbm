@@ -244,3 +244,11 @@ PYBB_POLL_MAX_ANSWERS
 .....................
 
 Max count of answers, thar user can add to topic. 10 by default.
+
+Permissions
+-----------
+
+PYBB_AUTO_USER_PERMISSIONS
+..........................
+
+Automatically adds add post and add topic permissions to users on user.save().
