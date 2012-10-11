@@ -6,6 +6,7 @@ from django.db.models import ObjectDoesNotExist
 from django.db.models.signals import post_save
 
 from pybb.subscription import notify_topic_subscribers
+from pybb import defaults
 
 
 def post_saved(instance, **kwargs):
@@ -35,4 +36,5 @@ def user_saved(instance, created, **kwargs):
 def setup_signals():
     from models import Post
     post_save.connect(post_saved, sender=Post)
-    post_save.connect(user_saved, sender=User)
+    if defaults.PYBB_AUTO_USER_PERMISSIONS:
+        post_save.connect(user_saved, sender=User)
