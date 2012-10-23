@@ -214,11 +214,11 @@ class PostEditMixin(object):
                         pollformset.save()
                     else:
                         success = False
-                else:
-                    self.object.topic.poll_question = None
-                    self.object.topic.save()
-                    self.object.topic.poll_answers.all().delete()
-                    pollformset = PollAnswerFormSet()
+                #else:
+                #    self.object.topic.poll_question = None
+                #    self.object.topic.save()
+                #    self.object.topic.poll_answers.all().delete()
+                #    pollformset = PollAnswerFormSet()
 
                 if success:
                     transaction.commit()
