@@ -7,6 +7,7 @@ setup(
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
     name = 'pybbm',
+    url = 'http://http://www.pybbm.org/',
     packages = find_packages(),
     include_package_data = True,
     package_data = {'': ['pybb/templates', 'pybb/static']},

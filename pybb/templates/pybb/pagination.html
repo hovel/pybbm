@@ -9,12 +9,12 @@
             </li>
             {% for page in page_obj.pages %}
                 {% if page %}
-                        <li {% ifequal page page_obj.number %}class="disabled"{% endifequal %}>
-                           <a href="?{{ page.querystring }}" class="page">{{ page }}</a>
-                        </li>
+                    <li {% ifequal page page_obj.number %}class="disabled"{% endifequal %}>
+                       <a href="?{{ page.querystring }}" class="page">{{ page }}</a>
+                    </li>
                 {% else %}
                     <li class="disabled">
-                       ...
+                       <a href="#">...</a>
                     </li>
                 {% endif %}
             {% endfor %}
