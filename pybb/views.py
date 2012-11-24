@@ -208,17 +208,18 @@ class PostEditMixin(object):
                 else:
                     aformset = AttachmentFormSet()
 
-                if self.object.topic.poll_type != Topic.POLL_TYPE_NONE and self.object.topic.head == self.object:
-                    pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
-                    if pollformset.is_valid():
-                        pollformset.save()
+                if self.object.topic.head == self.object:
+                    if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
+                        pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                        if pollformset.is_valid():
+                            pollformset.save()
+                        else:
+                            success = False
                     else:
-                        success = False
-                else:
-                    self.object.topic.poll_question = None
-                    self.object.topic.save()
-                    self.object.topic.poll_answers.all().delete()
-                    pollformset = PollAnswerFormSet()
+                        self.object.topic.poll_question = None
+                        self.object.topic.save()
+                        self.object.topic.poll_answers.all().delete()
+                        pollformset = PollAnswerFormSet()
 
                 if success:
                     transaction.commit()

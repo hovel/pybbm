@@ -1,5 +1,10 @@
 Updating PyBBM Version
 ======================
+0.11 - 0.12
+-----------
+
+* Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using
+polls subsystem
 
 0.10 - 0.11
 -----------

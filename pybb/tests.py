@@ -796,6 +796,32 @@ class PollTest(TransactionTestCase, SharedTestModule):
         self.assertEqual(new_topic.poll_question, 'q1')
         self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
 
+    def test_regression_poll_deletion_after_second_post(self):
+        self.login_client()
+
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
+        response = self.client.get(add_topic_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test poll body'
+        values['name'] = 'test poll name'
+        values['poll_type'] = 1 # poll type = single choice, create answers
+        values['poll_question'] = 'q1'
+        values['poll_answers-0-text'] = 'answer1' # two answers - what do we need to create poll
+        values['poll_answers-1-text'] = 'answer2'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_topic = Topic.objects.get(name='test poll name')
+        self.assertEqual(new_topic.poll_question, 'q1')
+        self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
+
+        add_post_url = reverse('pybb:add_post', kwargs={'topic_id': new_topic.id})
+        response = self.client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test answer body'
+        response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
+
     def test_poll_edit(self):
         edit_topic_url = reverse('pybb:edit_post', kwargs={'pk': self.post.id})
         self.login_client()
