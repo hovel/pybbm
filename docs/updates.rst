@@ -6,6 +6,8 @@ Updating PyBBM Version
 * Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using
 polls subsystem
 
+* Polish translation
+
 0.10 - 0.11
 -----------
 
