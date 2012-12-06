@@ -1,3 +1,4 @@
 recursive-include pybb/static *
 recursive-include pybb/templates *
+recursive-include pybb/locale *
 include README.rst
