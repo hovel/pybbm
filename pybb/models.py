@@ -4,7 +4,7 @@ import os.path
 import uuid
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
@@ -23,10 +23,12 @@ try:
     from django.utils.timezone import now as tznow
 except ImportError:
     import datetime
+
     tznow = datetime.datetime.now
 
 try:
     from south.modelsinspector import add_introspection_rules
+
     add_introspection_rules([], ["^annoying\.fields\.JSONField"])
     add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
 except ImportError:
@@ -36,15 +38,23 @@ from pybb import defaults
 
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
-(-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
-(-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
-(-5, '-05 EST'), (-4, '-04 AST'), (-3.5, '-03.5'), (-3, '-03 ADT'),
-(-2, '-02'), (-1, '-01'), (0, '00 GMT'), (1, '+01 CET'), (2, '+02'),
-(3, '+03'), (3.5, '+03.5'), (4, '+04'), (4.5, '+04.5'), (5, '+05'),
-(5.5, '+05.5'), (6, '+06'), (6.5, '+06.5'), (7, '+07'), (8, '+08'),
-(9, '+09'), (9.5, '+09.5'), (10, '+10'), (10.5, '+10.5'), (11, '+11'),
-(11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
-)]
+    (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
+    (-8.5, '-08.5'), (-8, '-08 PST'), (-7, '-07 MST'), (-6, '-06 CST'),
+    (-5, '-05 EST'), (-4, '-04 AST'), (-3.5, '-03.5'), (-3, '-03 ADT'),
+    (-2, '-02'), (-1, '-01'), (0, '00 GMT'), (1, '+01 CET'), (2, '+02'),
+    (3, '+03'), (3.5, '+03.5'), (4, '+04'), (4.5, '+04.5'), (5, '+05'),
+    (5.5, '+05.5'), (6, '+06'), (6.5, '+06.5'), (7, '+07'), (8, '+08'),
+    (9, '+09'), (9.5, '+09.5'), (10, '+10'), (10.5, '+10.5'), (11, '+11'),
+    (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
+    )]
+
+GROUP_TYPE_ANY = True
+GROUP_TYPE_ALL = False
+
+GROUP_TYPE_CHOICES = (
+    (GROUP_TYPE_ANY, _('Any')),
+    (GROUP_TYPE_ALL, _('All'))
+    )
 
 #noinspection PyUnusedLocal
 def get_file_path(instance, filename, to='pybb/avatar'):
@@ -58,12 +68,20 @@ def get_file_path(instance, filename, to='pybb/avatar'):
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join(to, filename)
 
+
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
-        help_text = _('If checked, this category will be visible only for staff')
-    )
+    access_loggedin = models.BooleanField(_('Logged in only'),
+        help_text=_('Check it to grant access to this category to authenticated users only.'), db_index=True,
+        default=True)
+    access_restricted = models.BooleanField(_('Allow access to groups'), db_index=True, default=False,
+        help_text=_('Check it to restrict user access to this category using a system of groups Django.'))
+    access_groups = models.ManyToManyField(Group, verbose_name=_('Select groups.'), blank=True,
+        help_text='Restrict access to a select group.')
+    access_type = models.BooleanField(_('Groups interpretation'), choices=GROUP_TYPE_CHOICES, default=GROUP_TYPE_ANY,
+        help_text=_('<b>Any</b> &mdash; the user must be in one of the selected groups '
+                    '<b>All</b> &mdash; the user should be in all the selected groups.'))
 
     class Meta(object):
         ordering = ['position']
@@ -97,9 +115,17 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
+    access_loggedin = models.BooleanField(_('Logged in only'),
+        help_text=_('Check it to grant access to this forum to authenticated users only.'), db_index=True, default=True)
+    access_restricted = models.BooleanField(_('Allow access to groups'), db_index=True, default=False,
+        help_text=_('Check it to restrict user access to this forum using a system of groups Django.'))
+    access_groups = models.ManyToManyField(Group, verbose_name=_('Select groups.'), blank=True,
+        help_text='Restrict access to a select group.')
+    access_type = models.BooleanField(_('Groups interpretation'), choices=GROUP_TYPE_CHOICES, default=GROUP_TYPE_ANY,
+        help_text=_('<b>Any</b> &mdash; the user must be in one of the selected groups '
+                    '<b>All</b> &mdash; the user should be in all the selected groups.'))
 
     class Meta(object):
         ordering = ['position']
@@ -150,7 +176,7 @@ class Topic(models.Model):
         (POLL_TYPE_NONE, _('None')),
         (POLL_TYPE_SINGLE, _('Single answer')),
         (POLL_TYPE_MULTIPLE, _('Multiple answers')),
-    )
+        )
 
     forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
     name = models.CharField(_('Subject'), max_length=255)
@@ -273,7 +299,7 @@ class Post(RenderableItem):
         if new:
             self.topic.updated = created_at
             self.topic.forum.updated = created_at
-        # If post is topic head and moderated, moderate topic too
+            # If post is topic head and moderated, moderate topic too
         if self.topic.head == self and self.on_moderation == False and self.topic.on_moderation == True:
             self.topic.on_moderation = False
         self.topic.update_counters()
@@ -310,7 +336,7 @@ class PybbProfile(models.Model):
         abstract = True
         permissions = (
             ("block_users", "Can block any user"),
-        )
+            )
 
     signature = models.TextField(_('Signature'), blank=True,
         max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH)
@@ -358,7 +384,6 @@ class Profile(PybbProfile):
 
 
 class Attachment(models.Model):
-
     class Meta(object):
         verbose_name = _('Attachment')
         verbose_name_plural = _('Attachments')
@@ -366,7 +391,7 @@ class Attachment(models.Model):
     post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
     file = models.FileField(_('File'),
-                            upload_to=lambda instance, filename: get_file_path(instance, filename, to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
+        upload_to=lambda instance, filename: get_file_path(instance, filename, to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
 
     def save(self, *args, **kwargs):
         self.size = self.file.size
@@ -386,6 +411,7 @@ class TopicReadTracker(models.Model):
     """
     Save per user topic read tracking
     """
+
     class Meta(object):
         verbose_name = _('Topic read tracker')
         verbose_name_plural = _('Topic read trackers')
@@ -399,6 +425,7 @@ class ForumReadTracker(models.Model):
     """
     Save per user forum read tracking
     """
+
     class Meta(object):
         verbose_name = _('Forum read tracker')
         verbose_name_plural = _('Forum read trackers')
@@ -443,4 +470,5 @@ class PollAnswerUser(models.Model):
 
 
 from pybb import signals
+
 signals.setup_signals()
