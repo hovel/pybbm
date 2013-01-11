@@ -58,7 +58,7 @@ class DefaultPermissionHandler(object):
            not user == topic.user:
             return False  
         # check whether this topic's forum or category is hidden
-        if (topic.forum.hidden or self.topic.forum.category.hidden) and (not user.is_staff):
+        if (topic.forum.hidden or topic.forum.category.hidden) and (not user.is_staff):
             raise Http404
         
         return True
@@ -90,8 +90,8 @@ class DefaultPermissionHandler(object):
         # only user which have 'pybb.add_post' permission may post
         return user.has_perm('pybb.add_post')
     
-    def may_post_as_admin(self, user, topic):
-        """ return True if `user` may post as admin in `topic` """
+    def may_post_as_admin(self, user):
+        """ return True if `user` may post as admin """
         return user.is_staff
     
     #
@@ -99,7 +99,7 @@ class DefaultPermissionHandler(object):
     #    
     def filter_posts(self, user, qs):
         """ return a queryset with posts `user` is allowed to see """
-        if self.request.user.is_authenticated():
+        if user.is_authenticated():
             # authenticated users may see their own posts, even if they on moderation
             qs = qs.filter(Q(user=user)|Q(on_moderation=False))
         else:
@@ -113,13 +113,13 @@ class DefaultPermissionHandler(object):
     
     def may_delete_post(self, user, post):
         """ return True if `user` may delete `post` """
-        return False
+        return pybb_topic_moderated_by(post.topic, user)
     
     #
     # permission checks on users
     #
-    def may_blog_user(self, user, user_to_block):
+    def may_block_user(self, user, user_to_block):
         """ return True if `user` may block `user_to_block` """
-        return user.has_permission('pybb.block_users')
+        return user.has_perm('pybb.block_users')
     
 perms = _resolve_class(defaults.PYBB_PERMISSION_HANDLER)

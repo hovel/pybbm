@@ -101,8 +101,9 @@ class TopicView(generic.ListView):
             raise PermissionDenied
         self.topic.views += 1
         self.topic.save()
+        qs = self.topic.posts.all().select_related('user')
         if not pybb_topic_moderated_by(self.topic, self.request.user):
-            qs = perms.filter_posts(self.topic.posts.all().select_related('user'))
+            qs = perms.filter_posts(self.request.user, self.topic.posts.all().select_related('user'))
         return qs
 
     def get_context_data(self, **kwargs):
@@ -110,7 +111,7 @@ class TopicView(generic.ListView):
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = self.request.user.is_superuser or (self.request.user in self.topic.forum.moderators.all())
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
-            if perms.may_post_as_admin(self.request.user, self.topic):
+            if perms.may_post_as_admin(self.request.user):
                 ctx['form'] = AdminPostForm(initial={'login': self.request.user.username}, topic=self.topic)
             else:
                 ctx['form'] = PostForm(topic=self.topic)
@@ -161,8 +162,8 @@ class TopicView(generic.ListView):
 
 class PostEditMixin(object):
 
-    def get_form_class(self):
-        if perms.may_post_as_admin(self.request.user, self.object.topic):
+    def get_form_class(self):        
+        if perms.may_post_as_admin(self.request.user):
             return AdminPostForm
         else:
             return PostForm
@@ -261,10 +262,12 @@ class AddPostView(PostEditMixin, generic.CreateView):
         self.forum = None
         self.topic = None
         if 'forum_id' in kwargs:
-            self.forum = get_object_or_404(perms.filter_forums(self.request.user, Forum.objects.all()), pk=kwargs['forum_id'])
+            self.forum = get_object_or_404(perms.filter_forums(request.user, Forum.objects.all()), pk=kwargs['forum_id'])
+            if not perms.may_create_topic(self.user, self.forum):
+                raise PermissionDenied    
         elif 'topic_id' in kwargs:
-            self.topic = get_object_or_404(perms.filter_topics(self.request.user, Topic.objects.all()), pk=kwargs['topic_id'])
-            if not perms.may_create_post(self.request.user, self.topic):
+            self.topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=kwargs['topic_id'])
+            if not perms.may_create_post(self.user, self.topic):
                 raise PermissionDenied            
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
@@ -282,7 +285,7 @@ class EditPostView(PostEditMixin, generic.UpdateView):
 
     def get_object(self, queryset=None):
         post = super(EditPostView, self).get_object(queryset)
-        if not perms.may_edit(self.request.user, post):
+        if not perms.may_edit_post(self.request.user, post):
             raise PermissionDenied
         return post
 
@@ -466,7 +469,7 @@ def post_ajax_preview(request):
 
 @login_required
 def mark_all_as_read(request):
-    for forum in perms.filter_forums(request, Forum.objects.all()):
+    for forum in perms.filter_forums(request.user, Forum.objects.all()):
         forum_mark, new = ForumReadTracker.objects.get_or_create(forum=forum, user=request.user)
         forum_mark.save()
     TopicReadTracker.objects.filter(user=request.user).delete()
