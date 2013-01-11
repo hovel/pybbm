@@ -24,7 +24,17 @@ def filter_hidden(user, qs):
     return qs.filter(hidden=False)
 
 class DefaultPermissionHandler(object):
-    """ Default Permission handler """
+    """ 
+    Default Permission handler. If you want to implement custom permissions (for example,
+    private forums based on some application-specific settings), you can inherit from this
+    class and override any of the `filter_*` and `may_*` methods. Methods starting with
+    `may` are expected to return `True` or `False`, whereas methods starting with `filter_*`
+    should filter the queryset they receive, and return a new queryset containing only the
+    objects the user is allowed to see.
+    
+    To activate your custom permission handler, set `settings.PYBB_PERMISSION_HANDLER` to
+    the full qualified name of your class, e.g. "`myapp.pybb_adapter.MyPermissionHandler`".    
+    """
     #
     # permission checks on categories
     #

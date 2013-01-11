@@ -252,3 +252,11 @@ PYBB_AUTO_USER_PERMISSIONS
 ..........................
 
 Automatically adds add post and add topic permissions to users on user.save().
+
+PYBB_PERMISSION_HANDLER
+.......................
+
+If you need custom permissions (for example, private forums based on application-specific 
+user groups), you can set `PYBB_PERMISSION_HANDLER` to a class which inherits from 
+`pybb.permissions.DefaultPermissionHandler`, and override any of the `filter_*` and 
+`may_*` method. For details, look at the source of `pybb.permissions.DefaultPermissionHandler`.
