@@ -33,17 +33,39 @@ from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 from pybb import defaults
 
 
-def filter_hidden(request, queryset_or_model):
-    """
-    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
-    """
-    queryset = _get_queryset(queryset_or_model)
-    if request.user.is_staff:
-        return queryset
-    return queryset.filter(hidden=False)
+def check_groups(groups, model):
+    check = False
+    for group in model.access_groups.all():
+        if group in groups:
+            if model.access_type:
+                return True
+            else:
+                check = True
+        else:
+            if not model.access_type:
+                return False
+    return check
+
+
+def filter_restricted(request, quetyset_or_object, base=True):
+    if base:
+        queryset = _get_queryset(quetyset_or_object)
+    else:
+        queryset = quetyset_or_object
+    if request.user.is_authenticated():
+        if not request.user.is_staff:
+            groups = request.user.groups.all()
+            for restricted in queryset.filter(access_restricted=True):
+                if not check_groups(groups, restricted):
+                    queryset = queryset.exclude(id=restricted.id)
+            return queryset
+        else:
+            return queryset
+    else:
+        return queryset.exclude(access_loggedin=True)
+
 
 class IndexView(generic.ListView):
-
     template_name = 'pybb/index.html'
     context_object_name = 'categories'
 
@@ -51,31 +73,29 @@ class IndexView(generic.ListView):
         ctx = super(IndexView, self).get_context_data(**kwargs)
         categories = list(ctx['categories'])
         for category in categories:
-            category.forums_accessed = filter_hidden(self.request, category.forums.all())
+            category.forums_accessed = filter_restricted(self.request, category.forums.all(), False)
         ctx['categories'] = categories
         return ctx
 
     def get_queryset(self):
-        return filter_hidden(self.request, Category)
+        return filter_restricted(self.request, Category)
 
-    
+
 class CategoryView(generic.DetailView):
-
     template_name = 'pybb/index.html'
     context_object_name = 'category'
 
     def get_queryset(self):
-        return filter_hidden(self.request, Category)
+        return filter_restricted(self.request, Category.objects.filter(pk=self.kwargs['pk']), False)
 
     def get_context_data(self, **kwargs):
         ctx = super(CategoryView, self).get_context_data(**kwargs)
-        ctx['category'].forums_accessed = filter_hidden(self.request, ctx['category'].forums.all())
+        ctx['category'].forums_accessed = filter_restricted(self.request, ctx['category'].forums.all(), False)
         ctx['categories'] = [ctx['category']]
         return ctx
 
 
 class ForumView(generic.ListView):
-
     paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
     context_object_name = 'topic_list'
     template_name = 'pybb/forum.html'
@@ -87,17 +107,27 @@ class ForumView(generic.ListView):
         return ctx
 
     def get_queryset(self):
-        self.forum = get_object_or_404(filter_hidden(self.request, Forum), pk=self.kwargs['pk'])
-        if self.forum.category.hidden and (not self.request.user.is_staff):
+        self.forum = get_object_or_404(
+            filter_restricted(
+                self.request,
+                Forum.objects.filter(pk=self.kwargs['pk']),
+                False
+            )
+        )
+        if self.forum.category.access_loggedin and (not self.request.user.is_authenticated()):
             raise Http404()
+        if not self.request.user.is_staff:
+            if self.forum.category.access_restricted:
+                if not check_groups(self.request.user.groups.all(), self.forum.category):
+                    raise Http404()
         qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
         if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
             if self.request.user.is_authenticated():
-                qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
+                qs = qs.filter(Q(user=self.request.user) | Q(on_moderation=False))
             else:
                 qs = qs.filter(on_moderation=False)
         return qs
-    
+
 
 class TopicView(generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
@@ -111,14 +141,20 @@ class TopicView(generic.ListView):
            not pybb_topic_moderated_by(self.topic, self.request.user) and\
            not self.request.user == self.topic.user:
             raise PermissionDenied
-        if (self.topic.forum.hidden or self.topic.forum.category.hidden) and (not self.request.user.is_staff):
+        if (self.topic.forum.access_loggedin or self.topic.forum.category.access_loggedin) and\
+           (not self.request.user.is_authenticated()):
             raise Http404()
+        if not self.request.user.is_staff:
+            if (self.topic.forum.access_restricted or self.topic.forum.category.access_restricted) and\
+               (not check_groups(self.request.user.groups.all(), self.topic.forum) or
+                not check_groups(self.request.user.groups.all(), self.topic.forum.category)):
+                raise Http404()
         self.topic.views += 1
         self.topic.save()
         qs = self.topic.posts.all().select_related('user')
         if not pybb_topic_moderated_by(self.topic, self.request.user):
             if self.request.user.is_authenticated():
-                qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
+                qs = qs.filter(Q(user=self.request.user) | Q(on_moderation=False))
             else:
                 qs = qs.filter(on_moderation=False)
         return qs
@@ -126,7 +162,8 @@ class TopicView(generic.ListView):
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
         if self.request.user.is_authenticated():
-            self.request.user.is_moderator = self.request.user.is_superuser or (self.request.user in self.topic.forum.moderators.all())
+            self.request.user.is_moderator = self.request.user.is_superuser or (
+            self.request.user in self.topic.forum.moderators.all())
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if self.request.user.is_staff:
                 ctx['form'] = AdminPostForm(initial={'login': self.request.user.username}, topic=self.topic)
@@ -146,7 +183,7 @@ class TopicView(generic.ListView):
             ctx['first_post'] = None
         ctx['topic'] = self.topic
 
-        if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
+        if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and\
            pybb_topic_poll_not_voted(self.topic, self.request.user):
             ctx['poll_form'] = PollForm(self.topic)
 
@@ -164,21 +201,22 @@ class TopicView(generic.ListView):
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
-                                                                Q(forum__forumreadtracker__user=request.user,forum__forumreadtracker__time_stamp__gt=F('updated')))
+            read = Topic.objects.filter(Q(forum=topic.forum) & (
+            Q(topicreadtracker__user=request.user, topicreadtracker__time_stamp__gt=F('updated'))) |
+                                        Q(forum__forumreadtracker__user=request.user,
+                                            forum__forumreadtracker__time_stamp__gt=F('updated')))
             unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
             if not unread.exists():
                 # Clear all topic marks for this forum, mark forum as readed
                 TopicReadTracker.objects.filter(
-                        user=request.user,
-                        topic__forum=topic.forum
-                        ).delete()
+                    user=request.user,
+                    topic__forum=topic.forum
+                ).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum, user=request.user)
                 forum_mark.save()
 
 
 class PostEditMixin(object):
-
     def get_form_class(self):
         if self.request.user.is_staff:
             return AdminPostForm
@@ -226,21 +264,34 @@ class PostEditMixin(object):
                     return super(ModelFormMixin, self).form_valid(form)
                 else:
                     transaction.rollback()
-                    return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+                    return self.render_to_response(
+                        self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
             except Exception:
                 transaction.rollback()
                 raise
 
 
 class AddPostView(PostEditMixin, generic.CreateView):
-
     template_name = 'pybb/add_post.html'
 
     def get_form_kwargs(self):
         ip = self.request.META.get('REMOTE_ADDR', '')
+        forum = None
+        topic = None
+        if 'forum_id' in self.kwargs:
+            if not self.user.has_perm('pybb.add_topic'):
+                raise PermissionDenied
+            forum = get_object_or_404(filter_restricted(self.request, Forum.objects.filter(pk=self.kwargs['forum_id'])))
+        elif 'topic_id' in self.kwargs:
+            topic = get_object_or_404(Topic, pk=self.kwargs['topic_id'])
+            if not self.user.is_staff:
+                if topic.forum.access_restricted and (not check_groups(self.request.user.groups.all(), topic.forum)):
+                    raise Http404
+            if topic.closed:
+                raise PermissionDenied
         form_kwargs = super(AddPostView, self).get_form_kwargs()
-        form_kwargs.update(dict(topic=self.topic, forum=self.forum, user=self.user,
-                       ip=ip, initial={}))
+        form_kwargs.update(dict(topic=topic, forum=forum, user=self.user,
+            ip=ip, initial={}))
         if 'quote_id' in self.request.GET:
             try:
                 quote_id = int(self.request.GET.get('quote_id'))
@@ -252,6 +303,8 @@ class AddPostView(PostEditMixin, generic.CreateView):
                 form_kwargs['initial']['body'] = quote
         if self.user.is_staff:
             form_kwargs['initial']['login'] = self.user.username
+        self.forum = forum
+        self.topic = topic
         return form_kwargs
 
     def get_context_data(self, **kwargs):
@@ -274,26 +327,14 @@ class AddPostView(PostEditMixin, generic.CreateView):
                 self.user, new = User.objects.get_or_create(username=defaults.PYBB_ANONYMOUS_USERNAME)
             else:
                 from django.contrib.auth.views import redirect_to_login
-                return redirect_to_login(request.get_full_path())
 
+                return redirect_to_login(request.get_full_path())
         if not self.user.has_perm('pybb.add_post'):
             raise PermissionDenied
-
-        self.forum = None
-        self.topic = None
-        if 'forum_id' in kwargs:
-            self.forum = get_object_or_404(filter_hidden(request, Forum), pk=kwargs['forum_id'])
-        elif 'topic_id' in kwargs:
-            self.topic = get_object_or_404(Topic, pk=kwargs['topic_id'])
-            if self.topic.forum.hidden and (not self.user.is_staff):
-                raise Http404
-            if self.topic.closed:
-                raise PermissionDenied
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
 
 class EditPostView(PostEditMixin, generic.UpdateView):
-
     model = Post
 
     context_object_name = 'post'
@@ -325,15 +366,15 @@ class UserView(generic.DetailView):
         ctx = super(UserView, self).get_context_data(**kwargs)
         ctx['topic_count'] = Topic.objects.filter(user=ctx['target_user']).count()
         return ctx
-        
+
 
 class PostView(generic.RedirectView):
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
         if defaults.PYBB_PREMODERATION and\
-            post.on_moderation and\
-            (not pybb_topic_moderated_by(post.topic, self.request.user)) and\
-            (not post.user==self.request.user):
+           post.on_moderation and\
+           (not pybb_topic_moderated_by(post.topic, self.request.user)) and\
+           (not post.user == self.request.user):
             raise PermissionDenied
         count = post.topic.posts.filter(created__lt=post.created).count() + 1
         page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
@@ -351,7 +392,6 @@ class ModeratePost(generic.RedirectView):
 
 
 class ProfileEditView(generic.UpdateView):
-
     template_name = 'pybb/edit_profile.html'
     form_class = EditProfileForm
 
@@ -368,7 +408,6 @@ class ProfileEditView(generic.UpdateView):
 
 
 class DeletePostView(generic.DeleteView):
-
     template_name = 'pybb/delete_post.html'
     context_object_name = 'post'
 
@@ -377,7 +416,7 @@ class DeletePostView(generic.DeleteView):
         self.topic = post.topic
         self.forum = post.topic.forum
         if not pybb_topic_moderated_by(self.topic, self.request.user):
-           raise PermissionDenied
+            raise PermissionDenied
         return post
 
     def get_success_url(self):
@@ -390,7 +429,6 @@ class DeletePostView(generic.DeleteView):
 
 
 class TopicActionBaseView(generic.View):
-
     def get_topic(self):
         topic = get_object_or_404(Topic, pk=self.kwargs['pk'])
         if not pybb_topic_moderated_by(topic, self.request.user):
@@ -421,10 +459,12 @@ class CloseTopicView(TopicActionBaseView):
         topic.closed = True
         topic.save()
 
+
 class OpenTopicView(TopicActionBaseView):
     def action(self, topic):
         topic.closed = False
         topic.save()
+
 
 class TopicPollVoteView(generic.UpdateView):
     model = Topic
@@ -467,11 +507,13 @@ def delete_subscription(request, topic_id):
     topic.subscribers.remove(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 
+
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
+
 
 @login_required
 def post_ajax_preview(request):
@@ -479,15 +521,17 @@ def post_ajax_preview(request):
     html = defaults.PYBB_MARKUP_ENGINES[defaults.PYBB_MARKUP](content)
     return HttpResponse(html)
 
+
 @login_required
 def mark_all_as_read(request):
-    for forum in filter_hidden(request, Forum):
+    for forum in filter_restricted(request, Forum):
         forum_mark, new = ForumReadTracker.objects.get_or_create(forum=forum, user=request.user)
         forum_mark.save()
     TopicReadTracker.objects.filter(user=request.user).delete()
     msg = _('All forums marked as read')
     messages.success(request, msg, fail_silently=True)
     return redirect(reverse('pybb:index'))
+
 
 @login_required
 @permission_required('pybb.block_users')
