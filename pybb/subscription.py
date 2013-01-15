@@ -22,7 +22,7 @@ def notify_topic_subscribers(post):
                     #invalid email
                     continue
                 old_lang = translation.get_language()
-                lang = user.get_profile().language or dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]]
+                lang = user.get_profile().language or settings.LANGUAGE_CODE
                 translation.activate(lang)
                 delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
                 current_site = Site.objects.get_current()
