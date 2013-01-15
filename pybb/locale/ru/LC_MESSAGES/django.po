@@ -147,7 +147,7 @@ msgstr "Выбор одного варианта"
 
 #: models.py:152
 msgid "Multiple answers"
-msgstr "Выбор нескольких ваирантов"
+msgstr "Выбор нескольких вариантов"
 
 #: models.py:157 models.py:246
 msgid "Created"
@@ -391,7 +391,7 @@ msgstr "Категории форума не созданы"
 
 #: templates/pybb/index.html:17
 msgid "Add a category now"
-msgstr "Добавить категорию сайчас"
+msgstr "Добавить категорию сейчас"
 
 #: templates/pybb/index.html:22
 msgid "Mark all forums as read"
