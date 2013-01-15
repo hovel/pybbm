@@ -1,15 +1,21 @@
 Updating PyBBM Version
 ======================
-0.11 - 0.12
------------
+0.12.2 -> 0.12.3
+----------------
+
+* German translation
+
+0.11 -> 0.12
+------------
 
 * Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using
 polls subsystem
 
 * Polish translation
 
-0.10 - 0.11
------------
+
+0.10 -> 0.11
+------------
 
 * Ability to override standard message when user doesn't login and not alowed anonymous posts by
 ``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
