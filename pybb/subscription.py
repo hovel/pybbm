@@ -5,8 +5,17 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils import translation
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
 from django import forms
+
+from pybb import defaults
+
+if defaults.PYBB_USE_DJANGO_MAILER:
+    try:
+        from mailer import send_mail
+    except ImportError:
+        from django.core.mail import send_mail
+else:
+    from django.core.mail import send_mail
 
 
 email_validator = forms.EmailField()
