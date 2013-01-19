@@ -1,0 +1,13 @@
+{% csrf_token %}
+
+{% include "pybb/form_errors.html" %}
+
+{% for field in form.visible_fields %}
+    {% include "pybb/form_field.html" %}
+{% endfor %}
+
+{% for field in form.hidden_fields %}
+    {{ field }}
+{% endfor %}
+
+<input type="hidden" name="next" value="{{ next }}" />

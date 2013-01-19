@@ -17,7 +17,7 @@
         {% csrf_token %}
         <fieldset>
             <legend>{% trans "Profile editing" %}</legend>
-            {{ form.as_p }}
+            {% include "pybb/form.html" %}
             <p>{% include "pybb/_button_save.html" %}</p>
         </fieldset>
     </form>
