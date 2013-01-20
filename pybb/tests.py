@@ -800,6 +800,23 @@ class PollTest(TransactionTestCase, SharedTestModule):
         self.assertEqual(new_topic.poll_question, 'q1')
         self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
 
+    def test_regression_adding_poll_with_removed_answers(self):
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
+        self.login_client()
+        response = self.client.get(add_topic_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test poll body'
+        values['name'] = 'test poll name'
+        values['poll_type'] = 1
+        values['poll_question'] = 'q1'
+        values['poll_answers-0-text'] = ''
+        values['poll_answers-0-DELETE'] = 'on'
+        values['poll_answers-1-text'] = ''
+        values['poll_answers-1-DELETE'] = 'on'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertFalse(Topic.objects.filter(name='test poll name').exists())
+
     def test_regression_poll_deletion_after_second_post(self):
         self.login_client()
 
