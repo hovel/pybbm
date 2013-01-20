@@ -191,10 +191,3 @@ def pybb_topic_inline_pagination(topic):
 @register.filter
 def pybb_topic_poll_not_voted(topic, user):
     return not PollAnswerUser.objects.filter(poll_answer__topic=topic, user=user).exists()
-
-@register.filter
-def is_widget(value, arg):
-    """
-    Check widget class name
-    """
-    return value.field.widget.__class__.__name__ in map(strip, arg.split(','))
