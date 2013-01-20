@@ -7,14 +7,16 @@
   <br>{% trans 'Poll answers' %}
     {% include "pybb/form_errors.html" with form=pollformset %}
     {% for form_answer in pollformset %}
-      {% include "pybb/form.html" with form=form_answer %}
+        <div class="poll-answer-form">
+            {% include "pybb/form.html" with form=form_answer hide_labels=1 %}
+        </div>
     {% endfor %}
   {{ pollformset.management_form }}
 </div>
 
 <script type="text/javascript">
   window.onload = function () {
-    $('div#poll-answers-formset table tr').formset({
+    $('div#poll-answers-formset div.poll-answer-form').formset({
       deleteText:'{% trans 'remove answer' %}',
       addText:'{% trans 'add answer' %}',
       prefix: 'poll_answers'
