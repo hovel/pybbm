@@ -1,9 +1,14 @@
+{% load pybb_tags %}
 {% csrf_token %}
 
 {% include "pybb/form_errors.html" %}
 
 {% for field in form.visible_fields %}
-    {% include "pybb/form_field.html" %}
+    {% if field.auto_id|endswith:'DELETE' %}
+        {{ field }}
+    {% else %}
+        {% include "pybb/form_field.html" %}
+    {% endif %}
 {% endfor %}
 
 {% for field in form.hidden_fields %}
