@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, redirect, _get_queryset
+from django.shortcuts import get_object_or_404, redirect, _get_queryset, render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
@@ -477,7 +477,7 @@ def add_subscription(request, topic_id):
 def post_ajax_preview(request):
     content = request.POST.get('data')
     html = defaults.PYBB_MARKUP_ENGINES[defaults.PYBB_MARKUP](content)
-    return HttpResponse(html)
+    return render(request, 'pybb/_markitup_preview.html', {'html': html})
 
 @login_required
 def mark_all_as_read(request):
