@@ -3,7 +3,7 @@
 from django.contrib.auth.models import User, Permission
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 
 from pybb.subscription import notify_topic_subscribers
 from pybb import defaults
@@ -15,6 +15,12 @@ def post_saved(instance, **kwargs):
     if instance.user.get_profile().autosubscribe:
         instance.topic.subscribers.add(instance.user)
 
+    if kwargs['created']:
+        profile = instance.user.get_profile()
+        profile.post_count = instance.user.posts.count()
+        profile.save()
+
+def post_deleted(instance, **kwargs):
     profile = instance.user.get_profile()
     profile.post_count = instance.user.posts.count()
     profile.save()
@@ -36,5 +42,6 @@ def user_saved(instance, created, **kwargs):
 def setup_signals():
     from models import Post
     post_save.connect(post_saved, sender=Post)
+    post_delete.connect(post_deleted, sender=Post)
     if defaults.PYBB_AUTO_USER_PERMISSIONS:
         post_save.connect(user_saved, sender=User)

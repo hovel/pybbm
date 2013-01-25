@@ -7,7 +7,7 @@ from django.contrib.auth.models import User, Permission
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-from django.test import TransactionTestCase
+from django.test import TestCase
 from django.test.client import Client
 
 try:
@@ -44,7 +44,7 @@ class SharedTestModule(object):
         return dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % form)[0].form_values())
 
 
-class FeaturesTest(TransactionTestCase, SharedTestModule):
+class FeaturesTest(TestCase, SharedTestModule):
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
@@ -612,12 +612,24 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         resp = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
         self.assertEqual(resp.status_code, 200)
 
+    def test_post_count(self):
+        topic = Topic(name='etopic', forum=self.forum, user=self.user)
+        topic.save()
+        post = Post(topic=topic, user=self.user, body='test') # another post
+        post.save()
+        self.assertEqual(self.user.get_profile().post_count, 2)
+        post.body = 'test2'
+        post.save()
+        self.assertEqual(Profile.objects.get(pk=self.user.get_profile().pk).post_count, 2)
+        post.delete()
+        self.assertEqual(Profile.objects.get(pk=self.user.get_profile().pk).post_count, 1)
+
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
 
-class AnonymousTest(TransactionTestCase, SharedTestModule):
+class AnonymousTest(TestCase, SharedTestModule):
 
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
@@ -655,7 +667,7 @@ def premoderate_test(user, post):
         return True
     return False
 
-class PreModerationTest(TransactionTestCase, SharedTestModule):
+class PreModerationTest(TestCase, SharedTestModule):
 
     def setUp(self):
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
@@ -765,7 +777,7 @@ class PreModerationTest(TransactionTestCase, SharedTestModule):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
         
-class AttachmentTest(TransactionTestCase, SharedTestModule):
+class AttachmentTest(TestCase, SharedTestModule):
     def setUp(self):
         self.PYBB_ATTACHMENT_ENABLE = defaults.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_ATTACHMENT_ENABLE = True
@@ -803,7 +815,7 @@ class AttachmentTest(TransactionTestCase, SharedTestModule):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
 
-class PollTest(TransactionTestCase, SharedTestModule):
+class PollTest(TestCase, SharedTestModule):
     def setUp(self):
         self.create_user()
         self.create_initial()
@@ -974,7 +986,7 @@ class PollTest(TransactionTestCase, SharedTestModule):
         defaults.PYBB_POLL_MAX_ANSWERS = self.PYBB_POLL_MAX_ANSWERS
 
 
-class FiltersTest(TransactionTestCase, SharedTestModule):
+class FiltersTest(TestCase, SharedTestModule):
     def setUp(self):
         self.create_user()
         self.create_initial(post=False)
