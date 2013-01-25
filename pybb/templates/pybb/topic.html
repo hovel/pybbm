@@ -86,7 +86,7 @@
             <div class="subscriber-list">
                 {% trans "Subscribers" %}:
                 {% for subscriber in topic.subscribers.all %}
-                    <a href="{{ subscriber.get_absolute_url }}">{{ subscriber.username }}</a>,
+                    <a href="{% url pybb:user subscriber.username %}">{{ subscriber.username }}</a>,
                 {% endfor %}
             </div>
         {% endif %}

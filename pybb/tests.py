@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import time
+import time, datetime
 import os
 
 from django.contrib.auth.models import User, Permission
@@ -333,6 +333,62 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user, forum=self.forum).count(), 1)
+
+    def test_latest_topics(self):
+        topic_1 = self.topic
+        topic_1.updated = datetime.datetime.utcnow()
+        topic_2 = Topic.objects.create(name='topic_2', forum=self.forum, user=self.user)
+        topic_2.updated = datetime.datetime.utcnow() + datetime.timedelta(days=-1)
+
+        category_2 = Category.objects.create(name='cat2')
+        forum_2 = Forum.objects.create(name='forum_2', category=category_2)
+        topic_3 = Topic.objects.create(name='topic_3', forum=forum_2, user=self.user)
+        topic_3.updated = datetime.datetime.utcnow() + datetime.timedelta(days=-2)
+
+        self.login_client()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        topic_2.forum.hidden = True
+        topic_2.forum.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_3])
+
+        topic_2.forum.hidden = False
+        topic_2.forum.save()
+        category_2.hidden = True
+        category_2.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2])
+
+        topic_2.forum.hidden = False
+        topic_2.forum.save()
+        category_2.hidden = False
+        category_2.save()
+        topic_1.on_moderation = True
+        topic_1.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        topic_1.user = User.objects.create_user('another', 'another@localhost', 'another')
+        topic_1.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_2, topic_3])
+
+        topic_1.forum.moderators.add(self.user)
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        topic_1.forum.moderators.remove(self.user)
+        self.user.is_superuser = True
+        self.user.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        self.client.logout()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_2, topic_3])
 
     def test_hidden(self):
         client = Client()

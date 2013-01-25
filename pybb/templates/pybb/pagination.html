@@ -3,7 +3,6 @@
 {% if is_paginated %}
 <div class="pagination">
         <ul>
-
             <li class="prev {% if not page_obj.has_previous %}disabled{% endif %}">
                 <a href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% endif %}" >← {% trans "previous page" %}</a>
             </li>

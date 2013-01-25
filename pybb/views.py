@@ -42,6 +42,15 @@ def filter_hidden(request, queryset_or_model):
         return queryset
     return queryset.filter(hidden=False)
 
+def filter_hidden_posts(request, queryset_or_model):
+    """
+    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
+    """
+    queryset = _get_queryset(queryset_or_model)
+    if request.user.is_staff:
+        return queryset
+    return queryset.filter(forum__hidden=False, forum__category__hidden=False)
+
 class IndexView(generic.ListView):
 
     template_name = 'pybb/index.html'
@@ -99,6 +108,26 @@ class ForumView(generic.ListView):
         return qs
     
 
+class LatestTopicsView(generic.ListView):
+
+    paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
+    context_object_name = 'topic_list'
+    template_name = 'pybb/latest_topics.html'
+    paginator_class = Paginator
+
+    def get_queryset(self):
+        qs = Topic.objects.all().select_related()
+        qs = filter_hidden_posts(self.request, qs)
+        if not self.request.user.is_superuser:
+            if self.request.user.is_authenticated():
+                qs = qs.filter(Q(forum__moderators=self.request.user) |
+                               Q(user=self.request.user) |
+                               Q(on_moderation=False))
+            else:
+                qs = qs.filter(on_moderation=False)
+        return qs.order_by('-updated')
+
+
 class TopicView(generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
     template_object_name = 'post_list'
@@ -115,7 +144,7 @@ class TopicView(generic.ListView):
             raise Http404()
         self.topic.views += 1
         self.topic.save()
-        qs = self.topic.posts.all().select_related('user')
+        qs = self.topic.posts.all().prefetch_related('user', 'user__pybb_profile')
         if not pybb_topic_moderated_by(self.topic, self.request.user):
             if self.request.user.is_authenticated():
                 qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
