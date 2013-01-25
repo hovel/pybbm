@@ -404,13 +404,25 @@ class DeletePostView(generic.DeleteView):
            raise PermissionDenied
         return post
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        redirect_url = self.get_success_url()
+        if not request.is_ajax():
+            return HttpResponseRedirect(redirect_url)
+        else:
+            return HttpResponse(redirect_url)
+
     def get_success_url(self):
         try:
             Topic.objects.get(pk=self.topic.id)
         except Topic.DoesNotExist:
             return self.forum.get_absolute_url()
         else:
-            return self.topic.get_absolute_url()
+            if not self.request.is_ajax():
+                return self.topic.get_absolute_url()
+            else:
+                return ""
 
 
 class TopicActionBaseView(generic.View):
@@ -445,10 +457,12 @@ class CloseTopicView(TopicActionBaseView):
         topic.closed = True
         topic.save()
 
+
 class OpenTopicView(TopicActionBaseView):
     def action(self, topic):
         topic.closed = False
         topic.save()
+
 
 class TopicPollVoteView(generic.UpdateView):
     model = Topic
@@ -491,17 +505,20 @@ def delete_subscription(request, topic_id):
     topic.subscribers.remove(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 
+
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 
+
 @login_required
 def post_ajax_preview(request):
     content = request.POST.get('data')
     html = defaults.PYBB_MARKUP_ENGINES[defaults.PYBB_MARKUP](content)
     return render(request, 'pybb/_markitup_preview.html', {'html': html})
+
 
 @login_required
 def mark_all_as_read(request):
@@ -512,6 +529,7 @@ def mark_all_as_read(request):
     msg = _('All forums marked as read')
     messages.success(request, msg, fail_silently=True)
     return redirect(reverse('pybb:index'))
+
 
 @login_required
 @permission_required('pybb.block_users')
