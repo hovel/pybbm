@@ -110,11 +110,15 @@ class Forum(models.Model):
         return self.name
 
     def update_counters(self):
-        self.post_count = Post.objects.filter(topic__forum=self).count()
+        posts = Post.objects.filter(topic__forum_id=self.id)
+        self.post_count = posts.count()
         self.topic_count = Topic.objects.filter(forum=self).count()
-        last_post = self.get_last_post()
-        if last_post:
-            self.updated = self.last_post.updated or self.last_post.created
+        try:
+            last_post = posts.order_by('-created')[0]
+            self.updated = last_post.updated or last_post.created
+        except IndexError:
+            pass
+
         self.save()
 
     def get_absolute_url(self):
@@ -126,7 +130,7 @@ class Forum(models.Model):
 
     def get_last_post(self):
         try:
-            return self.posts.order_by('-created').select_related()[0]
+            return self.posts.order_by('-created')[0]
         except IndexError:
             return None
 
@@ -204,7 +208,8 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        self.updated = self.last_post.updated or self.last_post.created
+        last_post = Post.objects.filter(topic_id=self.id).order_by('-created')[0]
+        self.updated = last_post.updated or last_post.created
         self.save()
 
     def get_parents(self):
@@ -243,7 +248,7 @@ class RenderableItem(models.Model):
 class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
-    created = models.DateTimeField(_('Created'), blank=True)
+    created = models.DateTimeField(_('Created'), blank=True, db_index=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     user_ip = models.IPAddressField(_('User IP'), blank=True, default='0.0.0.0')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
@@ -268,16 +273,16 @@ class Post(RenderableItem):
 
         new = self.pk is None
 
+        update_counters = kwargs.pop('update_counters', True)
+
         super(Post, self).save(*args, **kwargs)
 
-        if new:
-            self.topic.updated = created_at
-            self.topic.forum.updated = created_at
         # If post is topic head and moderated, moderate topic too
         if self.topic.head == self and self.on_moderation == False and self.topic.on_moderation == True:
             self.topic.on_moderation = False
-        self.topic.update_counters()
-        self.topic.forum.update_counters()
+        if update_counters:
+            self.topic.update_counters()
+            self.topic.forum.update_counters()
 
     def get_absolute_url(self):
         return reverse('pybb:post', kwargs={'pk': self.id})

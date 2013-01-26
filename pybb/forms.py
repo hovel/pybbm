@@ -127,6 +127,7 @@ class PostForm(forms.ModelForm):
                 post.topic.save()
             post.save()
             return post
+
         allow_post = True
         if defaults.PYBB_PREMODERATION:
             allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'])
@@ -147,7 +148,7 @@ class PostForm(forms.ModelForm):
             body=self.cleaned_data['body'])
         if not allow_post:
             post.on_moderation = True
-        post.save()
+        post.save(update_counters=commit)
         return post
 
 
