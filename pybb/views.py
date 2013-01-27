@@ -42,7 +42,7 @@ def filter_hidden(request, queryset_or_model):
         return queryset
     return queryset.filter(hidden=False)
 
-def filter_hidden_posts(request, queryset_or_model):
+def filter_hidden_topics(request, queryset_or_model):
     """
     Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
     """
@@ -117,7 +117,7 @@ class LatestTopicsView(generic.ListView):
 
     def get_queryset(self):
         qs = Topic.objects.all().select_related()
-        qs = filter_hidden_posts(self.request, qs)
+        qs = filter_hidden_topics(self.request, qs)
         if not self.request.user.is_superuser:
             if self.request.user.is_authenticated():
                 qs = qs.filter(Q(forum__moderators=self.request.user) |
@@ -144,7 +144,7 @@ class TopicView(generic.ListView):
             raise Http404()
         self.topic.views += 1
         self.topic.save()
-        qs = self.topic.posts.all().prefetch_related('user', 'user__pybb_profile')
+        qs = self.topic.posts.all().select_related('user')
         if not pybb_topic_moderated_by(self.topic, self.request.user):
             if self.request.user.is_authenticated():
                 qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
