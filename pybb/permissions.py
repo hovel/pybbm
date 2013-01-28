@@ -23,6 +23,14 @@ def filter_hidden(user, qs):
         return qs
     return qs.filter(hidden=False)
 
+def filter_hidden_topics(user, qs):
+    """
+    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
+    """
+    if user.is_staff:
+        return qs
+    return qs.filter(forum__hidden=False, forum__category__hidden=False)
+
 class DefaultPermissionHandler(object):
     """ 
     Default Permission handler. If you want to implement custom permissions (for example,
@@ -58,7 +66,13 @@ class DefaultPermissionHandler(object):
     # 
     def filter_topics(self, user, qs):
         """ return a queryset with topics `user` is allowed to see """
-        return qs 
+        qs = filter_hidden_topics(user, qs)
+        if not user.is_superuser:
+            if user.is_authenticated():
+                qs = qs.filter(Q(forum__moderators=user) | Q(user=user) | Q(on_moderation=False))
+            else:
+                qs = qs.filter(on_moderation=False)
+        return qs
     
     def may_view_topic(self, user, topic):
         """ return True if `user` may view `topic` """

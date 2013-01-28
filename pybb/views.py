@@ -107,14 +107,7 @@ class LatestTopicsView(generic.ListView):
 
     def get_queryset(self):
         qs = Topic.objects.all().select_related()
-        qs = filter_hidden_topics(self.request, qs)
-        if not self.request.user.is_superuser:
-            if self.request.user.is_authenticated():
-                qs = qs.filter(Q(forum__moderators=self.request.user) |
-                               Q(user=self.request.user) |
-                               Q(on_moderation=False))
-            else:
-                qs = qs.filter(on_moderation=False)
+        qs = perms.filter_topics(self.request.user, qs)
         return qs.order_by('-updated')
 
 
