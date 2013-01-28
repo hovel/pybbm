@@ -1,17 +1,17 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_tags i18n %}
 
-{% block title %}{{ forum.name }}{% endblock title %}
+{% block title %}{% trans "Last updates in topics" %}{% endblock title %}
 
 {% block breadcrumb %}
-    {% with forum as object %}
+    {% with extra_crumb=_("Last updates in topics") %}
         {% include "pybb/breadcrumb.html" %}
     {% endwith %}
 {% endblock %}
 
 {% block content %}
     <div class="forum">
-        <h1>{{ forum.name }}</h1>
+        <h1>{% trans "Last updates in topics" %}</h1>
         {% if forum.headline %}
             <div class="forum-headline alert alert-block">
                 {{ forum.headline|safe }}
@@ -24,9 +24,11 @@
 
         {% include "pybb/pagination.html" %}
 
-        {% if PYBB_ENABLE_ANONYMOUS_POST or not user.get_profile.is_banned %}
-            <div class="controls">
-                {% include "pybb/_button_new_topic.html" %}
+        {% if user.is_authenticated %}
+            <div id='mark-all-as-read'>
+                <a href='{% url pybb:mark_all_as_read %}'>
+                    {% trans "Mark all topics as read" %}
+                </a>
             </div>
         {% endif %}
     </div>

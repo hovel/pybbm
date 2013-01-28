@@ -11,10 +11,10 @@
     {% endif %}" method="post" enctype="multipart/form-data">
   {% csrf_token %}
   <fieldset>
-    {{ form.non_field_errors }}
-    {% if form.name %} {{ form.name.errors }} {{ form.name.label_tag }} {{ form.name }} {% endif %}
-    {% if form.login %} {{ form.login.errors }} {{ form.login.label_tag }} {{ form.login }}  {% endif %}
-    {% if form.body %} {{ form.body.errors }} {{ form.body.label_tag }} {{ form.body }}  {% endif %}
+    {% include "pybb/form_errors.html" %}
+    {% if form.name %} {% include "pybb/form_field.html" with field=form.name %} {% endif %}
+    {% if form.login %} {% include "pybb/form_field.html" with field=form.login %}  {% endif %}
+    {% if form.body %} {% include "pybb/form_field.html" with field=form.body %}  {% endif %}
     <div id='emoticons'>
       {% for smile, url in form.available_smiles.items %}
         <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>

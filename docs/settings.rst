@@ -29,6 +29,14 @@ PYBB_DEFAULT_AUTOSUBSCRIBE
 
 Users will be automatically subscribed to topic when create post in it.
 
+PYBB_USE_DJANGO_MAILER
+......................
+
+When True, then for sending email pybbm will use django-mailer app. With this app you can
+manage emails from your site in queue. But in this case you have to periodically actually
+send emails from queue. For more information see `app home page <https://github.com/pinax/django-mailer/>`_.
+(default False)
+
 Emoticons
 ---------
 
@@ -243,7 +251,7 @@ Polls
 PYBB_POLL_MAX_ANSWERS
 .....................
 
-Max count of answers, thar user can add to topic. 10 by default.
+Max count of answers, that user can add to topic. 10 by default.
 
 Permissions
 -----------

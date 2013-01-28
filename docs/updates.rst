@@ -1,15 +1,35 @@
 Updating PyBBM Version
 ======================
-0.11 - 0.12
------------
+
+0.12.4 -> 0.12.x
+----------------
+
+* More flexible forms/forms fields rendering in templates
+Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
+* Additional template for markitup preview
+You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
+
+0.12.3 -> 0.12.4
+----------------
+
+* `PYBB_USE_DJANGO_MAILER` setting
+
+0.12.2 -> 0.12.3
+----------------
+
+* German translation
+
+0.11 -> 0.12
+------------
 
 * Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using
 polls subsystem
 
 * Polish translation
 
-0.10 - 0.11
------------
+
+0.10 -> 0.11
+------------
 
 * Ability to override standard message when user doesn't login and not alowed anonymous posts by
 ``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``

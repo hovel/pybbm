@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import time
+import time, datetime
 import os
 
 from django.contrib.auth.models import User, Permission
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-from django.test import TransactionTestCase
+from django.test import TestCase
 from django.test.client import Client
 
 try:
@@ -44,7 +44,7 @@ class SharedTestModule(object):
         return dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % form)[0].form_values())
 
 
-class FeaturesTest(TransactionTestCase, SharedTestModule):
+class FeaturesTest(TestCase, SharedTestModule):
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
@@ -79,6 +79,10 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         response = self.client.get(self.category.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.forum.get_absolute_url())
+
+    def test_profile_language_default(self):
+        user = User.objects.create_user(username='user2', password='user2', email='user2@example.com')
+        self.assertEqual(user.get_profile().language, settings.LANGUAGE_CODE)
 
     def test_profile_edit(self):
         # Self profile edit
@@ -330,6 +334,62 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user, forum=self.forum).count(), 1)
 
+    def test_latest_topics(self):
+        topic_1 = self.topic
+        topic_1.updated = datetime.datetime.utcnow()
+        topic_2 = Topic.objects.create(name='topic_2', forum=self.forum, user=self.user)
+        topic_2.updated = datetime.datetime.utcnow() + datetime.timedelta(days=-1)
+
+        category_2 = Category.objects.create(name='cat2')
+        forum_2 = Forum.objects.create(name='forum_2', category=category_2)
+        topic_3 = Topic.objects.create(name='topic_3', forum=forum_2, user=self.user)
+        topic_3.updated = datetime.datetime.utcnow() + datetime.timedelta(days=-2)
+
+        self.login_client()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        topic_2.forum.hidden = True
+        topic_2.forum.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_3])
+
+        topic_2.forum.hidden = False
+        topic_2.forum.save()
+        category_2.hidden = True
+        category_2.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2])
+
+        topic_2.forum.hidden = False
+        topic_2.forum.save()
+        category_2.hidden = False
+        category_2.save()
+        topic_1.on_moderation = True
+        topic_1.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        topic_1.user = User.objects.create_user('another', 'another@localhost', 'another')
+        topic_1.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_2, topic_3])
+
+        topic_1.forum.moderators.add(self.user)
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        topic_1.forum.moderators.remove(self.user)
+        self.user.is_superuser = True
+        self.user.save()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_1, topic_2, topic_3])
+
+        self.client.logout()
+        response = self.client.get(reverse('pybb:topic_latest'))
+        self.assertListEqual(list(response.context['topic_list']), [topic_2, topic_3])
+
     def test_hidden(self):
         client = Client()
         category = Category(name='hcat', hidden=True)
@@ -552,12 +612,24 @@ class FeaturesTest(TransactionTestCase, SharedTestModule):
         resp = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
         self.assertEqual(resp.status_code, 200)
 
+    def test_post_count(self):
+        topic = Topic(name='etopic', forum=self.forum, user=self.user)
+        topic.save()
+        post = Post(topic=topic, user=self.user, body='test') # another post
+        post.save()
+        self.assertEqual(self.user.get_profile().post_count, 2)
+        post.body = 'test2'
+        post.save()
+        self.assertEqual(Profile.objects.get(pk=self.user.get_profile().pk).post_count, 2)
+        post.delete()
+        self.assertEqual(Profile.objects.get(pk=self.user.get_profile().pk).post_count, 1)
+
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
 
-class AnonymousTest(TransactionTestCase, SharedTestModule):
+class AnonymousTest(TestCase, SharedTestModule):
 
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
@@ -595,7 +667,7 @@ def premoderate_test(user, post):
         return True
     return False
 
-class PreModerationTest(TransactionTestCase, SharedTestModule):
+class PreModerationTest(TestCase, SharedTestModule):
 
     def setUp(self):
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
@@ -705,7 +777,7 @@ class PreModerationTest(TransactionTestCase, SharedTestModule):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
         
-class AttachmentTest(TransactionTestCase, SharedTestModule):
+class AttachmentTest(TestCase, SharedTestModule):
     def setUp(self):
         self.PYBB_ATTACHMENT_ENABLE = defaults.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_ATTACHMENT_ENABLE = True
@@ -743,7 +815,7 @@ class AttachmentTest(TransactionTestCase, SharedTestModule):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
 
-class PollTest(TransactionTestCase, SharedTestModule):
+class PollTest(TestCase, SharedTestModule):
     def setUp(self):
         self.create_user()
         self.create_initial()
@@ -795,6 +867,23 @@ class PollTest(TransactionTestCase, SharedTestModule):
         new_topic = Topic.objects.get(name='test poll name 1')
         self.assertEqual(new_topic.poll_question, 'q1')
         self.assertEqual(PollAnswer.objects.filter(topic=new_topic).count(), 2)
+
+    def test_regression_adding_poll_with_removed_answers(self):
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
+        self.login_client()
+        response = self.client.get(add_topic_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test poll body'
+        values['name'] = 'test poll name'
+        values['poll_type'] = 1
+        values['poll_question'] = 'q1'
+        values['poll_answers-0-text'] = ''
+        values['poll_answers-0-DELETE'] = 'on'
+        values['poll_answers-1-text'] = ''
+        values['poll_answers-1-DELETE'] = 'on'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertFalse(Topic.objects.filter(name='test poll name').exists())
 
     def test_regression_poll_deletion_after_second_post(self):
         self.login_client()
@@ -897,7 +986,7 @@ class PollTest(TransactionTestCase, SharedTestModule):
         defaults.PYBB_POLL_MAX_ANSWERS = self.PYBB_POLL_MAX_ANSWERS
 
 
-class FiltersTest(TransactionTestCase, SharedTestModule):
+class FiltersTest(TestCase, SharedTestModule):
     def setUp(self):
         self.create_user()
         self.create_initial(post=False)

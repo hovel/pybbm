@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    version = '0.12.2',
+    version = '0.12.4',
     description = 'PyBB Modified. Django forum application',
     long_description = open('README.rst').read(),
     author = 'Pavel Zhukov',
     author_email = 'gelios@gmail.com',
     name = 'pybbm',
-    url = 'http://http://www.pybbm.org/',
+    url = 'http://www.pybbm.org/',
     packages = find_packages(),
     include_package_data = True,
     package_data = {'': ['pybb/templates', 'pybb/static']},
@@ -19,7 +19,8 @@ setup(
             'pytils',
             'django-annoying',
             'sorl-thumbnail',
-            'django-pure-pagination'
+            'django-pure-pagination',
+            'django-mailer',
             ],
 
     license = "BSD",

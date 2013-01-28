@@ -18,6 +18,9 @@
     {% endif %}
     {% if user.is_authenticated %}
         <div id='mark-all-as-read'>
+            <a href='{% url pybb:topic_latest %}'>
+                {% trans "Last updates in topics" %}
+            </a>
             <a href='{% url pybb:mark_all_as_read %}'>
                 {% trans "Mark all forums as read" %}
             </a>

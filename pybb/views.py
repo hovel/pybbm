@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, redirect, _get_queryset
+from django.shortcuts import get_object_or_404, redirect, _get_queryset, render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
@@ -33,6 +33,15 @@ from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
 from pybb import defaults
 
 from pybb.permissions import perms
+
+def filter_hidden_topics(request, queryset_or_model):
+    """
+    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
+    """
+    queryset = _get_queryset(queryset_or_model)
+    if request.user.is_staff:
+        return queryset
+    return queryset.filter(forum__hidden=False, forum__category__hidden=False)
 
 class IndexView(generic.ListView):
 
@@ -88,6 +97,26 @@ class ForumView(generic.ListView):
                 qs = qs.filter(on_moderation=False)
         return qs
     
+
+class LatestTopicsView(generic.ListView):
+
+    paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
+    context_object_name = 'topic_list'
+    template_name = 'pybb/latest_topics.html'
+    paginator_class = Paginator
+
+    def get_queryset(self):
+        qs = Topic.objects.all().select_related()
+        qs = filter_hidden_topics(self.request, qs)
+        if not self.request.user.is_superuser:
+            if self.request.user.is_authenticated():
+                qs = qs.filter(Q(forum__moderators=self.request.user) |
+                               Q(user=self.request.user) |
+                               Q(on_moderation=False))
+            else:
+                qs = qs.filter(on_moderation=False)
+        return qs.order_by('-updated')
+
 
 class TopicView(generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
@@ -178,41 +207,36 @@ class PostEditMixin(object):
 
     def form_valid(self, form):
         success = True
-        with transaction.commit_manually():
-            try:
-                self.object = form.save()
+        self.object = form.save(commit=False)
 
-                if defaults.PYBB_ATTACHMENT_ENABLE:
-                    aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
-                    if aformset.is_valid():
-                        aformset.save()
-                    else:
-                        success = False
+        if defaults.PYBB_ATTACHMENT_ENABLE:
+            aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            if aformset.is_valid():
+                aformset.save()
+            else:
+                success = False
+        else:
+            aformset = AttachmentFormSet()
+
+        if self.object.topic.head == self.object:
+            if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
+                pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                if pollformset.is_valid():
+                    pollformset.save()
                 else:
-                    aformset = AttachmentFormSet()
+                    success = False
+            else:
+                self.object.topic.poll_question = None
+                self.object.topic.save()
+                self.object.topic.poll_answers.all().delete()
+                pollformset = PollAnswerFormSet()
 
-                if self.object.topic.head == self.object:
-                    if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
-                        pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
-                        if pollformset.is_valid():
-                            pollformset.save()
-                        else:
-                            success = False
-                    else:
-                        self.object.topic.poll_question = None
-                        self.object.topic.save()
-                        self.object.topic.poll_answers.all().delete()
-                        pollformset = PollAnswerFormSet()
-
-                if success:
-                    transaction.commit()
-                    return super(ModelFormMixin, self).form_valid(form)
-                else:
-                    transaction.rollback()
-                    return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
-            except Exception:
-                transaction.rollback()
-                raise
+        if success:
+            self.object.save()
+            return super(ModelFormMixin, self).form_valid(form)
+        else:
+            self.object.delete()
+            return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
 
 
 class AddPostView(PostEditMixin, generic.CreateView):
@@ -361,13 +385,25 @@ class DeletePostView(generic.DeleteView):
             raise PermissionDenied
         return post
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        redirect_url = self.get_success_url()
+        if not request.is_ajax():
+            return HttpResponseRedirect(redirect_url)
+        else:
+            return HttpResponse(redirect_url)
+
     def get_success_url(self):
         try:
             Topic.objects.get(pk=self.topic.id)
         except Topic.DoesNotExist:
             return self.forum.get_absolute_url()
         else:
-            return self.topic.get_absolute_url()
+            if not self.request.is_ajax():
+                return self.topic.get_absolute_url()
+            else:
+                return ""
 
 
 class TopicActionBaseView(generic.View):
@@ -407,12 +443,14 @@ class CloseTopicView(TopicActionBaseView):
         topic.closed = True
         topic.save()
 
+
 class OpenTopicView(TopicActionBaseView):
     def action(self, topic):
         if not perms.may_open_topic(self.request.user, topic):
             raise PermissionDenied        
         topic.closed = False
         topic.save()
+
 
 class TopicPollVoteView(generic.UpdateView):
     model = Topic
@@ -455,17 +493,20 @@ def delete_subscription(request, topic_id):
     topic.subscribers.remove(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 
+
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(Topic, pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 
+
 @login_required
 def post_ajax_preview(request):
     content = request.POST.get('data')
     html = defaults.PYBB_MARKUP_ENGINES[defaults.PYBB_MARKUP](content)
-    return HttpResponse(html)
+    return render(request, 'pybb/_markitup_preview.html', {'html': html})
+
 
 @login_required
 def mark_all_as_read(request):
@@ -476,6 +517,7 @@ def mark_all_as_read(request):
     msg = _('All forums marked as read')
     messages.success(request, msg, fail_silently=True)
     return redirect(reverse('pybb:index'))
+
 
 @login_required
 def block_user(request, username):

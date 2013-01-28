@@ -36,9 +36,7 @@
                     {{ forum.post_count }}
                 </td>
                 <td class="forum-last-post">
-                    {% if forum.updated %}
-                        {{ forum.updated|date:"d.m.Y H:i" }}
-                    {% endif %}
+                    {% include "pybb/forum_last_update_info.html" %}
                 </td>
             </tr>
         {% empty %}

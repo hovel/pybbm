@@ -1,33 +1,34 @@
 {% load i18n %}
-{{ form.poll_type.errors }} {{ form.poll_type.label_tag }} {{ form.poll_type }}
+{% include "pybb/form_field.html" with field=form.poll_type %}
+<div id="poll-question">
+  {% include "pybb/form_field.html" with field=form.poll_question %}
+</div>
 <div id="poll-answers-formset" style="display: none;">
-  {{ form.poll_question.errors }} {{ form.poll_question.label_tag }} {{ form.poll_question }}
   <br>{% trans 'Poll answers' %}
-  {{ pollformset.non_form_errors }}
-  <table>
-    {% for form in pollformset %}
-      <tr>
-        <td>{{ form.id }} {{ form.text }}</td>
-        <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
-      </tr>
+    {% include "pybb/form_errors.html" with form=pollformset %}
+    {% for form_answer in pollformset %}
+        <div class="poll-answer-form">
+            {% include "pybb/form.html" with form=form_answer hide_labels=1 %}
+        </div>
     {% endfor %}
-  </table>
   {{ pollformset.management_form }}
 </div>
 
 <script type="text/javascript">
   window.onload = function () {
-    $('div#poll-answers-formset table tr').formset({
+    $('div#poll-answers-formset div.poll-answer-form').formset({
       deleteText:'{% trans 'remove answer' %}',
       addText:'{% trans 'add answer' %}',
       prefix: 'poll_answers'
     });
 
     var toggle_poll_answers_formset = function (poll_type) {
-      if (poll_type == 0) {
+      if (poll_type === "0") {
         $('div#poll-answers-formset').hide();
+        $('div#poll-question').hide();
       } else {
         $('div#poll-answers-formset').show();
+        $('div#poll-question').show();
       }
     };
 

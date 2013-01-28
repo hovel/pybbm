@@ -43,7 +43,7 @@ class PollAnswerForm(forms.ModelForm):
 class BasePollAnswerFormset(BaseInlineFormSet):
     def clean(self):
         if any(self.errors):
-            return
+            raise forms.ValidationError(self.errors)
         forms_cnt = len(self.initial_forms) + len([form for form in self.extra_forms if form.has_changed()]) -\
                     len(self.deleted_forms)
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
@@ -127,6 +127,7 @@ class PostForm(forms.ModelForm):
                 post.topic.save()
             post.save()
             return post
+
         allow_post = True
         if defaults.PYBB_PREMODERATION:
             allow_post = defaults.PYBB_PREMODERATION(self.user, self.cleaned_data['body'])
@@ -147,7 +148,7 @@ class PostForm(forms.ModelForm):
             body=self.cleaned_data['body'])
         if not allow_post:
             post.on_moderation = True
-        post.save()
+        post.save(update_counters=commit)
         return post
 
 

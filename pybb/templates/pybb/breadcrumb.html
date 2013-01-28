@@ -1,10 +1,9 @@
 {% load i18n pybb_tags %}
 <ul class='breadcrumb'>
-    {% if request.path != '/' %}
-        <li><a href="/">{% trans "Home" %}</a> <span class="divider">/</span></li>
-    {% endif %}
+    {% include "pybb/breadcrumb_top_extra_crumb.html" %}
+    <li><a href="{% url pybb:index %}">{% trans "Home" %}</a> <span class="divider">/</span></li>
     {% if object %}
-            {% if object.get_parents %}
+        {% if object.get_parents %}
             {% for obj in object.get_parents %}
                 <li>{% pybb_link obj %} <span class="divider">/</span></li>
             {% endfor %}

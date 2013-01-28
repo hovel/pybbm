@@ -5,8 +5,17 @@ from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils import translation
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
 from django import forms
+
+from pybb import defaults
+
+if defaults.PYBB_USE_DJANGO_MAILER:
+    try:
+        from mailer import send_mail
+    except ImportError:
+        from django.core.mail import send_mail
+else:
+    from django.core.mail import send_mail
 
 
 email_validator = forms.EmailField()
@@ -22,7 +31,7 @@ def notify_topic_subscribers(post):
                     #invalid email
                     continue
                 old_lang = translation.get_language()
-                lang = user.get_profile().language or dict(settings.LANGUAGES)[settings.LANGUAGE_CODE.split('-')[0]]
+                lang = user.get_profile().language or settings.LANGUAGE_CODE
                 translation.activate(lang)
                 delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
                 current_site = Site.objects.get_current()
