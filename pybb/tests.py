@@ -247,6 +247,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=user_bob).count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=user_bob, forum=self.forum).count(), 1)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 0)
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_bob)],
+            [False, False])
 
         # user_ann creates topic_3, they should get a new topic read tracker in the db 
         add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})

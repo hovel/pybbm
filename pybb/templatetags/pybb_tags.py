@@ -162,7 +162,7 @@ def pybb_topic_unread(topics, user):
             topic.unread = True
 
         forums_ids = [f.forum_id for f in topic_list]
-        forum_marks = dict([(m.id, m.time_stamp)
+        forum_marks = dict([(m.forum_id, m.time_stamp)
                             for m
                             in ForumReadTracker.objects.filter(user=user, forum__in=forums_ids)])
         if len(forum_marks):
