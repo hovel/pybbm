@@ -130,28 +130,41 @@ def pybb_posted_by(post, user):
     """
     return post.user == user
 
+
+@register.filter
+def pybb_is_topic_unread(topic, user):
+    unread = not ForumReadTracker.objects.filter(
+        forum=topic.forum,
+        user=user,
+        time_stamp__gte=topic.updated).exists()
+    unread &= not TopicReadTracker.objects.filter(
+        topic=topic,
+        user=user,
+        time_stamp__gte=topic.updated).exists()
+    return unread
+
+
 @register.filter
 def pybb_topic_unread(topics, user):
     """
     Mark all topics in queryset/list with .unread for target user
     """
     topic_list = list(topics)
+
     if user.is_authenticated():
         for topic in topic_list:
             topic.unread = True
-        try:
-            forum_mark = ForumReadTracker.objects.get(user=user, forum=topic_list[0].forum)
-        except:
-            forum_mark = None
-        qs = TopicReadTracker.objects.filter(
-                user=user,
-                topic__in=topic_list
-                ).select_related('topic')
-        if forum_mark:
-            qs = qs.filter(topic__updated__gt=forum_mark.time_stamp)
+
+        forums_ids = [f.forum_id for f in topic_list]
+        forum_marks = dict([(m.id, m.time_stamp)
+                            for m
+                            in ForumReadTracker.objects.filter(user=user, forum__in=forums_ids)])
+        if len(forum_marks):
             for topic in topic_list:
-                if topic.updated and (topic.updated <= forum_mark.time_stamp):
+                if topic.forum.id in forum_marks and topic.updated <= forum_marks[topic.forum.id]:
                     topic.unread = False
+
+        qs = TopicReadTracker.objects.filter(user=user, topic__in=topic_list).select_related('topic')
         topic_marks = list(qs)
         topic_dict = dict(((topic.id, topic) for topic in topic_list))
         for mark in topic_marks:

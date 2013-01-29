@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
+from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread
 
 try:
     from lxml import html
@@ -333,6 +334,54 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user, forum=self.forum).count(), 1)
+
+    def test_pybb_is_topic_unread_filter(self):
+        forum_1 = self.forum
+        topic_1 = self.topic
+        topic_2 = Topic.objects.create(name='topic_2', forum=forum_1, user=self.user)
+
+        forum_2 = Forum.objects.create(name='forum_2', description='forum2', category=self.category)
+        topic_3 = Topic.objects.create(name='topic_2', forum=forum_2, user=self.user)
+
+        Post(topic=topic_1, user=self.user, body='one').save()
+        Post(topic=topic_2, user=self.user, body='two').save()
+        Post(topic=topic_3, user=self.user, body='three').save()
+
+        user_ann = User.objects.create_user('ann', 'ann@localhost', 'ann')
+        client_ann = Client()
+        client_ann.login(username='ann', password='ann')
+
+        # Two topics, each with one post. everything is unread, so the db should reflect that:
+        self.assertTrue(pybb_is_topic_unread(topic_1, user_ann))
+        self.assertTrue(pybb_is_topic_unread(topic_2, user_ann))
+        self.assertTrue(pybb_is_topic_unread(topic_3, user_ann))
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2, topic_3], user_ann)],
+            [True, True, True])
+
+        client_ann.get(topic_1.get_absolute_url())
+        self.assertFalse(pybb_is_topic_unread(topic_1, user_ann))
+        self.assertTrue(pybb_is_topic_unread(topic_2, user_ann))
+        self.assertTrue(pybb_is_topic_unread(topic_3, user_ann))
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2, topic_3], user_ann)],
+            [False, True, True])
+
+        client_ann.get(topic_2.get_absolute_url())
+        self.assertFalse(pybb_is_topic_unread(topic_1, user_ann))
+        self.assertFalse(pybb_is_topic_unread(topic_2, user_ann))
+        self.assertTrue(pybb_is_topic_unread(topic_3, user_ann))
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2, topic_3], user_ann)],
+            [False, False, True])
+
+        client_ann.get(topic_3.get_absolute_url())
+        self.assertFalse(pybb_is_topic_unread(topic_1, user_ann))
+        self.assertFalse(pybb_is_topic_unread(topic_2, user_ann))
+        self.assertFalse(pybb_is_topic_unread(topic_3, user_ann))
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2, topic_3], user_ann)],
+            [False, False, False])
 
     def test_latest_topics(self):
         topic_1 = self.topic
