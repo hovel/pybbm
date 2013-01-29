@@ -133,13 +133,19 @@ def pybb_posted_by(post, user):
 
 @register.filter
 def pybb_is_topic_unread(topic, user):
+    if not user.is_authenticated():
+        return False
+
+    if not topic.updated:
+        return True
+
     unread = not ForumReadTracker.objects.filter(
         forum=topic.forum,
-        user=user,
+        user=user.id,
         time_stamp__gte=topic.updated).exists()
     unread &= not TopicReadTracker.objects.filter(
         topic=topic,
-        user=user,
+        user=user.id,
         time_stamp__gte=topic.updated).exists()
     return unread
 
@@ -194,6 +200,7 @@ def pybb_forum_unread(forums, user):
                 forum_dict[mark.forum.id].unread = False
     return forum_list
 
+
 @register.filter
 def pybb_topic_inline_pagination(topic):
     page_count = int(math.ceil(topic.post_count / float(defaults.PYBB_TOPIC_PAGE_SIZE)))
@@ -201,9 +208,11 @@ def pybb_topic_inline_pagination(topic):
         return range(1, page_count+1)
     return range(1, 5) + ['...', page_count]
 
+
 @register.filter
 def pybb_topic_poll_not_voted(topic, user):
     return not PollAnswerUser.objects.filter(poll_answer__topic=topic, user=user).exists()
+
 
 @register.filter
 def endswith(str, substr):
