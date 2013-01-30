@@ -1,6 +1,6 @@
 # https://github.com/travis-ci/travis-ci/wiki/.travis.yml-options
 
-install: "pip install -r test/example_thirdparty/requirements.txt -r test/example_thirdparty/requirements_test.txt"
+install: "sudo pip install -r test/example_thirdparty/requirements.txt -r test/example_thirdparty/requirements_test.txt"
 
 script: "python test/example_thirdparty/manage.py test pybb"
 
