@@ -125,7 +125,7 @@ class TopicView(generic.ListView):
         self.topic.save()
         qs = self.topic.posts.all().select_related('user')
         if not pybb_topic_moderated_by(self.topic, self.request.user):
-            qs = perms.filter_posts(self.request.user, self.topic.posts.all().select_related('user'))
+            qs = perms.filter_posts(self.request.user, qs)
         return qs
 
     def get_context_data(self, **kwargs):
