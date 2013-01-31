@@ -124,8 +124,10 @@ class PostForm(forms.ModelForm):
                 post.topic.poll_type = self.cleaned_data['poll_type']
                 post.topic.poll_question = self.cleaned_data['poll_question']
                 post.topic.updated = tznow()
-                post.topic.save()
-            post.save()
+                if commit:
+                    post.topic.save()
+            if commit:
+                post.save()
             return post
 
         allow_post = True
@@ -141,14 +143,16 @@ class PostForm(forms.ModelForm):
             )
             if not allow_post:
                 topic.on_moderation = True
-            topic.save()
+            if commit:
+                topic.save()
         else:
             topic = self.topic
         post = Post(topic=topic, user=self.user, user_ip=self.ip,
             body=self.cleaned_data['body'])
         if not allow_post:
             post.on_moderation = True
-        post.save(update_counters=commit)
+        if commit:
+            post.save()
         return post
 
 
