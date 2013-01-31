@@ -638,8 +638,23 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(user in list(self.topic.subscribers.all()))
-        new_post = Post(topic=self.topic, user=self.user, body='test subscribtion юникод')
-        new_post.save()
+
+        # create a new reply (with another user)
+        self.client.login(username='zeus', password='zeus')
+        add_post_url = reverse('pybb:add_post', args=[self.topic.id])
+        response = self.client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test subscribtion юникод'
+        response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_post = Post.objects.get(pk=2)
+
+        # there should only be one email in the outbox (to user2@example.com)
+        self.assertEqual(len(mail.outbox),1)
+        self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
+
+        # unsubscribe
+        client.login(username='user2', password='user2')
         self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
         response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)

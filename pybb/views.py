@@ -224,35 +224,41 @@ class PostEditMixin(object):
 
     def form_valid(self, form):
         success = True
+        save_attachments = False
+        save_poll_answers = False
         self.object = form.save(commit=False)
 
         if defaults.PYBB_ATTACHMENT_ENABLE:
             aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
             if aformset.is_valid():
-                aformset.save()
+                save_attachments = True
             else:
                 success = False
         else:
             aformset = AttachmentFormSet()
 
-        if self.object.topic.head == self.object:
+        pollformset = PollAnswerFormSet()
+        if getattr(self, 'forum', None) or self.object.topic.head == self.object:
             if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
                 pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
                 if pollformset.is_valid():
-                    pollformset.save()
+                    save_poll_answers = True
                 else:
                     success = False
             else:
                 self.object.topic.poll_question = None
-                self.object.topic.save()
                 self.object.topic.poll_answers.all().delete()
-                pollformset = PollAnswerFormSet()
 
         if success:
+            self.object.topic.save()
+            self.object.topic = self.object.topic
             self.object.save()
+            if save_attachments:
+                aformset.save()
+            if save_poll_answers:
+                pollformset.save()
             return super(ModelFormMixin, self).form_valid(form)
         else:
-            self.object.delete()
             return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
 
 
