@@ -11,7 +11,7 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         app = get_app('pybb')
-        create_permissions(app, (), 2)
+        create_permissions(app, (), 0)
 
 
     def backwards(self, orm):
