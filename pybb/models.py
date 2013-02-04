@@ -206,6 +206,10 @@ class Topic(models.Model):
             self.created = tznow()
         super(Topic, self).save(*args, **kwargs)
 
+    def delete(self, using=None):
+        super(Topic, self).delete(using)
+        self.forum.update_counters()
+
     def update_counters(self):
         self.post_count = self.posts.count()
         last_post = Post.objects.filter(topic_id=self.id).order_by('-created')[0]
@@ -296,8 +300,7 @@ class Post(RenderableItem):
         else:
             super(Post, self).delete(*args, **kwargs)
             self.topic.update_counters()
-
-        self.topic.forum.update_counters()
+            self.topic.forum.update_counters()
 
     def get_parents(self):
         """
