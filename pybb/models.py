@@ -192,7 +192,7 @@ class Topic(models.Model):
         return self._head[0]
 
     def get_last_post(self):
-        return self.posts.order_by('-created').select_related()[0]
+        return self.posts.order_by('-created').select_related('user')[0]
 
     @property
     def last_post(self):
