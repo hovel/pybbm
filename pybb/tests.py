@@ -677,6 +677,29 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = client.get(self.forum.get_absolute_url())
         self.assertEqual(response.context['topic_list'][0], self.topic)
 
+    def test_topic_deleted(self):
+        forum_1 = Forum.objects.create(name='new forum', category=self.category)
+        topic_1 = Topic.objects.create(name='new topic', forum=forum_1, user=self.user)
+        post_1 = Post.objects.create(topic=topic_1, user=self.user, body='test')
+        time.sleep(2)
+        self.assertEqual(topic_1.updated, post_1.created)
+        self.assertEqual(forum_1.updated, post_1.created)
+
+        topic_2 = Topic.objects.create(name='another topic', forum=forum_1, user=self.user)
+        post_2 = Post.objects.create(topic=topic_2, user=self.user, body='another test')
+        time.sleep(2)
+        self.assertEqual(topic_2.updated, post_2.created)
+        self.assertEqual(forum_1.updated, post_2.created)
+
+        topic_2.delete()
+        self.assertEqual(forum_1.updated, post_1.created)
+        self.assertEqual(forum_1.topic_count, 1)
+        self.assertEqual(forum_1.post_count, 1)
+
+        post_1.delete()
+        self.assertEqual(forum_1.topic_count, 0)
+        self.assertEqual(forum_1.post_count, 0)
+
     def test_user_view(self):
         resp = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
         self.assertEqual(resp.status_code, 200)

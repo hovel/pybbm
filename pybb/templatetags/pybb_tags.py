@@ -161,7 +161,8 @@ def pybb_topic_unread(topics, user):
                             in ForumReadTracker.objects.filter(user=user, forum__in=forums_ids)])
         if len(forum_marks):
             for topic in topic_list:
-                if topic.forum.id in forum_marks and topic.updated <= forum_marks[topic.forum.id]:
+                topic_updated = topic.updated or topic.created
+                if topic.forum.id in forum_marks and topic_updated <= forum_marks[topic.forum.id]:
                     topic.unread = False
 
         qs = TopicReadTracker.objects.filter(user=user, topic__in=topic_list).select_related('topic')
