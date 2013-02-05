@@ -394,26 +394,28 @@ class TopicReadTracker(models.Model):
     """
     Save per user topic read tracking
     """
-    class Meta(object):
-        verbose_name = _('Topic read tracker')
-        verbose_name_plural = _('Topic read trackers')
-
     user = models.ForeignKey(User, blank=False, null=False)
     topic = models.ForeignKey(Topic, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
+
+    class Meta(object):
+        verbose_name = _('Topic read tracker')
+        verbose_name_plural = _('Topic read trackers')
+        unique_together = ('user', 'topic')
 
 
 class ForumReadTracker(models.Model):
     """
     Save per user forum read tracking
     """
-    class Meta(object):
-        verbose_name = _('Forum read tracker')
-        verbose_name_plural = _('Forum read trackers')
-
     user = models.ForeignKey(User, blank=False, null=False)
     forum = models.ForeignKey(Forum, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
+
+    class Meta(object):
+        verbose_name = _('Forum read tracker')
+        verbose_name_plural = _('Forum read trackers')
+        unique_together = ('user', 'forum')
 
 
 class PollAnswer(models.Model):
