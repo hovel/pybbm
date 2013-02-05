@@ -6,30 +6,12 @@ from django.utils.importlib import import_module
 from django.db.models import Q
 
 from pybb import models, defaults
-from pybb.templatetags.pybb_tags import pybb_topic_moderated_by, pybb_editable_by
-from django.http import Http404
 
 def _resolve_class(name):
     """ resolves a class function given as string, returning the function """
     if not name: return False
     modname, funcname = name.rsplit('.', 1)
     return getattr(import_module(modname), funcname)() 
-
-def filter_hidden(user, qs):
-    """
-    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
-    """
-    if user.is_staff:
-        return qs
-    return qs.filter(hidden=False)
-
-def filter_hidden_topics(user, qs):
-    """
-    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
-    """
-    if user.is_staff:
-        return qs
-    return qs.filter(forum__hidden=False, forum__category__hidden=False)
 
 class DefaultPermissionHandler(object):
     """ 
@@ -48,14 +30,14 @@ class DefaultPermissionHandler(object):
     #
     def filter_categories(self, user, qs):
         """ return a queryset with categories `user` is allowed to see """
-        return filter_hidden(user, qs)
+        return qs.filter(hidden=False) if not user.is_staff else qs
     
     # 
     # permission checks on forums
     # 
     def filter_forums(self, user, qs):
-        """ return a queryset with forums `user` is allowed to see """
-        return filter_hidden(user, qs)
+        """ return a queryset with forums `user` is allowed to see """                
+        return qs.filter(Q(hidden=False)&Q(category__hidden=False)) if not user.is_staff else qs
     
     def may_create_topic(self, user, forum):
         """ return True if `user` is allowed to create a new topic in `forum` """
@@ -66,7 +48,8 @@ class DefaultPermissionHandler(object):
     # 
     def filter_topics(self, user, qs):
         """ return a queryset with topics `user` is allowed to see """
-        qs = filter_hidden_topics(user, qs)
+        if not user.is_staff:
+            qs = qs.filter(Q(forum__hidden=False)&Q(forum__category__hidden=False))
         if not user.is_superuser:
             if user.is_authenticated():
                 qs = qs.filter(Q(forum__moderators=user) | Q(user=user) | Q(on_moderation=False))
@@ -74,40 +57,30 @@ class DefaultPermissionHandler(object):
                 qs = qs.filter(on_moderation=False)
         return qs
     
-    def may_view_topic(self, user, topic):
-        """ return True if `user` may view `topic` """
-        # check whether topic is on moderation
-        if topic.on_moderation and \
-           not pybb_topic_moderated_by(topic, user) and\
-           not user == topic.user:
-            return False  
-        # check whether this topic's forum or category is hidden
-        if (topic.forum.hidden or topic.forum.category.hidden) and (not user.is_staff):
-            raise Http404
-        
-        return True
+    def may_moderate_topic(self, user, topic):
+        return ( user.is_superuser or user in topic.forum.moderators.all() )
     
     def may_close_topic(self, user, topic):
         """ return True if `user` may close `topic` """
-        return pybb_topic_moderated_by(topic, user)
+        return self.may_moderate_topic(user, topic)
     
     def may_open_topic(self, user, topic):
         """ return True if `user` may open `topic` """
-        return pybb_topic_moderated_by(topic, user)
+        return self.may_moderate_topic(user, topic)
     
     def may_stick_topic(self, user, topic):
         """ return True if `user` may stick `topic` """
-        return pybb_topic_moderated_by(topic, user)
+        return self.may_moderate_topic(user, topic)
     
     def may_unstick_topic(self, user, topic):
         """ return True if `user` may unstick `topic` """
-        return pybb_topic_moderated_by(topic, user)
+        return self.may_moderate_topic(user, topic)
     
     def may_create_post(self, user, topic):
         """ return True if `user` is allowed to create a new post in `topic` """
         # if topic is hidden, only staff may post
         if topic.forum.hidden and (not user.is_staff):
-            raise Http404
+            return False
         # if topic is closed, only staff may post
         if topic.closed and (not user.is_staff):
             return False
@@ -123,9 +96,14 @@ class DefaultPermissionHandler(object):
     #    
     def filter_posts(self, user, qs):
         """ return a queryset with posts `user` is allowed to see """
-        if user.is_authenticated():
-            # authenticated users may see their own posts, even if they on moderation
-            qs = qs.filter(Q(user=user)|Q(on_moderation=False))
+        if not defaults.PYBB_PREMODERATION or user.is_superuser:
+            # superuser may see all posts, also if premoderation is turned off moderation 
+            # flag is ignored
+            return qs 
+        elif user.is_authenticated():
+            # post is visible if user is author, post is not on moderation, or user is moderator
+            # for this forum
+            qs = qs.filter(Q(user=user)|Q(on_moderation=False)|Q(topic__forum__moderators=user))
         else:
             # anonymous user may not see posts which are on moderation
             qs = qs.filter(on_moderation=False)
@@ -133,11 +111,12 @@ class DefaultPermissionHandler(object):
             
     def may_edit_post(self, user, post):
         """ return True if `user` may edit `post` """
-        return pybb_editable_by(post, user)        
-    
+        return ( user.is_superuser or post.user == user or 
+                 user in post.topic.forum.moderators.all() )
+        
     def may_delete_post(self, user, post):
         """ return True if `user` may delete `post` """
-        return pybb_topic_moderated_by(post.topic, user)
+        return self.may_moderate_topic(user, post.topic)
     
     #
     # permission checks on users

@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread
+from django.test.utils import override_settings
 
 try:
     from lxml import html
@@ -763,7 +764,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         # Post is not visible by others
         client = Client()
         response = client.get(post.get_absolute_url(), follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
         response = client.get(self.topic.get_absolute_url(), follow=True)
         self.assertNotContains(response, 'test premoderation')
 
@@ -829,7 +830,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'new topic name')
         response = client.get(Topic.objects.get(name='new topic name').get_absolute_url())
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
         response = admin_client.get(reverse('pybb:moderate_post',
                                      kwargs={'pk': Post.objects.get(body='new topic test').id}),
                                      follow=True)
@@ -1068,3 +1069,96 @@ class FiltersTest(TestCase, SharedTestModule):
         response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Post.objects.all()[0].body, u'test\nmultiple empty lines')
+        
+from pybb import permissions, views
+from django.db.models import Q
+
+class CustomPermissionHandler(permissions.DefaultPermissionHandler):
+    """ 
+    a custom permission handler which changes the meaning of "hidden" forum:
+    "hidden" forum or category is visible for all logged on users, not only staff 
+    """
+        
+    def filter_categories(self, user, qs):
+        return qs.filter(hidden=False) if user.is_anonymous() else qs
+        
+    def filter_forums(self, user, qs):
+        if user.is_anonymous():
+            qs = qs.filter(Q(hidden=False)&Q(category__hidden=False))
+        return qs        
+    
+    def filter_topics(self, user, qs):
+        if user.is_anonymous():
+            qs = qs.filter(Q(forum__hidden=False)&Q(forum__category__hidden=False))
+        return qs
+
+    def filter_posts(self, user, qs):
+        if user.is_anonymous():
+            qs = qs.filter(Q(topic__forum__hidden=False)&Q(topic__forum__category__hidden=False))
+        return qs
+
+class CustomPermissionHandlerTest(TestCase, SharedTestModule):
+    """ test custom permission handler """
+    
+    def setUp(self):
+        self.create_user()
+        # create public and hidden categories, forums, posts
+        c_pub = Category(name='public'); c_pub.save()
+        c_hid = Category(name='private', hidden=True); c_hid.save()
+        Forum(name='pub1', category=c_pub).save()
+        Forum(name='priv1', category=c_hid).save()
+        Forum(name='private_in_public_cat', hidden=True, category=c_pub).save()
+        for f in Forum.objects.all():
+            t = Topic(name='a topic', forum=f, user=self.user)
+            t.save()
+            Post(topic=t, user=self.user, body='test').save()
+        
+        # override the permission handler. this cannot be done with @override_settings as
+        # permissions.perms is already imported at this point, instead we got to monkeypatch
+        # the modules (not really nice, but only an issue in tests)
+        views.perms = permissions.perms = permissions._resolve_class('pybb.tests.CustomPermissionHandler')
+    
+    def tearDown(self):
+        # reset permission handler (otherwise other tests may fail)
+        views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
+    
+    def _get_with_user(self, url, username=None, password=None):
+        if username: 
+            self.client.login(username=username, password=password)
+        r = self.client.get(url,follow=True)
+        self.client.logout()
+        return r
+    
+    def test_category_permission(self):
+        for c in Category.objects.all():
+            # anon user may not see category
+            r=self._get_with_user(c.get_absolute_url())
+            if c.hidden:
+                self.assertEqual(r.status_code, 404)
+            else:
+                self.assertEqual(r.status_code, 200)            
+            # logged on user may see all categories
+            r=self._get_with_user(c.get_absolute_url(), 'zeus', 'zeus')        
+            self.assertEqual(r.status_code, 200)
+            
+    def test_forum_permission(self):
+        for f in Forum.objects.all():
+            r=self._get_with_user(f.get_absolute_url())
+            self.assertEqual(r.status_code, 404 if f.hidden or f.category.hidden else 200)
+            r=self._get_with_user(f.get_absolute_url(), 'zeus', 'zeus')            
+            self.assertEqual(r.status_code, 200)
+            
+    def test_topic_permission(self):
+        for t in Topic.objects.all():
+            r=self._get_with_user(t.get_absolute_url())
+            self.assertEqual(r.status_code, 404 if t.forum.hidden or t.forum.category.hidden else 200)
+            r=self._get_with_user(t.get_absolute_url(), 'zeus', 'zeus')            
+            self.assertEqual(r.status_code, 200)
+            
+    def test_post_permission(self):
+        for p in Post.objects.all():
+            r=self._get_with_user(p.get_absolute_url())
+            self.assertEqual(r.status_code, 404 if p.topic.forum.hidden or p.topic.forum.category.hidden else 200)
+            r=self._get_with_user(p.get_absolute_url(), 'zeus', 'zeus')            
+            self.assertEqual(r.status_code, 200)
+            

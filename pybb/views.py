@@ -28,20 +28,10 @@ from pure_pagination import Paginator
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
-from pybb.templatetags.pybb_tags import pybb_editable_by, pybb_topic_poll_not_voted
-from pybb.templatetags.pybb_tags import pybb_topic_moderated_by
+from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 from pybb import defaults
 
 from pybb.permissions import perms
-
-def filter_hidden_topics(request, queryset_or_model):
-    """
-    Return queryset for model, manager or queryset, filtering hidden objects for non staff users.
-    """
-    queryset = _get_queryset(queryset_or_model)
-    if request.user.is_staff:
-        return queryset
-    return queryset.filter(forum__hidden=False, forum__category__hidden=False)
 
 class IndexView(generic.ListView):
 
@@ -87,8 +77,6 @@ class ForumView(generic.ListView):
 
     def get_queryset(self):
         self.forum = get_object_or_404(perms.filter_forums(self.request.user, Forum.objects.all()), pk=self.kwargs['pk'])
-        if self.forum.category.hidden and (not self.request.user.is_staff):
-            raise Http404()
         qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
         if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
             if self.request.user.is_authenticated():
@@ -118,13 +106,11 @@ class TopicView(generic.ListView):
     paginator_class = Paginator
 
     def get_queryset(self):
-        self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=self.kwargs['pk'])
-        if not perms.may_view_topic(self.request.user, self.topic):
-            raise PermissionDenied
+        self.topic = get_object_or_404(perms.filter_topics(self.request.user, Topic.objects.select_related('forum')), pk=self.kwargs['pk'])
         self.topic.views += 1
         self.topic.save()
         qs = self.topic.posts.all().select_related('user')
-        if not pybb_topic_moderated_by(self.topic, self.request.user):
+        if not perms.may_moderate_topic(self.request.user, self.topic):
             qs = perms.filter_posts(self.request.user, qs)
         return qs
 
@@ -331,12 +317,7 @@ class UserView(generic.DetailView):
 
 class PostView(generic.RedirectView):
     def get_redirect_url(self, **kwargs):
-        post = get_object_or_404(Post, pk=self.kwargs['pk'])
-        if defaults.PYBB_PREMODERATION and\
-            post.on_moderation and\
-            (not pybb_topic_moderated_by(post.topic, self.request.user)) and\
-            (not post.user==self.request.user):
-            raise PermissionDenied
+        post = get_object_or_404(perms.filter_posts(self.request.user, Post.objects.all()), pk=self.kwargs['pk'])
         count = post.topic.posts.filter(created__lt=post.created).count() + 1
         page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
         return '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)
@@ -345,7 +326,7 @@ class PostView(generic.RedirectView):
 class ModeratePost(generic.RedirectView):
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
-        if not pybb_topic_moderated_by(post.topic, self.request.user):
+        if not perms.may_moderate_topic(self.request.user, post.topic):
             raise PermissionDenied
         post.on_moderation = False
         post.save()
@@ -380,7 +361,7 @@ class DeletePostView(generic.DeleteView):
             raise PermissionDenied
         self.topic = post.topic
         self.forum = post.topic.forum
-        if not pybb_topic_moderated_by(self.topic, self.request.user):
+        if not perms.may_moderate_topic(self.request.user, self.topic):
             raise PermissionDenied
         return post
 
@@ -488,14 +469,14 @@ class TopicPollVoteView(generic.UpdateView):
 
 @login_required
 def delete_subscription(request, topic_id):
-    topic = get_object_or_404(Topic, pk=topic_id)
+    topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=topic_id)
     topic.subscribers.remove(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
 @login_required
 def add_subscription(request, topic_id):
-    topic = get_object_or_404(Topic, pk=topic_id)
+    topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=topic_id)
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 
