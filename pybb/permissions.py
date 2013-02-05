@@ -5,7 +5,7 @@ Extensible permission system for pybbm
 from django.utils.importlib import import_module
 from django.db.models import Q
 
-from pybb import models, defaults
+from pybb import defaults
 
 def _resolve_class(name):
     """ resolves a class function given as string, returning the function """
@@ -37,7 +37,7 @@ class DefaultPermissionHandler(object):
     # 
     def filter_forums(self, user, qs):
         """ return a queryset with forums `user` is allowed to see """                
-        return qs.filter(Q(hidden=False)&Q(category__hidden=False)) if not user.is_staff else qs
+        return qs.filter(Q(hidden=False) & Q(category__hidden=False)) if not user.is_staff else qs
     
     def may_create_topic(self, user, forum):
         """ return True if `user` is allowed to create a new topic in `forum` """
@@ -49,7 +49,7 @@ class DefaultPermissionHandler(object):
     def filter_topics(self, user, qs):
         """ return a queryset with topics `user` is allowed to see """
         if not user.is_staff:
-            qs = qs.filter(Q(forum__hidden=False)&Q(forum__category__hidden=False))
+            qs = qs.filter(Q(forum__hidden=False) & Q(forum__category__hidden=False))
         if not user.is_superuser:
             if user.is_authenticated():
                 qs = qs.filter(Q(forum__moderators=user) | Q(user=user) | Q(on_moderation=False))
@@ -58,7 +58,7 @@ class DefaultPermissionHandler(object):
         return qs
     
     def may_moderate_topic(self, user, topic):
-        return ( user.is_superuser or user in topic.forum.moderators.all() )
+        return user.is_superuser or user in topic.forum.moderators.all()
     
     def may_close_topic(self, user, topic):
         """ return True if `user` may close `topic` """
@@ -103,7 +103,7 @@ class DefaultPermissionHandler(object):
         elif user.is_authenticated():
             # post is visible if user is author, post is not on moderation, or user is moderator
             # for this forum
-            qs = qs.filter(Q(user=user)|Q(on_moderation=False)|Q(topic__forum__moderators=user))
+            qs = qs.filter(Q(user=user) | Q(on_moderation=False) | Q(topic__forum__moderators=user))
         else:
             # anonymous user may not see posts which are on moderation
             qs = qs.filter(on_moderation=False)
@@ -111,8 +111,7 @@ class DefaultPermissionHandler(object):
             
     def may_edit_post(self, user, post):
         """ return True if `user` may edit `post` """
-        return ( user.is_superuser or post.user == user or 
-                 user in post.topic.forum.moderators.all() )
+        return user.is_superuser or post.user == user or self.may_moderate_topic(user, post.topic)
         
     def may_delete_post(self, user, post):
         """ return True if `user` may delete `post` """

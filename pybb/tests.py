@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread
-from django.test.utils import override_settings
 
 try:
     from lxml import html
@@ -1093,7 +1092,7 @@ class FiltersTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Post.objects.all()[0].body, u'test\nmultiple empty lines')
         
-from pybb import permissions, views
+from pybb import permissions
 from django.db.models import Q
 
 class CustomPermissionHandler(permissions.DefaultPermissionHandler):
@@ -1124,6 +1123,7 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """
     
     def setUp(self):
+        from pybb import views
         self.create_user()
         # create public and hidden categories, forums, posts
         c_pub = Category(name='public'); c_pub.save()
@@ -1142,6 +1142,7 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
         views.perms = permissions.perms = permissions._resolve_class('pybb.tests.CustomPermissionHandler')
     
     def tearDown(self):
+        from pybb import views
         # reset permission handler (otherwise other tests may fail)
         views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
     
