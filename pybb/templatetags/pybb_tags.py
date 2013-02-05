@@ -26,6 +26,7 @@ except ImportError:
     pytils_enabled = False
 
 from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb.permissions import perms
 from pybb import defaults
 
 
@@ -106,21 +107,14 @@ def pybb_topic_moderated_by(topic, user):
     Check if user is moderator of topic's forum.
     """
 
-    return user.is_superuser or (user in topic.forum.moderators.all())
+    return perms.may_moderate_topic(user, topic)
 
 @register.filter
 def pybb_editable_by(post, user):
     """
     Check if the post could be edited by the user.
     """
-
-    if user.is_superuser:
-        return True
-    if post.user == user:
-        return True
-    if user in post.topic.forum.moderators.all():
-        return True
-    return False
+    return perms.may_edit_post(user, post)    
 
 
 @register.filter
