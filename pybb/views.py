@@ -152,10 +152,11 @@ class TopicView(generic.ListView):
             # Mark topic as readed
             try:
                 topic_mark, new = TopicReadTracker.objects.get_or_create(topic=topic, user=request.user)
-                if not new:
-                    topic_mark.save()
             except IntegrityError: # duplicate mark
-                pass
+                topic_mark = TopicReadTracker.objects.get(topic=topic, user=request.user)
+                new = False
+            if not new:
+                topic_mark.save()
 
             # Check, if there are any unread topics in forum
             read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
@@ -169,9 +170,9 @@ class TopicView(generic.ListView):
                         ).delete()
                 try:
                     forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum, user=request.user)
-                    forum_mark.save()
                 except IntegrityError: # duplicate mark
-                    pass
+                    forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=request.user)
+                forum_mark.save()
 
 
 class PostEditMixin(object):
@@ -499,9 +500,9 @@ def mark_all_as_read(request):
     for forum in perms.filter_forums(request.user, Forum.objects.all()):
         try:
             forum_mark, new = ForumReadTracker.objects.get_or_create(forum=forum, user=request.user)
-            forum_mark.save()
         except IntegrityError: # duplicate mark
-            pass
+            forum_mark = ForumReadTracker.objects.get(forum=forum, user=request.user)
+        forum_mark.save()
     TopicReadTracker.objects.filter(user=request.user).delete()
     msg = _('All forums marked as read')
     messages.success(request, msg, fail_silently=True)
