@@ -27,7 +27,7 @@
         {% for answer in topic.poll_answers.all %}
           <tr class="poll-answer">
             <td>{{ answer }}</td>
-            <td>{{ answer.votes }} ({{ answer.votes_percent }} %)</td>
+            <td>{{ answer.votes }} ({{ answer.votes_percent|floatformat:2 }} %)</td>
           </tr>
         {% endfor %}
       {% endif %}
