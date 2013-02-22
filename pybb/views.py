@@ -9,7 +9,8 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db import IntegrityError
 from django.db.models import F, Q
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
+    HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -33,6 +34,25 @@ from pybb import defaults
 
 from pybb.permissions import perms
 
+class RedirectToLoginMixin(object):
+    """ mixin which redirects to settings.LOGIN_URL if the view encounters an PermissionDenied exception
+        and the user is not authenticated. Views inheriting from this need to implement 
+        get_login_redirect_url(), which returns the URL to redirect to after login (parameter "next")
+    """ 
+    def dispatch(self, *args, **kwargs):
+        try:
+            return super(RedirectToLoginMixin, self).dispatch(*args, **kwargs)
+        except PermissionDenied:
+            if not self.request.user.is_authenticated():
+                from django.contrib.auth.views import redirect_to_login
+                return redirect_to_login(self.get_login_redirect_url())
+            else:
+                return HttpResponseForbidden()
+
+    def get_login_redirect_url(self):
+        """ get the url to which we redirect after the user logs in. subclasses should override this """
+        return '/'
+
 class IndexView(generic.ListView):
 
     template_name = 'pybb/index.html'
@@ -49,13 +69,22 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return perms.filter_categories(self.request.user, Category.objects.all())
     
-class CategoryView(generic.DetailView):
+class CategoryView(RedirectToLoginMixin, generic.DetailView):
 
     template_name = 'pybb/index.html'
     context_object_name = 'category'
 
+    def get_login_redirect_url(self):
+        return reverse('pybb:category', args=(self.kwargs['pk'],))
+    
     def get_queryset(self):
-        return perms.filter_categories(self.request.user, Category.objects.all())
+        return Category.objects.all()
+    
+    def get_object(self, queryset=None):
+        obj = super(CategoryView, self).get_object(queryset)
+        if not perms.may_view_category(self.request.user, obj):
+            raise PermissionDenied
+        return obj        
 
     def get_context_data(self, **kwargs):
         ctx = super(CategoryView, self).get_context_data(**kwargs)
@@ -63,20 +92,26 @@ class CategoryView(generic.DetailView):
         ctx['categories'] = [ctx['category']]
         return ctx
 
-class ForumView(generic.ListView):
+class ForumView(RedirectToLoginMixin, generic.ListView):
 
     paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
     context_object_name = 'topic_list'
     template_name = 'pybb/forum.html'
     paginator_class = Paginator
 
+    def get_login_redirect_url(self):
+        return reverse('pybb:forum', args=(self.kwargs['pk'],))
+        
     def get_context_data(self, **kwargs):
         ctx = super(ForumView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
         return ctx
 
     def get_queryset(self):
-        self.forum = get_object_or_404(perms.filter_forums(self.request.user, Forum.objects.all()), pk=self.kwargs['pk'])
+        self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
+        if not perms.may_view_forum(self.request.user, self.forum):
+            raise PermissionDenied
+        
         qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
         if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
             if self.request.user.is_authenticated():
@@ -99,14 +134,20 @@ class LatestTopicsView(generic.ListView):
         return qs.order_by('-updated')
 
 
-class TopicView(generic.ListView):
+class TopicView(RedirectToLoginMixin, generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
     paginator_class = Paginator
 
-    def get_queryset(self):
-        self.topic = get_object_or_404(perms.filter_topics(self.request.user, Topic.objects.select_related('forum')), pk=self.kwargs['pk'])
+    def get_login_redirect_url(self):
+        return reverse('pybb:topic', args=(self.kwargs['pk'],))    
+
+    def get_queryset(self):        
+        self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=self.kwargs['pk'])
+        if not perms.may_view_topic(self.request.user, self.topic):
+            raise PermissionDenied
+            
         self.topic.views += 1
         self.topic.save()
         qs = self.topic.posts.all().select_related('user')
@@ -322,9 +363,15 @@ class UserView(generic.DetailView):
         return ctx
         
 
-class PostView(generic.RedirectView):
+class PostView(RedirectToLoginMixin, generic.RedirectView):
+    
+    def get_login_redirect_url(self):
+        return reverse('pybb:post', args=(self.kwargs['pk'],))
+    
     def get_redirect_url(self, **kwargs):
-        post = get_object_or_404(perms.filter_posts(self.request.user, Post.objects.all()), pk=self.kwargs['pk'])
+        post = get_object_or_404(Post.objects.all(), pk=self.kwargs['pk'])
+        if not perms.may_view_post(self.request.user, post):
+            raise PermissionDenied
         count = post.topic.posts.filter(created__lt=post.created).count() + 1
         page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
         return '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)

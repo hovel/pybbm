@@ -32,12 +32,20 @@ class DefaultPermissionHandler(object):
         """ return a queryset with categories `user` is allowed to see """
         return qs.filter(hidden=False) if not user.is_staff else qs
     
+    def may_view_category(self, user, category):
+        """ return True if `user` may view this category, False if not """
+        return user.is_staff or not category.hidden
+    
     # 
     # permission checks on forums
     # 
     def filter_forums(self, user, qs):
         """ return a queryset with forums `user` is allowed to see """                
         return qs.filter(Q(hidden=False) & Q(category__hidden=False)) if not user.is_staff else qs
+    
+    def may_view_forum(self, user, forum):
+        """ return True if user may view this forum, False if not """
+        return user.is_staff or ( forum.hidden == False and forum.category.hidden == False )
     
     def may_create_topic(self, user, forum):
         """ return True if `user` is allowed to create a new topic in `forum` """
@@ -56,6 +64,16 @@ class DefaultPermissionHandler(object):
             else:
                 qs = qs.filter(on_moderation=False)
         return qs
+    
+    def may_view_topic(self, user, topic):
+        """ return True if user may view this topic, False otherwise """
+        if user.is_superuser:
+            return True
+        if not user.is_staff and ( topic.forum.hidden or topic.forum.category.hidden ):
+            return False # only staff may see hidden forum / category             
+        if topic.on_moderation:
+            return user.is_authenticated() and ( user == topic.user or user in topic.forum.moderators ) 
+        return True
     
     def may_moderate_topic(self, user, topic):
         return user.is_superuser or user in topic.forum.moderators.all()
@@ -108,7 +126,15 @@ class DefaultPermissionHandler(object):
             # anonymous user may not see posts which are on moderation
             qs = qs.filter(on_moderation=False)
         return qs
-            
+    
+    def may_view_post(self, user, post):
+        """ return True if `user` may view `post`, False otherwise """
+        if user.is_superuser:
+            return True
+        if post.on_moderation:
+            return post.user == user or user in post.topic.forum.moderators.all()
+        return True  
+    
     def may_edit_post(self, user, post):
         """ return True if `user` may edit `post` """
         return user.is_superuser or post.user == user or self.may_moderate_topic(user, post.topic)
