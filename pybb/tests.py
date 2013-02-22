@@ -44,6 +44,13 @@ class SharedTestModule(object):
     def get_form_values(self, response, form="post-form"):
         return dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % form)[0].form_values())
 
+    def get_with_user(self, url, username=None, password=None):
+        if username: 
+            self.client.login(username=username, password=password)
+        r = self.client.get(url)
+        self.client.logout()
+        return r
+
 
 class FeaturesTest(TestCase, SharedTestModule):
     def setUp(self):
@@ -465,9 +472,9 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         
         self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
-        self.assertEqual(client.get(category.get_absolute_url()).status_code, 404)
-        self.assertEqual(client.get(forum_in_hidden.get_absolute_url()).status_code, 404)
-        self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 404)
+        self.assertEqual(client.get(category.get_absolute_url()).status_code, 302)
+        self.assertEqual(client.get(forum_in_hidden.get_absolute_url()).status_code, 302)
+        self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 302)
 
         self.assertNotContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
         self.assertNotContains(client.get(reverse('pybb:feed_topics')), topic_hidden.get_absolute_url())
@@ -475,26 +482,26 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         self.assertNotContains(client.get(reverse('pybb:feed_posts')), post_hidden.get_absolute_url())
         self.assertNotContains(client.get(reverse('pybb:feed_posts')), post_in_hidden.get_absolute_url())
-        self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 404)
-        self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 404)
+        self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 302)
+        self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 302)
 
         client.login(username='zeus', password='zeus')
         self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
         self.assertNotContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
-        self.assertEqual(client.get(category.get_absolute_url()).status_code, 404)
-        self.assertEqual(client.get(forum_in_hidden.get_absolute_url()).status_code, 404)
-        self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 404)
-        self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 404)
-        self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 404)
+        self.assertEqual(client.get(category.get_absolute_url()).status_code, 403)
+        self.assertEqual(client.get(forum_in_hidden.get_absolute_url()).status_code, 403)
+        self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 403)
+        self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 403)
+        self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 403)
         self.user.is_staff = True
         self.user.save()
         self.assertTrue(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
         self.assertContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
-        self.assertNotEqual(client.get(category.get_absolute_url()).status_code, 404)
-        self.assertNotEqual(client.get(forum_in_hidden.get_absolute_url()).status_code, 404)
-        self.assertNotEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 404)
-        self.assertNotEqual(client.get(forum_hidden.get_absolute_url()).status_code, 404)
-        self.assertNotEqual(client.get(topic_hidden.get_absolute_url()).status_code, 404)
+        self.assertEqual(client.get(category.get_absolute_url()).status_code, 200)
+        self.assertEqual(client.get(forum_in_hidden.get_absolute_url()).status_code, 200)
+        self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 200)
+        self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 200)
+        self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 200)
 
     def test_inactive(self):
         self.login_client()
@@ -783,10 +790,10 @@ class PreModerationTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'test premoderation')
 
-        # Post is not visible by others
+        # Post is not visible by anonymous user
         client = Client()
         response = client.get(post.get_absolute_url(), follow=True)
-        self.assertEqual(response.status_code, 404)
+        self.assertRedirects(response, settings.LOGIN_URL+'?next=%s' % post.get_absolute_url())
         response = client.get(self.topic.get_absolute_url(), follow=True)
         self.assertNotContains(response, 'test premoderation')
 
@@ -852,7 +859,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'new topic name')
         response = client.get(Topic.objects.get(name='new topic name').get_absolute_url())
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 302)
         response = admin_client.get(reverse('pybb:moderate_post',
                                      kwargs={'pk': Post.objects.get(body='new topic test').id}),
                                      follow=True)
@@ -1103,21 +1110,34 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
         
     def filter_categories(self, user, qs):
         return qs.filter(hidden=False) if user.is_anonymous() else qs
-        
+    
+    def may_view_category(self, user, category):
+        return user.is_authenticated() if category.hidden else True
+    
     def filter_forums(self, user, qs):
         if user.is_anonymous():
             qs = qs.filter(Q(hidden=False)&Q(category__hidden=False))
         return qs        
+    
+    def may_view_forum(self, user, forum):
+        return user.is_authenticated() if forum.hidden or forum.category.hidden else True
     
     def filter_topics(self, user, qs):
         if user.is_anonymous():
             qs = qs.filter(Q(forum__hidden=False)&Q(forum__category__hidden=False))
         return qs
 
+    def may_view_topic(self, user, topic):
+        return self.may_view_forum(user, topic.forum)
+
     def filter_posts(self, user, qs):
         if user.is_anonymous():
             qs = qs.filter(Q(topic__forum__hidden=False)&Q(topic__forum__category__hidden=False))
         return qs
+
+    def may_view_post(self, user, post):
+        return self.may_view_forum(user, post.topic.forum)
+
 
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """
@@ -1146,43 +1166,103 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
         # reset permission handler (otherwise other tests may fail)
         views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
     
-    def _get_with_user(self, url, username=None, password=None):
-        if username: 
-            self.client.login(username=username, password=password)
-        r = self.client.get(url,follow=True)
-        self.client.logout()
-        return r
-    
     def test_category_permission(self):
         for c in Category.objects.all():
             # anon user may not see category
-            r=self._get_with_user(c.get_absolute_url())
+            r=self.get_with_user(c.get_absolute_url())
             if c.hidden:
-                self.assertEqual(r.status_code, 404)
+                self.assertEqual(r.status_code, 302)
             else:
-                self.assertEqual(r.status_code, 200)            
+                self.assertEqual(r.status_code, 200)
             # logged on user may see all categories
-            r=self._get_with_user(c.get_absolute_url(), 'zeus', 'zeus')        
+            r=self.get_with_user(c.get_absolute_url(), 'zeus', 'zeus')        
             self.assertEqual(r.status_code, 200)
             
     def test_forum_permission(self):
         for f in Forum.objects.all():
-            r=self._get_with_user(f.get_absolute_url())
-            self.assertEqual(r.status_code, 404 if f.hidden or f.category.hidden else 200)
-            r=self._get_with_user(f.get_absolute_url(), 'zeus', 'zeus')            
+            r=self.get_with_user(f.get_absolute_url())
+            self.assertEqual(r.status_code, 302 if f.hidden or f.category.hidden else 200)
+            r=self.get_with_user(f.get_absolute_url(), 'zeus', 'zeus')            
             self.assertEqual(r.status_code, 200)
             
     def test_topic_permission(self):
         for t in Topic.objects.all():
-            r=self._get_with_user(t.get_absolute_url())
-            self.assertEqual(r.status_code, 404 if t.forum.hidden or t.forum.category.hidden else 200)
-            r=self._get_with_user(t.get_absolute_url(), 'zeus', 'zeus')            
+            r=self.get_with_user(t.get_absolute_url())
+            self.assertEqual(r.status_code, 302 if t.forum.hidden or t.forum.category.hidden else 200)
+            r=self.get_with_user(t.get_absolute_url(), 'zeus', 'zeus')            
             self.assertEqual(r.status_code, 200)
             
     def test_post_permission(self):
         for p in Post.objects.all():
-            r=self._get_with_user(p.get_absolute_url())
-            self.assertEqual(r.status_code, 404 if p.topic.forum.hidden or p.topic.forum.category.hidden else 200)
-            r=self._get_with_user(p.get_absolute_url(), 'zeus', 'zeus')            
-            self.assertEqual(r.status_code, 200)
+            r=self.get_with_user(p.get_absolute_url())
+            self.assertEqual(r.status_code, 302 if p.topic.forum.hidden or p.topic.forum.category.hidden else 301)
+            r=self.get_with_user(p.get_absolute_url(), 'zeus', 'zeus')            
+            self.assertEqual(r.status_code, 301)
             
+class LogonRedirectTest(TestCase, SharedTestModule):
+    """ test whether anonymous user gets redirected, whereas unauthorized user gets PermissionDenied """
+    
+    def setUp(self):
+        # create users
+        staff = User.objects.create_user('staff', 'staff@localhost', 'staff')
+        staff.is_staff = True
+        staff.save()
+        nostaff = User.objects.create_user('nostaff', 'nostaff@localhost', 'nostaff')
+        nostaff.is_staff = False
+        nostaff.save()
+        
+        # create topic, post in hidden category 
+        self.category = Category(name='private', hidden=True)
+        self.category.save()
+        self.forum = Forum(name='priv1', category=self.category)
+        self.forum.save()
+        self.topic = Topic(name='a topic', forum=self.forum, user=staff)
+        self.topic.save()
+        self.post = Post(body='body post', topic=self.topic, user=staff, on_moderation=True)
+        self.post.save()            
+                    
+    def test_redirect_category(self):
+        # access without user should be redirected
+        r = self.get_with_user(self.category.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.category.get_absolute_url())
+        # access with (unauthorized) user should get 403 (forbidden)
+        r = self.get_with_user(self.category.get_absolute_url(), 'nostaff', 'nostaff')
+        self.assertEquals(r.status_code, 403)
+        # allowed user is allowed
+        r = self.get_with_user(self.category.get_absolute_url(), 'staff', 'staff')
+        self.assertEquals(r.status_code, 200)
+    
+    def test_redirect_forum(self):
+        # access without user should be redirected
+        r = self.get_with_user(self.forum.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.forum.get_absolute_url())
+        # access with (unauthorized) user should get 403 (forbidden)
+        r = self.get_with_user(self.forum.get_absolute_url(), 'nostaff', 'nostaff')
+        self.assertEquals(r.status_code, 403)
+        # allowed user is allowed
+        r = self.get_with_user(self.forum.get_absolute_url(), 'staff', 'staff')
+        self.assertEquals(r.status_code, 200)
+    
+    def test_redirect_topic(self):
+        # access without user should be redirected
+        r = self.get_with_user(self.topic.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.topic.get_absolute_url())
+        # access with (unauthorized) user should get 403 (forbidden)
+        r = self.get_with_user(self.topic.get_absolute_url(), 'nostaff', 'nostaff')
+        self.assertEquals(r.status_code, 403)
+        # allowed user is allowed
+        r = self.get_with_user(self.topic.get_absolute_url(), 'staff', 'staff')
+        self.assertEquals(r.status_code, 200)
+    
+    def test_redirect_post(self):
+        # access without user should be redirected
+        r = self.get_with_user(self.post.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.post.get_absolute_url())
+        # access with (unauthorized) user should get 403 (forbidden)
+        r = self.get_with_user(self.post.get_absolute_url(), 'nostaff', 'nostaff')
+        self.assertEquals(r.status_code, 403)
+        # allowed user is allowed
+        r = self.get_with_user(self.post.get_absolute_url(), 'staff', 'staff')
+        self.assertEquals(r.status_code, 301)
+
+    
