@@ -1,4 +1,7 @@
 {% extends 'pybb/base.html' %}
+
+{% load url from future %}
+
 {% load pybb_tags i18n %}
 
 {% block title %}{% trans "All topics created by" %} {{ profile }}{% endblock %}
@@ -10,7 +13,7 @@
         <ul class="tablist-inner topic">
             {% for topic in page.object_list %}
             <li class="tablist-inner-row topic">
-                <span class="title"><a href={% url pybb_topic topic.id %}>{{ topic }}</a></span>
+                <span class="title"><a href={% url 'pybb_topic' topic.id %}>{{ topic }}</a></span>
                 <span class="post_count">{{ topic.posts.count }}</span>
                 <span class="updated">{{ topic.created|date:"d M Y h:i" }}</span>
             </li>

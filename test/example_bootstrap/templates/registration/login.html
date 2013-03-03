@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+
+{% load url from future %}
+
 {% block title %}
     Login
 {% endblock %}
@@ -16,7 +19,7 @@
     </form>
 
     <p>
-        <b>Don't have an account?</b> <a href="{% url registration_register %}">Register</a>
+        <b>Don't have an account?</b> <a href="{% url 'registration_register' %}">Register</a>
     </p>
 
 {% endblock %}

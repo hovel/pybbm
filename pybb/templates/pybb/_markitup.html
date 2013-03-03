@@ -1,3 +1,4 @@
+{% load url from future %}
 <script type="text/javascript" src="{{ STATIC_URL }}markitup/ajax_csrf.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}markitup/jquery.markitup.js"></script>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}markitup/skins/simple/style.css">
@@ -6,7 +7,7 @@
 
 <script type="text/javascript">
 $(function() {
-    mySettings['previewParserPath'] = '{% url pybb:post_ajax_preview %}';
+    mySettings['previewParserPath'] = '{% url 'pybb:post_ajax_preview' %}';
     mySettings['previewPosition'] = 'before';
     mySettings['resizeHandle'] = true;
     mySettings['markupSet'] = [

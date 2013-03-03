@@ -1,4 +1,7 @@
 {% extends 'pybb/base.html' %}
+
+{% load url from future %}
+
 {% load pybb_tags i18n %}
 
 {% block content %}
@@ -12,7 +15,7 @@
 
         <span class="post_count">{{ topic.posts.count }}</span>
         <span class="updated">{{ topic.created|date:"d M Y h:i" }}</span>
-        <a href={% url pybb_post topic.id %}>{{ topic.body_text }}</a>
+        <a href={% url 'pybb_post' topic.id %}>{{ topic.body_text }}</a>
         </li>
         {% endfor %}
 

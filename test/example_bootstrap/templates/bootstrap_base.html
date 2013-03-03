@@ -1,3 +1,4 @@
+{% load url from future %}
 {% load pytils_numeral %}
 <!DOCTYPE html>
 <html>
@@ -37,23 +38,23 @@
             <ul class="nav">
                 {% if request.user.is_authenticated %}
                     <li>
-                        <a href="{% url pybb:edit_profile %}">Profile [logged as {{ request.user.username }}]</a>
+                        <a href="{% url 'pybb:edit_profile' %}">Profile [logged as {{ request.user.username }}]</a>
                     </li>
                     <li>
-                        <a href="{% url auth_logout %}">Logout</a>
+                        <a href="{% url 'auth_logout' %}">Logout</a>
                     </li>
                     {% if request.user.is_superuser %}
                         <li>
-                            <a href="{% url admin:index %}">Admin interface</a>
+                            <a href="{% url 'admin:index' %}">Admin interface</a>
                         </li>
                     {% endif %}
 
                 {% else %}
                     <li>
-                        <a href="{% url auth_login %}">Login</a>
+                        <a href="{% url 'auth_login' %}">Login</a>
                     </li>
                     <li>
-                        <a href="{% url registration_register %}">Register</a>
+                        <a href="{% url 'registration_register' %}">Register</a>
                     </li>
                 {% endif %}
                 <li><a href="http://github.com/hovel/pybbm">Code</a></li>
