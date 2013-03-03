@@ -1,4 +1,7 @@
 {% extends 'pybb/base.html' %}
+
+{% load url from future %}
+
 {% load pybb_tags i18n %}
 
 {% block title %}{% trans "Last updates in topics" %}{% endblock title %}
@@ -26,7 +29,7 @@
 
         {% if user.is_authenticated %}
             <div id='mark-all-as-read'>
-                <a href='{% url pybb:mark_all_as_read %}'>
+                <a href='{% url 'pybb:mark_all_as_read' %}'>
                     {% trans "Mark all topics as read" %}
                 </a>
             </div>

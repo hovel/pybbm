@@ -1,4 +1,7 @@
 {% extends 'pybb/base.html' %}
+
+{% load url from future %}
+
 {% load i18n thumbnail pybb_tags %}
 
 {% block title %}{% trans "Profile editing" %}{% endblock title %}
@@ -12,7 +15,7 @@
         <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="avatar">
     {% endthumbnail %}
     </div>
-    <p><a href="{% url auth_password_change %}">{% trans "Change the password" %}</a></p>
+    <p><a href="{% url 'auth_password_change' %}">{% trans "Change the password" %}</a></p>
     <form method="post" enctype="multipart/form-data" class="profile-edit">
         {% csrf_token %}
         <fieldset>
@@ -28,7 +31,7 @@
                 {% pybb_link sub %}
                 &mdash;
                 <strong>
-                    <a href="{% url pybb:delete_subscription sub.id %}">{% trans "delete" %}</a>
+                    <a href="{% url 'pybb:delete_subscription' sub.id %}">{% trans "delete" %}</a>
                 </strong>
             </li>
         {% endfor %}

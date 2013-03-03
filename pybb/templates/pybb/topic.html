@@ -1,4 +1,7 @@
 {% extends 'pybb/base.html' %}
+
+{% load url from future %}
+
 {% load pybb_tags i18n %}
 
 {% block title %}{{ topic }}{% endblock %}
@@ -46,28 +49,28 @@
             <div class="controls">
                 {% if user.is_moderator %}
                     {% if topic.sticky %}
-                        <a href="{% url pybb:unstick_topic topic.id %}">{% trans "Unstick topic" %}</a> /
+                        <a href="{% url 'pybb:unstick_topic' topic.id %}">{% trans "Unstick topic" %}</a> /
                     {% else %}
-                        <a href="{% url pybb:stick_topic topic.id %}">{% trans "Stick topic" %}</a> /
+                        <a href="{% url 'pybb:stick_topic' topic.id %}">{% trans "Stick topic" %}</a> /
                     {% endif %}
 
                     {% if topic.closed %}
-                        <a href="{% url pybb:open_topic topic.id %}">{% trans "Open topic" %}</a> /
+                        <a href="{% url 'pybb:open_topic' topic.id %}">{% trans "Open topic" %}</a> /
                     {% else %}
-                        <a href="{% url pybb:close_topic topic.id %}">{% trans "Close topic" %}</a> /
+                        <a href="{% url 'pybb:close_topic' topic.id %}">{% trans "Close topic" %}</a> /
                     {% endif %}
                     {% if perms.pybb.change_topic and user.is_staff %}
-                        <a href="{% url admin:pybb_topic_change topic.id %}">{% trans 'Admin' %}</a> /
+                        <a href="{% url 'admin:pybb_topic_change' topic.id %}">{% trans 'Admin' %}</a> /
                     {% endif %}
                     {% comment %}
-            <a href="{% url pybb:merge_topics %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
+            <a href="{% url 'pybb:merge_topics' %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
             {% endcomment %}
                 {% endif %}
 
                 {% if user.is_subscribed %}
-                    <a href="{% url pybb:delete_subscription topic.id %}?from_topic">{% trans "Unsubscribe" %}</a>
+                    <a href="{% url 'pybb:delete_subscription' topic.id %}?from_topic">{% trans "Unsubscribe" %}</a>
                 {% else %}
-                    <a href="{% url pybb:add_subscription topic.id %}">{% trans "Subscribe" %}</a>
+                    <a href="{% url 'pybb:add_subscription' topic.id %}">{% trans "Subscribe" %}</a>
                 {% endif %}
             </div>
         {% endif %}
@@ -86,7 +89,7 @@
             <div class="subscriber-list">
                 {% trans "Subscribers" %}:
                 {% for subscriber in topic.subscribers.all %}
-                    <a href="{% url pybb:user subscriber.username %}">{{ subscriber.username }}</a>,
+                    <a href="{% url 'pybb:user' subscriber.username %}">{{ subscriber.username }}</a>,
                 {% endfor %}
             </div>
         {% endif %}
