@@ -1,3 +1,4 @@
+{% load url from future %}
 {% load i18n pybb_tags %}
 
 <div class="poll">
@@ -16,7 +17,7 @@
       {% if topic|pybb_topic_poll_not_voted:request.user %}
         <tr class="poll-answer-choice">
           <td>
-            <form class="poll-form" action="{% url pybb:topic_poll_vote topic.pk %}" method="post">
+            <form class="poll-form" action="{% url 'pybb:topic_poll_vote' topic.pk %}" method="post">
               {% csrf_token %}
               {% include "pybb/form.html" with form=poll_form %}
               <p class="submit">{% include "pybb/_button_submit.html" %}</p>
