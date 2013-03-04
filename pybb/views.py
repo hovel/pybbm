@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.db import IntegrityError
 from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
@@ -150,11 +149,7 @@ class TopicView(generic.ListView):
             forum_mark = None
         if (forum_mark is None) or (forum_mark.time_stamp < topic.updated):
             # Mark topic as readed
-            try:
-                topic_mark, new = TopicReadTracker.objects.get_or_create(topic=topic, user=request.user)
-            except IntegrityError: # duplicate mark
-                topic_mark = TopicReadTracker.objects.get(topic=topic, user=request.user)
-                new = False
+            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=topic, user=request.user)
             if not new:
                 topic_mark.save()
 
@@ -168,10 +163,7 @@ class TopicView(generic.ListView):
                         user=request.user,
                         topic__forum=topic.forum
                         ).delete()
-                try:
-                    forum_mark, new = ForumReadTracker.objects.get_or_create(forum=topic.forum, user=request.user)
-                except IntegrityError: # duplicate mark
-                    forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=request.user)
+                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=request.user)
                 forum_mark.save()
 
 
@@ -498,10 +490,7 @@ def post_ajax_preview(request):
 @login_required
 def mark_all_as_read(request):
     for forum in perms.filter_forums(request.user, Forum.objects.all()):
-        try:
-            forum_mark, new = ForumReadTracker.objects.get_or_create(forum=forum, user=request.user)
-        except IntegrityError: # duplicate mark
-            forum_mark = ForumReadTracker.objects.get(forum=forum, user=request.user)
+        forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=forum, user=request.user)
         forum_mark.save()
     TopicReadTracker.objects.filter(user=request.user).delete()
     msg = _('All forums marked as read')

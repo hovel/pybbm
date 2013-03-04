@@ -3,9 +3,10 @@
 import os.path
 import uuid
 
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.db.utils import IntegrityError
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -390,6 +391,26 @@ class Attachment(models.Model):
             return '%.2fMb' % (size / float(1024 * 1024))
 
 
+class TopicReadTrackerManager(models.Manager):
+    @transaction.commit_on_success
+    def get_or_create_tracker(self, user, topic):
+        """
+        Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
+
+        It's known problem when standrard get_or_create method return can raise exception
+        with correct data in mysql database.
+        See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
+        """
+        is_new = True
+        try:
+            obj = TopicReadTracker.objects.create(user=user, topic=topic)
+        except IntegrityError:
+            transaction.commit()
+            obj = TopicReadTracker.objects.get(user=user, topic=topic)
+            is_new = False
+        return obj, is_new
+
+
 class TopicReadTracker(models.Model):
     """
     Save per user topic read tracking
@@ -398,10 +419,32 @@ class TopicReadTracker(models.Model):
     topic = models.ForeignKey(Topic, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
 
+    objects = TopicReadTrackerManager()
+
     class Meta(object):
         verbose_name = _('Topic read tracker')
         verbose_name_plural = _('Topic read trackers')
         unique_together = ('user', 'topic')
+
+
+class ForumReadTrackerManager(models.Manager):
+    @transaction.commit_on_success
+    def get_or_create_tracker(self, user, forum):
+        """
+        Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
+
+        It's known problem when standrard get_or_create method return can raise exception
+        with correct data in mysql database.
+        See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
+        """
+        is_new = True
+        try:
+            obj = ForumReadTracker.objects.create(user=user, forum=forum)
+        except IntegrityError:
+            transaction.commit()
+            is_new = False
+            obj = ForumReadTracker.objects.get(user=user, forum=forum)
+        return obj, is_new
 
 
 class ForumReadTracker(models.Model):
@@ -411,6 +454,8 @@ class ForumReadTracker(models.Model):
     user = models.ForeignKey(User, blank=False, null=False)
     forum = models.ForeignKey(Forum, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
+
+    objects = ForumReadTrackerManager()
 
     class Meta(object):
         verbose_name = _('Forum read tracker')
