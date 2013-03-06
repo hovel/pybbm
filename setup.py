@@ -12,7 +12,6 @@ setup(
     include_package_data = True,
     package_data = {'': ['pybb/templates', 'pybb/static']},
     install_requires = [
-            'django',
             'markdown',
             'postmarkup',
             'south',
