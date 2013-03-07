@@ -13,9 +13,9 @@ env:
   - DJANGO = 1.4.5
 
 install:
-  - "sudo pip install -q Django==$DJANGO --use-mirrors"
-  - "sudo pip install -r test/example_thirdparty/requirements.txt -r test/example_thirdparty/requirements_test.txt"
+  - sudo pip install -q Django==$DJANGO --use-mirrors
+  - sudo pip install -r test/example_thirdparty/requirements.txt -r test/example_thirdparty/requirements_test.txt
 
 script:
-  - "python test/example_thirdparty/manage.py test pybb"
+  - python test/example_thirdparty/manage.py test pybb
 
