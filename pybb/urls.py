@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-
-from django.conf.urls import *
+try:
+    from django.conf.urls import patterns, include, url
+except ImportError:
+    from django.conf.urls.defaults import patterns, include, url
 
 from pybb.feeds import LastPosts, LastTopics
 from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
