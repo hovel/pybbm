@@ -111,7 +111,7 @@ class Forum(models.Model):
         return self.name
 
     def update_counters(self):
-        posts = Post.objects.filter(topic__forum_id=self.id)
+        posts = Post.objects.filter(topic__forum__id=self.id)
         self.post_count = posts.count()
         self.topic_count = Topic.objects.filter(forum=self).count()
         try:
