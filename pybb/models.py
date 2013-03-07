@@ -213,7 +213,7 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        last_post = Post.objects.filter(topic_id=self.id).order_by('-created')[0]
+        last_post = Post.objects.filter(topic__id=self.id).order_by('-created')[0]
         self.updated = last_post.updated or last_post.created
         self.save()
 
