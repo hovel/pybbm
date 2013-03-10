@@ -205,7 +205,19 @@ class Topic(models.Model):
     def save(self, *args, **kwargs):
         if self.id is None:
             self.created = tznow()
+
+        forum_changed = False
+        old_topic = None
+        if self.id is not None:
+            old_topic = Topic.objects.get(id=self.id)
+            if self.forum != old_topic.forum:
+                forum_changed = True
+
         super(Topic, self).save(*args, **kwargs)
+
+        if forum_changed:
+            old_topic.forum.update_counters()
+            self.forum.update_counters()
 
     def delete(self, using=None):
         super(Topic, self).delete(using)
@@ -278,16 +290,25 @@ class Post(RenderableItem):
 
         new = self.pk is None
 
-        update_counters = kwargs.pop('update_counters', True)
+        topic_changed = False
+        old_post = None
+        if not new:
+            old_post = Post.objects.get(pk=self.pk)
+            if old_post.topic != self.topic:
+                topic_changed = True
 
         super(Post, self).save(*args, **kwargs)
 
         # If post is topic head and moderated, moderate topic too
-        if self.topic.head == self and self.on_moderation == False and self.topic.on_moderation == True:
+        if self.topic.head == self and not self.on_moderation and self.topic.on_moderation:
             self.topic.on_moderation = False
-        if update_counters:
-            self.topic.update_counters()
-            self.topic.forum.update_counters()
+
+        self.topic.update_counters()
+        self.topic.forum.update_counters()
+
+        if topic_changed:
+            old_post.topic.update_counters()
+            old_post.topic.forum.update_counters()
 
     def get_absolute_url(self):
         return reverse('pybb:post', kwargs={'pk': self.id})
