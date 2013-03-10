@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
-from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread
+from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread
 
 try:
     from lxml import html
@@ -371,6 +371,9 @@ class FeaturesTest(TestCase, SharedTestModule):
             [True, True, True])
 
         client_ann.get(topic_1.get_absolute_url())
+        topic_1 = Topic.objects.get(id=topic_1.id)
+        topic_2 = Topic.objects.get(id=topic_2.id)
+        topic_3 = Topic.objects.get(id=topic_3.id)
         self.assertFalse(pybb_is_topic_unread(topic_1, user_ann))
         self.assertTrue(pybb_is_topic_unread(topic_2, user_ann))
         self.assertTrue(pybb_is_topic_unread(topic_3, user_ann))
@@ -379,6 +382,9 @@ class FeaturesTest(TestCase, SharedTestModule):
             [False, True, True])
 
         client_ann.get(topic_2.get_absolute_url())
+        topic_1 = Topic.objects.get(id=topic_1.id)
+        topic_2 = Topic.objects.get(id=topic_2.id)
+        topic_3 = Topic.objects.get(id=topic_3.id)
         self.assertFalse(pybb_is_topic_unread(topic_1, user_ann))
         self.assertFalse(pybb_is_topic_unread(topic_2, user_ann))
         self.assertTrue(pybb_is_topic_unread(topic_3, user_ann))
@@ -387,12 +393,87 @@ class FeaturesTest(TestCase, SharedTestModule):
             [False, False, True])
 
         client_ann.get(topic_3.get_absolute_url())
+        topic_1 = Topic.objects.get(id=topic_1.id)
+        topic_2 = Topic.objects.get(id=topic_2.id)
+        topic_3 = Topic.objects.get(id=topic_3.id)
         self.assertFalse(pybb_is_topic_unread(topic_1, user_ann))
         self.assertFalse(pybb_is_topic_unread(topic_2, user_ann))
         self.assertFalse(pybb_is_topic_unread(topic_3, user_ann))
         self.assertListEqual(
             [t.unread for t in pybb_topic_unread([topic_1, topic_2, topic_3], user_ann)],
             [False, False, False])
+
+    def test_read_tracker_when_topics_forum_changed(self):
+        forum_1 = Forum.objects.create(name='f1', description='bar', category=self.category)
+        forum_2 = Forum.objects.create(name='f2', description='bar', category=self.category)
+        topic_1 = Topic.objects.create(name='t1', forum=forum_1, user=self.user)
+        topic_2 = Topic.objects.create(name='t2', forum=forum_2, user=self.user)
+
+        Post.objects.create(topic=topic_1, user=self.user, body='one')
+        Post.objects.create(topic=topic_2, user=self.user, body='two')
+
+        user_ann = User.objects.create_user('ann', 'ann@localhost', 'ann')
+        client_ann = Client()
+        client_ann.login(username='ann', password='ann')
+
+        # Everything is unread
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
+            [True, True])
+        self.assertListEqual(
+            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
+            [True, True])
+
+        # read all
+        client_ann.get(reverse('pybb:mark_all_as_read'))
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
+            [False, False])
+        self.assertListEqual(
+            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
+            [False, False])
+
+        post = Post.objects.create(topic=topic_1, user=self.user, body='three')
+
+        topic_1 = Topic.objects.get(id=topic_1.id)
+        topic_2 = Topic.objects.get(id=topic_2.id)
+        self.assertEqual(topic_1.updated, post.updated or post.created)
+        self.assertEqual(forum_1.updated, post.updated or post.created)
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
+            [True, False])
+        self.assertListEqual(
+            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
+            [True, False])
+
+        post.topic = topic_2
+        post.save()
+        topic_1 = Topic.objects.get(id=topic_1.id)
+        topic_2 = Topic.objects.get(id=topic_2.id)
+        forum_1 = Forum.objects.get(id=forum_1.id)
+        forum_2 = Forum.objects.get(id=forum_2.id)
+        self.assertEqual(topic_2.updated, post.updated or post.created)
+        self.assertEqual(forum_2.updated, post.updated or post.created)
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
+            [False, True])
+        self.assertListEqual(
+            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
+            [False, True])
+
+        topic_2.forum = forum_1
+        topic_2.save()
+        topic_1 = Topic.objects.get(id=topic_1.id)
+        topic_2 = Topic.objects.get(id=topic_2.id)
+        forum_1 = Forum.objects.get(id=forum_1.id)
+        forum_2 = Forum.objects.get(id=forum_2.id)
+        self.assertEqual(forum_1.updated, post.updated or post.created)
+        self.assertListEqual(
+            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
+            [False, True])
+        self.assertListEqual(
+            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
+            [True, False])
 
     def test_latest_topics(self):
         topic_1 = self.topic

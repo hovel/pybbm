@@ -130,17 +130,16 @@ def pybb_is_topic_unread(topic, user):
     if not user.is_authenticated():
         return False
 
-    if not topic.updated:
-        return True
+    last_topic_update = topic.updated or topic.created
 
     unread = not ForumReadTracker.objects.filter(
         forum=topic.forum,
         user=user.id,
-        time_stamp__gte=topic.updated).exists()
+        time_stamp__gte=last_topic_update).exists()
     unread &= not TopicReadTracker.objects.filter(
         topic=topic,
         user=user.id,
-        time_stamp__gte=topic.updated).exists()
+        time_stamp__gte=last_topic_update).exists()
     return unread
 
 
@@ -182,8 +181,7 @@ def pybb_forum_unread(forums, user):
     forum_list = list(forums)
     if user.is_authenticated():
         for forum in forum_list:
-            if forum.topic_count:
-                forum.unread = True
+            forum.unread = forum.topic_count > 0
         forum_marks = ForumReadTracker.objects.filter(
                 user=user,
                 forum__in=forum_list
