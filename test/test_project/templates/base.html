@@ -1,0 +1,17 @@
+{% load url from future %}
+{% load pytils_numeral %}
+<!DOCTYPE html>
+<html>
+<head>
+  {% block extra_style %}{% endblock %}
+  <title>{% block title %}{% endblock %}</title>
+  {% block extra_head %}{% endblock %}
+  {% block extra_script %}{% endblock %}
+</head>
+<body>
+{% block breadcrumb %}
+{% endblock breadcrumb %}
+{% block content %}
+{% endblock content %}
+</body>
+</html>

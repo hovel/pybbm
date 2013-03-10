@@ -966,7 +966,7 @@ class AttachmentTest(TestCase, SharedTestModule):
         self.create_user()
         self.create_initial()
 
-    def test_attachment(self):
+    def test_attachment_one(self):
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
         self.login_client()
         response = self.client.get(add_post_url)
@@ -977,7 +977,7 @@ class AttachmentTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Post.objects.filter(body='test attachment').exists())
 
-    def test_attachment(self):
+    def test_attachment_two(self):
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
         self.login_client()
         response = self.client.get(add_post_url)
