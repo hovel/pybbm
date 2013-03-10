@@ -1,13 +1,15 @@
 Updating PyBBM Version
 ======================
 
-0.12.4 -> 0.12.x
+0.12.4 -> 0.12.5
 ----------------
 
 * More flexible forms/forms fields rendering in templates
 Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
 * Additional template for markitup preview
 You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
+* Improved permissions handling see `PYBB_PERMISSION_HANDLER` setting in :doc:`settings</settings>`
+* Bug fixes and impoved perfomance
 
 0.12.3 -> 0.12.4
 ----------------
