@@ -175,8 +175,6 @@ Each function in list should accept `auth.User` instance as first argument and `
 for example this is enabled by default `rstrip_str` cleaner::
 
     def rstrip_str(user, str):
-        if user.is_staff:
-            return str
         return '\n'.join([s.rstrip() for s in str.splitlines()])
 
 default is::
