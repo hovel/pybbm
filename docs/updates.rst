@@ -9,7 +9,7 @@ Strongly recommended to check rendering of pybbm forms on your site (edit profil
 * Additional template for markitup preview
 You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
 * Improved permissions handling see `PYBB_PERMISSION_HANDLER` setting in :doc:`settings</settings>`
-* Bug fixes and impoved perfomance
+* Fixed bugs and improved performance
 
 0.12.3 -> 0.12.4
 ----------------
