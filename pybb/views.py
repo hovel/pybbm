@@ -33,16 +33,17 @@ from pybb import defaults
 
 from pybb.permissions import perms
 
+
 class RedirectToLoginMixin(object):
     """ mixin which redirects to settings.LOGIN_URL if the view encounters an PermissionDenied exception
         and the user is not authenticated. Views inheriting from this need to implement 
         get_login_redirect_url(), which returns the URL to redirect to after login (parameter "next")
     """ 
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         try:
-            return super(RedirectToLoginMixin, self).dispatch(*args, **kwargs)
+            return super(RedirectToLoginMixin, self).dispatch(request, *args, **kwargs)
         except PermissionDenied:
-            if not self.request.user.is_authenticated():
+            if not request.user.is_authenticated():
                 from django.contrib.auth.views import redirect_to_login
                 return redirect_to_login(self.get_login_redirect_url())
             else:
@@ -51,6 +52,7 @@ class RedirectToLoginMixin(object):
     def get_login_redirect_url(self):
         """ get the url to which we redirect after the user logs in. subclasses should override this """
         return '/'
+
 
 class IndexView(generic.ListView):
 
@@ -67,7 +69,8 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         return perms.filter_categories(self.request.user, Category.objects.all())
-    
+
+
 class CategoryView(RedirectToLoginMixin, generic.DetailView):
 
     template_name = 'pybb/index.html'
@@ -90,6 +93,7 @@ class CategoryView(RedirectToLoginMixin, generic.DetailView):
         ctx['category'].forums_accessed = perms.filter_forums(self.request.user, ctx['category'].forums.all())
         ctx['categories'] = [ctx['category']]
         return ctx
+
 
 class ForumView(RedirectToLoginMixin, generic.ListView):
 
@@ -142,11 +146,37 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def get_login_redirect_url(self):
         return reverse('pybb:topic', args=(self.kwargs['pk'],))    
 
-    def get_queryset(self):        
-        self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=self.kwargs['pk'])
+    def dispatch(self, request, *args, **kwargs):
+        self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
+
+        if request.GET.get('last-unread'):
+            if request.user.is_authenticated():
+                read_dates = []
+                try:
+                    read_dates.append(TopicReadTracker.objects.get(user=request.user, topic=self.topic).time_stamp)
+                except TopicReadTracker.DoesNotExist:
+                    pass
+                try:
+                    read_dates.append(ForumReadTracker.objects.get(user=request.user, forum=self.topic.forum).time_stamp)
+                except ForumReadTracker.DoesNotExist:
+                    pass
+
+                read_date = read_dates and max(read_dates)
+                if read_date:
+                    try:
+                        last_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created')[0]
+                    except IndexError:
+                        last_unread_topic = self.topic.last_post
+                else:
+                    last_unread_topic = self.topic.head
+                return HttpResponseRedirect(reverse('pybb:post', kwargs={'pk': last_unread_topic.id}))
+
+        return super(TopicView, self).dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
         if not perms.may_view_topic(self.request.user, self.topic):
             raise PermissionDenied
-            
+
         self.topic.views += 1
         self.topic.save()
         qs = self.topic.posts.all().select_related('user')
@@ -320,6 +350,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
                 raise PermissionDenied            
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
+
 class EditPostView(PostEditMixin, generic.UpdateView):
 
     model = Post
@@ -442,6 +473,7 @@ class TopicActionBaseView(generic.View):
         self.topic = self.get_topic()
         self.action(self.topic)
         return HttpResponseRedirect(self.topic.get_absolute_url())
+
 
 class StickTopicView(TopicActionBaseView):
         

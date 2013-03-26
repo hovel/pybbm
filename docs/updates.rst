@@ -1,6 +1,10 @@
 Updating PyBBM Version
 ======================
 
+0.12.4 -> dev
+
+* You can add last-unread get parameter to the topic url to provide link to last unread post from topic
+
 0.12.4 -> 0.12.5
 ----------------
 
