@@ -475,7 +475,7 @@ class FeaturesTest(TestCase, SharedTestModule):
             [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
             [True, False])
 
-    def test_open_last_unread_post(self):
+    def test_open_first_unread_post(self):
         forum_1 = self.forum
         topic_1 = Topic.objects.create(name='topic_1', forum=forum_1, user=self.user)
         topic_2 = Topic.objects.create(name='topic_2', forum=forum_1, user=self.user)
@@ -488,16 +488,16 @@ class FeaturesTest(TestCase, SharedTestModule):
         client_ann = Client()
         client_ann.login(username='ann', password='ann')
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'last-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_1.id))
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'last-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_2.id))
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_2.id }), data={'last-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_2.id }), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_2.id}), 1, post_2_1.id))
@@ -505,7 +505,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         post_1_3 = Post.objects.create(topic=topic_1, user=self.user, body='1_3')
         post_1_4 = Post.objects.create(topic=topic_1, user=self.user, body='1_4')
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'last-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_3.id))

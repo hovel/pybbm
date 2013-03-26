@@ -149,7 +149,7 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def dispatch(self, request, *args, **kwargs):
         self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
 
-        if request.GET.get('last-unread'):
+        if request.GET.get('first-unread'):
             if request.user.is_authenticated():
                 read_dates = []
                 try:
@@ -164,12 +164,12 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
                 read_date = read_dates and max(read_dates)
                 if read_date:
                     try:
-                        last_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created')[0]
+                        first_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created')[0]
                     except IndexError:
-                        last_unread_topic = self.topic.last_post
+                        first_unread_topic = self.topic.last_post
                 else:
-                    last_unread_topic = self.topic.head
-                return HttpResponseRedirect(reverse('pybb:post', kwargs={'pk': last_unread_topic.id}))
+                    first_unread_topic = self.topic.head
+                return HttpResponseRedirect(reverse('pybb:post', kwargs={'pk': first_unread_topic.id}))
 
         return super(TopicView, self).dispatch(request, *args, **kwargs)
 
