@@ -146,8 +146,34 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def get_login_redirect_url(self):
         return reverse('pybb:topic', args=(self.kwargs['pk'],))    
 
+    def dispatch(self, request, *args, **kwargs):
+        self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
+
+        if request.GET.get('last-unread'):
+            if request.user.is_authenticated():
+                read_dates = []
+                try:
+                    read_dates.append(TopicReadTracker.objects.get(user=request.user, topic=self.topic).time_stamp)
+                except TopicReadTracker.DoesNotExist:
+                    pass
+                try:
+                    read_dates.append(ForumReadTracker.objects.get(user=request.user, forum=self.topic.forum).time_stamp)
+                except ForumReadTracker.DoesNotExist:
+                    pass
+
+                read_date = read_dates and max(read_dates)
+                if read_date:
+                    try:
+                        last_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created')[0]
+                    except IndexError:
+                        last_unread_topic = self.topic.last_post
+                else:
+                    last_unread_topic = self.topic.head
+                return HttpResponseRedirect(reverse('pybb:post', kwargs={'pk': last_unread_topic.id}))
+
+        return super(TopicView, self).dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
-        self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=self.kwargs['pk'])
         if not perms.may_view_topic(self.request.user, self.topic):
             raise PermissionDenied
 
