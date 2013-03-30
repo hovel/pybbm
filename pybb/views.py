@@ -2,7 +2,6 @@
 
 import math
 
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
@@ -16,6 +15,10 @@ from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 
+from pybb import util
+User = util.get_user_model()
+username_field = util.get_username_field()
+
 try:
     from django.views import generic
 except ImportError:
@@ -27,7 +30,7 @@ except ImportError:
 from pure_pagination import Paginator
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
-from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
+from pybb.forms import PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 from pybb import defaults
 
@@ -187,10 +190,11 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
         if self.request.user.is_authenticated():
-            self.request.user.is_moderator = self.request.user.is_superuser or (self.request.user in self.topic.forum.moderators.all())
+            self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if perms.may_post_as_admin(self.request.user):
-                ctx['form'] = AdminPostForm(initial={'login': self.request.user.username}, topic=self.topic)
+                ctx['form'] = AdminPostForm(initial={'login': getattr(self.request.user, username_field)},
+                                            topic=self.topic)
             else:
                 ctx['form'] = PostForm(topic=self.topic)
             self.mark_read(self.request, self.topic)
@@ -225,15 +229,14 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
-                                                                Q(forum__forumreadtracker__user=request.user,forum__forumreadtracker__time_stamp__gt=F('updated')))
+            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,
+                                                                  topicreadtracker__time_stamp__gt=F('updated'))) |
+                                                                Q(forum__forumreadtracker__user=request.user,
+                                                                  forum__forumreadtracker__time_stamp__gt=F('updated')))
             unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
             if not unread.exists():
                 # Clear all topic marks for this forum, mark forum as readed
-                TopicReadTracker.objects.filter(
-                        user=request.user,
-                        topic__forum=topic.forum
-                        ).delete()
+                TopicReadTracker.objects.filter(user=request.user, topic__forum=topic.forum).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=request.user)
                 forum_mark.save()
 
@@ -310,10 +313,10 @@ class AddPostView(PostEditMixin, generic.CreateView):
                 raise Http404
             else:
                 post = get_object_or_404(Post, pk=quote_id)
-                quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, post.user.username)
+                quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
                 form_kwargs['initial']['body'] = quote
         if self.user.is_staff:
-            form_kwargs['initial']['login'] = self.user.username
+            form_kwargs['initial']['login'] = getattr(self.user, username_field)
         return form_kwargs
 
     def get_context_data(self, **kwargs):
@@ -333,7 +336,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
             self.user = request.user
         else:
             if defaults.PYBB_ENABLE_ANONYMOUS_POST:
-                self.user, new = User.objects.get_or_create(username=defaults.PYBB_ANONYMOUS_USERNAME)
+                self.user, new = User.objects.get_or_create(**{username_field:defaults.PYBB_ANONYMOUS_USERNAME})
             else:
                 from django.contrib.auth.views import redirect_to_login
                 return redirect_to_login(request.get_full_path())
@@ -378,7 +381,7 @@ class UserView(generic.DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
-        return get_object_or_404(queryset, username=self.kwargs['username'])
+        return get_object_or_404(queryset, **{username_field: self.kwargs['username']})
 
     def get_context_data(self, **kwargs):
         ctx = super(UserView, self).get_context_data(**kwargs)
@@ -579,7 +582,7 @@ def mark_all_as_read(request):
 
 @login_required
 def block_user(request, username):
-    user = get_object_or_404(User, username=username)
+    user = get_object_or_404(User, **{username_field: username})
     if not perms.may_block_user(request.user, user):
         raise PermissionDenied
     user.is_active = False

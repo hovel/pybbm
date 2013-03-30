@@ -4,7 +4,6 @@ import os.path
 import uuid
 
 from django.db import models, transaction
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db.utils import IntegrityError
 from django.utils.html import strip_tags
@@ -13,7 +12,10 @@ from django.conf import settings
 
 from annoying.fields import AutoOneToOneField
 from sorl.thumbnail import ImageField
-from pybb.util import unescape
+from pybb.util import unescape, get_user_model, get_username_field
+
+User = get_user_model()
+username_field = get_username_field()
 
 try:
     from hashlib import sha1
@@ -384,7 +386,7 @@ class Profile(PybbProfile):
         verbose_name_plural = _('Profiles')
 
     def get_absolute_url(self):
-        return reverse('pybb:user', kwargs={'username': self.user.username})
+        return reverse('pybb:user', kwargs={'username': getattr(self.user, username_field)})
 
 
 class Attachment(models.Model):

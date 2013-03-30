@@ -2,13 +2,17 @@
 import re
 import inspect
 
+
 from django import forms
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
+
+from pybb import util
+User = util.get_user_model()
+username_field = util.get_username_field()
 
 try:
     from django.utils.timezone import now as tznow
@@ -167,15 +171,15 @@ class AdminPostForm(PostForm):
         if args:
             kwargs.update(dict(zip(inspect.getargspec(forms.ModelForm.__init__)[0][1:], args)))
         if 'instance' in kwargs and kwargs['instance']:
-            kwargs.setdefault('initial', {}).update({'login': kwargs['instance'].user.username})
+            kwargs.setdefault('initial', {}).update({'login': getattr(kwargs['instance'].user, username_field)})
         super(AdminPostForm, self).__init__(**kwargs)
 
     def save(self, *args, **kwargs):
         try:
-            self.user = User.objects.filter(username=self.cleaned_data['login']).get()
+            self.user = User.objects.filter(**{username_field: self.cleaned_data['login']}).get()
         except User.DoesNotExist:
             self.user = User.objects.create_user(self.cleaned_data['login'],
-                '%s@example.com' % self.cleaned_data['login'])
+                                                 '%s@example.com' % self.cleaned_data['login'])
         return super(AdminPostForm, self).save(*args, **kwargs)
 
 try:
@@ -212,13 +216,13 @@ class UserSearchForm(forms.Form):
     def filter(self, qs):
         if self.is_valid():
             query = self.cleaned_data['query']
-            return qs.filter(username__contains=query)
+            return qs.filter(**{'%s__contains' % username_field: query})
         else:
             return qs
 
 
 class PollForm(forms.Form):
-    def __init__(self, topic,  *args, **kwargs):
+    def __init__(self, topic, *args, **kwargs):
         self.topic = topic
 
         super(PollForm, self).__init__(*args, **kwargs)

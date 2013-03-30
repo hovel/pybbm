@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
 from django.conf import settings
 from django.db.models import ObjectDoesNotExist
 from django.db.models.signals import post_save, post_delete
 
 from pybb.subscription import notify_topic_subscribers
 from pybb import defaults
+
+from pybb import util
+User = util.get_user_model()
+username_field = util.get_username_field()
 
 
 def post_saved(instance, **kwargs):
