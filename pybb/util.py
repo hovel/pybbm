@@ -44,3 +44,19 @@ def get_username_field():
         return get_user_model().USERNAME_FIELD
     else:
         return 'username'
+
+
+def get_pybb_profile(user):
+    from pybb import defaults
+    if defaults.PYBB_PROFILE_RELATED_NAME:
+        return getattr(user, defaults.PYBB_PROFILE_RELATED_NAME)
+    else:
+        return user
+
+
+def get_pybb_profile_model():
+    from pybb import defaults
+    if defaults.PYBB_PROFILE_RELATED_NAME:
+        return get_user_model()._meta.get_field_by_name(defaults.PYBB_PROFILE_RELATED_NAME)[0].model
+    else:
+        return get_user_model()

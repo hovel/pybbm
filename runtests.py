@@ -45,7 +45,6 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
         DEBUG=False,
         SITE_ID=1,
         STATIC_URL='/static/',
-        AUTH_PROFILE_MODULE='pybb.Profile',
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test/test_project/templates'), ),
         PYBB_ATTACHMENT_ENABLE=True,
         TEMPLATE_CONTEXT_PROCESSORS=TEMPLATE_CONTEXT_PROCESSORS,

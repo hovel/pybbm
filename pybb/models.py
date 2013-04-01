@@ -49,6 +49,7 @@ TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (11.5, '+11.5'), (12, '+12'), (13, '+13'), (14, '+14'),
 )]
 
+
 #noinspection PyUnusedLocal
 def get_file_path(instance, filename, to='pybb/avatar'):
     """
@@ -60,6 +61,7 @@ def get_file_path(instance, filename, to='pybb/avatar'):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join(to, filename)
+
 
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)

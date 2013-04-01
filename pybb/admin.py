@@ -3,7 +3,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer
 
@@ -142,7 +141,7 @@ admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
 
-if settings.AUTH_PROFILE_MODULE == 'pybb.Profile':
+if util.get_pybb_profile_model() == Profile:
     admin.site.register(Profile, ProfileAdmin)
 
 # This can be used to debug read/unread trackers

@@ -5,9 +5,6 @@ import inspect
 
 from django import forms
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 
 from pybb import util
@@ -21,7 +18,7 @@ except ImportError:
 
     tznow = datetime.datetime.now
 
-from pybb.models import Topic, Post, Profile, Attachment, PollAnswer
+from pybb.models import Topic, Post, Attachment, PollAnswer
 from pybb import defaults
 
 
@@ -58,7 +55,7 @@ class BasePollAnswerFormset(BaseInlineFormSet):
 
 
 PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=defaults.PYBB_POLL_MAX_ANSWERS,
-    form=PollAnswerForm, formset=BasePollAnswerFormset)
+                                          form=PollAnswerForm, formset=BasePollAnswerFormset)
 
 
 class PostForm(forms.ModelForm):
@@ -151,8 +148,7 @@ class PostForm(forms.ModelForm):
                 topic.save()
         else:
             topic = self.topic
-        post = Post(topic=topic, user=self.user, user_ip=self.ip,
-            body=self.cleaned_data['body'])
+        post = Post(topic=topic, user=self.user, user_ip=self.ip, body=self.cleaned_data['body'])
         if not allow_post:
             post.on_moderation = True
         if commit:
@@ -186,15 +182,10 @@ class AdminPostForm(PostForm):
             self.user = User.objects.create(**create_data)
         return super(AdminPostForm, self).save(*args, **kwargs)
 
-try:
-    profile_app, profile_model = settings.AUTH_PROFILE_MODULE.split('.')
-    profile_model = ContentType.objects.get_by_natural_key(profile_app, profile_model).model_class()
-except (AttributeError, ValueError, ObjectDoesNotExist):
-    profile_model = Profile
 
 class EditProfileForm(forms.ModelForm):
     class Meta(object):
-        model = profile_model
+        model = util.get_pybb_profile_model()
         fields = ['signature', 'time_zone', 'language',
                   'show_signatures', 'avatar']
 

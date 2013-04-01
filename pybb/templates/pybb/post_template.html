@@ -1,6 +1,9 @@
 {% load url from future %}
 {% load i18n pybb_tags thumbnail %}
 
+{% pybb_get_profile user=post.user as post_user_profile %}
+{% pybb_get_profile user=user as user_profile %}
+
 <a name="post-{{ post.id }}"></a> {# may be remove this string? #}
 <table class="table table-bordered post {% if post.on_moderation %}on-moderation{% endif %}" id="post-{{ post.id }}">
     <thead class="post-header">
@@ -15,17 +18,16 @@
     <tr>
         <td class="post-info">
             {% include "pybb/avatar.html" %}
-            <div class="post-author"><a href="{{ post.user.get_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
-            {% if post.user.get_profile.rank %}
-                {% with post.user.get_profile as profile %}
-                    <div class='rank'>
-                        {% trans "Rank" %}: {{ profile.rank }}
-                        {% if user.is_authenticated and user != post.user %}
-                            <a href='#' class='vote' rel='{{ profile.get_vote_up_url }}'>+</a>
-                            <a href='#' class='vote' rel='{{ profile.get_vote_down_url }}'>-</a>
-                        {% endif %}
-                    </div>
-                {% endwith %}
+
+            <div class="post-author"><a href="{{ post_user_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
+            {% if post_user_profile.rank %}
+                <div class='rank'>
+                    {% trans "Rank" %}: {{ post_user_profile.rank }}
+                    {% if user.is_authenticated and user != post.user %}
+                        <a href='#' class='vote' rel='{{ post_user_profile.get_vote_up_url }}'>+</a>
+                        <a href='#' class='vote' rel='{{ post_user_profile.get_vote_down_url }}'>-</a>
+                    {% endif %}
+                </div>
             {% endif %}
             {% if user.is_superuser %}
                 <div class="post-extra-info">{{ post.user_ip }}</div>
@@ -52,10 +54,11 @@
         </td>
         <td class="post-content">
             {{ post.body_html|safe }}
-            {% if not user.is_authenticated or user.get_profile.show_signatures %}
-                {% if post.user.get_profile.signature %}
+
+            {% if not user.is_authenticated or user_profile.show_signatures %}
+                {% if post_user_profile.signature %}
                     <div class="post-signature">
-                        {{ post.user.get_profile.signature_html|safe }}
+                        {{ post_user_profile.signature_html|safe }}
                     </div>
                 {% endif %}
             {% endif %}

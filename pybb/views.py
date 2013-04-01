@@ -336,7 +336,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
             self.user = request.user
         else:
             if defaults.PYBB_ENABLE_ANONYMOUS_POST:
-                self.user, new = User.objects.get_or_create(**{username_field:defaults.PYBB_ANONYMOUS_USERNAME})
+                self.user, new = User.objects.get_or_create(**{username_field: defaults.PYBB_ANONYMOUS_USERNAME})
             else:
                 from django.contrib.auth.views import redirect_to_login
                 return redirect_to_login(request.get_full_path())
@@ -419,7 +419,7 @@ class ProfileEditView(generic.UpdateView):
     form_class = EditProfileForm
 
     def get_object(self, queryset=None):
-        return self.request.user.get_profile()
+        return util.get_pybb_profile(self.request.user)
 
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
