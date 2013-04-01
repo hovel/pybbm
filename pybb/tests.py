@@ -3,7 +3,8 @@
 import time, datetime
 import os
 
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
+from django.conf import settings
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -11,13 +12,17 @@ from django.test import TestCase
 from django.test.client import Client
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread
 
+from pybb import util
+User = util.get_user_model()
+username_field = util.get_username_field()
+
 try:
     from lxml import html
 except ImportError:
     raise Exception('PyBB requires lxml for self testing')
 
 from pybb import defaults
-from pybb.models import *
+from pybb.models import Topic, TopicReadTracker, Forum, ForumReadTracker, Post, Category, PollAnswer, Profile
 
 __author__ = 'zeus'
 

@@ -178,8 +178,12 @@ class AdminPostForm(PostForm):
         try:
             self.user = User.objects.filter(**{username_field: self.cleaned_data['login']}).get()
         except User.DoesNotExist:
-            self.user = User.objects.create_user(self.cleaned_data['login'],
-                                                 '%s@example.com' % self.cleaned_data['login'])
+            if username_field != 'email':
+                create_data = {username_field: self.cleaned_data['login'],
+                               'email': '%s@example.com' % self.cleaned_data['login']}
+            else:
+                create_data = {'email': '%s@example.com' % self.cleaned_data['login']}
+            self.user = User.objects.create(**create_data)
         return super(AdminPostForm, self).save(*args, **kwargs)
 
 try:

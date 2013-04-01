@@ -13,5 +13,3 @@ Second way is to meet next requirments:
 * define email, is_staff, is_superuser fields or properties
 * inherite from `django.contib.auth.models.PermissionsMixin` or reproduce django's
 default permission system
-* set default manager (`objects` field) to `django.contrib.auth.models.UserManager` or
-to manager with the manager model, which implements same interface
