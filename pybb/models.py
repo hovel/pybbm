@@ -9,6 +9,7 @@ from django.db.utils import IntegrityError
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.utils.timezone import now as tznow
 
 from annoying.fields import AutoOneToOneField
 from sorl.thumbnail import ImageField
@@ -21,12 +22,6 @@ try:
     from hashlib import sha1
 except ImportError:
     from sha import sha as sha1
-
-try:
-    from django.utils.timezone import now as tznow
-except ImportError:
-    import datetime
-    tznow = datetime.datetime.now
 
 try:
     from south.modelsinspector import add_introspection_rules
@@ -115,7 +110,7 @@ class Forum(models.Model):
         return self.name
 
     def update_counters(self):
-        posts = Post.objects.filter(topic__forum__id=self.id)
+        posts = Post.objects.filter(topic__forum_id=self.id)
         self.post_count = posts.count()
         self.topic_count = Topic.objects.filter(forum=self).count()
         try:
@@ -229,7 +224,7 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        last_post = Post.objects.filter(topic__id=self.id).order_by('-created')[0]
+        last_post = Post.objects.filter(topic_id=self.id).order_by('-created')[0]
         self.updated = last_post.updated or last_post.created
         self.save()
 

@@ -15,10 +15,8 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'django.core.context_processors.static',
     'django.core.context_processors.request',
     'pybb.context_processors.processor',
+    'django.core.context_processors.tz'
 ]
-
-if django.VERSION[:2] >= (1, 4):
-    TEMPLATE_CONTEXT_PROCESSORS += ['django.core.context_processors.tz',]
 
 # For convenience configure settings if they are not pre-configured or if we
 # haven't been provided settings to use by environment variable.

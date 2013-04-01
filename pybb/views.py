@@ -14,18 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
-
-from pybb import util
-User = util.get_user_model()
-username_field = util.get_username_field()
-
-try:
-    from django.views import generic
-except ImportError:
-    try:
-        from cbv import generic
-    except ImportError:
-        raise ImportError('If you using django version < 1.3 you should install django-cbv for pybb')
+from django.views import generic
 
 from pure_pagination import Paginator
 
@@ -36,6 +25,9 @@ from pybb import defaults
 
 from pybb.permissions import perms
 
+from pybb import util
+User = util.get_user_model()
+username_field = util.get_username_field()
 
 class RedirectToLoginMixin(object):
     """ mixin which redirects to settings.LOGIN_URL if the view encounters an PermissionDenied exception

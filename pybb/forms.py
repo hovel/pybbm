@@ -6,17 +6,11 @@ import inspect
 from django import forms
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.translation import ugettext as _
+from django.utils.timezone import now as tznow
 
 from pybb import util
 User = util.get_user_model()
 username_field = util.get_username_field()
-
-try:
-    from django.utils.timezone import now as tznow
-except ImportError:
-    import datetime
-
-    tznow = datetime.datetime.now
 
 from pybb.models import Topic, Post, Attachment, PollAnswer
 from pybb import defaults

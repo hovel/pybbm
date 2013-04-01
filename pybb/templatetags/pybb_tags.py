@@ -10,14 +10,8 @@ from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
-
-try:
-    from django.utils.timezone import timedelta
-    from django.utils.timezone import now as tznow
-except ImportError:
-    import datetime
-    from datetime import timedelta
-    tznow = datetime.datetime.now
+from django.utils.timezone import timedelta
+from django.utils.timezone import now as tznow
 
 try:
     import pytils
