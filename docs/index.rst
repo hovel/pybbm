@@ -4,7 +4,7 @@ PyBBM - Django forum solution
 PyBBM is a full-featured django forum solution with these features:
 
 * Avatars
-* Custom profiles and support of Custom User Model (since django 1.5
+* Custom profiles and support of Custom User Model (since django 1.5)
 * Post editing
 * Pre-moderation
 * Custom sanitization

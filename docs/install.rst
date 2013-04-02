@@ -85,15 +85,15 @@ Put `include('pybb.urls', namespace='pybb'))` into main project urls.py file::
 Enable your site profile
 ------------------------
 
-Set correct PYBB_PROFILE_RELATED_NAME setting.
+Setup forum's profile model and PYBB_PROFILE_RELATED_NAME setting.
 
-If you have no site profile, dafault settings will satisfy your needs
+If you have no site profile, dafault settings will satisfy your needs.
 
-If you have custom user model, which stores all profile fields itself or
-if you have custom site profile model check that it inherits from `pybb.models.PybbProfileMixin` or
+If you have custom user model, which stores all profile fields itself, or
+if you have custom site profile model, then check that it inherits from `pybb.models.PybbProfile` or
 contains all fields and properties from this class.
 Then set `PYBB_PROFILE_RELATED_NAME` to `None` for custom user model, or to related_name
-from ForeignKey field related to User for custom site profile model
+from OneToOne field related to User from custom site profile model
 
 For more information see :doc:`how to use custom user model with pybbm</customuser>`
 

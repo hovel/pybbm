@@ -2,7 +2,7 @@ import django
 
 if django.VERSION[:2] >= (1, 5):
     from django.db import models
-    from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, SiteProfileNotAvailable
+    from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
     from django.utils import timezone
 
     class CustomUserManager(BaseUserManager):

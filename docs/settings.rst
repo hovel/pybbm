@@ -80,6 +80,14 @@ User profile settings
 Next settings used only if you don't customize user profile model,
 user profile creation form or templates.
 
+PYBB_PROFILE_RELATED_NAME
+.........................
+
+Related name from profile's OneToOne relationship to User model. If profile model is User
+model itselt then set it to `None`
+
+For more information see :doc:`how to use custom user model with pybbm</customuser>`
+
 PYBB_AVATAR_WIDTH and PYBB_AVATAR_HEIGHT
 ........................................
 

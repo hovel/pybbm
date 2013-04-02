@@ -14,4 +14,15 @@ Second way is to meet next requirments:
 * define USERNAME_FIELD constant, which point to unique field on your model
 * define email, is_staff, is_superuser fields or properties
 * inherite from `django.contib.auth.models.PermissionsMixin` or reproduce django's
-default permission system
+  default permission system
+
+Next step is to decide which model will store all fields for pybb forum profiles.
+This model should be referenced to current User model (custom or default) in OneToOne
+relationship. To easily setup such model you can use predefined `pybb.models.PybbProfile`
+class. If profile model is custom user model itself then you can use `PybbProfile` class
+as mixin for adding required fields.
+
+Last step is to correctly set `PYBB_PROFILE_RELATED_NAME` setting. You have to set this
+setting to related_name parameter from profile's model from OneToOne relation to User model.
+If you use custom user model and this model is profile model itself, then you have to set
+this setting to `None`
