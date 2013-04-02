@@ -8,6 +8,7 @@ Updating PyBBM Version
 * Support Custom User model introduced in django 1.5. See :doc:`how to use custom user model with pybbm</customuser>`
 * Dropped support for django 1.3
 * Experimental support for python 3
+* Removed django-mailer from hard dependencies, you have to manually install it for using it's functionality
 
 0.12.4 -> 0.12.5
 ----------------

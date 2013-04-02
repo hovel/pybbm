@@ -18,8 +18,7 @@ setup(
         'pytils',
         'django-annoying',
         'sorl-thumbnail',
-        'django-pure-pagination',
-        'django-mailer',
+        'django-pure-pagination'
     ],
     test_suite='runtests.runtests',
     license="BSD",

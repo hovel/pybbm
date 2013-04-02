@@ -32,7 +32,7 @@ Users will be automatically subscribed to topic when create post in it.
 PYBB_USE_DJANGO_MAILER
 ......................
 
-When True, then for sending email pybbm will use django-mailer app. With this app you can
+When True and django-mailer app installed, then for sending email pybbm will use this app. With django-mailer you can
 manage emails from your site in queue. But in this case you have to periodically actually
 send emails from queue. For more information see `app home page <https://github.com/pinax/django-mailer/>`_.
 (default False)
