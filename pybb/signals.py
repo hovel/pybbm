@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 from django.contrib.auth.models import Permission
 from django.db.models import ObjectDoesNotExist
 from django.db.models.signals import post_save, post_delete

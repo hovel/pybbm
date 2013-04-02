@@ -1,5 +1,5 @@
 # Django settings for example_bootstrap project.
-
+from __future__ import unicode_literals
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

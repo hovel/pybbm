@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import os.path
 import uuid
 
 from django.db import models, transaction
 from django.core.urlresolvers import reverse
 from django.db.utils import IntegrityError
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -58,6 +60,7 @@ def get_file_path(instance, filename, to='pybb/avatar'):
     return os.path.join(to, filename)
 
 
+@python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
@@ -70,7 +73,7 @@ class Category(models.Model):
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def forum_count(self):
@@ -88,6 +91,7 @@ class Category(models.Model):
         return Post.objects.filter(topic__forum__category=self).select_related()
 
 
+@python_2_unicode_compatible
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
     name = models.CharField(_('Name'), max_length=80)
@@ -106,7 +110,7 @@ class Forum(models.Model):
         verbose_name = _('Forum')
         verbose_name_plural = _('Forums')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def update_counters(self):
@@ -145,6 +149,7 @@ class Forum(models.Model):
         return self.category,
 
 
+@python_2_unicode_compatible
 class Topic(models.Model):
     POLL_TYPE_NONE = 0
     POLL_TYPE_SINGLE = 1
@@ -177,7 +182,7 @@ class Topic(models.Model):
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -261,6 +266,7 @@ class RenderableItem(models.Model):
         self.body_text = unescape(text)
 
 
+@python_2_unicode_compatible
 class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
@@ -279,7 +285,8 @@ class Post(RenderableItem):
         tail = len(self.body) > LIMIT and '...' or ''
         return self.body[:LIMIT] + tail
 
-    __unicode__ = summary
+    def __str__(self):
+        return self.summary()
 
     def save(self, *args, **kwargs):
         created_at = tznow()
@@ -483,6 +490,7 @@ class ForumReadTracker(models.Model):
         unique_together = ('user', 'forum')
 
 
+@python_2_unicode_compatible
 class PollAnswer(models.Model):
     topic = models.ForeignKey(Topic, related_name='poll_answers', verbose_name=_('Topic'))
     text = models.CharField(max_length=255, verbose_name=_('Text'))
@@ -491,7 +499,7 @@ class PollAnswer(models.Model):
         verbose_name = _('Poll answer')
         verbose_name_plural = _('Polls answers')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.text
 
     def votes(self):
@@ -503,6 +511,7 @@ class PollAnswer(models.Model):
             return 1.0 * self.votes() / topic_votes * 100
 
 
+@python_2_unicode_compatible
 class PollAnswerUser(models.Model):
     poll_answer = models.ForeignKey(PollAnswer, related_name='users', verbose_name=_('Poll answer'))
     user = models.ForeignKey(User, related_name='poll_answers', verbose_name=_('User'))
@@ -513,8 +522,8 @@ class PollAnswerUser(models.Model):
         verbose_name_plural = _('Polls answers users')
         unique_together = (('poll_answer', 'user', ), )
 
-    def __unicode__(self):
-        return u'%s - %s' % (self.poll_answer.topic, self.user)
+    def __str__(self):
+        return '%s - %s' % (self.poll_answer.topic, self.user)
 
 
 from pybb import signals

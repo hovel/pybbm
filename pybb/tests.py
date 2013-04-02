@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import time, datetime
 import os
 
@@ -73,7 +74,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = self.client.get(url)
         parser = html.HTMLParser(encoding='utf8')
         tree = html.fromstring(response.content, parser=parser)
-        self.assertContains(response, u'foo')
+        self.assertContains(response, 'foo')
         self.assertContains(response, self.forum.get_absolute_url())
         self.assertTrue(defaults.PYBB_DEFAULT_TITLE in tree.xpath('//title')[0].text_content())
         self.assertEqual(len(response.context['categories']), 1)
@@ -129,7 +130,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         tree = html.fromstring(response.content)
         self.assertTrue(self.topic.name in tree.xpath('//title')[0].text_content())
         self.assertContains(response, self.post.body_html)
-        self.assertContains(response, u'bbcode <strong>test</strong>')
+        self.assertContains(response, 'bbcode <strong>test</strong>')
 
     def test_topic_addition(self):
         self.login_client()
@@ -1215,10 +1216,10 @@ class FiltersTest(TestCase, SharedTestModule):
         self.login_client()
         response = self.client.get(add_post_url)
         values = self.get_form_values(response)
-        values['body'] = u'test\n \n \n\nmultiple empty lines\n'
+        values['body'] = 'test\n \n \n\nmultiple empty lines\n'
         response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Post.objects.all()[0].body, u'test\nmultiple empty lines')
+        self.assertEqual(Post.objects.all()[0].body, 'test\nmultiple empty lines')
         
 from pybb import permissions
 from django.db.models import Q

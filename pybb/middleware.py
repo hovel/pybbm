@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 from django.utils import translation
 from django.db.models import ObjectDoesNotExist
 from pybb import util

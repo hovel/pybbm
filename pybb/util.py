@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import re
 import django
 from django.utils.translation import ugettext_lazy as _
@@ -54,7 +55,7 @@ def get_pybb_profile(user):
         if defaults.PYBB_ENABLE_ANONYMOUS_POST:
             user = get_user_model().objects.get(**{get_username_field(): defaults.PYBB_ANONYMOUS_USERNAME})
         else:
-            raise ValueError(_(u'Can\'t get profile for anonymous user'))
+            raise ValueError(_('Can\'t get profile for anonymous user'))
 
     if defaults.PYBB_PROFILE_RELATED_NAME:
         return getattr(user, defaults.PYBB_PROFILE_RELATED_NAME)
