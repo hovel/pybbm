@@ -13,6 +13,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         ids = [int(topic_id) for topic_id in args]
-        objects = list(Topic.objects.filter(id__in=ids)) + list(Post.objects.filter(topic__id__in=ids))
+        objects = list(Topic.objects.filter(id__in=ids)) + list(Post.objects.filter(topic_id__in=ids))
         dump = serializers.serialize('json', objects)
         self.stdout.write(dump)

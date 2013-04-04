@@ -10,14 +10,8 @@ from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
-
-try:
-    from django.utils.timezone import timedelta
-    from django.utils.timezone import now as tznow
-except ImportError:
-    import datetime
-    from datetime import timedelta
-    tznow = datetime.datetime.now
+from django.utils.timezone import timedelta
+from django.utils.timezone import now as tznow
 
 try:
     import pytils
@@ -27,7 +21,7 @@ except ImportError:
 
 from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
-from pybb import defaults
+from pybb import defaults, util
 
 
 register = template.Library()
@@ -79,7 +73,7 @@ class PybbTimeNode(template.Node):
                 tz1 = time.altzone
             else:
                 tz1 = time.timezone
-            tz = tz1 + context['user'].get_profile().time_zone * 60 * 60
+            tz = tz1 + util.get_pybb_profile(context['user']).time_zone * 60 * 60
             context_time = context_time + timedelta(seconds=tz)
         if today < context_time < tomorrow:
             return _('today, %s') % context_time.strftime('%H:%M')
@@ -210,3 +204,11 @@ def pybb_topic_poll_not_voted(topic, user):
 @register.filter
 def endswith(str, substr):
     return str.endswith(substr)
+
+
+@register.assignment_tag
+def pybb_get_profile(*args, **kwargs):
+    try:
+        return util.get_pybb_profile(kwargs.get('user') or args[0])
+    except:
+        return util.get_pybb_profile_model().objects.none()

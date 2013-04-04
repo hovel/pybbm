@@ -3,9 +3,11 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
-from django.conf import settings
 
 from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer
+
+from pybb import util
+username_field = util.get_username_field()
 
 
 class ForumInlineAdmin(admin.TabularInline):
@@ -71,11 +73,11 @@ class TopicAdmin(admin.ModelAdmin):
 
 class TopicReadTrackerAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'time_stamp']
-    search_fields = ['user__username']
+    search_fields = ['user__%s' % username_field]
 
 class ForumReadTrackerAdmin(admin.ModelAdmin):
     list_display = ['forum', 'user', 'time_stamp']
-    search_fields = ['user__username']
+    search_fields = ['user__%s' % username_field]
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['topic', 'user', 'created', 'updated', 'summary']
@@ -105,7 +107,7 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'time_zone', 'language', 'post_count']
     list_per_page = 20
     ordering = ['-user']
-    search_fields = ['user__username', 'user__first_name', 'user__last_name']
+    search_fields = ['user__%s' % username_field]
     fieldsets = (
         (None, {
                 'fields': ('time_zone', 'language')
@@ -139,7 +141,7 @@ admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Attachment, AttachmentAdmin)
 
-if settings.AUTH_PROFILE_MODULE == 'pybb.Profile':
+if util.get_pybb_profile_model() == Profile:
     admin.site.register(Profile, ProfileAdmin)
 
 # This can be used to debug read/unread trackers
