@@ -10,7 +10,6 @@ from pybb.models import Profile
 
 from pybb import util
 User = util.get_user_model()
-username_field = util.get_username_field()
 
 
 def post_saved(instance, **kwargs):

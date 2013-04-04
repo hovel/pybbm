@@ -185,7 +185,7 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if perms.may_post_as_admin(self.request.user):
-                ctx['form'] = AdminPostForm(initial={'login': getattr(self.request.user, username_field)},
+                ctx['form'] = AdminPostForm(initial={'login': self.request.user.get_username_field()},
                                             topic=self.topic)
             else:
                 ctx['form'] = PostForm(topic=self.topic)
@@ -305,10 +305,10 @@ class AddPostView(PostEditMixin, generic.CreateView):
                 raise Http404
             else:
                 post = get_object_or_404(Post, pk=quote_id)
-                quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
+                quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, post.user.get_username())
                 form_kwargs['initial']['body'] = quote
         if self.user.is_staff:
-            form_kwargs['initial']['login'] = getattr(self.user, username_field)
+            form_kwargs['initial']['login'] = self.user.get_username()
         return form_kwargs
 
     def get_context_data(self, **kwargs):

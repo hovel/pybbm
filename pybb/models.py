@@ -383,7 +383,7 @@ class Profile(PybbProfile):
         verbose_name_plural = _('Profiles')
 
     def get_absolute_url(self):
-        return reverse('pybb:user', kwargs={'username': getattr(self.user, username_field)})
+        return reverse('pybb:user', kwargs={'username': self.user.get_username()})
 
 
 class Attachment(models.Model):
