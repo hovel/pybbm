@@ -14,6 +14,7 @@ from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread,
 
 from pybb import util
 User = util.get_user_model()
+username_field = util.get_username_field()
 
 try:
     from lxml import html

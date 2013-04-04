@@ -161,7 +161,7 @@ class AdminPostForm(PostForm):
         if args:
             kwargs.update(dict(zip(inspect.getargspec(forms.ModelForm.__init__)[0][1:], args)))
         if 'instance' in kwargs and kwargs['instance']:
-            kwargs.setdefault('initial', {}).update({'login': kwargs['instance'].user.get_username()})
+            kwargs.setdefault('initial', {}).update({'login': getattr(kwargs['instance'].user, username_field)})
         super(AdminPostForm, self).__init__(**kwargs)
 
     def save(self, *args, **kwargs):
