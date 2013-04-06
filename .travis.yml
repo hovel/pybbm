@@ -11,6 +11,7 @@ env:
   - DJANGO=1.5
 install:
   - pip install Django==$DJANGO --use-mirrors
+  - pip install Pillow
   - pip install -r test/test_project/requirements_test.txt
 script:
   - python setup.py test
