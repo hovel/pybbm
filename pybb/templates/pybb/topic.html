@@ -76,7 +76,9 @@
         {% endif %}
 
         {% if user.is_authenticated or PYBB_ENABLE_ANONYMOUS_POST %}
-            {% if not user.get_profile.is_banned %}
+            {% pybb_get_profile user=user as user_profile %}
+
+            {% if not user_profile.is_banned %}
                 {% if not topic.closed %}
                     {% include "pybb/post_form.html" %}
                 {% endif %}

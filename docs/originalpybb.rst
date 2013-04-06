@@ -5,7 +5,6 @@ PyBB originally developed by lorien in 2008-2010 has ben dropped from developmen
 
 This is a list of differences between PyBB and PyBBM as of mid 2011.
 
-* PyBBM uses get_profile() anywhere to populate additional user information.
 * All settings of pybbm have default values, see default.py file for detailed list.
 * pybbm templates fill *content*, *head*, *title* and *breadcrumb* blocks for template defined in settings as PYBB_TEMPLATE ("base.html" by default).
 * Markup engines can be configured as an ordinary settings.

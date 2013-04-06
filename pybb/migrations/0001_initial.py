@@ -1,115 +1,124 @@
+# encoding: utf-8
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:  # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
 from south.db import db
 from django.db import models
-from pybb.models import *
+from south.v2 import SchemaMigration
 
-class Migration:
+
+class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        
+
         # Adding model 'Post'
         db.create_table('pybb_post', (
-            ('id', orm['pybb.Post:id']),
-            ('topic', orm['pybb.Post:topic']),
-            ('user', orm['pybb.Post:user']),
-            ('created', orm['pybb.Post:created']),
-            ('updated', orm['pybb.Post:updated']),
-            ('markup', orm['pybb.Post:markup']),
-            ('body', orm['pybb.Post:body']),
-            ('body_html', orm['pybb.Post:body_html']),
-            ('body_text', orm['pybb.Post:body_text']),
-            ('user_ip', orm['pybb.Post:user_ip']),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('body', self.gf('django.db.models.fields.TextField')()),
+            ('body_html', self.gf('django.db.models.fields.TextField')()),
+            ('body_text', self.gf('django.db.models.fields.TextField')()),
+            ('topic', self.gf('django.db.models.fields.related.ForeignKey')(related_name='posts', to=orm['pybb.Topic'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'posts', to=orm["%s.%s" % (User._meta.app_label, User._meta.object_name)])),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(db_index=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('user_ip', self.gf('django.db.models.fields.IPAddressField')(default=u'0.0.0.0', max_length=15, blank=True)),
+            ('markup', self.gf('django.db.models.fields.CharField')(max_length=15)),
         ))
         db.send_create_signal('pybb', ['Post'])
-        
+
         # Adding model 'Category'
         db.create_table('pybb_category', (
-            ('id', orm['pybb.Category:id']),
-            ('name', orm['pybb.Category:name']),
-            ('position', orm['pybb.Category:position']),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=80)),
+            ('position', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
         ))
         db.send_create_signal('pybb', ['Category'])
-        
+
         # Adding model 'Forum'
         db.create_table('pybb_forum', (
-            ('id', orm['pybb.Forum:id']),
-            ('category', orm['pybb.Forum:category']),
-            ('name', orm['pybb.Forum:name']),
-            ('position', orm['pybb.Forum:position']),
-            ('description', orm['pybb.Forum:description']),
-            ('updated', orm['pybb.Forum:updated']),
-            ('post_count', orm['pybb.Forum:post_count']),
-            ('topic_count', orm['pybb.Forum:topic_count']),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('category', self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'forums', to=orm['pybb.Category'])),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=80)),
+            ('position', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('post_count', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
+            ('topic_count', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
         ))
         db.send_create_signal('pybb', ['Forum'])
-        
+
         # Adding model 'Profile'
         db.create_table('pybb_profile', (
-            ('id', orm['pybb.Profile:id']),
-            ('user', orm['pybb.Profile:user']),
-            ('signature', orm['pybb.Profile:signature']),
-            ('signature_html', orm['pybb.Profile:signature_html']),
-            ('time_zone', orm['pybb.Profile:time_zone']),
-            ('language', orm['pybb.Profile:language']),
-            ('avatar', orm['pybb.Profile:avatar']),
-            ('show_signatures', orm['pybb.Profile:show_signatures']),
-            ('markup', orm['pybb.Profile:markup']),
-            ('ban_status', orm['pybb.Profile:ban_status']),
-            ('ban_till', orm['pybb.Profile:ban_till']),
-            ('post_count', orm['pybb.Profile:post_count']),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('signature', self.gf('django.db.models.fields.TextField')(max_length=1024, blank=True)),
+            ('signature_html', self.gf('django.db.models.fields.TextField')(max_length=1054, blank=True)),
+            ('time_zone', self.gf('django.db.models.fields.FloatField')(default=3.0)),
+            ('language', self.gf('django.db.models.fields.CharField')(default=u'en-us', max_length=10, blank=True)),
+            ('show_signatures', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('post_count', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
+            ('avatar', self.gf('sorl.thumbnail.fields.ImageField')(max_length=100, null=True, blank=True)),
+            ('user', self.gf('annoying.fields.AutoOneToOneField')(related_name=u'pybb_profile', unique=True, to=orm["%s.%s" % (User._meta.app_label, User._meta.object_name)])),
+            ('markup', self.gf('django.db.models.fields.CharField')(max_length=15)),
+            ('ban_status', self.gf('django.db.models.fields.SmallIntegerField')(default=0)),
+            ('ban_till', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
         ))
         db.send_create_signal('pybb', ['Profile'])
-        
+
         # Adding model 'Attachment'
         db.create_table('pybb_attachment', (
-            ('id', orm['pybb.Attachment:id']),
-            ('post', orm['pybb.Attachment:post']),
-            ('size', orm['pybb.Attachment:size']),
-            ('content_type', orm['pybb.Attachment:content_type']),
-            ('path', orm['pybb.Attachment:path']),
-            ('name', orm['pybb.Attachment:name']),
-            ('hash', orm['pybb.Attachment:hash']),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('post', self.gf('django.db.models.fields.related.ForeignKey')(related_name=u'attachments', to=orm['pybb.Post'])),
+            ('size', self.gf('django.db.models.fields.IntegerField')()),
+            ('hash', self.gf('django.db.models.fields.CharField')(blank=True, default='', max_length=40, db_index=True)),
+            ('content_type', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('name', self.gf('django.db.models.fields.TextField')()),
+            ('path', self.gf('django.db.models.fields.CharField')(max_length=255)),
         ))
         db.send_create_signal('pybb', ['Attachment'])
         
         # Adding model 'ReadTracking'
         db.create_table('pybb_readtracking', (
-            ('id', orm['pybb.ReadTracking:id']),
-            ('user', orm['pybb.ReadTracking:user']),
-            ('topics', orm['pybb.ReadTracking:topics']),
-            ('last_read', orm['pybb.ReadTracking:last_read']),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm["%s.%s" % (User._meta.app_label, User._meta.object_name)])),
+            ('topics', self.gf('django.db.models.fields.TextField')(null=True)),
+            ('last_read', self.gf('django.db.models.fields.DateTimeField')(null=True)),
         ))
         db.send_create_signal('pybb', ['ReadTracking'])
-        
+
         # Adding model 'Topic'
         db.create_table('pybb_topic', (
-            ('id', orm['pybb.Topic:id']),
-            ('forum', orm['pybb.Topic:forum']),
-            ('name', orm['pybb.Topic:name']),
-            ('created', orm['pybb.Topic:created']),
-            ('updated', orm['pybb.Topic:updated']),
-            ('user', orm['pybb.Topic:user']),
-            ('views', orm['pybb.Topic:views']),
-            ('sticky', orm['pybb.Topic:sticky']),
-            ('closed', orm['pybb.Topic:closed']),
-            ('post_count', orm['pybb.Topic:post_count']),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('forum', self.gf('django.db.models.fields.related.ForeignKey')(related_name='topics', to=orm['pybb.Forum'])),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm["%s.%s" % (User._meta.app_label, User._meta.object_name)])),
+            ('views', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
+            ('sticky', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('closed', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('post_count', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
         ))
         db.send_create_signal('pybb', ['Topic'])
         
-        # Adding ManyToManyField 'Topic.subscribers'
+        # Adding M2M table for field subscribers on 'Topic'
         db.create_table('pybb_topic_subscribers', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('topic', models.ForeignKey(orm.Topic, null=False)),
-            ('user', models.ForeignKey(orm['auth.User'], null=False))
+            ('topic', models.ForeignKey(orm['pybb.topic'], null=False)),
+            ('user', models.ForeignKey(orm['auth.user'], null=False))
         ))
-        
-        # Adding ManyToManyField 'Forum.moderators'
+        db.create_unique('pybb_topic_subscribers', ['topic_id', 'user_id'])
+
+        # Adding M2M table for field moderators on 'Forum'
         db.create_table('pybb_forum_moderators', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('forum', models.ForeignKey(orm.Forum, null=False)),
-            ('user', models.ForeignKey(orm['auth.User'], null=False))
+            ('forum', models.ForeignKey(orm['pybb.forum'], null=False)),
+            ('user', models.ForeignKey(orm['auth.user'], null=False))
         ))
-        
+        db.create_unique('pybb_forum_moderators', ['forum_id', 'user_id'])
     
     
     def backwards(self, orm):
@@ -196,7 +205,7 @@ class Migration:
             'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'forums'", 'to': "orm['pybb.Category']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'moderators': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
+            'moderators': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name), 'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
@@ -212,7 +221,7 @@ class Migration:
             'markup': ('django.db.models.fields.CharField', [], {'default': "'bbcode'", 'max_length': '15'}),
             'topic': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['pybb.Topic']"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['auth.User']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
             'user_ip': ('django.db.models.fields.IPAddressField', [], {'default': "'0.0.0.0'", 'max_length': '15', 'blank': 'True'})
         },
         'pybb.profile': {
@@ -227,13 +236,13 @@ class Migration:
             'signature': ('django.db.models.fields.TextField', [], {'max_length': '1024', 'blank': 'True'}),
             'signature_html': ('django.db.models.fields.TextField', [], {'max_length': '1054', 'blank': 'True'}),
             'time_zone': ('django.db.models.fields.FloatField', [], {'default': '3.0'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'related_name': "'pybb_profile'", 'unique': 'True'})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name), 'related_name': "'pybb_profile'", 'unique': 'True'})
         },
         'pybb.readtracking': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_read': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'topics': ('django.db.models.fields.TextField', [], {'null': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
         },
         'pybb.topic': {
             'closed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -243,9 +252,9 @@ class Migration:
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'sticky': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'blank': 'True'}),
+            'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name), 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'blank': 'True', 'null': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
             'views': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
         }
     }

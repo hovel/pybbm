@@ -77,7 +77,7 @@ INSTALLED_APPS = (
     'pybb',
     'pytils',
     'sorl.thumbnail',
-    #'south',
+    'south',
     'pure_pagination',
     'account',
     'pinax_theme_bootstrap_account',

@@ -10,7 +10,9 @@
     <h1>{{ target_user.username }}</h1>
     <div class="userinfo">
     <div class="avatar">
-        {% thumbnail target_user.get_profile.avatar "80x80" as avatar %}
+        {% pybb_get_profile user=target_user as target_user_profile %}
+
+        {% thumbnail target_user_profile.avatar "80x80" as avatar %}
             <img src="{{ avatar.url }}" alt="avatar">
         {% empty %}
             <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="avatar">

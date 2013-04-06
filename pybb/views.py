@@ -2,7 +2,6 @@
 
 import math
 
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
@@ -15,30 +14,26 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
-
-try:
-    from django.views import generic
-except ImportError:
-    try:
-        from cbv import generic
-    except ImportError:
-        raise ImportError('If you using django version < 1.3 you should install django-cbv for pybb')
+from django.views import generic
 
 from pure_pagination import Paginator
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
-from pybb.forms import  PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
+from pybb.forms import PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 from pybb import defaults
 
 from pybb.permissions import perms
 
+from pybb import util
+User = util.get_user_model()
+username_field = util.get_username_field()
 
 class RedirectToLoginMixin(object):
     """ mixin which redirects to settings.LOGIN_URL if the view encounters an PermissionDenied exception
-        and the user is not authenticated. Views inheriting from this need to implement 
+        and the user is not authenticated. Views inheriting from this need to implement
         get_login_redirect_url(), which returns the URL to redirect to after login (parameter "next")
-    """ 
+    """
     def dispatch(self, request, *args, **kwargs):
         try:
             return super(RedirectToLoginMixin, self).dispatch(request, *args, **kwargs)
@@ -78,15 +73,15 @@ class CategoryView(RedirectToLoginMixin, generic.DetailView):
 
     def get_login_redirect_url(self):
         return reverse('pybb:category', args=(self.kwargs['pk'],))
-    
+
     def get_queryset(self):
         return Category.objects.all()
-    
+
     def get_object(self, queryset=None):
         obj = super(CategoryView, self).get_object(queryset)
         if not perms.may_view_category(self.request.user, obj):
             raise PermissionDenied
-        return obj        
+        return obj
 
     def get_context_data(self, **kwargs):
         ctx = super(CategoryView, self).get_context_data(**kwargs)
@@ -104,7 +99,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
 
     def get_login_redirect_url(self):
         return reverse('pybb:forum', args=(self.kwargs['pk'],))
-        
+
     def get_context_data(self, **kwargs):
         ctx = super(ForumView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
@@ -114,7 +109,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
         self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
         if not perms.may_view_forum(self.request.user, self.forum):
             raise PermissionDenied
-        
+
         qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
         if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
             if self.request.user.is_authenticated():
@@ -122,7 +117,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
             else:
                 qs = qs.filter(on_moderation=False)
         return qs
-    
+
 
 class LatestTopicsView(generic.ListView):
 
@@ -144,7 +139,7 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     paginator_class = Paginator
 
     def get_login_redirect_url(self):
-        return reverse('pybb:topic', args=(self.kwargs['pk'],))    
+        return reverse('pybb:topic', args=(self.kwargs['pk'],))
 
     def dispatch(self, request, *args, **kwargs):
         self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
@@ -187,10 +182,11 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
         if self.request.user.is_authenticated():
-            self.request.user.is_moderator = self.request.user.is_superuser or (self.request.user in self.topic.forum.moderators.all())
+            self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if perms.may_post_as_admin(self.request.user):
-                ctx['form'] = AdminPostForm(initial={'login': self.request.user.username}, topic=self.topic)
+                ctx['form'] = AdminPostForm(initial={'login': getattr(self.request.user, username_field)},
+                                            topic=self.topic)
             else:
                 ctx['form'] = PostForm(topic=self.topic)
             self.mark_read(self.request, self.topic)
@@ -225,22 +221,21 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,topicreadtracker__time_stamp__gt=F('updated'))) | 
-                                                                Q(forum__forumreadtracker__user=request.user,forum__forumreadtracker__time_stamp__gt=F('updated')))
+            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,
+                                                                  topicreadtracker__time_stamp__gt=F('updated'))) |
+                                                                Q(forum__forumreadtracker__user=request.user,
+                                                                  forum__forumreadtracker__time_stamp__gt=F('updated')))
             unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
             if not unread.exists():
                 # Clear all topic marks for this forum, mark forum as readed
-                TopicReadTracker.objects.filter(
-                        user=request.user,
-                        topic__forum=topic.forum
-                        ).delete()
+                TopicReadTracker.objects.filter(user=request.user, topic__forum=topic.forum).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=request.user)
                 forum_mark.save()
 
 
 class PostEditMixin(object):
 
-    def get_form_class(self):        
+    def get_form_class(self):
         if perms.may_post_as_admin(self.request.user):
             return AdminPostForm
         else:
@@ -310,10 +305,10 @@ class AddPostView(PostEditMixin, generic.CreateView):
                 raise Http404
             else:
                 post = get_object_or_404(Post, pk=quote_id)
-                quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, post.user.username)
+                quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
                 form_kwargs['initial']['body'] = quote
         if self.user.is_staff:
-            form_kwargs['initial']['login'] = self.user.username
+            form_kwargs['initial']['login'] = getattr(self.user, username_field)
         return form_kwargs
 
     def get_context_data(self, **kwargs):
@@ -333,21 +328,21 @@ class AddPostView(PostEditMixin, generic.CreateView):
             self.user = request.user
         else:
             if defaults.PYBB_ENABLE_ANONYMOUS_POST:
-                self.user, new = User.objects.get_or_create(username=defaults.PYBB_ANONYMOUS_USERNAME)
+                self.user, new = User.objects.get_or_create(**{username_field: defaults.PYBB_ANONYMOUS_USERNAME})
             else:
                 from django.contrib.auth.views import redirect_to_login
                 return redirect_to_login(request.get_full_path())
-        
+
         self.forum = None
         self.topic = None
         if 'forum_id' in kwargs:
             self.forum = get_object_or_404(perms.filter_forums(request.user, Forum.objects.all()), pk=kwargs['forum_id'])
             if not perms.may_create_topic(self.user, self.forum):
-                raise PermissionDenied    
+                raise PermissionDenied
         elif 'topic_id' in kwargs:
             self.topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=kwargs['topic_id'])
             if not perms.may_create_post(self.user, self.topic):
-                raise PermissionDenied            
+                raise PermissionDenied
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
 
@@ -360,7 +355,7 @@ class EditPostView(PostEditMixin, generic.UpdateView):
 
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
-    def dispatch(self, request, *args, **kwargs):        
+    def dispatch(self, request, *args, **kwargs):
         return super(EditPostView, self).dispatch(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -378,19 +373,19 @@ class UserView(generic.DetailView):
     def get_object(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
-        return get_object_or_404(queryset, username=self.kwargs['username'])
+        return get_object_or_404(queryset, **{username_field: self.kwargs['username']})
 
     def get_context_data(self, **kwargs):
         ctx = super(UserView, self).get_context_data(**kwargs)
         ctx['topic_count'] = Topic.objects.filter(user=ctx['target_user']).count()
         return ctx
-        
+
 
 class PostView(RedirectToLoginMixin, generic.RedirectView):
-    
+
     def get_login_redirect_url(self):
         return reverse('pybb:post', args=(self.kwargs['pk'],))
-    
+
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post.objects.all(), pk=self.kwargs['pk'])
         if not perms.may_view_post(self.request.user, post):
@@ -416,7 +411,7 @@ class ProfileEditView(generic.UpdateView):
     form_class = EditProfileForm
 
     def get_object(self, queryset=None):
-        return self.request.user.get_profile()
+        return util.get_pybb_profile(self.request.user)
 
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
@@ -467,16 +462,16 @@ class TopicActionBaseView(generic.View):
 
     def get_topic(self):
         return get_object_or_404(Topic, pk=self.kwargs['pk'])
-        
+
     @method_decorator(login_required)
-    def get(self, *args, **kwargs):        
+    def get(self, *args, **kwargs):
         self.topic = self.get_topic()
         self.action(self.topic)
         return HttpResponseRedirect(self.topic.get_absolute_url())
 
 
 class StickTopicView(TopicActionBaseView):
-        
+
     def action(self, topic):
         if not perms.may_stick_topic(self.request.user, topic):
             raise PermissionDenied
@@ -485,19 +480,19 @@ class StickTopicView(TopicActionBaseView):
 
 
 class UnstickTopicView(TopicActionBaseView):
-    
+
     def action(self, topic):
         if not perms.may_unstick_topic(self.request.user, topic):
-            raise PermissionDenied        
+            raise PermissionDenied
         topic.sticky = False
         topic.save()
 
 
 class CloseTopicView(TopicActionBaseView):
-    
+
     def action(self, topic):
         if not perms.may_close_topic(self.request.user, topic):
-            raise PermissionDenied        
+            raise PermissionDenied
         topic.closed = True
         topic.save()
 
@@ -505,7 +500,7 @@ class CloseTopicView(TopicActionBaseView):
 class OpenTopicView(TopicActionBaseView):
     def action(self, topic):
         if not perms.may_open_topic(self.request.user, topic):
-            raise PermissionDenied        
+            raise PermissionDenied
         topic.closed = False
         topic.save()
 
@@ -579,7 +574,7 @@ def mark_all_as_read(request):
 
 @login_required
 def block_user(request, username):
-    user = get_object_or_404(User, username=username)
+    user = get_object_or_404(User, **{username_field: username})
     if not perms.may_block_user(request.user, user):
         raise PermissionDenied
     user.is_active = False
