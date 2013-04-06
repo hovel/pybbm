@@ -25,7 +25,7 @@ All packages can be installed as a dependency for PyBBM if you install it with p
   template.
 
 * `PIL` (Python Imaging Library) or it fork `Pillow` is optional if you configure sorl.thumbnail to use
-  different backend, but remember, that using an ImageField in forms requires that the Python Imaging Library
+  different backend or don't use sorl.thumbnail in general, but remember, that using an ImageField in forms requires that the Python Imaging Library
   is installed (e.g. you should install it if you use buildin profile).
 
 * PyBBM emulates behavior and functionality of `django-pure-pagination`, but we recommend to install it in your
