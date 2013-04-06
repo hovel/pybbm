@@ -1,9 +1,9 @@
 {% load pybb_tags %}
+{% friendly_load thumbnail %}
 <div class="avatar">
     <a href="{{ user.get_profile.get_absolute_url }}">
-      {% pybb_get_profile user=user as user_profile %}
-        {% if PYBB_USE_SORL_THUMBNAIL %}
-            {% load thumbnail %}
+        {% pybb_get_profile user=user as user_profile %}
+        {% if_has_tag thumbnail %}
             {% thumbnail user_profile.avatar "{{ PYBB_AVATAR_WIDTH }}x{{ PYBB_AVATAR_HEIGHT }}" as avatar %}
                 <img src="{{ avatar.url }}" alt="{{ user }} avatar" />
             {% empty %}
@@ -15,6 +15,6 @@
             {% else %}
                 <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
             {% endif %}
-        {% endif %}
+        {% endif_has_tag %}
     </a>
 </div>

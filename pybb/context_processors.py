@@ -5,12 +5,6 @@ from django.conf import settings
 
 __author__ = 'zeus'
 
-try:
-    from sorl import thumbnail
-    sorl_thumbnail_enabled = 'sorl.thumbnail' in settings.INSTALLED_APPS
-except ImportError:
-    sorl_thumbnail_enabled = True
-
 
 def processor(request):
     context = {}
@@ -25,5 +19,4 @@ def processor(request):
         'PYBB_AVATAR_HEIGHT'
     ):
         context[i] = getattr(defaults, i, None)
-    context['PYBB_USE_SORL_THUMBNAIL'] = sorl_thumbnail_enabled
     return context
