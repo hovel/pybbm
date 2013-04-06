@@ -9,17 +9,19 @@ PyBBM required next packages to be installed:
 * django
 * markdown
 * postmarkup
-* south
-* pytils
 * django-annoying
 * sorl-thumbnail
 * django-pure-pagination
 
-* django-cbv (for django versions < 1.3)
 
 All packages can be installed as a dependency for PyBBM if you install it with pip or easy_install::
 
     pip install pybbm
+
+* We strongly recommend you to use `south` application for building migration in your projects.
+PyBBM forum supports `south`, but it should be installed separately.
+
+* For better support ru language you can install `pytils` application.
 
 * PIL (Python Imaging Library) is optional if you configure sorl.thumbnail to use different backend,
   but remember, that using an ImageField in forms requires that the Python Imaging Library is
@@ -37,7 +39,6 @@ Enable applications and edit settings
 * Add following apps to your `INSTALLED_APPS` to enable pybbm and required applications.
 
     * pybb
-    * pytils
     * sorl.thumbnail
     * pure_pagination
 
@@ -46,14 +47,13 @@ Enable applications and edit settings
     INSTALLED_APPS = (
         ....
         'pybb',
-        'pytils',
         'sorl.thumbnail',
         'pure_pagination',
         ...
     )
 
   It is highly recommended that you also enable `south` application for properly
-  migrate future updates
+  migrate future updates and `pytils` application for better support ru language
 
 * Add `pybb.context_processors.processor` to your `settings.CONTEXT_PROCESSORS`::
 

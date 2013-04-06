@@ -14,8 +14,6 @@ setup(
     install_requires=[
         'markdown',
         'postmarkup',
-        'south',
-        'pytils',
         'django-annoying',
         'sorl-thumbnail',
         'django-pure-pagination',
