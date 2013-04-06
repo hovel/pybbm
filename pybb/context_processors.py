@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 from pybb import defaults
+from django.conf import settings
 
 __author__ = 'zeus'
 
@@ -14,8 +15,9 @@ def processor(request):
         'PYBB_MARKUP',
         'PYBB_DEFAULT_TITLE',
         'PYBB_ENABLE_ANONYMOUS_POST',
-        'PYBB_ATTACHMENT_ENABLE'
-        ):
+        'PYBB_ATTACHMENT_ENABLE',
+        'PYBB_AVATAR_WIDTH',
+        'PYBB_AVATAR_HEIGHT'
+    ):
         context[i] = getattr(defaults, i, None)
-    context['PYBB_AVATAR_DIMENSIONS'] = '%sx%s' % (defaults.PYBB_AVATAR_WIDTH, defaults.PYBB_AVATAR_WIDTH)
     return context

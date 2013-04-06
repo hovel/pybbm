@@ -1,5 +1,5 @@
 {% load url from future %}
-{% load i18n pybb_tags thumbnail %}
+{% load i18n pybb_tags %}
 
 {% pybb_get_profile user=post.user as post_user_profile %}
 {% pybb_get_profile user=user as user_profile %}
@@ -17,7 +17,7 @@
     <tbody>
     <tr>
         <td class="post-info">
-            {% include "pybb/avatar.html" %}
+            {% include "pybb/avatar.html" with user=post.user %}
 
             <div class="post-author"><a href="{{ post_user_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
             {% if post_user_profile.rank %}

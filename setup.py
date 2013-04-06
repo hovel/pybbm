@@ -14,11 +14,7 @@ setup(
     install_requires=[
         'markdown',
         'postmarkup',
-        'south',
-        'pytils',
         'django-annoying',
-        'sorl-thumbnail',
-        'django-pure-pagination'
     ],
     test_suite='runtests.runtests',
     license="BSD",

@@ -2,19 +2,13 @@
 
 {% load url from future %}
 
-{% load i18n thumbnail pybb_tags %}
+{% load i18n pybb_tags %}
 
 {% block title %}{% trans "Profile editing" %}{% endblock title %}
 
 {% block content %}
     <h1>{% trans "Profile editing" %}</h1>
-    <div class="avatar">
-    {% thumbnail form.instance.avatar "80x80" as avatar %}
-        <img src="{{ avatar.url }}" alt="avatar">
-    {% empty %}
-        <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="avatar">
-    {% endthumbnail %}
-    </div>
+    {% include 'pybb/avatar.html' with user=user %}
     <p><a href="{% url 'auth_password_change' %}">{% trans "Change the password" %}</a></p>
     <form method="post" enctype="multipart/form-data" class="profile-edit">
         {% csrf_token %}
