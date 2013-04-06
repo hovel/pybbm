@@ -83,8 +83,8 @@ user profile creation form or templates.
 PYBB_AVATAR_WIDTH and PYBB_AVATAR_HEIGHT
 ........................................
 
-Avatar width and height respectively to use in templates (avatars scaled using sorl.thumbnail)
-(default 80 and 80)
+Avatar width and height respectively to use in templates (avatars scaled using sorl.thumbnail
+if it installed and included in project) (default 80 and 80)
 
 PYBB_MAX_AVATAR_SIZE
 ....................

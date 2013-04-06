@@ -1,5 +1,5 @@
 {% load url from future %}
-{% load i18n pybb_tags thumbnail %}
+{% load i18n pybb_tags %}
 
 <a name="post-{{ post.id }}"></a> {# may be remove this string? #}
 <table class="table table-bordered post {% if post.on_moderation %}on-moderation{% endif %}" id="post-{{ post.id }}">
@@ -14,7 +14,7 @@
     <tbody>
     <tr>
         <td class="post-info">
-            {% include "pybb/avatar.html" %}
+            {% include "pybb/avatar.html" with user=post.user %}
             <div class="post-author"><a href="{{ post.user.get_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
             {% if post.user.get_profile.rank %}
                 {% with post.user.get_profile as profile %}

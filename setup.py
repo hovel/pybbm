@@ -15,7 +15,6 @@ setup(
         'markdown',
         'postmarkup',
         'django-annoying',
-        'sorl-thumbnail',
         'django-pure-pagination',
         'django-mailer',
     ],

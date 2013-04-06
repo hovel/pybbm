@@ -4,6 +4,7 @@ Updating PyBBM Version
 0.12.4 -> dev
 
 * You can add first-unread get parameter to the topic url to provide link to first unread post from topic
+* Removed djnago-mailer, pytils, sorl.thumbnail, south from hard dependencies
 
 0.12.4 -> 0.12.5
 ----------------
