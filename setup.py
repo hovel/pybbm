@@ -15,7 +15,6 @@ setup(
         'markdown',
         'postmarkup',
         'django-annoying',
-        'django-pure-pagination',
     ],
     test_suite='runtests.runtests',
     license="BSD",

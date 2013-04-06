@@ -10,7 +10,6 @@ PyBBM required next packages to be installed:
 * markdown
 * postmarkup
 * django-annoying
-* django-pure-pagination
 
 
 All packages can be installed as a dependency for PyBBM if you install it with pip or easy_install::
@@ -18,15 +17,19 @@ All packages can be installed as a dependency for PyBBM if you install it with p
     pip install pybbm
 
 * We strongly recommend you to use `south` application for building migration in your projects.
-PyBBM forum supports `south`, but it should be installed separately.
+  PyBBM forum supports `south`, but it should be installed separately.
 
-* For better perfomance and easy using you can use any thumbnail django application. PyBBM by default use
-`sorl.thumbnail` if it installed and included in your `INSTALLED_APPS` setting. It is used for defining
-`avatar` field in `PybbProfile` model and for resizing avatar in `pybb/avatar.html` template.
+* For better perfomance and easy images thumbnailing you can use any thumbnail django application.
+  PyBBM by default uses `sorl.thumbnail` if it installed and included in your `INSTALLED_APPS` setting.
+  It is used for defining `avatar` field in `PybbProfile` model and for resizing avatar in `pybb/avatar.html`
+  template.
 
 * `PIL` (Python Imaging Library) or it fork `Pillow` is optional if you configure sorl.thumbnail to use
-different backend, but remember, that using an ImageField in forms requires that the Python Imaging Library
-is installed (e.g. you should install it if you use buildin profile).
+  different backend, but remember, that using an ImageField in forms requires that the Python Imaging Library
+  is installed (e.g. you should install it if you use buildin profile).
+
+* PyBBM emulates behavior and functionality of `django-pure-pagination`, but we recommend to install it in your
+  project, if you didn't did this yet
 
 * For better support ru language you can install `pytils` application.
 
@@ -42,14 +45,12 @@ Enable applications and edit settings
 * Add following apps to your `INSTALLED_APPS` to enable pybbm and required applications.
 
     * pybb
-    * pure_pagination
 
   ::
 
     INSTALLED_APPS = (
         ....
         'pybb',
-        'pure_pagination',
         ...
     )
 
