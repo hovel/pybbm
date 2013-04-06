@@ -1,12 +1,4 @@
-from optparse import make_option
-try:
-    from django.utils.timezone import now, timedelta
-except:
-    from datetime import timedelta
-    from datetime import datetime
-    now = datetime.now
-
-
+from django.utils.timezone import now, timedelta
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 

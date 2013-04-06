@@ -3,7 +3,8 @@
 import time, datetime
 import os
 
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
+from django.conf import settings
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
@@ -11,13 +12,17 @@ from django.test import TestCase
 from django.test.client import Client
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread
 
+from pybb import util
+User = util.get_user_model()
+username_field = util.get_username_field()
+
 try:
     from lxml import html
 except ImportError:
     raise Exception('PyBB requires lxml for self testing')
 
 from pybb import defaults
-from pybb.models import *
+from pybb.models import Topic, TopicReadTracker, Forum, ForumReadTracker, Post, Category, PollAnswer, Profile
 
 __author__ = 'zeus'
 
@@ -90,7 +95,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
     def test_profile_language_default(self):
         user = User.objects.create_user(username='user2', password='user2', email='user2@example.com')
-        self.assertEqual(user.get_profile().language, settings.LANGUAGE_CODE)
+        self.assertEqual(util.get_pybb_profile(user).language, settings.LANGUAGE_CODE)
 
     def test_profile_edit(self):
         # Self profile edit
@@ -831,12 +836,12 @@ class FeaturesTest(TestCase, SharedTestModule):
         topic.save()
         post = Post(topic=topic, user=self.user, body='test') # another post
         post.save()
-        self.assertEqual(self.user.get_profile().post_count, 2)
+        self.assertEqual(util.get_pybb_profile(self.user).post_count, 2)
         post.body = 'test2'
         post.save()
-        self.assertEqual(Profile.objects.get(pk=self.user.get_profile().pk).post_count, 2)
+        self.assertEqual(Profile.objects.get(pk=util.get_pybb_profile(self.user).pk).post_count, 2)
         post.delete()
-        self.assertEqual(Profile.objects.get(pk=self.user.get_profile().pk).post_count, 1)
+        self.assertEqual(Profile.objects.get(pk=util.get_pybb_profile(self.user).pk).post_count, 1)
 
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST

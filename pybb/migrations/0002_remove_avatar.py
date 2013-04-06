@@ -1,9 +1,15 @@
+# encoding: utf-8
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:  # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
 
 from south.db import db
-from django.db import models
-from pybb.models import *
+from south.v2 import SchemaMigration
 
-class Migration:
+class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
@@ -15,7 +21,7 @@ class Migration:
     def backwards(self, orm):
         
         # Adding field 'Profile.avatar'
-        db.add_column('pybb_profile', 'avatar', orm['pybb.profile:avatar'])
+        db.add_column('pybb_profile', 'avatar', self.gf('sorl.thumbnail.fields.ImageField')(max_length=100, null=True, blank=True))
         
     
     
@@ -72,7 +78,7 @@ class Migration:
             'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'forums'", 'to': "orm['pybb.Category']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'moderators': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
+            'moderators': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name), 'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
@@ -88,7 +94,7 @@ class Migration:
             'markup': ('django.db.models.fields.CharField', [], {'default': "'bbcode'", 'max_length': '15'}),
             'topic': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['pybb.Topic']"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['auth.User']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
             'user_ip': ('django.db.models.fields.IPAddressField', [], {'default': "'0.0.0.0'", 'max_length': '15', 'blank': 'True'})
         },
         'pybb.profile': {
@@ -102,13 +108,13 @@ class Migration:
             'signature': ('django.db.models.fields.TextField', [], {'max_length': '1024', 'blank': 'True'}),
             'signature_html': ('django.db.models.fields.TextField', [], {'max_length': '1054', 'blank': 'True'}),
             'time_zone': ('django.db.models.fields.FloatField', [], {'default': '3.0'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'related_name': "'pybb_profile'", 'unique': 'True'})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name), 'related_name': "'pybb_profile'", 'unique': 'True'})
         },
         'pybb.readtracking': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_read': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'topics': ('django.db.models.fields.TextField', [], {'null': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['auth.User']"})
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
         },
         'pybb.topic': {
             'closed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -118,9 +124,9 @@ class Migration:
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'sticky': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'blank': 'True'}),
+            'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name), 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
             'views': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
         }
     }

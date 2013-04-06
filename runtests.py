@@ -7,7 +7,7 @@ from optparse import OptionParser
 from django.conf import settings
 import django
 
-TEMPLATE_CONTEXT_PROCESSORS = (
+TEMPLATE_CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
@@ -15,10 +15,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.request',
     'pybb.context_processors.processor',
-)
-
-if django.get_version() >= (1, 4):
-    TEMPLATE_CONTEXT_PROCESSORS += ['django.core.context_processors.tz',]
+    'django.core.context_processors.tz'
+]
 
 # For convenience configure settings if they are not pre-configured or if we
 # haven't been provided settings to use by environment variable.
@@ -36,16 +34,17 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
             'django.contrib.sessions',
             'django.contrib.sites',
             'pure_pagination',
+            'test.test_project',
             'pybb',
         ],
         ROOT_URLCONF='test.test_project.test_urls',
         DEBUG=False,
         SITE_ID=1,
         STATIC_URL='/static/',
-        AUTH_PROFILE_MODULE='pybb.Profile',
         TEMPLATE_DIRS=(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test/test_project/templates'), ),
         PYBB_ATTACHMENT_ENABLE=True,
         TEMPLATE_CONTEXT_PROCESSORS=TEMPLATE_CONTEXT_PROCESSORS,
+        AUTH_USER_MODEL='test_project.CustomUser',
         LOGIN_URL='/'
     )
 

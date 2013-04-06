@@ -16,7 +16,6 @@ setup(
         'postmarkup',
         'django-annoying',
         'django-pure-pagination',
-        'django-mailer',
     ],
     test_suite='runtests.runtests',
     license="BSD",
