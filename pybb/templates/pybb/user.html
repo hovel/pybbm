@@ -2,22 +2,14 @@
 
 {% load url from future %}
 
-{% load pybb_tags i18n thumbnail %}
+{% load pybb_tags i18n %}
 
 {% block title %}{{ target_user.username }}{% endblock %}
 
 {% block content %}
     <h1>{{ target_user.username }}</h1>
     <div class="userinfo">
-    <div class="avatar">
-        {% pybb_get_profile user=target_user as target_user_profile %}
-
-        {% thumbnail target_user_profile.avatar "80x80" as avatar %}
-            <img src="{{ avatar.url }}" alt="avatar">
-        {% empty %}
-            <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="avatar">
-        {% endthumbnail %}
-        </div>
+        {% include 'pybb/avatar.html' with user=target_user %}
         <div class="info">
             <div class="label">{% trans "Statistics" %}</div>
             <div>{% trans "Number of posts" %}: {{ target_user.posts.all.count }}.
