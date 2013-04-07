@@ -16,7 +16,15 @@ from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 
-from pure_pagination import Paginator
+try:
+    from pure_pagination import Paginator
+except ImportError:
+    # the simplest emulation of django-pure-pagination behavior
+    from django.core.paginator import Paginator, Page
+    class PageRepr(int):
+        def querystring(self):
+            return 'page=%s' % self
+    Page.pages = lambda self: [PageRepr(i) for i in range(1, self.paginator.num_pages + 1)]
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.forms import PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm

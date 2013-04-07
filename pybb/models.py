@@ -12,7 +12,10 @@ from django.conf import settings
 from django.utils.timezone import now as tznow
 
 from annoying.fields import AutoOneToOneField
-from sorl.thumbnail import ImageField
+try:
+    from sorl.thumbnail import ImageField
+except ImportError:
+    from django.db.models import ImageField
 from pybb.util import unescape, get_user_model, get_username_field
 
 User = get_user_model()
