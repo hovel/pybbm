@@ -1,11 +1,11 @@
 Updating PyBBM Version
 ======================
 
-0.12.4 -> dev
--------------
+0.12.5 -> 0.13
+--------------
 
 * You can add first-unread get parameter to the topic url to provide link to first unread post from topic
-* Removed djnago-mailer, pytils, sorl.thumbnail, south, django-pure-pagination from hard dependencies
+* Removed django-mailer, pytils, sorl-thumbnail, south, django-pure-pagination from hard dependencies
 * Support Custom User model introduced in django 1.5. See :doc:`how to use custom user model with pybbm</customuser>`
 * Dropped support for django 1.3
 
