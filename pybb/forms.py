@@ -5,7 +5,7 @@ import inspect
 
 from django import forms
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
 
 from pybb import util
@@ -23,7 +23,7 @@ class AttachmentForm(forms.ModelForm):
 
     def clean_file(self):
         if self.cleaned_data['file'].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
-            raise forms.ValidationError(_('Attachment is too big'))
+            raise forms.ValidationError(ugettext('Attachment is too big'))
         return self.cleaned_data['file']
 
 AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
@@ -43,9 +43,9 @@ class BasePollAnswerFormset(BaseInlineFormSet):
                     len(self.deleted_forms)
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
             raise forms.ValidationError(
-                _('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
+                ugettext('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
         if forms_cnt < 2:
-            raise forms.ValidationError(_('Add two or more answers for this poll'))
+            raise forms.ValidationError(ugettext('Add two or more answers for this poll'))
 
 
 PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=defaults.PYBB_POLL_MAX_ANSWERS,
@@ -53,10 +53,10 @@ PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=de
 
 
 class PostForm(forms.ModelForm):
-    name = forms.CharField(label=_('Subject'))
-    poll_type = forms.TypedChoiceField(label=_('Poll type'), choices=Topic.POLL_TYPE_CHOICES, coerce=int)
+    name = forms.CharField(label=ugettext_lazy('Subject'))
+    poll_type = forms.TypedChoiceField(label=ugettext_lazy('Poll type'), choices=Topic.POLL_TYPE_CHOICES, coerce=int)
     poll_question = forms.CharField(
-        label=_('Poll question'),
+        label=ugettext_lazy('Poll question'),
         required=False,
         widget=forms.Textarea(attrs={'class': 'no-markitup'}))
 
@@ -105,7 +105,7 @@ class PostForm(forms.ModelForm):
         poll_type = self.cleaned_data.get('poll_type', None)
         poll_question = self.cleaned_data.get('poll_question', None)
         if poll_type is not None and poll_type != Topic.POLL_TYPE_NONE and not poll_question:
-            raise forms.ValidationError(_('Poll''s question is required when adding a poll'))
+            raise forms.ValidationError(ugettext('Poll''s question is required when adding a poll'))
 
         return self.cleaned_data
 
@@ -155,7 +155,7 @@ class AdminPostForm(PostForm):
     Superusers can post messages from any user and from any time
     If no user with specified name - new user will be created
     """
-    login = forms.CharField(label=_('User'))
+    login = forms.CharField(label=ugettext_lazy('User'))
 
     def __init__(self, *args, **kwargs):
         if args:
@@ -187,7 +187,7 @@ class EditProfileForm(forms.ModelForm):
 
     def clean_avatar(self):
         if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):
-            forms.ValidationError(_('Avatar is too large, max size: %s bytes' % defaults.PYBB_MAX_AVATAR_SIZE))
+            forms.ValidationError(ugettext('Avatar is too large, max size: %s bytes' % defaults.PYBB_MAX_AVATAR_SIZE))
         return self.cleaned_data['avatar']
 
     def clean_signature(self):

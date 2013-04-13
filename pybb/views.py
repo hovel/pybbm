@@ -10,7 +10,7 @@ from django.db.models import F, Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect

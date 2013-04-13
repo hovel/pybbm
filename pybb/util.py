@@ -2,7 +2,7 @@
 
 import re
 import django
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 
 def unescape(text):
