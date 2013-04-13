@@ -1,6 +1,11 @@
 Updating PyBBM Version
 ======================
 
+0.13 -> 0.13.1
+--------------
+
+* Hotfix for rendering avatars
+
 0.12.5 -> 0.13
 --------------
 

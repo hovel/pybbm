@@ -19,4 +19,5 @@ def processor(request):
         'PYBB_AVATAR_HEIGHT'
     ):
         context[i] = getattr(defaults, i, None)
+    context['PYBB_AVATAR_DIMENSIONS'] = '%sx%s' % (defaults.PYBB_AVATAR_WIDTH, defaults.PYBB_AVATAR_WIDTH)
     return context
