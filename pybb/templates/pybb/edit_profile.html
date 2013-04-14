@@ -9,7 +9,6 @@
 {% block content %}
     <h1>{% trans "Profile editing" %}</h1>
     {% include 'pybb/avatar.html' with user=user %}
-    <p><a href="{% url 'auth_password_change' %}">{% trans "Change the password" %}</a></p>
     <form method="post" enctype="multipart/form-data" class="profile-edit">
         {% csrf_token %}
         <fieldset>

@@ -8,7 +8,8 @@ from pybb.feeds import LastPosts, LastTopics
 from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
-    OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView
+    OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView,\
+    UserTopics, UserPosts
 
 
 urlpatterns = patterns('',
@@ -26,6 +27,8 @@ urlpatterns += patterns('pybb.views',
                         # User
                         url('^users/(?P<username>[^/]+)/$', UserView.as_view(), name='user'),
                         url('^block_user/([^/]+)/$', 'block_user', name='block_user'),
+                        url(r'^users/(?P<username>[^/]+)/topics/$', UserTopics.as_view(), name='user_topics'),
+                        url(r'^users/(?P<username>[^/]+)/posts/$', UserPosts.as_view(), name='user_posts'),
 
                         # Profile
                         url('^profile/edit/$', ProfileEditView.as_view(), name='edit_profile'),

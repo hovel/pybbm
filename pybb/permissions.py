@@ -114,6 +114,11 @@ class DefaultPermissionHandler(object):
     #    
     def filter_posts(self, user, qs):
         """ return a queryset with posts `user` is allowed to see """
+
+        # first filter by topic availability
+        if not user.is_staff:
+            qs = qs.filter(Q(topic__forum__hidden=False) & Q(topic__forum__category__hidden=False))
+
         if not defaults.PYBB_PREMODERATION or user.is_superuser:
             # superuser may see all posts, also if premoderation is turned off moderation 
             # flag is ignored
