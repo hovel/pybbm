@@ -827,9 +827,28 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(forum_1.topic_count, 0)
         self.assertEqual(forum_1.post_count, 0)
 
-    def test_user_view(self):
-        resp = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
-        self.assertEqual(resp.status_code, 200)
+    def test_user_views(self):
+        response = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(reverse('pybb:user_posts', kwargs={'username': self.user.username}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
+
+        response = self.client.get(reverse('pybb:user_topics', kwargs={'username': self.user.username}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
+
+        self.topic.forum.hidden = True
+        self.topic.forum.save()
+
+        self.client.logout()
+
+        response = self.client.get(reverse('pybb:user_posts', kwargs={'username': self.user.username}))
+        self.assertEqual(response.context['object_list'].count(), 0)
+
+        response = self.client.get(reverse('pybb:user_topics', kwargs={'username': self.user.username}))
+        self.assertEqual(response.context['object_list'].count(), 0)
 
     def test_post_count(self):
         topic = Topic(name='etopic', forum=self.forum, user=self.user)

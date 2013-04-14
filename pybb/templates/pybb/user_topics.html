@@ -1,29 +1,23 @@
 {% extends 'pybb/base.html' %}
 
 {% load url from future %}
-
 {% load pybb_tags i18n %}
+
+{% block breadcrumb %}
+    {% pybb_get_profile target_user as target_profile %}
+    {% include "pybb/breadcrumb.html" with object=target_profile extra_crumb=_('Topics') %}
+{% endblock %}
 
 {% block title %}{% trans "All topics created by" %} {{ profile }}{% endblock %}
 
 {% block content %}
-<h1>{% trans "All topics created by" %} {{ profile|pybb_profile_link }}</h1>
-<ul class="tablist">
-    <li class="tablist-row last">
-        <ul class="tablist-inner topic">
-            {% for topic in page.object_list %}
-            <li class="tablist-inner-row topic">
-                <span class="title"><a href={% url 'pybb_topic' topic.id %}>{{ topic }}</a></span>
-                <span class="post_count">{{ topic.posts.count }}</span>
-                <span class="updated">{{ topic.created|date:"d M Y h:i" }}</span>
-            </li>
-            {% endfor %}
-        </ul>
-    </li>
-</ul>
+    {% pybb_get_profile target_user as target_profile %}
+    <h1>{% trans "All topics created by" %} {{ target_profile.get_absolute_url }}</h1>
 
-{% with _('Topics') as label %}
-{% include "pybb/pagination.html" %}
-{% endwith %}
+    {% include "pybb/pagination.html" %}
+
+    {% include 'pybb/topic_list.html' with topic_list=object_list %}
+
+    {% include "pybb/pagination.html" %}
 
 {% endblock %}

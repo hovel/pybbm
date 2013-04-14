@@ -389,6 +389,54 @@ class UserView(generic.DetailView):
         return ctx
 
 
+class UserPosts(generic.ListView):
+    model = Post
+    paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
+    paginator_class = Paginator
+    template_name = 'pybb/user_posts.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        username = kwargs.pop('username')
+        self.user = get_object_or_404(**{'klass': User, username_field: username})
+        return super(UserPosts, self).dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super(UserPosts, self).get_queryset()
+        qs = qs.filter(user=self.user)
+        qs = perms.filter_posts(self.request.user, qs).select_related('topic')
+        qs = qs.order_by('-created', '-updated')
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(UserPosts, self).get_context_data(**kwargs)
+        context['target_user'] = self.user
+        return context
+
+
+class UserTopics(generic.ListView):
+    model = Topic
+    paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
+    paginator_class = Paginator
+    template_name = 'pybb/user_topics.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        username = kwargs.pop('username')
+        self.user = get_object_or_404(User, username=username)
+        return super(UserTopics, self).dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super(UserTopics, self).get_queryset()
+        qs = qs.filter(user=self.user)
+        qs = perms.filter_topics(self.user, qs)
+        qs = qs.order_by('-updated', '-created')
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(UserTopics, self).get_context_data(**kwargs)
+        context['target_user'] = self.user
+        return context
+
+
 class PostView(RedirectToLoginMixin, generic.RedirectView):
 
     def get_login_redirect_url(self):

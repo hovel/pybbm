@@ -4,23 +4,26 @@
 
 {% load pybb_tags i18n %}
 
-{% block title %}{{ target_user.username }}{% endblock %}
+{% block title %}{{ target_user.get_username }}{% endblock %}
 
 {% block content %}
-    <h1>{{ target_user.username }}</h1>
+    {% pybb_get_profile target_user as target_profile %}
+    <h1>{{ target_user }}</h1>
     <div class="userinfo">
         {% include 'pybb/avatar.html' with user=target_user %}
         <div class="info">
             <div class="label">{% trans "Statistics" %}</div>
-            <div>{% trans "Number of posts" %}: {{ target_user.posts.all.count }}.
-            </div>
-            <div>{% trans "Number of topics" %}: {{ topic_count }}.
-                {% comment %}
-                &nbsp;
-                <a href="{% url 'pybb:user_topics' profile.username %}">
-                    {% trans "Find all topics" %}
+            <div>
+                <a href="{% url 'pybb:user_topics' target_user.get_username %}">
+                    {% trans "Number of topics" %}:
+                    {{ topic_count }}
                 </a>
-                {% endcomment %}
+            </div>
+            <div>
+                <a href="{% url 'pybb:user_posts' target_user.get_username %}">
+                    {% trans "Number of posts" %}:
+                    {{ target_user.posts.all.count }}
+                </a>
             </div>
             <div>{% trans "Date of registration" %}: {% pybb_time target_user.date_joined %}</div>
         </div>
@@ -28,10 +31,10 @@
     </div>
     <div class='controls'>
         {% if perms.pybb.block_users %}
-            <a href='{% url 'pybb:block_user' target_user.username %}'>{% trans 'Block' %}</a>
+            <a href="{% url 'pybb:block_user' target_user.get_username %}">{% trans 'Block' %}</a>
         {% endif %}
-        {% if perms.pybb.can_edit %}
-            <a href='{% url 'admin:pybb_profile_change' target_user.pybb_profile.id %}'>{% trans 'Edit' %}</a>
+        {% if target_user.id == user.id %}
+            <a href="{% url 'pybb:edit_profile' %}">{% trans 'Edit' %}</a>
         {% endif %}
     </div>
 
