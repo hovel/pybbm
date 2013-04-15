@@ -16,16 +16,18 @@ Updating PyBBM Version
 
 * You can add first-unread get parameter to the topic url to provide link to first unread post from topic
 * Removed django-mailer, pytils, sorl-thumbnail, south, django-pure-pagination from hard dependencies
-* Support Custom User model introduced in django 1.5. See :doc:`how to use custom user model with pybbm</customuser>`
+* Support Custom User model introduced in django 1.5. Do not forget to define `PYBB_PROFILE_RELATED_NAME`
+  in settings, if you don't yse predefinet `pybb.PybbProfile` model See :doc:`how to use custom user model
+  with pybbm</customuser>`
 * Dropped support for django 1.3
 
 0.12.4 -> 0.12.5
 ----------------
 
 * More flexible forms/forms fields rendering in templates
-Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
+  Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
 * Additional template for markitup preview
-You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
+  You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
 * Improved permissions handling see `PYBB_PERMISSION_HANDLER` setting in :doc:`settings</settings>`
 * Fixed bugs and improved performance
 
@@ -43,7 +45,7 @@ You can override `pybb/_markitup_preview.html` to provide your styling for <code
 ------------
 
 * Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using
-polls subsystem
+  polls subsystem
 
 * Polish translation
 
@@ -52,11 +54,11 @@ polls subsystem
 ------------
 
 * Ability to override standard message when user doesn't login and not alowed anonymous posts by
-``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
-and/or ``auth_login`` url names in ``urls.py``
+  ``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
+  and/or ``auth_login`` url names in ``urls.py``
 
 * Content in each ``topic.html`` and ``forum.html`` is wrapped in ``<div>`` tag with ``topic`` and ``forum`` classes
-accordingly
+  accordingly
 
 0.9 -> 0.10
 -----------
