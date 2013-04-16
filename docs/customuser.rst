@@ -20,7 +20,11 @@ Next step is to decide which model will store all fields for pybb forum profiles
 This model should be referenced to current User model (custom or default) in OneToOne
 relationship. To easily setup such model you can use predefined `pybb.models.PybbProfile`
 class. If profile model is custom user model itself then you can use `PybbProfile` class
-as mixin for adding required fields.
+as mixin for adding required fields. For more granunal control of fields in your forum
+profile model you may not rely on `PybbProfile` and define all fields from
+this model manually. You can use fields from another app (such as `avatar` or `language`),
+but you have to define proxy properties in forum profile model and build custom
+edit profile view, which will be override default pybb profile edit view in urls.py.
 
 Last step is to correctly set `PYBB_PROFILE_RELATED_NAME` setting. You have to set this
 setting to related_name parameter from profile's model from OneToOne relation to User model.

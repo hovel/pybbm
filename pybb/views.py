@@ -27,7 +27,7 @@ except ImportError:
     Page.pages = lambda self: [PageRepr(i) for i in range(1, self.paginator.num_pages + 1)]
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
-from pybb.forms import PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
+from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 from pybb import defaults
 
@@ -464,10 +464,13 @@ class ModeratePost(generic.RedirectView):
 class ProfileEditView(generic.UpdateView):
 
     template_name = 'pybb/edit_profile.html'
-    form_class = EditProfileForm
 
     def get_object(self, queryset=None):
         return util.get_pybb_profile(self.request.user)
+
+    def get_form_class(self):
+        from pybb.forms import EditProfileForm
+        return EditProfileForm
 
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
