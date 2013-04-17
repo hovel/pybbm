@@ -276,3 +276,6 @@ If you need custom permissions (for example, private forums based on application
 user groups), you can set `PYBB_PERMISSION_HANDLER` to a class which inherits from 
 `pybb.permissions.DefaultPermissionHandler`, and override any of the `filter_*` and 
 `may_*` method. For details, look at the source of `pybb.permissions.DefaultPermissionHandler`.
+All methods from permission handler (custom or default) can be used in templates as filters,
+if loaded pybb_tags. In template will be loaded methods which start with 'may' or 'filter'
+and with three arguments (include 'self' argument)
