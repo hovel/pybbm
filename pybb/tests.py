@@ -10,7 +10,8 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
-from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread
+from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
+     pybb_get_latest_topics, pybb_get_latest_posts
 
 from pybb import util
 User = util.get_user_model()
@@ -861,6 +862,26 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(Profile.objects.get(pk=util.get_pybb_profile(self.user).pk).post_count, 2)
         post.delete()
         self.assertEqual(Profile.objects.get(pk=util.get_pybb_profile(self.user).pk).post_count, 1)
+
+    def test_latest_topics_tag(self):
+        Topic.objects.all().delete()
+        for i in range(10):
+            Topic.objects.create(name='topic%s' % i, user = self.user, forum=self.forum)
+        latest_topics = pybb_get_latest_topics(context=None, user=self.user)
+        self.assertEqual(len(latest_topics), 5)
+        self.assertEqual(latest_topics[0].name, 'topic9')
+        self.assertEqual(latest_topics[4].name, 'topic5')
+
+
+    def test_latest_posts_tag(self):
+        Post.objects.all().delete()
+        for i in range(10):
+            Post.objects.create(body='post%s' % i, user = self.user, topic=self.topic)
+        latest_topics = pybb_get_latest_posts(context=None, user=self.user)
+        self.assertEqual(len(latest_topics), 5)
+        self.assertEqual(latest_topics[0].body, 'post9')
+        self.assertEqual(latest_topics[4].body, 'post5')
+
 
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
