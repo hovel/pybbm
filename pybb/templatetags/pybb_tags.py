@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import math
-from string import strip
 import time
 
 from django import template
@@ -22,7 +21,7 @@ try:
 except ImportError:
     pytils_enabled = False
 
-from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser, Topic, Post
 from pybb.permissions import perms
 from pybb import defaults, util
 
@@ -215,6 +214,24 @@ def pybb_get_profile(*args, **kwargs):
         return util.get_pybb_profile(kwargs.get('user') or args[0])
     except:
         return util.get_pybb_profile_model().objects.none()
+
+
+@register.assignment_tag(takes_context=True)
+def pybb_get_latest_topics(context, cnt=5, user=None):
+    qs = Topic.objects.all().order_by('-updated', '-created')
+    if not user:
+        user = context['user']
+    qs = perms.filter_topics(user, qs)
+    return qs[:cnt]
+
+
+@register.assignment_tag(takes_context=True)
+def pybb_get_latest_posts(context, cnt=5, user=None):
+    qs = Post.objects.all().order_by('-created')
+    if not user:
+        user = context['user']
+    qs = perms.filter_posts(user, qs)
+    return qs[:cnt]
 
 
 # next two tags copied from https://bitbucket.org/jaap3/django-friendly-tag-loader

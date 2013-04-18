@@ -31,8 +31,10 @@ Contents:
    install
    updates
    settings
+   customuser
    premoderation
    anonymous
+   templatetags
    example
    filters
    testing
