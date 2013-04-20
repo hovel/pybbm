@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-14 14:45+0400\n"
+"POT-Creation-Date: 2013-04-20 23:30+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Pavel Zhukov <gelios@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,41 +40,41 @@ msgstr "Последние сообщения на форуме"
 msgid "Latest topics on forum"
 msgstr "Последние темы на форуме"
 
-#: forms.py:26
+#: forms.py:27
 msgid "Attachment is too big"
 msgstr "Вложение слишком большое"
 
-#: forms.py:46
+#: forms.py:47
 #, python-format
 msgid "You cant add more than %s answers for poll"
 msgstr "Вы не можете добавить более чем %s ответов на опрос"
 
-#: forms.py:48
+#: forms.py:49
 msgid "Add two or more answers for this poll"
 msgstr "Добавьте по крайней мере 2 варианта ответа на опрос"
 
-#: forms.py:56 models.py:163
+#: forms.py:57 models.py:163
 msgid "Subject"
 msgstr "Заголовок"
 
-#: forms.py:57 models.py:175
+#: forms.py:58 models.py:175
 msgid "Poll type"
 msgstr "Тип опроса"
 
-#: forms.py:59 models.py:176
+#: forms.py:60 models.py:176
 msgid "Poll question"
 msgstr "Тема опроса"
 
-#: forms.py:108
+#: forms.py:109
 msgid "Polls question is required when adding a poll"
 msgstr "Необходимо указать вопрос при добавлении опроса"
 
-#: forms.py:158 models.py:166 models.py:269 models.py:382 models.py:511
+#: forms.py:159 models.py:166 models.py:269 models.py:382 models.py:511
 #: templates/pybb/mail_templates/subscription_email_body.html:3
 msgid "User"
 msgstr "Пользователь"
 
-#: forms.py:190
+#: forms.py:192
 #, python-format
 msgid "Avatar is too large, max size: %s bytes"
 msgstr "Аватар слишком большой, максимальный размер: %s байт"
@@ -300,11 +300,11 @@ msgstr "Ответы пользователей на опросы"
 msgid "Can't get profile for anonymous user"
 msgstr "Невозможно получить профиль для анонимного пользователя"
 
-#: views.py:626
+#: views.py:629
 msgid "All forums marked as read"
 msgstr "Все форумы отмечены как прочтенные"
 
-#: views.py:638
+#: views.py:641
 msgid "User successfuly blocked"
 msgstr "Пользователь успешно заблокирован"
 
@@ -319,6 +319,58 @@ msgstr "Сохранить"
 #: templates/pybb/_button_submit.html:1
 msgid "Submit"
 msgstr "Отправить"
+
+#: templates/pybb/_markitup.html:15
+msgid "Bold"
+msgstr "Жирный"
+
+#: templates/pybb/_markitup.html:16
+msgid "Italic"
+msgstr "Курсив"
+
+#: templates/pybb/_markitup.html:17
+msgid "Underline"
+msgstr "Подчёркнутый"
+
+#: templates/pybb/_markitup.html:18
+msgid "Stroke"
+msgstr "Зачёркнутый"
+
+#: templates/pybb/_markitup.html:20
+msgid "Picture"
+msgstr "Изображение"
+
+#: templates/pybb/_markitup.html:21
+msgid "Link"
+msgstr "Ссылка"
+
+#: templates/pybb/_markitup.html:23
+msgid "Bulleted list"
+msgstr "Ненумерованный список"
+
+#: templates/pybb/_markitup.html:24
+msgid "Numeric list"
+msgstr "Нумерованный список"
+
+#: templates/pybb/_markitup.html:25
+msgid "List item"
+msgstr "Элемент списка"
+
+#: templates/pybb/_markitup.html:27
+msgid "Quotes"
+msgstr "Цитировать"
+
+#: templates/pybb/_markitup.html:28
+msgid "Code"
+msgstr "Код"
+
+#: templates/pybb/_markitup.html:30
+msgid "Clean"
+msgstr "Очистить"
+
+#: templates/pybb/_markitup.html:31
+msgid "Preview"
+msgstr "Предпросмотр"
 
 #: templates/pybb/_need_to_login_message.html:3
 msgid "Register"
@@ -567,28 +619,28 @@ msgstr ""
 msgid "New answer in topic that you subscribed."
 msgstr "Новый ответ в теме, на которую вы подписаны"
 
-#: templatetags/pybb_tags.py:60
+#: templatetags/pybb_tags.py:59
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "секунду назад,секунды назад,секунд назад"
 
-#: templatetags/pybb_tags.py:63
+#: templatetags/pybb_tags.py:62
 msgid "seconds ago"
 msgstr "seconds ago"
 
-#: templatetags/pybb_tags.py:69
+#: templatetags/pybb_tags.py:68
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "минуту назад,минуты назад,минут назад"
 
-#: templatetags/pybb_tags.py:72
+#: templatetags/pybb_tags.py:71
 msgid "minutes ago"
 msgstr "minutes ago"
 
-#: templatetags/pybb_tags.py:82
+#: templatetags/pybb_tags.py:81
 #, python-format
 msgid "today, %s"
 msgstr "сегодня, %s"
 
-#: templatetags/pybb_tags.py:84
+#: templatetags/pybb_tags.py:83
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"
@@ -640,9 +692,6 @@ msgstr "вчера, %s"
 
 #~ msgid "Merge"
 #~ msgstr "Объединение"
-
-#~ msgid "Preview"
-#~ msgstr "Предпросмотр"
 
 #~ msgid "Posts from changed topics"
 #~ msgstr "Сообщения из объединённых тем"
