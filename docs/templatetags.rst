@@ -4,7 +4,7 @@ Useful template tags and filters
 Next filters and tags can be used when `pybb_tags` loaded in template:
 
 * PyBBM passes all filter_* and may_* methods from current permission handler
-  to templates as filters with pybb_ prefix. So you can they as::
+  to templates as filters with pybb_ prefix. So you can use they as::
 
     {% if user|may_view_topic:topic %}
       you can view {{ topic }}
