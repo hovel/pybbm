@@ -469,8 +469,8 @@ class ProfileEditView(generic.UpdateView):
         return util.get_pybb_profile(self.request.user)
 
     def get_form_class(self):
-        from pybb.forms import EditProfileForm
         if not self.form_class:
+            from pybb.forms import EditProfileForm
             return EditProfileForm
         else:
             return super(ProfileEditView, self).get_form_class()
