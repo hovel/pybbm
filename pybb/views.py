@@ -470,7 +470,10 @@ class ProfileEditView(generic.UpdateView):
 
     def get_form_class(self):
         from pybb.forms import EditProfileForm
-        return EditProfileForm
+        if not self.form_class:
+            return EditProfileForm
+        else:
+            return super(ProfileEditView, self).get_form_class()
 
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
