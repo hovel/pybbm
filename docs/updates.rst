@@ -6,6 +6,9 @@ Updating PyBBM Version
 
 * Restored views for rendering user's posts and topics and link to that views from profile info page
 * Broken hard dependency from EditProfileView and EditProfileForm classes in forum
+* Block user view accepts only POST requests
+* If `block_and_delete_messages` passed to request.POST for block user view,
+  then all user's messages will be deleted
 
 0.13 -> 0.13.1
 --------------
