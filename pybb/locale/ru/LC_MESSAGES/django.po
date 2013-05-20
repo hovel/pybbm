@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-20 23:30+0400\n"
+"POT-Creation-Date: 2013-05-20 22:15+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Pavel Zhukov <gelios@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,7 +69,7 @@ msgstr "Тема опроса"
 msgid "Polls question is required when adding a poll"
 msgstr "Необходимо указать вопрос при добавлении опроса"
 
-#: forms.py:159 models.py:166 models.py:269 models.py:382 models.py:511
+#: forms.py:159 models.py:166 models.py:269 models.py:382 models.py:513
 #: templates/pybb/mail_templates/subscription_email_body.html:3
 msgid "User"
 msgstr "Пользователь"
@@ -280,7 +280,7 @@ msgstr "Отметки прочитанных форумов"
 msgid "Text"
 msgstr "Текст"
 
-#: models.py:494 models.py:510
+#: models.py:494 models.py:512
 msgid "Poll answer"
 msgstr "Ответ на опрос"
 
@@ -288,11 +288,11 @@ msgstr "Ответ на опрос"
 msgid "Polls answers"
 msgstr "Ответы на опросы"
 
-#: models.py:515
+#: models.py:517
 msgid "Poll answer user"
 msgstr "Ответ пользователя на опрос"
 
-#: models.py:516
+#: models.py:518
 msgid "Polls answers users"
 msgstr "Ответы пользователей на опросы"
 
@@ -300,11 +300,11 @@ msgstr "Ответы пользователей на опросы"
 msgid "Can't get profile for anonymous user"
 msgstr "Невозможно получить профиль для анонимного пользователя"
 
-#: views.py:629
+#: views.py:640
 msgid "All forums marked as read"
 msgstr "Все форумы отмечены как прочтенные"
 
-#: views.py:641
+#: views.py:652
 msgid "User successfuly blocked"
 msgstr "Пользователь успешно заблокирован"
 
@@ -475,6 +475,10 @@ msgstr "следующая страница"
 msgid "Poll"
 msgstr "Опрос"
 
+#: templates/pybb/poll.html:37
+msgid "Cancel my poll vote"
+msgstr "Отменить мой выбор"
+
 #: templates/pybb/poll_edit_form.html:7
 msgid "Poll answers"
 msgstr "Ответы на опрос"
@@ -644,277 +648,3 @@ msgstr "сегодня, %s"
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"
-
-#~ msgid "Change the password"
-#~ msgstr "Изменить пароль"
-
-#~ msgid "Latest topics"
-#~ msgstr "Последние темы"
-
-#~ msgid "Path"
-#~ msgstr "Путь"
-
-#~ msgid "Content type"
-#~ msgstr "Тип содержимого"
-
-#~ msgid "Hash"
-#~ msgstr "Хеш"
-
-#~ msgid "Page"
-#~ msgstr "Страница"
-
-#~ msgid "first page"
-#~ msgstr "первая страница"
-
-#~ msgid "of"
-#~ msgstr "из"
-
-#~ msgid "last page"
-#~ msgstr "последняя страница"
-
-#~ msgid "Markup"
-#~ msgstr "Разметка"
-
-#~ msgid "Default markup"
-#~ msgstr "Разметка по умолчанию"
-
-#~ msgid "Root"
-#~ msgstr "Начало"
-
-#~ msgid "Enter topic id for add to merged topics"
-#~ msgstr "Введите id темы для добавления к списку объединяемых тем"
-
-#~ msgid "Add"
-#~ msgstr "Добавить"
-
-#~ msgid "Choose main topic to merge"
-#~ msgstr "Выберите главную тему, в ней окажутся все сообщения"
-
-#~ msgid "Merge"
-#~ msgstr "Объединение"
-
-#~ msgid "Posts from changed topics"
-#~ msgstr "Сообщения из объединённых тем"
-
-#~ msgid "Merge topics"
-#~ msgstr "Объединить темы"
-
-#~ msgid "Find all topics"
-#~ msgstr "Найти все темы"
-
-#~ msgid "Ban options"
-#~ msgstr "Опции блокировки (бана)"
-
-#~ msgid "No"
-#~ msgstr "Нет"
-
-#~ msgid "Caution"
-#~ msgstr "Предупреждение"
-
-#~ msgid "Ban"
-#~ msgstr "Бан"
-
-#~ msgid "Ban status"
-#~ msgstr "Статус блокировки"
-
-#~ msgid "Ban till"
-#~ msgstr "Забанен до"
-
-#~ msgid ""
-#~ "New reply from %(username)s to topic that you have subscribed on.\n"
-#~ "---\n"
-#~ "%(message)s\n"
-#~ "---\n"
-#~ "See topic: %(post_url)s\n"
-#~ "Unsubscribe %(unsubscribe_url)s"
-#~ msgstr ""
-#~ "Новый ответ от %(username)s в тему, на которую вы подписаны.\n"
-#~ "---\n"
-#~ "%(message)s\n"
-#~ "---\n"
-#~ "Посмотреть тему: %(post_url)s\n"
-#~ "Отписаться %(unsubscribe_url)s"
-
-#~ msgid "You banned"
-#~ msgstr "Вы заблокированы"
-
-#~ msgid "Expire"
-#~ msgstr "Истекает"
-
-#~ msgid "last post"
-#~ msgstr "Последнее сообщение"
-
-#~ msgid "New private message"
-#~ msgstr "Создание сообщения"
-
-#~ msgid "Enter page number"
-#~ msgstr "Введите номер страницы"
-
-#~ msgid "Go to page..."
-#~ msgstr "Перейти к странице..."
-
-#~ msgid "IM"
-#~ msgstr "IM"
-
-#~ msgid "Site"
-#~ msgstr "Сайт"
-
-#~ msgid "Jabber"
-#~ msgstr "Jabber"
-
-#~ msgid "ICQ"
-#~ msgstr "ICQ"
-
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
-#~ msgid "AIM"
-#~ msgstr "AIM"
-
-#~ msgid "Yahoo"
-#~ msgstr "Yahoo"
-
-#~ msgid "Location"
-#~ msgstr "Откуда"
-
-#~ msgid "Time"
-#~ msgstr "Время"
-
-#~ msgid "Read"
-#~ msgstr "Просмотр"
-
-#~ msgid "Reads"
-#~ msgstr "Просмотры"
-
-#~ msgid "PYBB - django forum engine"
-#~ msgstr "PYBB - движок форума на django"
-
-#~ msgid "Important"
-#~ msgstr "Важно"
-
-#~ msgid "My profile"
-#~ msgstr "Мой профиль"
-
-#~ msgid "Log out"
-#~ msgstr "Выйти"
-
-#~ msgid "Logged in as "
-#~ msgstr "Ваш логин"
-
-#~ msgid "Sign up"
-#~ msgstr "Регистрация"
-
-#~ msgid "Log in"
-#~ msgstr "Войти"
-
-#~ msgid "Search powered by Google"
-#~ msgstr "Поиск осуществляется через Google"
-
-#~ msgid "Find all posts"
-#~ msgstr "Найти все сообщения"
-
-#~ msgid "Contacts"
-#~ msgstr "Контакты"
-
-#~ msgid "Recipient"
-#~ msgstr "Получатель"
-
-#~ msgid "User with login %s does not exist"
-#~ msgstr "Пользователь с логином %s не существует"
-
-#~ msgid "You can't send PM to yourself"
-#~ msgstr "Вы не можете отослать ЛС самому себе"
-
-#~ msgid "Invalid thread ID"
-#~ msgstr "Неверный ID цепочки"
-
-#~ msgid "Inbox"
-#~ msgstr "Входящие сообщения"
-
-#~ msgid "Outbox"
-#~ msgstr "Исходящие сообщения"
-
-#~ msgid "Trash"
-#~ msgstr "Удаленные"
-
-#~ msgid "Author"
-#~ msgstr "Автор"
-
-#~ msgid "Private message"
-#~ msgstr "Личное сообщение"
-
-#~ msgid "Private messages"
-#~ msgstr "Личные сообщения"
-
-#~ msgid "Messagebox"
-#~ msgstr "Почтовый ящик"
-
-#~ msgid ""
-#~ "User %(username)s have sent your the new private message.\n"
-#~ "---\n"
-#~ "%(message)s\n"
-#~ "---\n"
-#~ "See message online: %(pm_url)s"
-#~ msgstr ""
-#~ "Пользователь %(username)s послал вам новое личное сообщение.\n"
-#~ "---\n"
-#~ "%(message)s\n"
-#~ "---\n"
-#~ "Посмотреть сообщение online: %(pm_url)s"
-
-#~ msgid "New private message for you"
-#~ msgstr "Новое личное сообщение для вас"
-
-#~ msgid "PM"
-#~ msgstr "ЛС"
-
-#~ msgid "Send PM"
-#~ msgstr "Отправить ЛС"
-
-#~ msgid "Select messages:"
-#~ msgstr "Выбрать сообщения: "
-
-#~ msgid "All"
-#~ msgstr "Все"
-
-#~ msgid "Read messages"
-#~ msgstr "Прочтенные"
-
-#~ msgid "With selected:"
-#~ msgstr "С выбранными:"
-
-#~ msgid "Mark as unread"
-#~ msgstr "Отметить как непрочтенные"
-
-#~ msgid "Inbox is empty"
-#~ msgstr "Нет сообщений во входящих"
-
-#~ msgid "Message from"
-#~ msgstr "Сообщение от"
-
-#~ msgid "Message for"
-#~ msgstr "Сообщение для"
-
-#~ msgid "Reply"
-#~ msgstr "Ответ"
-
-#~ msgid "to"
-#~ msgstr "для"
-
-#~ msgid "Are you sure you want to delete these messages?"
-#~ msgstr "Вы уверены, что хотите удалить эти сообщения?"
-
-#~ msgid "Messages"
-#~ msgstr "Сообщения"
-
-#~ msgid "From"
-#~ msgstr "от"
-
-#~ msgid "This messagebox is empty"
-#~ msgstr "В этом ящике нет сообщений"
-
-#~ msgid "Sent messages"
-#~ msgstr "Отосланные сообщения"
-
-#~ msgid "outbox"
-#~ msgstr "исходящие сообщения"

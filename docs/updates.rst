@@ -6,6 +6,7 @@ Updating PyBBM Version
 
 * Restored views for rendering user's posts and topics and link to that views from profile info page
 * Broken hard dependency from EditProfileView and EditProfileForm classes in forum
+* Ability for users to cancel their poll vote
 
 0.13 -> 0.13.1
 --------------
