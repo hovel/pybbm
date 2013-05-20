@@ -9,7 +9,7 @@ from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
     OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView,\
-    UserTopics, UserPosts
+    UserTopics, UserPosts, topic_cancel_poll_vote
 
 
 urlpatterns = patterns('',
@@ -40,6 +40,7 @@ urlpatterns += patterns('pybb.views',
                         url('^topic/(?P<pk>\d+)/close/$', CloseTopicView.as_view(), name='close_topic'),
                         url('^topic/(?P<pk>\d+)/open/$', OpenTopicView.as_view(), name='open_topic'),
                         url('^topic/(?P<pk>\d+)/poll_vote/$', TopicPollVoteView.as_view(), name='topic_poll_vote'),
+                        url('^topic/(?P<pk>\d+)/cancel_poll_vote/$', topic_cancel_poll_vote, name='topic_cancel_poll_vote'),
                         url('^topic/latest/$', LatestTopicsView.as_view(), name='topic_latest'),
 
                         # Add topic/post

@@ -584,7 +584,7 @@ class TopicPollVoteView(generic.UpdateView):
     def form_valid(self, form):
         # already voted
         if not pybb_topic_poll_not_voted(self.object, self.request.user):
-            return HttpResponseBadRequest()
+            return HttpResponseForbidden()
 
         answers = form.cleaned_data['answers']
         for answer in answers:
@@ -600,6 +600,13 @@ class TopicPollVoteView(generic.UpdateView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+
+@login_required
+def topic_cancel_poll_vote(request, pk):
+    topic = get_object_or_404(Topic, pk=pk)
+    PollAnswerUser.objects.filter(user=request.user, poll_answer__topic_id=topic.id).delete()
+    return HttpResponseRedirect(topic.get_absolute_url())
 
 
 @login_required
