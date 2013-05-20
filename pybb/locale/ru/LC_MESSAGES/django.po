@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-20 23:30+0400\n"
+"POT-Creation-Date: 2013-05-20 23:16+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Pavel Zhukov <gelios@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -300,11 +300,11 @@ msgstr "Ответы пользователей на опросы"
 msgid "Can't get profile for anonymous user"
 msgstr "Невозможно получить профиль для анонимного пользователя"
 
-#: views.py:629
+#: views.py:633
 msgid "All forums marked as read"
 msgstr "Все форумы отмечены как прочтенные"
 
-#: views.py:641
+#: views.py:648
 msgid "User successfuly blocked"
 msgstr "Пользователь успешно заблокирован"
 
@@ -491,7 +491,7 @@ msgstr "добавить ответ"
 msgid "Rank"
 msgstr "Ранг"
 
-#: templates/pybb/post_template.html:38 templates/pybb/user.html:37
+#: templates/pybb/post_template.html:38 templates/pybb/user.html:41
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -575,9 +575,13 @@ msgstr "Количество сообщений"
 msgid "Date of registration"
 msgstr "Дата регистрации"
 
-#: templates/pybb/user.html:34
+#: templates/pybb/user.html:35
 msgid "Block"
 msgstr "Заблокировать"
+
+#: templates/pybb/user.html:36
+msgid "Block and delete all messages"
+msgstr "Заблокировать и удалить сообщения"
 
 #: templates/pybb/user_posts.html:13
 msgid "All posts created by"
