@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import inspect
 
 import math
 import time
+import warnings
 
 from django import template
 from django.template.base import get_library, InvalidTemplateLibrary, TemplateSyntaxError, TOKEN_BLOCK
@@ -102,7 +104,9 @@ def pybb_topic_moderated_by(topic, user):
     """
     Check if user is moderator of topic's forum.
     """
-
+    warnings.warn("pybb_topic_moderated_by filter is deprecated and will be removed in later releases. "
+                  "Use pybb_may_moderate_topic(user, topic) filter instead",
+                  DeprecationWarning)
     return perms.may_moderate_topic(user, topic)
 
 @register.filter
@@ -110,7 +114,10 @@ def pybb_editable_by(post, user):
     """
     Check if the post could be edited by the user.
     """
-    return perms.may_edit_post(user, post)    
+    warnings.warn("pybb_editable_by filter is deprecated and will be removed in later releases. "
+                  "Use pybb_may_edit_post(user, post) filter instead",
+                  DeprecationWarning)
+    return perms.may_edit_post(user, post)
 
 
 @register.filter
@@ -233,6 +240,19 @@ def pybb_get_latest_posts(context, cnt=5, user=None):
     qs = perms.filter_posts(user, qs)
     return qs[:cnt]
 
+
+def load_perms_filters():
+    def partial(func_name, perms_obj):
+        def newfunc(user, obj):
+            return getattr(perms_obj, func_name)(user, obj)
+        return newfunc
+
+    for method in inspect.getmembers(perms):
+        if inspect.ismethod(method[1]) and len(inspect.getargspec(method[1]).args) == 3 and\
+                inspect.getargspec(method[1]).args[0] == 'self' and\
+                (method[0].startswith('may') or method[0].startswith('filter')):
+            register.filter('%s%s' % ('pybb_', method[0]), partial(method[0], perms))
+load_perms_filters()
 
 # next two tags copied from https://bitbucket.org/jaap3/django-friendly-tag-loader
 
