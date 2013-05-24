@@ -1,7 +1,7 @@
 Updating PyBBM Version
 ======================
 
-0.13.1 -> dev
+0.13.1 -> 0.14
 -------------
 
 * Restored views for rendering user's posts and topics and link to that views from profile info page
