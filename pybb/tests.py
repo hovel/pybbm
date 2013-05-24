@@ -37,15 +37,11 @@ class SharedTestModule(object):
         self.client.login(username=username, password=password)
 
     def create_initial(self, post=True):
-        self.category = Category(name='foo')
-        self.category.save()
-        self.forum = Forum(name='xfoo', description='bar', category=self.category)
-        self.forum.save()
-        self.topic = Topic(name='etopic', forum=self.forum, user=self.user)
-        self.topic.save()
+        self.category = Category.objects.create(name='foo')
+        self.forum = Forum.objects.create(name='xfoo', description='bar', category=self.category)
+        self.topic = Topic.objects.create(name='etopic', forum=self.forum, user=self.user)
         if post:
-            self.post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
-            self.post.save()
+            self.post = Post.objects.create(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
 
     def get_form_values(self, response, form="post-form"):
         return dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % form)[0].form_values())
@@ -658,12 +654,29 @@ class FeaturesTest(TestCase, SharedTestModule):
 
     def test_user_blocking(self):
         user = User.objects.create_user('test', 'test@localhost', 'test')
+        topic = Topic.objects.create(name='topic', forum=self.forum, user=self.user)
+        self.post = Post.objects.create(topic=topic, user=user, body='bbcode [b]test[b]')
         self.user.is_superuser = True
         self.user.save()
         self.login_client()
-        self.assertEqual(self.client.get(reverse('pybb:block_user', args=[user.username]), follow=True).status_code, 200)
+        response = self.client.get(reverse('pybb:block_user', args=[user.username]), follow=True)
+        self.assertEqual(response.status_code, 405)
+        response = self.client.post(reverse('pybb:block_user', args=[user.username]), follow=True)
+        self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=user.username)
         self.assertFalse(user.is_active)
+        self.assertEqual(Topic.objects.filter().count(), 2)
+        self.assertEqual(Post.objects.filter(user=user).count(), 1)
+
+        user.is_active = True
+        user.save()
+        response = self.client.post(reverse('pybb:block_user', args=[user.username]),
+                                    data={'block_and_delete_messages': 'block_and_delete_messages'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        user = User.objects.get(username=user.username)
+        self.assertFalse(user.is_active)
+        self.assertEqual(Topic.objects.filter().count(), 1)
+        self.assertEqual(Post.objects.filter(user=user).count(), 0)
 
     def test_ajax_preview(self):
         self.login_client()
