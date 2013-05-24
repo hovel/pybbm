@@ -12,7 +12,7 @@ Next filters and tags can be used when `pybb_tags` loaded in template:
 
   or::
 
-    {% with user|filter_topics:topic_queryset %}
+    {% with queryset=user|filter_topics:topic_queryset %}
       {# operations on queryset there #}
     {% endwith %}
 
