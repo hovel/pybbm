@@ -83,6 +83,7 @@ INSTALLED_APPS = (
     'pinax_theme_bootstrap_account',
     'pinax_theme_bootstrap',
     'django_forms_bootstrap',
+    'captcha'
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = [
