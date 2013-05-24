@@ -1155,6 +1155,7 @@ class PollTest(TestCase, SharedTestModule):
         values['poll_answers-1-DELETE'] = 'on'
         values['poll_answers-TOTAL_FORMS'] = 2
         response = self.client.post(add_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(Topic.objects.filter(name='test poll name').exists())
 
     def test_regression_poll_deletion_after_second_post(self):
@@ -1245,14 +1246,28 @@ class PollTest(TestCase, SharedTestModule):
 
         # already voted
         response = self.client.post(vote_url, data=values, follow=True)
-        self.assertEqual(response.status_code, 400) # bad request status
+        self.assertEqual(response.status_code, 403) # bad request status
 
         recreate_poll(poll_type=Topic.POLL_TYPE_MULTIPLE)
         values = {'answers': [a.id for a in PollAnswer.objects.all()]}
         response = self.client.post(vote_url, data=values, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual([a.votes() for a in PollAnswer.objects.all()], [1, 1, ])
-        self.assertListEqual([a.votes_percent() for a in PollAnswer.objects.all()], [50.0, 50.0, ])
+        self.assertListEqual([a.votes() for a in PollAnswer.objects.all()], [1, 1])
+        self.assertListEqual([a.votes_percent() for a in PollAnswer.objects.all()], [50.0, 50.0])
+
+        response = self.client.post(vote_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 403)  # already voted
+
+        cancel_vote_url = reverse('pybb:topic_cancel_poll_vote', kwargs={'pk': self.topic.id})
+        response = self.client.post(cancel_vote_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual([a.votes() for a in PollAnswer.objects.all()], [0, 0])
+        self.assertListEqual([a.votes_percent() for a in PollAnswer.objects.all()], [0, 0])
+
+        response = self.client.post(vote_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual([a.votes() for a in PollAnswer.objects.all()], [1, 1])
+        self.assertListEqual([a.votes_percent() for a in PollAnswer.objects.all()], [50.0, 50.0])
 
     def tearDown(self):
         defaults.PYBB_POLL_MAX_ANSWERS = self.PYBB_POLL_MAX_ANSWERS

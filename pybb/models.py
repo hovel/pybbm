@@ -504,6 +504,8 @@ class PollAnswer(models.Model):
         topic_votes = self.topic.poll_votes()
         if topic_votes > 0:
             return 1.0 * self.votes() / topic_votes * 100
+        else:
+            return 0
 
 
 class PollAnswerUser(models.Model):
