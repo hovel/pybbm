@@ -520,7 +520,3 @@ class PollAnswerUser(models.Model):
 
     def __unicode__(self):
         return u'%s - %s' % (self.poll_answer.topic, self.user)
-
-
-from pybb import signals
-signals.setup_signals()

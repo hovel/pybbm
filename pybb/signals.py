@@ -45,8 +45,7 @@ def user_saved(instance, created, **kwargs):
         Profile(user=instance).save()
 
 
-def setup_signals():
-    post_save.connect(post_saved, sender=Post)
-    post_delete.connect(post_deleted, sender=Post)
-    if defaults.PYBB_AUTO_USER_PERMISSIONS:
-        post_save.connect(user_saved, sender=User)
+post_save.connect(post_saved, sender=Post)
+post_delete.connect(post_deleted, sender=Post)
+if defaults.PYBB_AUTO_USER_PERMISSIONS:
+    post_save.connect(user_saved, sender=User)
