@@ -185,6 +185,8 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
         self.topic.views += 1
         self.topic.save()
         qs = self.topic.posts.all().select_related('user')
+        if defaults.PYBB_PROFILE_RELATED_NAME:
+            qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)
         if not perms.may_moderate_topic(self.request.user, self.topic):
             qs = perms.filter_posts(self.request.user, qs)
         return qs

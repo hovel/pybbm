@@ -131,15 +131,12 @@ class Forum(models.Model):
     def posts(self):
         return Post.objects.filter(topic__forum=self).select_related()
 
-    def get_last_post(self):
+    @property
+    def last_post(self):
         try:
             return self.posts.order_by('-created')[0]
         except IndexError:
             return None
-
-    @property
-    def last_post(self):
-        return self.get_last_post()
 
     def get_parents(self):
         """
@@ -194,12 +191,11 @@ class Topic(models.Model):
             return None
         return self._head[0]
 
-    def get_last_post(self):
-        return self.posts.order_by('-created').select_related('user')[0]
-
     @property
     def last_post(self):
-        return self.get_last_post()
+        if not getattr(self, '_last_post', None):
+            self._last_post = self.posts.order_by('-created').select_related('user')[0]
+        return self._last_post
 
     def get_absolute_url(self):
         return reverse('pybb:topic', kwargs={'pk': self.id})
