@@ -600,7 +600,7 @@ class TopicPollVoteView(generic.UpdateView):
         return super(ModelFormMixin, self).form_valid(form)
 
     def form_invalid(self, form):
-        return self.object.get_absolute_url()
+        return redirect(self.object)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
