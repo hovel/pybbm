@@ -6,7 +6,6 @@ from django.db.models.signals import post_save, post_delete
 
 from pybb.subscription import notify_topic_subscribers
 from pybb import defaults
-from pybb.models import Profile, Post
 
 from pybb import util
 User = util.get_user_model()
@@ -41,11 +40,16 @@ def user_saved(instance, created, **kwargs):
         return
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()
+    from pybb.models import Profile
     if util.get_pybb_profile_model() == Profile:
         Profile(user=instance).save()
 
 
-post_save.connect(post_saved, sender=Post)
-post_delete.connect(post_deleted, sender=Post)
-if defaults.PYBB_AUTO_USER_PERMISSIONS:
-    post_save.connect(user_saved, sender=User)
+def attach_signals():
+    from pybb.models import Post
+    post_save.connect(post_saved, sender=Post)
+    post_delete.connect(post_deleted, sender=Post)
+    if defaults.PYBB_AUTO_USER_PERMISSIONS:
+        post_save.connect(user_saved, sender=User)
+
+attach_signals()
