@@ -4,7 +4,7 @@ from django.utils import translation
 from django.db.models import ObjectDoesNotExist
 from pybb import util
 
-from pybb.signals import user_saved
+from pybb.models import user_saved
 
 
 class PybbMiddleware(object):
