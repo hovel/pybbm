@@ -1,6 +1,10 @@
 Updating PyBBM Version
 ======================
 
+0.14 -> dev
+--------------
+* Fixed MultipleObjectReturned when topic has more than one moderator
+
 0.14 -> 0.14.1
 --------------
 * Fixed circular import issue

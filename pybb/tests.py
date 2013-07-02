@@ -885,7 +885,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(latest_topics[0].name, 'topic9')
         self.assertEqual(latest_topics[4].name, 'topic5')
 
-
     def test_latest_posts_tag(self):
         Post.objects.all().delete()
         for i in range(10):
@@ -895,6 +894,21 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(latest_topics[0].body, 'post9')
         self.assertEqual(latest_topics[4].body, 'post5')
 
+    def test_multiple_objects_returned(self):
+        """
+        see issue #87: https://github.com/hovel/pybbm/issues/87
+        """
+        self.assertFalse(self.user.is_superuser)
+        self.assertFalse(self.user.is_staff)
+        self.assertFalse(self.topic.on_moderation)
+        self.assertEqual(self.topic.user, self.user)
+        user1 = User.objects.create_user('geyser', 'geyser@localhost', 'geyser')
+        self.topic.forum.moderators.add(self.user)
+        self.topic.forum.moderators.add(user1)
+
+        self.login_client()
+        response = self.client.get(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}))
+        self.assertEqual(response.status_code, 200)
 
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
