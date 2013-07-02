@@ -1,7 +1,7 @@
 Updating PyBBM Version
 ======================
 
-0.14 -> dev
+0.14 -> 0.14.2
 --------------
 * Fixed MultipleObjectReturned when topic has more than one moderator
 
