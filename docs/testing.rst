@@ -19,6 +19,6 @@ Go to `test/example_bootstrap` or `test/example_thirdparty` directory and run::
 Extending
 ---------
 
-Development happens on bitbucket, with main repo: http://github.com/hovel/pybbm
+Development happens on github, with main repo: https://github.com/hovel/pybbm
 
-Forks, patch and pull changes ;)
+Forks, patches and pull requests live here ;)
