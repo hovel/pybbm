@@ -121,11 +121,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
             raise PermissionDenied
 
         qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
-        if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
-            if self.request.user.is_authenticated():
-                qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
-            else:
-                qs = qs.filter(on_moderation=False)
+        qs = perms.filter_topics(self.request.user, qs)
         return qs
 
 

@@ -11,9 +11,10 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.test.client import Client
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
-     pybb_get_latest_topics, pybb_get_latest_posts
+    pybb_get_latest_topics, pybb_get_latest_posts
 
 from pybb import util
+
 User = util.get_user_model()
 username_field = util.get_username_field()
 
@@ -29,7 +30,6 @@ __author__ = 'zeus'
 
 
 class SharedTestModule(object):
-
     def create_user(self):
         self.user = User.objects.create_user('zeus', 'zeus@localhost', 'zeus')
 
@@ -47,7 +47,7 @@ class SharedTestModule(object):
         return dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % form)[0].form_values())
 
     def get_with_user(self, url, username=None, password=None):
-        if username: 
+        if username:
             self.client.login(username=username, password=password)
         r = self.client.get(url)
         self.client.logout()
@@ -167,7 +167,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         post = Post(topic=topic, user=self.user, body='one')
         post.save()
         post = Post.objects.get(id=post.id)
-        self.assertTrue(self.forum.updated==post.created)
+        self.assertTrue(self.forum.updated == post.created)
 
     def test_read_tracking(self):
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
@@ -181,7 +181,8 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertTrue(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.get_absolute_url()))
         # Forum status
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
-        self.assertTrue(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
+        self.assertTrue(
+            tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
         # Visit it
         client.get(topic.get_absolute_url())
         # Topic status - readed
@@ -192,7 +193,8 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.get_absolute_url()))
         # Forum status - readed
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
-        self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
+        self.assertFalse(
+            tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
         # Post message
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': topic.id})
         response = client.get(add_post_url)
@@ -205,12 +207,14 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.get_absolute_url()))
         # Forum status - readed
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
-        self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
+        self.assertFalse(
+            tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
         post = Post(topic=topic, user=self.user, body='one')
         post.save()
         client.get(reverse('pybb:mark_all_as_read'))
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
-        self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
+        self.assertFalse(
+            tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
         # Empty forum - readed
         f = Forum(name='empty', category=self.category)
         f.save()
@@ -221,7 +225,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         topic_1 = self.topic
         topic_2 = Topic(name='topic_2', forum=self.forum, user=self.user)
         topic_2.save()
-       
+
         Post(topic=topic_2, user=self.user, body='one').save()
 
         user_ann = User.objects.create_user('ann', 'ann@localhost', 'ann')
@@ -318,7 +322,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         topic_1 = self.topic
         topic_2 = Topic(name='topic_2', forum=self.forum, user=self.user)
         topic_2.save()
-       
+
         Post(topic=topic_2, user=self.user, body='one').save()
 
         forum_1 = self.forum
@@ -490,16 +494,16 @@ class FeaturesTest(TestCase, SharedTestModule):
         client_ann = Client()
         client_ann.login(username='ann', password='ann')
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'first-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id}), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_1.id))
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'first-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id}), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_2.id))
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_2.id }), data={'first-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_2.id}), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_2.id}), 1, post_2_1.id))
@@ -507,7 +511,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         post_1_3 = Post.objects.create(topic=topic_1, user=self.user, body='1_3')
         post_1_4 = Post.objects.create(topic=topic_1, user=self.user, body='1_4')
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id }), data={'first-unread': 1},
+        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id}), data={'first-unread': 1},
                                   follow=True)
         self.assertRedirects(response,
                              '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_3.id))
@@ -588,7 +592,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         post_in_hidden = Post(topic=topic_in_hidden, user=self.user, body='hidden')
         post_in_hidden.save()
 
-        
         self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
         self.assertEqual(client.get(category.get_absolute_url()).status_code, 302)
         self.assertEqual(client.get(forum_in_hidden.get_absolute_url()).status_code, 302)
@@ -691,7 +694,8 @@ class FeaturesTest(TestCase, SharedTestModule):
 
     def test_quote(self):
         self.login_client()
-        response = self.client.get(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}), data={'quote_id': self.post.id, 'body': 'test tracking'}, follow=True)
+        response = self.client.get(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}),
+                                   data={'quote_id': self.post.id, 'body': 'test tracking'}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.post.body)
 
@@ -726,7 +730,9 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.user.is_staff = True
         self.user.save()
         self.login_client()
-        response = self.client.post(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}), data={'quote_id': self.post.id, 'body': 'test admin post', 'user': 'zeus'}, follow=True)
+        response = self.client.post(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}),
+                                    data={'quote_id': self.post.id, 'body': 'test admin post', 'user': 'zeus'},
+                                    follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'test admin post')
 
@@ -734,8 +740,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.user.is_superuser = True
         self.user.save()
         self.login_client()
-        self.assertEqual(self.client.get(reverse('pybb:stick_topic', kwargs={'pk': self.topic.id}), follow=True).status_code, 200)
-        self.assertEqual(self.client.get(reverse('pybb:unstick_topic', kwargs={'pk': self.topic.id}), follow=True).status_code, 200)
+        self.assertEqual(
+            self.client.get(reverse('pybb:stick_topic', kwargs={'pk': self.topic.id}), follow=True).status_code, 200)
+        self.assertEqual(
+            self.client.get(reverse('pybb:unstick_topic', kwargs={'pk': self.topic.id}), follow=True).status_code, 200)
 
     def test_delete_view(self):
         post = Post(topic=self.topic, user=self.user, body='test to delete')
@@ -792,7 +800,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         new_post = Post.objects.get(pk=2)
 
         # there should only be one email in the outbox (to user2@example.com)
-        self.assertEqual(len(mail.outbox),1)
+        self.assertEqual(len(mail.outbox), 1)
         self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
 
         # unsubscribe
@@ -879,7 +887,7 @@ class FeaturesTest(TestCase, SharedTestModule):
     def test_latest_topics_tag(self):
         Topic.objects.all().delete()
         for i in range(10):
-            Topic.objects.create(name='topic%s' % i, user = self.user, forum=self.forum)
+            Topic.objects.create(name='topic%s' % i, user=self.user, forum=self.forum)
         latest_topics = pybb_get_latest_topics(context=None, user=self.user)
         self.assertEqual(len(latest_topics), 5)
         self.assertEqual(latest_topics[0].name, 'topic9')
@@ -888,7 +896,7 @@ class FeaturesTest(TestCase, SharedTestModule):
     def test_latest_posts_tag(self):
         Post.objects.all().delete()
         for i in range(10):
-            Post.objects.create(body='post%s' % i, user = self.user, topic=self.topic)
+            Post.objects.create(body='post%s' % i, user=self.user, topic=self.topic)
         latest_topics = pybb_get_latest_posts(context=None, user=self.user)
         self.assertEqual(len(latest_topics), 5)
         self.assertEqual(latest_topics[0].body, 'post9')
@@ -916,7 +924,6 @@ class FeaturesTest(TestCase, SharedTestModule):
 
 
 class AnonymousTest(TestCase, SharedTestModule):
-
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
         self.ORIG_PYBB_ANONYMOUS_USERNAME = defaults.PYBB_ANONYMOUS_USERNAME
@@ -953,8 +960,8 @@ def premoderate_test(user, post):
         return True
     return False
 
-class PreModerationTest(TestCase, SharedTestModule):
 
+class PreModerationTest(TestCase, SharedTestModule):
     def setUp(self):
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
         defaults.PYBB_PREMODERATION = premoderate_test
@@ -981,7 +988,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         # Post is not visible by anonymous user
         client = Client()
         response = client.get(post.get_absolute_url(), follow=True)
-        self.assertRedirects(response, settings.LOGIN_URL+'?next=%s' % post.get_absolute_url())
+        self.assertRedirects(response, settings.LOGIN_URL + '?next=%s' % post.get_absolute_url())
         response = client.get(self.topic.get_absolute_url(), follow=True)
         self.assertNotContains(response, 'test premoderation')
 
@@ -1049,8 +1056,8 @@ class PreModerationTest(TestCase, SharedTestModule):
         response = client.get(Topic.objects.get(name='new topic name').get_absolute_url())
         self.assertEqual(response.status_code, 302)
         response = admin_client.get(reverse('pybb:moderate_post',
-                                     kwargs={'pk': Post.objects.get(body='new topic test').id}),
-                                     follow=True)
+                                            kwargs={'pk': Post.objects.get(body='new topic test').id}),
+                                    follow=True)
         self.assertEqual(response.status_code, 200)
 
         response = client.get(self.forum.get_absolute_url())
@@ -1062,14 +1069,14 @@ class PreModerationTest(TestCase, SharedTestModule):
     def tearDown(self):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
-        
+
 class AttachmentTest(TestCase, SharedTestModule):
     def setUp(self):
         self.PYBB_ATTACHMENT_ENABLE = defaults.PYBB_ATTACHMENT_ENABLE
         defaults.PYBB_ATTACHMENT_ENABLE = True
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
         defaults.PYBB_PREMODERATION = False
-        self.file = open(os.path.join(os.path.dirname(__file__), 'static', 'pybb', 'img','attachment.png'))
+        self.file = open(os.path.join(os.path.dirname(__file__), 'static', 'pybb', 'img', 'attachment.png'))
         self.create_user()
         self.create_initial()
 
@@ -1301,33 +1308,36 @@ class FiltersTest(TestCase, SharedTestModule):
         response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Post.objects.all()[0].body, u'test\nmultiple empty lines')
-        
+
+
 from pybb import permissions
 from django.db.models import Q
+
 
 class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     """ 
     a custom permission handler which changes the meaning of "hidden" forum:
     "hidden" forum or category is visible for all logged on users, not only staff 
     """
-        
+
     def filter_categories(self, user, qs):
         return qs.filter(hidden=False) if user.is_anonymous() else qs
-    
+
     def may_view_category(self, user, category):
         return user.is_authenticated() if category.hidden else True
-    
+
     def filter_forums(self, user, qs):
         if user.is_anonymous():
-            qs = qs.filter(Q(hidden=False)&Q(category__hidden=False))
-        return qs        
-    
+            qs = qs.filter(Q(hidden=False) & Q(category__hidden=False))
+        return qs
+
     def may_view_forum(self, user, forum):
         return user.is_authenticated() if forum.hidden or forum.category.hidden else True
-    
+
     def filter_topics(self, user, qs):
         if user.is_anonymous():
-            qs = qs.filter(Q(forum__hidden=False)&Q(forum__category__hidden=False))
+            qs = qs.filter(Q(forum__hidden=False) & Q(forum__category__hidden=False))
+        qs = qs.filter(closed=False)  # filter out closed topics for test
         return qs
 
     def may_view_topic(self, user, topic):
@@ -1335,7 +1345,7 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
 
     def filter_posts(self, user, qs):
         if user.is_anonymous():
-            qs = qs.filter(Q(topic__forum__hidden=False)&Q(topic__forum__category__hidden=False))
+            qs = qs.filter(Q(topic__forum__hidden=False) & Q(topic__forum__category__hidden=False))
         return qs
 
     def may_view_post(self, user, post):
@@ -1344,13 +1354,16 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
 
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """
-    
+
     def setUp(self):
         from pybb import views
+
         self.create_user()
         # create public and hidden categories, forums, posts
-        c_pub = Category(name='public'); c_pub.save()
-        c_hid = Category(name='private', hidden=True); c_hid.save()
+        c_pub = Category(name='public');
+        c_pub.save()
+        c_hid = Category(name='private', hidden=True);
+        c_hid.save()
         Forum(name='pub1', category=c_pub).save()
         Forum(name='priv1', category=c_hid).save()
         Forum(name='private_in_public_cat', hidden=True, category=c_pub).save()
@@ -1358,53 +1371,58 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
             t = Topic(name='a topic', forum=f, user=self.user)
             t.save()
             Post(topic=t, user=self.user, body='test').save()
-        
+        # make some topics closed => hidden
+        for t in Topic.objects.all()[0:2]:
+            t.closed = True
+            t.save()
         # override the permission handler. this cannot be done with @override_settings as
         # permissions.perms is already imported at this point, instead we got to monkeypatch
         # the modules (not really nice, but only an issue in tests)
         views.perms = permissions.perms = permissions._resolve_class('pybb.tests.CustomPermissionHandler')
-    
+
     def tearDown(self):
         from pybb import views
         # reset permission handler (otherwise other tests may fail)
         views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
-    
+
     def test_category_permission(self):
         for c in Category.objects.all():
             # anon user may not see category
-            r=self.get_with_user(c.get_absolute_url())
+            r = self.get_with_user(c.get_absolute_url())
             if c.hidden:
                 self.assertEqual(r.status_code, 302)
             else:
                 self.assertEqual(r.status_code, 200)
-            # logged on user may see all categories
-            r=self.get_with_user(c.get_absolute_url(), 'zeus', 'zeus')        
+                # logged on user may see all categories
+            r = self.get_with_user(c.get_absolute_url(), 'zeus', 'zeus')
             self.assertEqual(r.status_code, 200)
-            
+
     def test_forum_permission(self):
         for f in Forum.objects.all():
-            r=self.get_with_user(f.get_absolute_url())
+            r = self.get_with_user(f.get_absolute_url())
             self.assertEqual(r.status_code, 302 if f.hidden or f.category.hidden else 200)
-            r=self.get_with_user(f.get_absolute_url(), 'zeus', 'zeus')            
+            r = self.get_with_user(f.get_absolute_url(), 'zeus', 'zeus')
             self.assertEqual(r.status_code, 200)
-            
+            self.assertEqual(r.context['object_list'].count(), f.topics.filter(closed=False).count())
+
     def test_topic_permission(self):
         for t in Topic.objects.all():
-            r=self.get_with_user(t.get_absolute_url())
+            r = self.get_with_user(t.get_absolute_url())
             self.assertEqual(r.status_code, 302 if t.forum.hidden or t.forum.category.hidden else 200)
-            r=self.get_with_user(t.get_absolute_url(), 'zeus', 'zeus')            
+            r = self.get_with_user(t.get_absolute_url(), 'zeus', 'zeus')
             self.assertEqual(r.status_code, 200)
-            
+
     def test_post_permission(self):
         for p in Post.objects.all():
-            r=self.get_with_user(p.get_absolute_url())
+            r = self.get_with_user(p.get_absolute_url())
             self.assertEqual(r.status_code, 302 if p.topic.forum.hidden or p.topic.forum.category.hidden else 301)
-            r=self.get_with_user(p.get_absolute_url(), 'zeus', 'zeus')            
+            r = self.get_with_user(p.get_absolute_url(), 'zeus', 'zeus')
             self.assertEqual(r.status_code, 301)
-            
+
+
 class LogonRedirectTest(TestCase, SharedTestModule):
     """ test whether anonymous user gets redirected, whereas unauthorized user gets PermissionDenied """
-    
+
     def setUp(self):
         # create users
         staff = User.objects.create_user('staff', 'staff@localhost', 'staff')
@@ -1413,7 +1431,7 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         nostaff = User.objects.create_user('nostaff', 'nostaff@localhost', 'nostaff')
         nostaff.is_staff = False
         nostaff.save()
-        
+
         # create topic, post in hidden category 
         self.category = Category(name='private', hidden=True)
         self.category.save()
@@ -1422,45 +1440,45 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.topic = Topic(name='a topic', forum=self.forum, user=staff)
         self.topic.save()
         self.post = Post(body='body post', topic=self.topic, user=staff, on_moderation=True)
-        self.post.save()            
-                    
+        self.post.save()
+
     def test_redirect_category(self):
         # access without user should be redirected
         r = self.get_with_user(self.category.get_absolute_url())
-        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.category.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.category.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.category.get_absolute_url(), 'nostaff', 'nostaff')
         self.assertEquals(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.category.get_absolute_url(), 'staff', 'staff')
         self.assertEquals(r.status_code, 200)
-    
+
     def test_redirect_forum(self):
         # access without user should be redirected
         r = self.get_with_user(self.forum.get_absolute_url())
-        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.forum.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.forum.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.forum.get_absolute_url(), 'nostaff', 'nostaff')
         self.assertEquals(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.forum.get_absolute_url(), 'staff', 'staff')
         self.assertEquals(r.status_code, 200)
-    
+
     def test_redirect_topic(self):
         # access without user should be redirected
         r = self.get_with_user(self.topic.get_absolute_url())
-        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.topic.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.topic.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.topic.get_absolute_url(), 'nostaff', 'nostaff')
         self.assertEquals(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.topic.get_absolute_url(), 'staff', 'staff')
         self.assertEquals(r.status_code, 200)
-    
+
     def test_redirect_post(self):
         # access without user should be redirected
         r = self.get_with_user(self.post.get_absolute_url())
-        self.assertRedirects(r, settings.LOGIN_URL+'?next=%s' % self.post.get_absolute_url())
+        self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.post.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.post.get_absolute_url(), 'nostaff', 'nostaff')
         self.assertEquals(r.status_code, 403)

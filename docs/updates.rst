@@ -1,7 +1,11 @@
 Updating PyBBM Version
 ======================
 
-0.14 -> 0.14.2
+0.14.2 -> 0.14.3
+----------------
+* Show only available topics (by permission handler) in ForumView
+
+0.14.1 -> 0.14.2
 --------------
 * Fixed MultipleObjectReturned when topic has more than one moderator
 
