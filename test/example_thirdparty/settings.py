@@ -80,9 +80,8 @@ INSTALLED_APPS = (
     'south',
     'pure_pagination',
     'account',
-    'pinax_theme_bootstrap_account',
     'pinax_theme_bootstrap',
-    'django_forms_bootstrap',
+    'bootstrapform',
     'captcha'
 )
 

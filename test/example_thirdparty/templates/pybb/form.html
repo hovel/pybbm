@@ -1,0 +1,6 @@
+{% load bootstrap %}
+{% csrf_token %}
+
+{{ form|bootstrap }}
+
+<input type="hidden" name="next" value="{{ next }}" />

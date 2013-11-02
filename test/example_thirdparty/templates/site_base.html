@@ -14,11 +14,11 @@
 {% endblock %}
 
 {% block site_brand %}
-<a class="brand" href="/">PYBB Modified. Django forum solution.</a>
+<a class="navbar-brand" href="/">PYBB Modified. Django forum solution.</a>
 {% endblock %}
 
 {% block nav %}
-<ul class="nav">
+<ul class="nav navbar-nav">
     <li><a href="http://github.com/hovel/pybbm">Code</a></li>
     <li><a href="http://pypi.python.org/pypi/pybbm">Download</a></li>
     <li><a href="http://readthedocs.org/docs/pybbm/en/latest/">Documentation</a></li>
@@ -46,33 +46,33 @@
     </div>
     {% if request.path == '/' %}
         <div class="row">
-            <div class="span4">
+            <div class="col-lg-4">
                 <h2>Fully Documented</h2>
                 <p>Everything explained</p>
-                <p><a class="btn" href="http://readthedocs.org/docs/pybbm/en/latest/">Read docs now &raquo;</a></p>
+                <p><a class="btn btn-default" href="http://readthedocs.org/docs/pybbm/en/latest/">Read docs now &raquo;</a></p>
             </div>
-            <div class="span4">
+            <div class="col-lg-4">
                 <h2>Heavily tested</h2>
                 <p> 95% code coverage!</p>
-                <p><a class="btn" href="https://github.com/hovel/pybbm/blob/master/pybb/tests.py">View tests &raquo;</a></p>
+                <p><a class="btn btn-default" href="https://github.com/hovel/pybbm/blob/master/pybb/tests.py">View tests &raquo;</a></p>
             </div>
-            <div class="span4">
+            <div class="col-lg-4">
                 <h2>Want a fast start?</h2>
                 <p>Start from ready to use example project</p>
-                <p><a class="btn" href="http://readthedocs.org/docs/pybbm/en/latest/example.html">Read more &raquo;</a></p>
+                <p><a class="btn btn-default" href="http://readthedocs.org/docs/pybbm/en/latest/example.html">Read more &raquo;</a></p>
             </div>
         </div>
 
         <div class="row">
-            <div class="span4">
+            <div class="col-lg-4">
                 <h2>Django application</h2>
                 <p>Easy to embed to any django project</p>
                 <p><a class="btn btn-success" href="http://readthedocs.org/docs/pybbm/en/latest/install.html">Learn how to install &raquo;</a></p>
             </div>
-            <div class="span4">
+            <div class="col-lg-4">
                 <h2>Help welcomed</h2>
                 <p>Extended PyBBM? Push your changes.</p>
-                <p><a class="btn" href="https://github.com/hovel/pybbm">Fork repo &raquo;</a></p>
+                <p><a class="btn btn-default" href="https://github.com/hovel/pybbm">Fork repo &raquo;</a></p>
             </div>
         </div>
     {% endif %}
@@ -80,7 +80,7 @@
 
 {% block footer %}
 <footer>
-    powerd by:
+    powered by:
     <a href="http://www.djangoproject.com">django</a>,&nbsp;
     <a href="http://www.pybbm.org">pybbm</a>
 </footer>
