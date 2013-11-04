@@ -19,7 +19,7 @@ class Migration(SchemaMigration):
         try:
             # Adding unique constraint on 'PollAnswerUser', fields ['poll_answer', 'user']
             db.create_unique('pybb_pollansweruser', ['poll_answer_id', 'user_id'])
-        except IntegrityError as ex:
+        except Exception as ex:
             print 'error in 0023_auto__add_unique_pollansweruser_poll_answer_user.py:'
             print ex
 
