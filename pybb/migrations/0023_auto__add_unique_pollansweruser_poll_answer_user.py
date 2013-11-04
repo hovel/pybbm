@@ -1,4 +1,6 @@
 # encoding: utf-8
+from django.db.utils import IntegrityError
+
 try:
     from django.contrib.auth import get_user_model
 except ImportError:  # django < 1.5
@@ -14,8 +16,12 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding unique constraint on 'PollAnswerUser', fields ['poll_answer', 'user']
-        db.create_unique('pybb_pollansweruser', ['poll_answer_id', 'user_id'])
+        try:
+            # Adding unique constraint on 'PollAnswerUser', fields ['poll_answer', 'user']
+            db.create_unique('pybb_pollansweruser', ['poll_answer_id', 'user_id'])
+        except IntegrityError as ex:
+            print 'error in 0023_auto__add_unique_pollansweruser_poll_answer_user.py:'
+            print ex
 
         # Adding index on 'Post', fields ['created']
         db.create_index('pybb_post', ['created'])

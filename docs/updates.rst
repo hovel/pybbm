@@ -1,6 +1,11 @@
 Updating PyBBM Version
 ======================
 
+0.14.3 -> 0.14.4
+----------------
+* Fix for migration that may fails on clean mysql installation
+* Make example_thirdparty project bootstrap3 compatible
+
 0.14.2 -> 0.14.3
 ----------------
 * Show only available topics (by permission handler) in ForumView
