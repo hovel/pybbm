@@ -177,9 +177,7 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def get_queryset(self):
         if not perms.may_view_topic(self.request.user, self.topic):
             raise PermissionDenied
-
-        self.topic.views += 1
-        self.topic.save()
+        Topic.objects.filter(id=self.topic.id).update(views=F('views') + 1)
         qs = self.topic.posts.all().select_related('user')
         if defaults.PYBB_PROFILE_RELATED_NAME:
             qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)

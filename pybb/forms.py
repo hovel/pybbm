@@ -182,14 +182,16 @@ try:
     class EditProfileForm(forms.ModelForm):
         class Meta(object):
             model = util.get_pybb_profile_model()
-            fields = ['signature', 'time_zone', 'language',
-                      'show_signatures', 'avatar']
+            fields = ['signature', 'time_zone', 'language', 'show_signatures', 'avatar']
 
-        signature = forms.CharField(widget=forms.Textarea(attrs={'rows': 2, 'cols:': 60}), required=False)
+        def __init__(self, *args, **kwargs):
+            super(EditProfileForm, self).__init__(*args, **kwargs)
+            self.fields['signature'].widget = forms.Textarea(attrs={'rows': 2, 'cols:': 60})
 
         def clean_avatar(self):
             if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):
-                forms.ValidationError(ugettext('Avatar is too large, max size: %s bytes' % defaults.PYBB_MAX_AVATAR_SIZE))
+                forms.ValidationError(ugettext('Avatar is too large, max size: %s bytes' %
+                                               defaults.PYBB_MAX_AVATAR_SIZE))
             return self.cleaned_data['avatar']
 
         def clean_signature(self):
