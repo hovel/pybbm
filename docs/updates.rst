@@ -1,6 +1,10 @@
 Updating PyBBM Version
 ======================
 
+0.14.4 -> 0.14.5
+----------------
+* Minor fixes
+
 0.14.3 -> 0.14.4
 ----------------
 * Fix for migration that may fails on clean mysql installation
