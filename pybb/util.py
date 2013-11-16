@@ -69,3 +69,10 @@ def get_pybb_profile_model():
         return get_user_model()._meta.get_field_by_name(defaults.PYBB_PROFILE_RELATED_NAME)[0].model
     else:
         return get_user_model()
+
+
+def build_cache_key(key_name, **kwargs):
+    if key_name == 'anonymous_topic_views':
+        return 'pybbm_anonymous_topic_%s_views' % kwargs['topic_id']
+    else:
+        raise ValueError('Wrong key_name parameter passed: %s' % key_name)

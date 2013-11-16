@@ -3,6 +3,7 @@
 import math
 
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -17,6 +18,8 @@ from django.views.decorators.http import require_POST
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
+from pybb.defaults import PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER
+from pybb.util import build_cache_key
 
 try:
     from pure_pagination import Paginator
@@ -177,7 +180,14 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def get_queryset(self):
         if not perms.may_view_topic(self.request.user, self.topic):
             raise PermissionDenied
-        Topic.objects.filter(id=self.topic.id).update(views=F('views') + 1)
+        if self.request.user.is_authenticated():
+            Topic.objects.filter(id=self.topic.id).update(views=F('views') + 1)
+        else:
+            cache_key = build_cache_key('anonymous_topic_views', topic_id=self.topic.id)
+            cache.add(cache_key, 0)
+            if cache.incr(cache_key) % PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER == 0:
+                Topic.objects.filter(id=self.topic.id).update(views=F('views') + PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
+                cache.set(cache_key, 0)
         qs = self.topic.posts.all().select_related('user')
         if defaults.PYBB_PROFILE_RELATED_NAME:
             qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)

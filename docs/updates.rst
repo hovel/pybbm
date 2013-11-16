@@ -1,6 +1,12 @@
 Updating PyBBM Version
 ======================
 
+0.14.5 -> dev
+-------------
+* Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
+  This value can be changed by setting `PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
+  `pybbm_calc_topic_views` that calc actual views count for topic
+
 0.14.4 -> 0.14.5
 ----------------
 * Minor fixes

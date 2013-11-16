@@ -6,6 +6,7 @@ import os
 from django.contrib.auth.models import Permission
 from django.conf import settings
 from django.core import mail
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -14,6 +15,7 @@ from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread,
     pybb_get_latest_topics, pybb_get_latest_posts
 
 from pybb import util
+from pybb.util import build_cache_key
 
 User = util.get_user_model()
 username_field = util.get_username_field()
@@ -945,6 +947,22 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(Post.objects.filter(body='test anonymous')), 1)
         self.assertEqual(Post.objects.get(body='test anonymous').user, self.user)
+
+    def test_anonymous_cache_topic_views(self):
+        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = 150
+        self.assertNotIn(build_cache_key('anonymous_topic_views', topic_id=self.topic.id), cache)
+        url = self.topic.get_absolute_url()
+        self.client.get(url)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 1)
+        for _ in range(defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER - 2):
+            self.client.get(url)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).views, 0)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)),
+                         defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER - 1)
+        self.client.get(url)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).views, defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
+        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = 100
 
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST

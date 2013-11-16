@@ -78,6 +78,8 @@ PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
 PYBB_ENABLE_ANONYMOUS_POST = getattr(settings, 'PYBB_ENABLE_ANONYMOUS_POST', False)
 PYBB_ANONYMOUS_USERNAME = getattr(settings, 'PYBB_ANONYMOUS_USERNAME', 'Anonymous')
+PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = getattr(settings, 'PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER', 100)
+
 PYBB_PREMODERATION = getattr(settings, 'PYBB_PREMODERATION', False)
 
 PYBB_BODY_CLEANERS = getattr(settings, 'PYBB_BODY_CLEANERS', [rstrip_str, filter_blanks])

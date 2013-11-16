@@ -227,6 +227,11 @@ PYBB_ANONYMOUS_USERNAME
 
 Username for anonymous posts. If no user with this username exists it will be created on first anonymous post.
 
+PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER
+.................................
+
+Number of anonymous views for each topic, that will be cached. 100 by default
+
 Premoderation
 -------------
 
