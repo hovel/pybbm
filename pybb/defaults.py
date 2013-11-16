@@ -67,12 +67,6 @@ PYBB_QUOTE_ENGINES = getattr(settings, 'PYBB_QUOTE_ENGINES', {
 })
 
 PYBB_MARKUP = getattr(settings, 'PYBB_MARKUP', 'bbcode')
-PYBB_BUTTONS = getattr(settings, 'PYBB_BUTTONS', {})
-#Dict of buttons that will be used, instead of text links if defined
-#Currently supported buttons:
-#  new_topic
-#  submit
-#  save
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
