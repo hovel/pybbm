@@ -929,6 +929,8 @@ class AnonymousTest(TestCase, SharedTestModule):
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
         self.ORIG_PYBB_ANONYMOUS_USERNAME = defaults.PYBB_ANONYMOUS_USERNAME
+        self.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER
+
         defaults.PYBB_ENABLE_ANONYMOUS_POST = True
         defaults.PYBB_ANONYMOUS_USERNAME = 'Anonymous'
         self.user = User.objects.create_user('Anonymous', 'Anonymous@localhost', 'Anonymous')
@@ -937,6 +939,11 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.topic = Topic.objects.create(name='etopic', forum=self.forum, user=self.user)
         add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
         self.user.user_permissions.add(add_post_permission)
+
+    def tearDown(self):
+        defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
+        defaults.PYBB_ANONYMOUS_USERNAME = self.ORIG_PYBB_ANONYMOUS_USERNAME
+        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = self.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER
 
     def test_anonymous_posting(self):
         post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
@@ -949,7 +956,6 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.assertEqual(Post.objects.get(body='test anonymous').user, self.user)
 
     def test_anonymous_cache_topic_views(self):
-        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = 150
         self.assertNotIn(build_cache_key('anonymous_topic_views', topic_id=self.topic.id), cache)
         url = self.topic.get_absolute_url()
         self.client.get(url)
@@ -962,11 +968,13 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.client.get(url)
         self.assertEqual(Topic.objects.get(id=self.topic.id).views, defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
         self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
-        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = 100
 
-    def tearDown(self):
-        defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
-        defaults.PYBB_ANONYMOUS_USERNAME = self.ORIG_PYBB_ANONYMOUS_USERNAME
+        views = Topic.objects.get(id=self.topic.id).views
+
+        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = None
+        self.client.get(url)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).views, views + 1)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
 
 
 def premoderate_test(user, post):
