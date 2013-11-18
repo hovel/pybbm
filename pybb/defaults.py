@@ -33,6 +33,8 @@ from postmarkup import render_bbcode
 from markdown import Markdown
 from django.utils.html import urlize
 
+PYBB_ENABLE_EMOTICONS = getattr(settings, 'PYBB_ENABLE_EMOTICONS', True)
+
 PYBB_SMILES_PREFIX = getattr(settings, 'PYBB_SMILES_PREFIX', 'pybb/emoticons/')
 
 PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
@@ -50,8 +52,9 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
     ';)': 'wink.png'
 })
 
-def smile_it(str):
-    s = str
+def smile_it(s):
+    if not PYBB_ENABLE_EMOTICONS:
+        return s
     for smile, url in PYBB_SMILES.items():
         s = s.replace(smile, '<img src="%s%s%s" alt="smile" />' % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url))
     return s

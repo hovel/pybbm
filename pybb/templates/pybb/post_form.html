@@ -16,11 +16,13 @@
     {% if form.name %} {% include "pybb/form_field.html" with field=form.name %} {% endif %}
     {% if form.login %} {% include "pybb/form_field.html" with field=form.login %}  {% endif %}
     {% if form.body %} {% include "pybb/form_field.html" with field=form.body %}  {% endif %}
+    {% if PYBB_ENABLE_EMOTICONS %}
     <div id='emoticons'>
       {% for smile, url in form.available_smiles.items %}
         <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
       {% endfor %}
     </div>
+    {% endif %}
 
     {% if form.poll_type %}
       {% include "pybb/poll_edit_form.html" %}
