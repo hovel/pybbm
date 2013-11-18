@@ -16,7 +16,8 @@ def processor(request):
         'PYBB_ENABLE_ANONYMOUS_POST',
         'PYBB_ATTACHMENT_ENABLE',
         'PYBB_AVATAR_WIDTH',
-        'PYBB_AVATAR_HEIGHT'
+        'PYBB_AVATAR_HEIGHT',
+        'PYBB_ENABLE_EMOTICONS',
     ):
         context[i] = getattr(defaults, i, None)
     context['PYBB_AVATAR_DIMENSIONS'] = '%sx%s' % (defaults.PYBB_AVATAR_WIDTH, defaults.PYBB_AVATAR_WIDTH)

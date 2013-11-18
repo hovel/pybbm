@@ -40,6 +40,11 @@ send emails from queue. For more information see `app home page <https://github.
 Emoticons
 ---------
 
+PYBB_ENABLE_EMOTICONS
+.....................
+
+If `False`, disables all emoticon rendering (default `True`).
+
 PYBB_SMILES_PREFIX
 ..................
 
@@ -84,7 +89,7 @@ PYBB_PROFILE_RELATED_NAME
 .........................
 
 Related name from profile's OneToOne relationship to User model. If profile model is User
-model itselt then set it to `None`
+model itself then set it to `None`
 
 For more information see :doc:`how to use custom user model with pybbm</customuser>`
 
