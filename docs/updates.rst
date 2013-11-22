@@ -1,13 +1,22 @@
 Updating PyBBM Version
 ======================
 
+0.14.5 -> 0.14.6
+-------------
+* Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
+  This value can be changed by setting `PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
+  `pybbm_calc_topic_views` that calc actual views count for topic
+* Fix for migration that may fails on clean mysql installation
+* Fixed perfomance issue with feed views
+* Using custom permissions handler in feed views
+
 0.14.4 -> 0.14.5
 ----------------
 * Minor fixes
 
 0.14.3 -> 0.14.4
 ----------------
-* Fix for migration that may fails on clean mysql installation
+* Fix for migration that may fails on clean mysql installation (not fixed really, filxed after 0.14.5)
 * Make example_thirdparty project bootstrap3 compatible
 
 0.14.2 -> 0.14.3

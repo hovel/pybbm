@@ -6,6 +6,7 @@ import os
 from django.contrib.auth.models import Permission
 from django.conf import settings
 from django.core import mail
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -14,6 +15,7 @@ from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread,
     pybb_get_latest_topics, pybb_get_latest_posts
 
 from pybb import util
+from pybb.util import build_cache_key
 
 User = util.get_user_model()
 username_field = util.get_username_field()
@@ -927,6 +929,8 @@ class AnonymousTest(TestCase, SharedTestModule):
     def setUp(self):
         self.ORIG_PYBB_ENABLE_ANONYMOUS_POST = defaults.PYBB_ENABLE_ANONYMOUS_POST
         self.ORIG_PYBB_ANONYMOUS_USERNAME = defaults.PYBB_ANONYMOUS_USERNAME
+        self.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER
+
         defaults.PYBB_ENABLE_ANONYMOUS_POST = True
         defaults.PYBB_ANONYMOUS_USERNAME = 'Anonymous'
         self.user = User.objects.create_user('Anonymous', 'Anonymous@localhost', 'Anonymous')
@@ -935,6 +939,11 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.topic = Topic.objects.create(name='etopic', forum=self.forum, user=self.user)
         add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
         self.user.user_permissions.add(add_post_permission)
+
+    def tearDown(self):
+        defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
+        defaults.PYBB_ANONYMOUS_USERNAME = self.ORIG_PYBB_ANONYMOUS_USERNAME
+        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = self.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER
 
     def test_anonymous_posting(self):
         post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
@@ -946,9 +955,26 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.assertEqual(len(Post.objects.filter(body='test anonymous')), 1)
         self.assertEqual(Post.objects.get(body='test anonymous').user, self.user)
 
-    def tearDown(self):
-        defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
-        defaults.PYBB_ANONYMOUS_USERNAME = self.ORIG_PYBB_ANONYMOUS_USERNAME
+    def test_anonymous_cache_topic_views(self):
+        self.assertNotIn(build_cache_key('anonymous_topic_views', topic_id=self.topic.id), cache)
+        url = self.topic.get_absolute_url()
+        self.client.get(url)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 1)
+        for _ in range(defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER - 2):
+            self.client.get(url)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).views, 0)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)),
+                         defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER - 1)
+        self.client.get(url)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).views, defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
+
+        views = Topic.objects.get(id=self.topic.id).views
+
+        defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = None
+        self.client.get(url)
+        self.assertEqual(Topic.objects.get(id=self.topic.id).views, views + 1)
+        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
 
 
 def premoderate_test(user, post):
