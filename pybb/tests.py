@@ -683,6 +683,18 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(Topic.objects.filter().count(), 1)
         self.assertEqual(Post.objects.filter(user=user).count(), 0)
 
+    def test_user_unblocking(self):
+        user = User.objects.create_user('test', 'test@localhost', 'test')
+        self.user.is_superuser = True
+        self.user.save()
+        self.login_client()
+        response = self.client.get(reverse('pybb:unblock_user', args=[user.username]), follow=True)
+        self.assertEqual(response.status_code, 405)
+        response = self.client.post(reverse('pybb:unblock_user', args=[user.username]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        user = User.objects.get(username=user.username)
+        self.assertTrue(user.is_active)
+
     def test_ajax_preview(self):
         self.login_client()
         response = self.client.post(reverse('pybb:post_ajax_preview'), data={'data': '[b]test bbcode ajax preview[b]'})

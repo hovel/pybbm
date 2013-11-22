@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-16 22:55+0400\n"
+"POT-Creation-Date: 2013-11-22 23:34+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Pavel Zhukov <gelios@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,11 +32,11 @@ msgstr "Просмотр сообщения"
 msgid "Edit post"
 msgstr "Редактирование сообщения"
 
-#: feeds.py:25 feeds.py:26 templates/pybb/base.html:12
+#: feeds.py:26 feeds.py:27 templates/pybb/base.html:12
 msgid "Latest posts on forum"
 msgstr "Последние сообщения на форуме"
 
-#: feeds.py:35 feeds.py:36 templates/pybb/base.html:13
+#: feeds.py:40 feeds.py:41 templates/pybb/base.html:13
 msgid "Latest topics on forum"
 msgstr "Последние темы на форуме"
 
@@ -300,15 +300,15 @@ msgstr "Ответы пользователей на опросы"
 msgid "Can't get profile for anonymous user"
 msgstr "Невозможно получить профиль для анонимного пользователя"
 
-#: views.py:637
+#: views.py:647
 msgid "All forums marked as read"
 msgstr "Все форумы отмечены как прочтенные"
 
-#: views.py:657
+#: views.py:667
 msgid "User successfuly blocked"
 msgstr "Пользователь успешно заблокирован"
 
-#: views.py:660
+#: views.py:680
 msgid "User successfuly unblocked"
 msgstr "Пользователь успешно разблокирован"
 
@@ -499,7 +499,7 @@ msgstr "добавить ответ"
 msgid "Rank"
 msgstr "Ранг"
 
-#: templates/pybb/post_template.html:38 templates/pybb/user.html:45
+#: templates/pybb/post_template.html:38 templates/pybb/user.html:46
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -591,7 +591,7 @@ msgstr "Заблокировать"
 msgid "Block and delete all messages"
 msgstr "Заблокировать и удалить сообщения"
 
-#: templates/pybb/user.html:39
+#: templates/pybb/user.html:41
 msgid "Unblock"
 msgstr "Разблокировать"
 
@@ -635,28 +635,28 @@ msgstr ""
 msgid "New answer in topic that you subscribed."
 msgstr "Новый ответ в теме, на которую вы подписаны"
 
-#: templatetags/pybb_tags.py:61
+#: templatetags/pybb_tags.py:63
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "секунду назад,секунды назад,секунд назад"
 
-#: templatetags/pybb_tags.py:64
+#: templatetags/pybb_tags.py:66
 msgid "seconds ago"
 msgstr "seconds ago"
 
-#: templatetags/pybb_tags.py:70
+#: templatetags/pybb_tags.py:72
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "минуту назад,минуты назад,минут назад"
 
-#: templatetags/pybb_tags.py:73
+#: templatetags/pybb_tags.py:75
 msgid "minutes ago"
 msgstr "minutes ago"
 
-#: templatetags/pybb_tags.py:83
+#: templatetags/pybb_tags.py:85
 #, python-format
 msgid "today, %s"
 msgstr "сегодня, %s"
 
-#: templatetags/pybb_tags.py:85
+#: templatetags/pybb_tags.py:87
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"

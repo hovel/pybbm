@@ -655,19 +655,28 @@ def block_user(request, username):
     user = get_object_or_404(User, **{username_field: username})
     if not perms.may_block_user(request.user, user):
         raise PermissionDenied
-    if user.is_active:
-        user.is_active = False
-        if 'block_and_delete_messages' in request.POST:
-            # individually delete each post and empty topic to fire method
-            # with forum/topic counters recalculation
-            for p in Post.objects.filter(user=user):
-                p.delete()
-            for t in Topic.objects.annotate(cnt=Count('posts')).filter(cnt=0):
-                t.delete()
-        msg = _('User successfuly blocked')
-    else:
-        user.is_active = True
-        msg = _('User successfuly unblocked')
+    user.is_active = False
     user.save()
+    if 'block_and_delete_messages' in request.POST:
+        # individually delete each post and empty topic to fire method
+        # with forum/topic counters recalculation
+        for p in Post.objects.filter(user=user):
+            p.delete()
+        for t in Topic.objects.annotate(cnt=Count('posts')).filter(cnt=0):
+            t.delete()
+    msg = _('User successfuly blocked')
+    messages.success(request, msg, fail_silently=True)
+    return redirect('pybb:index')
+
+
+@login_required
+@require_POST
+def unblock_user(request, username):
+    user = get_object_or_404(User, **{username_field: username})
+    if not perms.may_block_user(request.user, user):
+        raise PermissionDenied
+    user.is_active = True
+    user.save()
+    msg = _('User successfuly unblocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')
