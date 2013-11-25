@@ -684,7 +684,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(Post.objects.filter(user=user).count(), 0)
 
     def test_user_unblocking(self):
-        user = User.objects.create_user('test', 'test@localhost', 'test')
+        user = User.objects.create_user('test', 'test@localhost', 'test', is_active=False)
         self.user.is_superuser = True
         self.user.save()
         self.login_client()

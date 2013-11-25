@@ -1,6 +1,11 @@
 Updating PyBBM Version
 ======================
 
+0.14.6 -> 0.14.7
+----------------
+* Django 1.6 compatibility
+* unblock user functionality added
+
 0.14.5 -> 0.14.6
 -------------
 * Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
