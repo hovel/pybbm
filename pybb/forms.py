@@ -171,9 +171,11 @@ class AdminPostForm(PostForm):
         except User.DoesNotExist:
             if username_field != 'email':
                 create_data = {username_field: self.cleaned_data['login'],
-                               'email': '%s@example.com' % self.cleaned_data['login']}
+                               'email': '%s@example.com' % self.cleaned_data['login'],
+                               'is_staff': False}
             else:
-                create_data = {'email': '%s@example.com' % self.cleaned_data['login']}
+                create_data = {'email': '%s@example.com' % self.cleaned_data['login'],
+                               'is_staff': False}
             self.user = User.objects.create(**create_data)
         return super(AdminPostForm, self).save(*args, **kwargs)
 

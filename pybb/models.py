@@ -38,6 +38,11 @@ except ImportError:
 
 from pybb import defaults
 
+try:
+    from django.db.transaction import atomic as atomic_func
+except ImportError:
+    from django.db.transaction import commit_on_success as atomic_func
+
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
@@ -414,7 +419,6 @@ class Attachment(models.Model):
 
 
 class TopicReadTrackerManager(models.Manager):
-    @transaction.commit_on_success
     def get_or_create_tracker(self, user, topic):
         """
         Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
@@ -425,7 +429,8 @@ class TopicReadTrackerManager(models.Manager):
         """
         is_new = True
         try:
-            obj = TopicReadTracker.objects.create(user=user, topic=topic)
+            with atomic_func():
+                obj = TopicReadTracker.objects.create(user=user, topic=topic)
         except IntegrityError:
             transaction.commit()
             obj = TopicReadTracker.objects.get(user=user, topic=topic)
@@ -450,7 +455,6 @@ class TopicReadTracker(models.Model):
 
 
 class ForumReadTrackerManager(models.Manager):
-    @transaction.commit_on_success
     def get_or_create_tracker(self, user, forum):
         """
         Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
@@ -461,7 +465,8 @@ class ForumReadTrackerManager(models.Manager):
         """
         is_new = True
         try:
-            obj = ForumReadTracker.objects.create(user=user, forum=forum)
+            with atomic_func():
+                obj = ForumReadTracker.objects.create(user=user, forum=forum)
         except IntegrityError:
             transaction.commit()
             is_new = False
