@@ -667,3 +667,16 @@ def block_user(request, username):
     msg = _('User successfuly blocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')
+
+
+@login_required
+@require_POST
+def unblock_user(request, username):
+    user = get_object_or_404(User, **{username_field: username})
+    if not perms.may_block_user(request.user, user):
+        raise PermissionDenied
+    user.is_active = True
+    user.save()
+    msg = _('User successfuly unblocked')
+    messages.success(request, msg, fail_silently=True)
+    return redirect('pybb:index')
