@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import time, datetime
+import time
+import datetime
 import os
 
 from django.contrib.auth.models import Permission
@@ -1362,7 +1363,7 @@ class FiltersTest(TestCase, SharedTestModule):
         values['body'] = 'test\n \n \n\nmultiple empty lines\n'
         response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Post.objects.all()[0].body, u'test\nmultiple empty lines')
+        self.assertEqual(Post.objects.all()[0].body, 'test\nmultiple empty lines')
 
 
 from pybb import permissions
