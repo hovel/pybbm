@@ -4,7 +4,7 @@ import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
@@ -205,7 +205,7 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
                                             topic=self.topic)
             else:
                 ctx['form'] = PostForm(topic=self.topic)
-            self.mark_read(self.request, self.topic)
+            self.mark_read(self.request.user, self.topic)
         elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
             ctx['form'] = PostForm(topic=self.topic)
         else:
@@ -225,27 +225,29 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
 
         return ctx
 
-    def mark_read(self, request, topic):
+    def mark_read(self, user, topic):
         try:
-            forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=request.user)
-        except ObjectDoesNotExist:
+            forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=user)
+        except ForumReadTracker.DoesNotExist:
             forum_mark = None
         if (forum_mark is None) or (forum_mark.time_stamp < topic.updated):
             # Mark topic as readed
-            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=topic, user=request.user)
+            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=topic, user=user)
             if not new:
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,
-                                                                  topicreadtracker__time_stamp__gt=F('updated'))) |
-                                                                Q(forum__forumreadtracker__user=request.user,
-                                                                  forum__forumreadtracker__time_stamp__gt=F('updated')))
-            unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
-            if not unread.exists():
+            readed = topic.forum.topics.filter((Q(topicreadtracker__user=user,
+                                                  topicreadtracker__time_stamp__gte=F('updated'))) |
+                                                Q(forum__forumreadtracker__user=user,
+                                                  forum__forumreadtracker__time_stamp__gte=F('updated')))\
+                                       .only('id').order_by()
+
+            not_readed = topic.forum.topics.exclude(id__in=readed)
+            if not not_readed.exists():
                 # Clear all topic marks for this forum, mark forum as readed
-                TopicReadTracker.objects.filter(user=request.user, topic__forum=topic.forum).delete()
-                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=request.user)
+                TopicReadTracker.objects.filter(user=user, topic__forum=topic.forum).delete()
+                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=user)
                 forum_mark.save()
 
 

@@ -354,6 +354,20 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=self.user, forum=self.forum).count(), 1)
 
+    def test_read_tracker_after_posting(self):
+        client = Client()
+        client.login(username='zeus', password='zeus')
+        add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
+        response = client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test tracking'
+        response = client.post(add_post_url, values, follow=True)
+
+        # after posting in topic it should be readed
+        # because there is only one topic, so whole forum should be marked as readed
+        self.assertEqual(TopicReadTracker.objects.filter(user=self.user, topic=self.topic).count(), 0)
+        self.assertEqual(ForumReadTracker.objects.filter(user=self.user, forum=self.forum).count(), 1)
+
     def test_pybb_is_topic_unread_filter(self):
         forum_1 = self.forum
         topic_1 = self.topic
