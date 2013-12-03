@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import inspect
 
 import math
-from string import strip
 import time
 import warnings
 
