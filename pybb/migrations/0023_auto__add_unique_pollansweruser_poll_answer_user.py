@@ -1,4 +1,6 @@
 # encoding: utf-8
+from django.db.utils import IntegrityError, DatabaseError
+
 try:
     from django.contrib.auth import get_user_model
 except ImportError:  # django < 1.5
@@ -17,14 +19,8 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'PollAnswerUser', fields ['poll_answer', 'user']
         db.create_unique('pybb_pollansweruser', ['poll_answer_id', 'user_id'])
 
-        # Adding index on 'Post', fields ['created']
-        db.create_index('pybb_post', ['created'])
-
 
     def backwards(self, orm):
-        # Removing index on 'Post', fields ['created']
-        db.delete_index('pybb_post', ['created'])
-
         # Removing unique constraint on 'PollAnswerUser', fields ['poll_answer', 'user']
         db.delete_unique('pybb_pollansweruser', ['poll_answer_id', 'user_id'])
 

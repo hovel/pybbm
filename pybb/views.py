@@ -4,18 +4,22 @@ from __future__ import unicode_literals
 import math
 
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
+from django.db.models.aggregates import Count
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
+from pybb.util import build_cache_key
 
 try:
     from pure_pagination import Paginator
@@ -28,7 +32,7 @@ except ImportError:
     Page.pages = lambda self: [PageRepr(i) for i in range(1, self.paginator.num_pages + 1)]
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
-from pybb.forms import PostForm, AdminPostForm, EditProfileForm, AttachmentFormSet, PollAnswerFormSet, PollForm
+from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 from pybb import defaults
 
@@ -120,11 +124,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
             raise PermissionDenied
 
         qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
-        if not (self.request.user.is_superuser or self.request.user in self.forum.moderators.all()):
-            if self.request.user.is_authenticated():
-                qs = qs.filter(Q(user=self.request.user)|Q(on_moderation=False))
-            else:
-                qs = qs.filter(on_moderation=False)
+        qs = perms.filter_topics(self.request.user, qs)
         return qs
 
 
@@ -180,10 +180,18 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
     def get_queryset(self):
         if not perms.may_view_topic(self.request.user, self.topic):
             raise PermissionDenied
-
-        self.topic.views += 1
-        self.topic.save()
+        if self.request.user.is_authenticated() or not defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER:
+            Topic.objects.filter(id=self.topic.id).update(views=F('views') + 1)
+        else:
+            cache_key = build_cache_key('anonymous_topic_views', topic_id=self.topic.id)
+            cache.add(cache_key, 0)
+            if cache.incr(cache_key) % defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER == 0:
+                Topic.objects.filter(id=self.topic.id).update(views=F('views') +
+                                                                    defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
+                cache.set(cache_key, 0)
         qs = self.topic.posts.all().select_related('user')
+        if defaults.PYBB_PROFILE_RELATED_NAME:
+            qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)
         if not perms.may_moderate_topic(self.request.user, self.topic):
             qs = perms.filter_posts(self.request.user, qs)
         return qs
@@ -198,7 +206,7 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
                                             topic=self.topic)
             else:
                 ctx['form'] = PostForm(topic=self.topic)
-            self.mark_read(self.request, self.topic)
+            self.mark_read(self.request.user, self.topic)
         elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
             ctx['form'] = PostForm(topic=self.topic)
         else:
@@ -218,27 +226,29 @@ class TopicView(RedirectToLoginMixin, generic.ListView):
 
         return ctx
 
-    def mark_read(self, request, topic):
+    def mark_read(self, user, topic):
         try:
-            forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=request.user)
-        except ObjectDoesNotExist:
+            forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=user)
+        except ForumReadTracker.DoesNotExist:
             forum_mark = None
         if (forum_mark is None) or (forum_mark.time_stamp < topic.updated):
             # Mark topic as readed
-            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=topic, user=request.user)
+            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=topic, user=user)
             if not new:
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            read = Topic.objects.filter(Q(forum=topic.forum) & (Q(topicreadtracker__user=request.user,
-                                                                  topicreadtracker__time_stamp__gt=F('updated'))) |
-                                                                Q(forum__forumreadtracker__user=request.user,
-                                                                  forum__forumreadtracker__time_stamp__gt=F('updated')))
-            unread = Topic.objects.filter(forum=topic.forum).exclude(id__in=read)
-            if not unread.exists():
+            readed = topic.forum.topics.filter((Q(topicreadtracker__user=user,
+                                                  topicreadtracker__time_stamp__gte=F('updated'))) |
+                                                Q(forum__forumreadtracker__user=user,
+                                                  forum__forumreadtracker__time_stamp__gte=F('updated')))\
+                                       .only('id').order_by()
+
+            not_readed = topic.forum.topics.exclude(id__in=readed)
+            if not not_readed.exists():
                 # Clear all topic marks for this forum, mark forum as readed
-                TopicReadTracker.objects.filter(user=request.user, topic__forum=topic.forum).delete()
-                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=request.user)
+                TopicReadTracker.objects.filter(user=user, topic__forum=topic.forum).delete()
+                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=user)
                 forum_mark.save()
 
 
@@ -390,6 +400,54 @@ class UserView(generic.DetailView):
         return ctx
 
 
+class UserPosts(generic.ListView):
+    model = Post
+    paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
+    paginator_class = Paginator
+    template_name = 'pybb/user_posts.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        username = kwargs.pop('username')
+        self.user = get_object_or_404(**{'klass': User, username_field: username})
+        return super(UserPosts, self).dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super(UserPosts, self).get_queryset()
+        qs = qs.filter(user=self.user)
+        qs = perms.filter_posts(self.request.user, qs).select_related('topic')
+        qs = qs.order_by('-created', '-updated')
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(UserPosts, self).get_context_data(**kwargs)
+        context['target_user'] = self.user
+        return context
+
+
+class UserTopics(generic.ListView):
+    model = Topic
+    paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
+    paginator_class = Paginator
+    template_name = 'pybb/user_topics.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        username = kwargs.pop('username')
+        self.user = get_object_or_404(User, username=username)
+        return super(UserTopics, self).dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super(UserTopics, self).get_queryset()
+        qs = qs.filter(user=self.user)
+        qs = perms.filter_topics(self.user, qs)
+        qs = qs.order_by('-updated', '-created')
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(UserTopics, self).get_context_data(**kwargs)
+        context['target_user'] = self.user
+        return context
+
+
 class PostView(RedirectToLoginMixin, generic.RedirectView):
 
     def get_login_redirect_url(self):
@@ -417,10 +475,16 @@ class ModeratePost(generic.RedirectView):
 class ProfileEditView(generic.UpdateView):
 
     template_name = 'pybb/edit_profile.html'
-    form_class = EditProfileForm
 
     def get_object(self, queryset=None):
         return util.get_pybb_profile(self.request.user)
+
+    def get_form_class(self):
+        if not self.form_class:
+            from pybb.forms import EditProfileForm
+            return EditProfileForm
+        else:
+            return super(ProfileEditView, self).get_form_class()
 
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
@@ -531,7 +595,7 @@ class TopicPollVoteView(generic.UpdateView):
     def form_valid(self, form):
         # already voted
         if not pybb_topic_poll_not_voted(self.object, self.request.user):
-            return HttpResponseBadRequest()
+            return HttpResponseForbidden()
 
         answers = form.cleaned_data['answers']
         for answer in answers:
@@ -543,10 +607,17 @@ class TopicPollVoteView(generic.UpdateView):
         return super(ModelFormMixin, self).form_valid(form)
 
     def form_invalid(self, form):
-        return self.object.get_absolute_url()
+        return redirect(self.object)
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+
+@login_required
+def topic_cancel_poll_vote(request, pk):
+    topic = get_object_or_404(Topic, pk=pk)
+    PollAnswerUser.objects.filter(user=request.user, poll_answer__topic_id=topic.id).delete()
+    return HttpResponseRedirect(topic.get_absolute_url())
 
 
 @login_required
@@ -582,12 +653,33 @@ def mark_all_as_read(request):
 
 
 @login_required
+@require_POST
 def block_user(request, username):
     user = get_object_or_404(User, **{username_field: username})
     if not perms.may_block_user(request.user, user):
         raise PermissionDenied
     user.is_active = False
     user.save()
+    if 'block_and_delete_messages' in request.POST:
+        # individually delete each post and empty topic to fire method
+        # with forum/topic counters recalculation
+        for p in Post.objects.filter(user=user):
+            p.delete()
+        for t in Topic.objects.annotate(cnt=Count('posts')).filter(cnt=0):
+            t.delete()
     msg = _('User successfuly blocked')
+    messages.success(request, msg, fail_silently=True)
+    return redirect('pybb:index')
+
+
+@login_required
+@require_POST
+def unblock_user(request, username):
+    user = get_object_or_404(User, **{username_field: username})
+    if not perms.may_block_user(request.user, user):
+        raise PermissionDenied
+    user.is_active = True
+    user.save()
+    msg = _('User successfuly unblocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')

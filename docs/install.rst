@@ -57,9 +57,9 @@ Enable applications and edit settings
   It is highly recommended that you also enable `south` application for properly
   migrate future updates and `pytils` application for better support ru language
 
-* Add `pybb.context_processors.processor` to your `settings.CONTEXT_PROCESSORS`::
+* Add `pybb.context_processors.processor` to your `settings.TEMPLATE_CONTEXT_PROCESSORS`::
 
-    CONTEXT_PROCESSORS = (
+    TEMPLATE_CONTEXT_PROCESSORS = (
         ...
         'pybb.context_processors.processor',
         ...

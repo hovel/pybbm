@@ -10,7 +10,8 @@ from pybb.feeds import LastPosts, LastTopics
 from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
-    OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView
+    OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView,\
+    UserTopics, UserPosts, topic_cancel_poll_vote
 
 
 urlpatterns = patterns('',
@@ -28,6 +29,9 @@ urlpatterns += patterns('pybb.views',
                         # User
                         url('^users/(?P<username>[^/]+)/$', UserView.as_view(), name='user'),
                         url('^block_user/([^/]+)/$', 'block_user', name='block_user'),
+                        url('^unblock_user/([^/]+)/$', 'unblock_user', name='unblock_user'),
+                        url(r'^users/(?P<username>[^/]+)/topics/$', UserTopics.as_view(), name='user_topics'),
+                        url(r'^users/(?P<username>[^/]+)/posts/$', UserPosts.as_view(), name='user_posts'),
 
                         # Profile
                         url('^profile/edit/$', ProfileEditView.as_view(), name='edit_profile'),
@@ -39,6 +43,7 @@ urlpatterns += patterns('pybb.views',
                         url('^topic/(?P<pk>\d+)/close/$', CloseTopicView.as_view(), name='close_topic'),
                         url('^topic/(?P<pk>\d+)/open/$', OpenTopicView.as_view(), name='open_topic'),
                         url('^topic/(?P<pk>\d+)/poll_vote/$', TopicPollVoteView.as_view(), name='topic_poll_vote'),
+                        url('^topic/(?P<pk>\d+)/cancel_poll_vote/$', topic_cancel_poll_vote, name='topic_cancel_poll_vote'),
                         url('^topic/latest/$', LatestTopicsView.as_view(), name='topic_latest'),
 
                         # Add topic/post

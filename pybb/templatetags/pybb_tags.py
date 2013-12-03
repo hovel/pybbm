@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import inspect
+
 import math
+from string import strip
 import time
+import warnings
 
 from django import template
+from django.core.cache import cache
 from django.template.base import get_library, InvalidTemplateLibrary, TemplateSyntaxError, TOKEN_BLOCK
 from django.template.defaulttags import LoadNode, CommentNode, IfNode
 from django.template.smartif import Literal
@@ -14,6 +19,7 @@ from django.utils.translation import ugettext as _
 from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
+from pybb.util import build_cache_key
 
 try:
     import pytils
@@ -21,7 +27,7 @@ try:
 except ImportError:
     pytils_enabled = False
 
-from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser, Topic, Post
 from pybb.permissions import perms
 from pybb import defaults, util
 
@@ -102,7 +108,9 @@ def pybb_topic_moderated_by(topic, user):
     """
     Check if user is moderator of topic's forum.
     """
-
+    warnings.warn("pybb_topic_moderated_by filter is deprecated and will be removed in later releases. "
+                  "Use pybb_may_moderate_topic(user, topic) filter instead",
+                  DeprecationWarning)
     return perms.may_moderate_topic(user, topic)
 
 @register.filter
@@ -110,7 +118,10 @@ def pybb_editable_by(post, user):
     """
     Check if the post could be edited by the user.
     """
-    return perms.may_edit_post(user, post)    
+    warnings.warn("pybb_editable_by filter is deprecated and will be removed in later releases. "
+                  "Use pybb_may_edit_post(user, post) filter instead",
+                  DeprecationWarning)
+    return perms.may_edit_post(user, post)
 
 
 @register.filter
@@ -216,6 +227,37 @@ def pybb_get_profile(*args, **kwargs):
         return util.get_pybb_profile_model().objects.none()
 
 
+@register.assignment_tag(takes_context=True)
+def pybb_get_latest_topics(context, cnt=5, user=None):
+    qs = Topic.objects.all().order_by('-updated', '-created')
+    if not user:
+        user = context['user']
+    qs = perms.filter_topics(user, qs)
+    return qs[:cnt]
+
+
+@register.assignment_tag(takes_context=True)
+def pybb_get_latest_posts(context, cnt=5, user=None):
+    qs = Post.objects.all().order_by('-created')
+    if not user:
+        user = context['user']
+    qs = perms.filter_posts(user, qs)
+    return qs[:cnt]
+
+
+def load_perms_filters():
+    def partial(func_name, perms_obj):
+        def newfunc(user, obj):
+            return getattr(perms_obj, func_name)(user, obj)
+        return newfunc
+
+    for method in inspect.getmembers(perms):
+        if inspect.ismethod(method[1]) and len(inspect.getargspec(method[1]).args) == 3 and\
+                inspect.getargspec(method[1]).args[0] == 'self' and\
+                (method[0].startswith('may') or method[0].startswith('filter')):
+            register.filter('%s%s' % ('pybb_', method[0]), partial(method[0], perms))
+load_perms_filters()
+
 # next two tags copied from https://bitbucket.org/jaap3/django-friendly-tag-loader
 
 @register.tag
@@ -305,3 +347,9 @@ def if_has_tag(parser, token):
                        (None, nodelist_false)])
     except TypeError:  # < 1.4
         return IfNode(Literal(has_tag), nodelist_true, nodelist_false)
+
+
+@register.filter
+def pybbm_calc_topic_views(topic):
+    cache_key = build_cache_key('anonymous_topic_views', topic_id=topic.id)
+    return topic.views + cache.get(cache_key, 0)

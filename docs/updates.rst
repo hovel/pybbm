@@ -1,12 +1,64 @@
 Updating PyBBM Version
 ======================
 
-0.12.4 -> dev
+0.14.6 -> 0.14.7
+----------------
+* Django 1.6 compatibility
+* unblock user functionality added
+
+0.14.5 -> 0.14.6
+-------------
+* Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
+  This value can be changed by setting `PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
+  `pybbm_calc_topic_views` that calc actual views count for topic
+* Fix for migration that may fails on clean mysql installation
+* Fixed perfomance issue with feed views
+* Using custom permissions handler in feed views
+
+0.14.4 -> 0.14.5
+----------------
+* Minor fixes
+
+0.14.3 -> 0.14.4
+----------------
+* Fix for migration that may fails on clean mysql installation (not fixed really, filxed after 0.14.5)
+* Make example_thirdparty project bootstrap3 compatible
+
+0.14.2 -> 0.14.3
+----------------
+* Show only available topics (by permission handler) in ForumView
+
+0.14.1 -> 0.14.2
+--------------
+* Fixed MultipleObjectReturned when topic has more than one moderator
+
+0.14 -> 0.14.1
+--------------
+* Fixed circular import issue
+
+0.13.1 -> 0.14
 -------------
 
+* Restored views for rendering user's posts and topics and link to that views from profile info page
+* Broken hard dependency from EditProfileView and EditProfileForm classes in forum
+* Ability for users to cancel their poll vote
+* Block user view accepts only POST requests
+* If `block_and_delete_messages` passed to request.POST for block user view,
+  then all user's messages will be deleted
+
+0.13 -> 0.13.1
+--------------
+
+* Hotfix for rendering avatars
+
+0.12.5 -> 0.13
+--------------
+
 * You can add first-unread get parameter to the topic url to provide link to first unread post from topic
-* Removed djnago-mailer, pytils, sorl.thumbnail, south, django-pure-pagination from hard dependencies
-* Support Custom User model introduced in django 1.5. See :doc:`how to use custom user model with pybbm</customuser>`
+* Removed django-mailer, pytils, sorl-thumbnail, south, django-pure-pagination from hard dependencies
+* Support Custom User model introduced in django 1.5. Do not forget to define `PYBB_PROFILE_RELATED_NAME`
+  in settings, if you don't yse predefinet `pybb.PybbProfile` model See :doc:`how to use custom user model
+  with pybbm</customuser>`
 * Dropped support for django 1.3
 * Experimental support for python 3
 * Removed django-mailer from hard dependencies, you have to manually install it for using it's functionality
@@ -15,9 +67,9 @@ Updating PyBBM Version
 ----------------
 
 * More flexible forms/forms fields rendering in templates
-Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
+  Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
 * Additional template for markitup preview
-You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
+  You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
 * Improved permissions handling see `PYBB_PERMISSION_HANDLER` setting in :doc:`settings</settings>`
 * Fixed bugs and improved performance
 
@@ -35,7 +87,7 @@ You can override `pybb/_markitup_preview.html` to provide your styling for <code
 ------------
 
 * Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using
-polls subsystem
+  polls subsystem
 
 * Polish translation
 
@@ -44,11 +96,11 @@ polls subsystem
 ------------
 
 * Ability to override standard message when user doesn't login and not alowed anonymous posts by
-``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
-and/or ``auth_login`` url names in ``urls.py``
+  ``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
+  and/or ``auth_login`` url names in ``urls.py``
 
 * Content in each ``topic.html`` and ``forum.html`` is wrapped in ``<div>`` tag with ``topic`` and ``forum`` classes
-accordingly
+  accordingly
 
 0.9 -> 0.10
 -----------

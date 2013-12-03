@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 import re
 import django
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 
 def unescape(text):
@@ -38,6 +38,7 @@ def get_user_model():
         return get_user_model()
     else:
         from django.contrib.auth.models import User
+        User.get_username = lambda u: u.username  # emulate new 1.5 method
         return User
 
 
@@ -69,3 +70,10 @@ def get_pybb_profile_model():
         return get_user_model()._meta.get_field_by_name(defaults.PYBB_PROFILE_RELATED_NAME)[0].model
     else:
         return get_user_model()
+
+
+def build_cache_key(key_name, **kwargs):
+    if key_name == 'anonymous_topic_views':
+        return 'pybbm_anonymous_topic_%s_views' % kwargs['topic_id']
+    else:
+        raise ValueError('Wrong key_name parameter passed: %s' % key_name)

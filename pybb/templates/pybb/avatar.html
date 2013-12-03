@@ -4,7 +4,7 @@
     {% pybb_get_profile user=user as user_profile %}
     <a href="{{ user_profile.get_absolute_url }}">
         {% if_has_tag thumbnail %}
-            {% thumbnail user_profile.avatar "{{ PYBB_AVATAR_WIDTH }}x{{ PYBB_AVATAR_HEIGHT }}" as avatar %}
+            {% thumbnail user_profile.avatar PYBB_AVATAR_DIMENSIONS as avatar %}
                 <img src="{{ avatar.url }}" alt="{{ user }} avatar" />
             {% empty %}
                 <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" />

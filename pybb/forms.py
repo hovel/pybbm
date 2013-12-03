@@ -6,8 +6,9 @@ import inspect
 
 
 from django import forms
+from django.core.exceptions import FieldError
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
 
 from pybb import util
@@ -25,7 +26,7 @@ class AttachmentForm(forms.ModelForm):
 
     def clean_file(self):
         if self.cleaned_data['file'].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
-            raise forms.ValidationError(_('Attachment is too big'))
+            raise forms.ValidationError(ugettext('Attachment is too big'))
         return self.cleaned_data['file']
 
 AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
@@ -45,9 +46,9 @@ class BasePollAnswerFormset(BaseInlineFormSet):
                     len(self.deleted_forms)
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
             raise forms.ValidationError(
-                _('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
+                ugettext('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
         if forms_cnt < 2:
-            raise forms.ValidationError(_('Add two or more answers for this poll'))
+            raise forms.ValidationError(ugettext('Add two or more answers for this poll'))
 
 
 PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=defaults.PYBB_POLL_MAX_ANSWERS,
@@ -55,10 +56,10 @@ PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=de
 
 
 class PostForm(forms.ModelForm):
-    name = forms.CharField(label=_('Subject'))
-    poll_type = forms.TypedChoiceField(label=_('Poll type'), choices=Topic.POLL_TYPE_CHOICES, coerce=int)
+    name = forms.CharField(label=ugettext_lazy('Subject'))
+    poll_type = forms.TypedChoiceField(label=ugettext_lazy('Poll type'), choices=Topic.POLL_TYPE_CHOICES, coerce=int)
     poll_question = forms.CharField(
-        label=_('Poll question'),
+        label=ugettext_lazy('Poll question'),
         required=False,
         widget=forms.Textarea(attrs={'class': 'no-markitup'}))
 
@@ -107,7 +108,7 @@ class PostForm(forms.ModelForm):
         poll_type = self.cleaned_data.get('poll_type', None)
         poll_question = self.cleaned_data.get('poll_question', None)
         if poll_type is not None and poll_type != Topic.POLL_TYPE_NONE and not poll_question:
-            raise forms.ValidationError(_('Poll''s question is required when adding a poll'))
+            raise forms.ValidationError(ugettext('Poll''s question is required when adding a poll'))
 
         return self.cleaned_data
 
@@ -157,7 +158,7 @@ class AdminPostForm(PostForm):
     Superusers can post messages from any user and from any time
     If no user with specified name - new user will be created
     """
-    login = forms.CharField(label=_('User'))
+    login = forms.CharField(label=ugettext_lazy('User'))
 
     def __init__(self, *args, **kwargs):
         if args:
@@ -172,33 +173,40 @@ class AdminPostForm(PostForm):
         except User.DoesNotExist:
             if username_field != 'email':
                 create_data = {username_field: self.cleaned_data['login'],
-                               'email': '%s@example.com' % self.cleaned_data['login']}
+                               'email': '%s@example.com' % self.cleaned_data['login'],
+                               'is_staff': False}
             else:
-                create_data = {'email': '%s@example.com' % self.cleaned_data['login']}
+                create_data = {'email': '%s@example.com' % self.cleaned_data['login'],
+                               'is_staff': False}
             self.user = User.objects.create(**create_data)
         return super(AdminPostForm, self).save(*args, **kwargs)
 
 
-class EditProfileForm(forms.ModelForm):
-    class Meta(object):
-        model = util.get_pybb_profile_model()
-        fields = ['signature', 'time_zone', 'language',
-                  'show_signatures', 'avatar']
+try:
+    class EditProfileForm(forms.ModelForm):
+        class Meta(object):
+            model = util.get_pybb_profile_model()
+            fields = ['signature', 'time_zone', 'language', 'show_signatures', 'avatar']
 
-    signature = forms.CharField(widget=forms.Textarea(attrs={'rows': 2, 'cols:': 60}), required=False)
+        def __init__(self, *args, **kwargs):
+            super(EditProfileForm, self).__init__(*args, **kwargs)
+            self.fields['signature'].widget = forms.Textarea(attrs={'rows': 2, 'cols:': 60})
 
-    def clean_avatar(self):
-        if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):
-            forms.ValidationError(_('Avatar is too large, max size: %s bytes' % defaults.PYBB_MAX_AVATAR_SIZE))
-        return self.cleaned_data['avatar']
+        def clean_avatar(self):
+            if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):
+                forms.ValidationError(ugettext('Avatar is too large, max size: %s bytes' %
+                                               defaults.PYBB_MAX_AVATAR_SIZE))
+            return self.cleaned_data['avatar']
 
-    def clean_signature(self):
-        value = self.cleaned_data['signature'].strip()
-        if len(re.findall(r'\n', value)) > defaults.PYBB_SIGNATURE_MAX_LINES:
-            raise forms.ValidationError('Number of lines is limited to %d' % defaults.PYBB_SIGNATURE_MAX_LINES)
-        if len(value) > defaults.PYBB_SIGNATURE_MAX_LENGTH:
-            raise forms.ValidationError('Length of signature is limited to %d' % defaults.PYBB_SIGNATURE_MAX_LENGTH)
-        return value
+        def clean_signature(self):
+            value = self.cleaned_data['signature'].strip()
+            if len(re.findall(r'\n', value)) > defaults.PYBB_SIGNATURE_MAX_LINES:
+                raise forms.ValidationError('Number of lines is limited to %d' % defaults.PYBB_SIGNATURE_MAX_LINES)
+            if len(value) > defaults.PYBB_SIGNATURE_MAX_LENGTH:
+                raise forms.ValidationError('Length of signature is limited to %d' % defaults.PYBB_SIGNATURE_MAX_LENGTH)
+            return value
+except FieldError:
+    pass
 
 
 class UserSearchForm(forms.Form):

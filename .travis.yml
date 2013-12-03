@@ -7,11 +7,12 @@ python:
   - "3.2"
   - "3.3"
 env:
-  - DJANGO=1.4.5
-  - DJANGO=1.5.1
+  - DJANGO=1.4.10
+  - DJANGO=1.5.5
+  - DJANGO=1.6
 install:
   - pip install Django==$DJANGO --use-mirrors
-  - pip install Pillow
+  - pip install Pillow -U
   - pip install -r test/test_project/requirements_test.txt
 script:
   - python setup.py test

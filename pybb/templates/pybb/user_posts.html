@@ -1,27 +1,25 @@
 {% extends 'pybb/base.html' %}
 
 {% load url from future %}
-
 {% load pybb_tags i18n %}
 
-{% block content %}
-    <h1><a href="{{ profile.pybb_profile.get_absolute_url }}">{{ profile.username }}</a></h1>
-    <div class="userinfo">
-        <div class="avatar">
-            <img src="{{ profile.pybb_profile.avatar_url }}" alt="" />
-        </div>
-        {% for topic in list %}
-        <li class="user">
+{% block breadcrumb %}
+    {% pybb_get_profile target_user as target_profile %}
+    {% include "pybb/breadcrumb.html" with object=target_profile extra_crumb=_('Posts') %}
+{% endblock %}
 
-        <span class="post_count">{{ topic.posts.count }}</span>
-        <span class="updated">{{ topic.created|date:"d M Y h:i" }}</span>
-        <a href={% url 'pybb_post' topic.id %}>{{ topic.body_text }}</a>
-        </li>
+{% block content %}
+    {% pybb_get_profile target_user as target_profile %}
+    <h1>{% trans "All posts created by" %} <a href="{{ target_profile.get_absolute_url }}">{{ target_user.get_username }}</a></h1>
+    <div class="userinfo">
+        {% include "pybb/pagination.html" %}
+
+        {% for post in object_list %}
+            {% cycle 'odd' 'even' as rowcolors silent %}
+            {% include "pybb/post_template.html" with topic=post.topic %}
         {% endfor %}
 
-        {% with _('Topics') as label %}
         {% include "pybb/pagination.html" %}
-        {% endwith %}
 
     </div>
 {% endblock %}

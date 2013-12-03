@@ -11,8 +11,10 @@ TEMPLATE_DEBUG = DEBUG
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'testdb.sqlite',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'pybbm',
+        'USER': 'root',
+        'PASSWORD': 'qwerty'
     }
 }
 
@@ -80,9 +82,9 @@ INSTALLED_APPS = (
     'south',
     'pure_pagination',
     'account',
-    'pinax_theme_bootstrap_account',
     'pinax_theme_bootstrap',
-    'django_forms_bootstrap',
+    'bootstrapform',
+    'captcha'
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = [

@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from pybb.models import Post, Topic
 
+from pybb.permissions import perms
 
 class PybbFeed(Feed):
     feed_type = Atom1Feed
@@ -28,8 +29,12 @@ class LastPosts(PybbFeed):
     title_template = 'pybb/feeds/posts_title.html'
     description_template = 'pybb/feeds/posts_description.html'
 
-    def items(self):
-        return Post.objects.filter(topic__forum__hidden=False, topic__forum__category__hidden=False).order_by('-created')[:15]
+    def get_object(self, request, *args, **kwargs):
+        return request.user
+
+    def items(self, user):
+        ids = [p.id for p in perms.filter_posts(user, Post.objects.only('id')).order_by('-created')[:15]]
+        return Post.objects.filter(id__in=ids).select_related('topic', 'topic__forum', 'user')
 
 
 class LastTopics(PybbFeed):
@@ -38,5 +43,8 @@ class LastTopics(PybbFeed):
     title_template = 'pybb/feeds/topics_title.html'
     description_template = 'pybb/feeds/topics_description.html'
 
-    def items(self):
-        return Topic.objects.filter(forum__hidden=False, forum__category__hidden=False).order_by('-created')[:15]
+    def get_object(self, request, *args, **kwargs):
+        return request.user
+
+    def items(self, user):
+        return perms.filter_topics(user, Topic.objects.all()).order_by('-created')[:15]

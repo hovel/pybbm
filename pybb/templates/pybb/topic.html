@@ -25,7 +25,7 @@
             {% include "pybb/pagination.html" %}
         {% endwith %}
 
-        {% if topic.poll_type != 0 %}
+        {% if topic.poll_type %}
             {% include 'pybb/poll.html' %}
         {% endif %}
 

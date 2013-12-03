@@ -18,7 +18,6 @@
         <tr class="poll-answer-choice">
           <td>
             <form class="poll-form" action="{% url 'pybb:topic_poll_vote' topic.pk %}" method="post">
-              {% csrf_token %}
               {% include "pybb/form.html" with form=poll_form %}
               <p class="submit">{% include "pybb/_button_submit.html" %}</p>
             </form>
@@ -31,6 +30,15 @@
             <td>{{ answer.votes }} ({{ answer.votes_percent|floatformat:2 }} %)</td>
           </tr>
         {% endfor %}
+        <tr>
+          <td colspan="2">
+            <form action="{% url 'pybb:topic_cancel_poll_vote' pk=topic.pk %}" method="post">{% csrf_token %}
+              {% with submit_text=_('Cancel my poll vote') %}
+                {% include "pybb/_button_submit.html" %}
+              {% endwith %}
+            </form>
+          </td>
+        </tr>
       {% endif %}
     {% else %}
       {% for answer in topic.poll_answers.all %}
