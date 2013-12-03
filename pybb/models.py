@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from django.contrib.auth.models import Permission
 from django.db.models.signals import post_delete, post_save
 from pybb.subscription import notify_topic_subscribers
 
-from __future__ import unicode_literals
 import os.path
 import uuid
 
