@@ -5,7 +5,6 @@ from os.path import dirname, abspath
 from optparse import OptionParser
 
 from django.conf import settings
-import django
 
 TEMPLATE_CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
@@ -46,8 +45,10 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
         AUTH_USER_MODEL='test_project.CustomUser',
         LOGIN_URL='/'
     )
-
-from django.test.simple import DjangoTestSuiteRunner
+try:
+    from django.test.runner import DiscoverRunner as Runner
+except ImportError:
+    from django.test.simple import DjangoTestSuiteRunner as Runner
 
 
 def runtests(*test_args, **kwargs):
@@ -59,7 +60,8 @@ def runtests(*test_args, **kwargs):
         test_args = ['pybb']
     parent = dirname(abspath(__file__))
     sys.path.insert(0, parent)
-    test_runner = DjangoTestSuiteRunner(verbosity=kwargs.get('verbosity', 1), interactive=kwargs.get('interactive', False), failfast=kwargs.get('failfast'))
+    test_runner = Runner(verbosity=kwargs.get('verbosity', 1), interactive=kwargs.get('interactive', False),
+                         failfast=kwargs.get('failfast'))
     failures = test_runner.run_tests(test_args)
     sys.exit(failures)
 
