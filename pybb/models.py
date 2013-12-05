@@ -101,6 +101,8 @@ class Category(models.Model):
 
 class Forum(models.Model):
     category = models.ForeignKey(Category, related_name='forums', verbose_name=_('Category'))
+    parent = models.ForeignKey('self', related_name='child_forums', verbose_name=_('Parent forum'),
+                               blank=True, null=True)
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
     description = models.TextField(_('Description'), blank=True)
@@ -150,7 +152,12 @@ class Forum(models.Model):
         """
         Used in templates for breadcrumb building
         """
-        return self.category,
+        parents = [self.category]
+        parent = self.parent
+        while parent is not None:
+            parents.append(parent)
+            parent = parent.parent
+        return parents
 
 
 class Topic(models.Model):
@@ -239,7 +246,9 @@ class Topic(models.Model):
         """
         Used in templates for breadcrumb building
         """
-        return self.forum.category, self.forum
+        parents = self.forum.get_parents()
+        parents.append(self.forum)
+        return parents
 
     def poll_votes(self):
         if self.poll_type != self.POLL_TYPE_NONE:

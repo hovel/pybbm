@@ -188,14 +188,15 @@ def pybb_forum_unread(forums, user):
         for forum in forum_list:
             forum.unread = forum.topic_count > 0
         forum_marks = ForumReadTracker.objects.filter(
-                user=user,
-                forum__in=forum_list
-                ).select_related('forum')
+            user=user,
+            forum__in=forum_list
+        ).select_related('forum')
         forum_dict = dict(((forum.id, forum) for forum in forum_list))
         for mark in forum_marks:
-            if (forum_dict[mark.forum.id].updated is None) or\
-               (forum_dict[mark.forum.id].updated <= mark.time_stamp):
-                forum_dict[mark.forum.id].unread = False
+            curr_forum = forum_dict[mark.forum.id]
+            if (curr_forum.updated is None) or (curr_forum.updated <= mark.time_stamp):
+                if not any((f.unread for f in pybb_forum_unread(curr_forum.child_forums.all(), user))):
+                    forum_dict[mark.forum.id].unread = False
     return forum_list
 
 
