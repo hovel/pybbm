@@ -42,7 +42,7 @@
                             'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
                        href="{% url 'pybb:delete_post' post.id %}">{% trans "Delete" %}</a>
                     {% if post.on_moderation %}
-                    <a href="{% url 'pybb:moderate_post' pk=post.id %}">{% trans "Approve post" %}</a>
+                        <a href="{% url 'pybb:moderate_post' pk=post.id %}">{% trans "Approve post" %}</a>
                     {% endif %}
                 {% endif %}
 
@@ -75,7 +75,7 @@
                     {% endif %}
             {% endcomment %}
             <div class="post-related">
-                <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
+                <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}" class="quote-link">{% trans "quote" %}</a>
                 <a href="#" class="quote-selected-link">{% trans "quote selected" %}</a>
                 <div class='attachments'>
                     {% for attachment in post.attachments.all %}

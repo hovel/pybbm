@@ -311,34 +311,17 @@ class AddPostView(PostEditMixin, generic.CreateView):
 
     template_name = 'pybb/add_post.html'
 
-    def get_form_kwargs(self):
-        ip = self.request.META.get('REMOTE_ADDR', '')
-        form_kwargs = super(AddPostView, self).get_form_kwargs()
-        form_kwargs.update(dict(topic=self.topic, forum=self.forum, user=self.user,
-                       ip=ip, initial={}))
-        if 'quote_id' in self.request.GET:
+    def _get_quote_text(self, request):
+        quote = ''
+        if 'quote_id' in request.GET:
             try:
                 quote_id = int(self.request.GET.get('quote_id'))
             except TypeError:
-                raise Http404
+                pass
             else:
                 post = get_object_or_404(Post, pk=quote_id)
                 quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
-                form_kwargs['initial']['body'] = quote
-        if self.user.is_staff:
-            form_kwargs['initial']['login'] = getattr(self.user, username_field)
-        return form_kwargs
-
-    def get_context_data(self, **kwargs):
-        ctx = super(AddPostView, self).get_context_data(**kwargs)
-        ctx['forum'] = self.forum
-        ctx['topic'] = self.topic
-        return ctx
-
-    def get_success_url(self):
-        if (not self.request.user.is_authenticated()) and defaults.PYBB_PREMODERATION:
-            return reverse('pybb:index')
-        return super(AddPostView, self).get_success_url()
+        return quote
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
@@ -361,7 +344,42 @@ class AddPostView(PostEditMixin, generic.CreateView):
             self.topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=kwargs['topic_id'])
             if not perms.may_create_post(self.user, self.topic):
                 raise PermissionDenied
+
+            self.quote = ''
+            if 'quote_id' in request.GET:
+                try:
+                    quote_id = int(self.request.GET.get('quote_id'))
+                except TypeError:
+                    raise Http404
+                else:
+                    post = get_object_or_404(Post, pk=quote_id)
+                    self.quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
+
+                if self.quote and self.request.is_ajax():
+                    return HttpResponse(self.quote)
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        ip = self.request.META.get('REMOTE_ADDR', '')
+        form_kwargs = super(AddPostView, self).get_form_kwargs()
+        form_kwargs.update(dict(topic=self.topic, forum=self.forum, user=self.user,
+                           ip=ip, initial={}))
+        if getattr(self, 'quote', None):
+            form_kwargs['initial']['body'] = self.quote
+        if self.user.is_staff:
+            form_kwargs['initial']['login'] = getattr(self.user, username_field)
+        return form_kwargs
+
+    def get_context_data(self, **kwargs):
+        ctx = super(AddPostView, self).get_context_data(**kwargs)
+        ctx['forum'] = self.forum
+        ctx['topic'] = self.topic
+        return ctx
+
+    def get_success_url(self):
+        if (not self.request.user.is_authenticated()) and defaults.PYBB_PREMODERATION:
+            return reverse('pybb:index')
+        return super(AddPostView, self).get_success_url()
 
 
 class EditPostView(PostEditMixin, generic.UpdateView):

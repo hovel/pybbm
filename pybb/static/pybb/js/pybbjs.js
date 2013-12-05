@@ -27,7 +27,20 @@ jQuery(function ($) {
     var textarea = $('#id_body');
 
     if (textarea.length > 0) {
-        $('.quote-selected-link').click(function (e) {
+        $('.quote-link').on('click', function(e){
+            e.preventDefault();
+            var url = $(this).attr('href');
+            $.get(
+                url,
+                function(data) {
+                    if (textarea.val())
+                        textarea.val(textarea.val() + '\n');
+                    textarea.val(textarea.val() + data);
+                }
+            );
+        });
+
+        $('.quote-selected-link').on('click', function (e) {
             e.preventDefault();
             var selectedText = getSelectedText();
             if (selectedText != '') {
@@ -50,7 +63,7 @@ jQuery(function ($) {
         });
     }
 
-    $('.post-row .post-author > a').click(function (e) {
+    $('.post-row .post-author > a').on('click', function (e) {
         if (e.shiftKey) {
             var nick = $.trim($(this).text());
             if (textarea.val())
