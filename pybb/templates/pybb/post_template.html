@@ -15,11 +15,11 @@
     </tr>
     </thead>
     <tbody>
-    <tr>
+    <tr class="post-row">
         <td class="post-info">
             {% include "pybb/avatar.html" with user=post.user %}
 
-            <div class="post-author"><a href="{{ post_user_profile.get_absolute_url }}">{{ post.user.username }}</a></div>
+            <div class="post-author"><a href="{{ post_user_profile.get_absolute_url }}"><span class="post-username">{{ post.user.username }}</span></a></div>
             {% if post_user_profile.rank %}
                 <div class='rank'>
                     {% trans "Rank" %}: {{ post_user_profile.rank }}
@@ -76,6 +76,7 @@
             {% endcomment %}
             <div class="post-related">
                 <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}">{% trans "quote" %}</a>
+                <a href="#" class="quote-selected-link">{% trans "quote selected" %}</a>
                 <div class='attachments'>
                     {% for attachment in post.attachments.all %}
                         <a href="{{ attachment.file.url }}"><img src="{{ STATIC_URL }}pybb/img/attachment.png"> {{ attachment.size_display }}</a>

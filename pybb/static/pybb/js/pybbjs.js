@@ -1,4 +1,4 @@
-function pybb_delete_post(url, post_id, confirm_text){
+function pybb_delete_post(url, post_id, confirm_text) {
     conf = confirm(confirm_text);
     if (!conf) return false;
     obj = {url: url,
@@ -14,3 +14,49 @@ function pybb_delete_post(url, post_id, confirm_text){
     };
     $.ajax(obj);
 }
+
+jQuery(function ($) {
+    function getSelectedText() {
+        if (document.selection) {
+            return document.selection.createRange().text;
+        } else {
+            return window.getSelection().toString();
+        }
+    }
+
+    var textarea = $('#id_body');
+
+    if (textarea.length > 0) {
+        $('.quote-selected-link').click(function (e) {
+            e.preventDefault();
+            var selectedText = getSelectedText();
+            if (selectedText != '') {
+                if (textarea.val())
+                    textarea.val(textarea.val() + '\n');
+
+                var nickName = '';
+                if ($(this).closest('.post-row').length == 1 &&
+                    $(this).closest('.post-row').find('.post-username').length == 1) {
+                    nickName = $(this).closest('.post').find('.post-username').text();
+                }
+
+                textarea.val(
+                    textarea.val() +
+                    (nickName ? ('[quote="' + nickName + '"]') : '[quote]') +
+                    selectedText +
+                    '[/quote]\n'
+                );
+            }
+        });
+    }
+
+    $('.post-row .post-author > a').click(function (e) {
+        if (e.shiftKey) {
+            var nick = $.trim($(this).text());
+            if (textarea.val())
+                textarea.val(textarea.val() + '\n');
+            textarea.val(textarea.val() + '[b]' + nick + '[/b], ');
+            return e.preventDefault();
+        }
+    });
+});
