@@ -311,18 +311,6 @@ class AddPostView(PostEditMixin, generic.CreateView):
 
     template_name = 'pybb/add_post.html'
 
-    def _get_quote_text(self, request):
-        quote = ''
-        if 'quote_id' in request.GET:
-            try:
-                quote_id = int(self.request.GET.get('quote_id'))
-            except TypeError:
-                pass
-            else:
-                post = get_object_or_404(Post, pk=quote_id)
-                quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
-        return quote
-
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated():
@@ -348,14 +336,14 @@ class AddPostView(PostEditMixin, generic.CreateView):
             self.quote = ''
             if 'quote_id' in request.GET:
                 try:
-                    quote_id = int(self.request.GET.get('quote_id'))
+                    quote_id = int(request.GET.get('quote_id'))
                 except TypeError:
                     raise Http404
                 else:
                     post = get_object_or_404(Post, pk=quote_id)
                     self.quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
 
-                if self.quote and self.request.is_ajax():
+                if self.quote and request.is_ajax():
                     return HttpResponse(self.quote)
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
