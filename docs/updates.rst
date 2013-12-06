@@ -6,6 +6,7 @@ Updating PyBBM Version
 * Improved javascript functionality: quote selected text, qoute full original message via ajax,
 insert nickname in post body. For enabling this functionality you should satisfy :doc:`some requirements</javascript>`
 in your templates
+* Support for nested forums
 
 0.14.6 -> 0.14.7
 ----------------
