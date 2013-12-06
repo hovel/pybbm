@@ -37,6 +37,7 @@ Contents:
    templatetags
    example
    filters
+   javascript
    testing
    pybbmigrate
    originalpybb
