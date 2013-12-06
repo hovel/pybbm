@@ -343,7 +343,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
                     post = get_object_or_404(Post, pk=quote_id)
                     self.quote = defaults.PYBB_QUOTE_ENGINES[defaults.PYBB_MARKUP](post.body, getattr(post.user, username_field))
 
-                if self.quote and self.request.is_ajax():
+                if self.quote and request.is_ajax():
                     return HttpResponse(self.quote)
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
