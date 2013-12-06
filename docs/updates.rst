@@ -1,6 +1,12 @@
 Updating PyBBM Version
 ======================
 
+0.14.7 -> dev
+-------------
+* Improved javascript functionality: quote selected text, qoute full original message via ajax,
+insert nickname in post body. For enabling this functionality you should satisfy :doc:`some requirements</javascript>`
+in your templates
+
 0.14.6 -> 0.14.7
 ----------------
 * Django 1.6 compatibility

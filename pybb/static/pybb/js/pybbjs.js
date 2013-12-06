@@ -55,21 +55,21 @@ jQuery(function ($) {
 
                 textarea.val(
                     textarea.val() +
-                    (nickName ? ('[quote="' + nickName + '"]') : '[quote]') +
+                    (nickName ? ('[quote="' + $.trim(nickName) + '"]') : '[quote]') +
                     selectedText +
                     '[/quote]\n'
                 );
             }
         });
-    }
 
-    $('.post-row .post-author > a').on('click', function (e) {
-        if (e.shiftKey) {
-            var nick = $.trim($(this).text());
-            if (textarea.val())
-                textarea.val(textarea.val() + '\n');
-            textarea.val(textarea.val() + '[b]' + nick + '[/b], ');
-            return e.preventDefault();
-        }
-    });
+        $('.post-row .post-username').on('click', function (e) {
+            if (e.shiftKey) {
+                var nick = $.trim($(this).text());
+                if (textarea.val())
+                    textarea.val(textarea.val() + '\n');
+                textarea.val(textarea.val() + '[b]' + nick + '[/b], ');
+                return e.preventDefault();
+            }
+        });
+    }
 });
