@@ -18,7 +18,7 @@ Second way is to meet next requirments:
 
 Next step is to decide which model will store all fields for pybb forum profiles.
 This model should be referenced to current User model (custom or default) in OneToOne
-relationship. To easily setup such model you can use predefined `pybb.models.PybbProfile`
+relationship. To easily setup such model you can use predefined `pybb.profiles.PybbProfile`
 class. If profile model is custom user model itself then you can use `PybbProfile` class
 as mixin for adding required fields. For more granunal control of fields in your forum
 profile model you may not rely on `PybbProfile` and define all fields from

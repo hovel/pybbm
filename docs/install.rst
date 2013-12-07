@@ -92,7 +92,7 @@ Setup forum's profile model and PYBB_PROFILE_RELATED_NAME setting.
 If you have no site profile, dafault settings will satisfy your needs.
 
 If you have custom user model, which stores all profile fields itself, or
-if you have custom site profile model, then check that it inherits from `pybb.models.PybbProfile` or
+if you have custom site profile model, then check that it inherits from `pybb.profiles.PybbProfile` or
 contains all fields and properties from this class.
 Then set `PYBB_PROFILE_RELATED_NAME` to `None` for custom user model, or to related_name
 from OneToOne field related to User from custom site profile model

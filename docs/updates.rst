@@ -7,6 +7,7 @@ Updating PyBBM Version
 insert nickname in post body. For enabling this functionality you should satisfy :doc:`some requirements</javascript>`
 in your templates
 * Support for nested forums
+* `PybbProfile` abstract model moved to `pybb.profiles` module to avoid circular imports when checking models.
 
 0.14.6 -> 0.14.7
 ----------------
@@ -64,7 +65,7 @@ in your templates
 * You can add first-unread get parameter to the topic url to provide link to first unread post from topic
 * Removed django-mailer, pytils, sorl-thumbnail, south, django-pure-pagination from hard dependencies
 * Support Custom User model introduced in django 1.5. Do not forget to define `PYBB_PROFILE_RELATED_NAME`
-  in settings, if you don't yse predefinet `pybb.PybbProfile` model See :doc:`how to use custom user model
+  in settings, if you don't use predefined `pybb.PybbProfile` model See :doc:`how to use custom user model
   with pybbm</customuser>`
 * Dropped support for django 1.3
 
