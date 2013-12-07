@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import os
 
 import re
+import uuid
 import django
 from django.utils.translation import ugettext as _
 
@@ -76,3 +78,15 @@ def build_cache_key(key_name, **kwargs):
         return 'pybbm_anonymous_topic_%s_views' % kwargs['topic_id']
     else:
         raise ValueError('Wrong key_name parameter passed: %s' % key_name)
+
+
+def get_file_path(instance, filename):
+    """
+    This function generate filename with uuid4
+    it's useful if:
+    - you don't want to allow others to see original uploaded filenames
+    - users can upload images with unicode in filenames wich can confuse browsers and filesystem
+    """
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    return os.path.join(to, filename)
