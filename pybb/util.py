@@ -80,7 +80,7 @@ def build_cache_key(key_name, **kwargs):
         raise ValueError('Wrong key_name parameter passed: %s' % key_name)
 
 
-def get_file_path(instance, filename):
+def get_file_path(instance, filename, to):
     """
     This function generate filename with uuid4
     it's useful if:

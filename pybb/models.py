@@ -17,7 +17,7 @@ from django.utils.timezone import now as tznow
 
 from annoying.fields import AutoOneToOneField
 
-from pybb.util import unescape, get_user_model, get_username_field, get_pybb_profile_model, get_pybb_profile
+from pybb.util import unescape, get_user_model, get_username_field, get_pybb_profile_model, get_pybb_profile, get_file_path
 
 User = get_user_model()
 username_field = get_username_field()
@@ -40,18 +40,6 @@ try:
     from django.db.transaction import atomic as atomic_func
 except ImportError:
     from django.db.transaction import commit_on_success as atomic_func
-
-
-def get_file_path(instance, filename, to='pybb/avatar'):
-    """
-    This function generate filename with uuid4
-    it's useful if:
-    - you don't want to allow others to see original uploaded filenames
-    - users can upload images with unicode in filenames wich can confuse browsers and filesystem
-    """
-    ext = filename.split('.')[-1]
-    filename = "%s.%s" % (uuid.uuid4(), ext)
-    return os.path.join(to, filename)
 
 
 class Category(models.Model):
@@ -355,7 +343,7 @@ class Attachment(models.Model):
     post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
     file = models.FileField(_('File'),
-                            upload_to=functools.partial(get_file_path, {'to': defaults.PYBB_ATTACHMENT_UPLOAD_TO}))
+                            upload_to=functools.partial(get_file_path, to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
 
     def save(self, *args, **kwargs):
         self.size = self.file.size
