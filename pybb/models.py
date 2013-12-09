@@ -128,7 +128,7 @@ class Forum(models.Model):
         parents = [self.category]
         parent = self.parent
         while parent is not None:
-            parents.append(parent)
+            parents.insert(1, parent)
             parent = parent.parent
         return parents
 

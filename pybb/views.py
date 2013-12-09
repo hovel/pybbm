@@ -98,7 +98,7 @@ class CategoryView(RedirectToLoginMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         ctx = super(CategoryView, self).get_context_data(**kwargs)
-        ctx['category'].forums_accessed = perms.filter_forums(self.request.user, ctx['category'].forums.all())
+        ctx['category'].forums_accessed = perms.filter_forums(self.request.user, ctx['category'].forums.filter(parent=None))
         ctx['categories'] = [ctx['category']]
         return ctx
 

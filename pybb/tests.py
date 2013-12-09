@@ -69,6 +69,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
     def test_base(self):
         # Check index page
+        Forum.objects.create(name='xfoo1', description='bar1', category=self.category, parent=self.forum)
         url = reverse('pybb:index')
         response = self.client.get(url)
         parser = html.HTMLParser(encoding='utf8')
@@ -77,6 +78,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertContains(response, self.forum.get_absolute_url())
         self.assertTrue(defaults.PYBB_DEFAULT_TITLE in tree.xpath('//title')[0].text_content())
         self.assertEqual(len(response.context['categories']), 1)
+        self.assertEqual(len(response.context['categories'][0].forums_accessed), 1)
 
     def test_forum_page(self):
         # Check forum page
@@ -89,9 +91,11 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertFalse(response.context['is_paginated'])
 
     def test_category_page(self):
+        Forum.objects.create(name='xfoo1', description='bar1', category=self.category, parent=self.forum)
         response = self.client.get(self.category.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.forum.get_absolute_url())
+        self.assertEqual(len(response.context['object'].forums_accessed), 1)
 
     def test_profile_language_default(self):
         user = User.objects.create_user(username='user2', password='user2', email='user2@example.com')
