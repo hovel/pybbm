@@ -41,6 +41,7 @@ from pybb import util
 User = util.get_user_model()
 username_field = util.get_username_field()
 
+
 class RedirectToLoginMixin(object):
     """ mixin which redirects to settings.LOGIN_URL if the view encounters an PermissionDenied exception
         and the user is not authenticated. Views inheriting from this need to implement
@@ -70,7 +71,7 @@ class IndexView(generic.ListView):
         ctx = super(IndexView, self).get_context_data(**kwargs)
         categories = ctx['categories']
         for category in categories:
-            category.forums_accessed = perms.filter_forums(self.request.user, category.forums.all())
+            category.forums_accessed = perms.filter_forums(self.request.user, category.forums.filter(parent=None))
         ctx['categories'] = categories
         return ctx
 
@@ -115,6 +116,7 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ForumView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
+        ctx['forum'].forums_accessed = perms.filter_forums(self.request.user, self.forum.child_forums.all())
         return ctx
 
     def get_queryset(self):

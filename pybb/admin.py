@@ -15,6 +15,7 @@ class ForumInlineAdmin(admin.TabularInline):
     fields = ['name', 'hidden', 'position']
     extra = 0
 
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'position', 'hidden', 'forum_count']
     list_per_page = 20
@@ -34,7 +35,7 @@ class ForumAdmin(admin.ModelAdmin):
     list_editable = ['position', 'hidden']
     fieldsets = (
         (None, {
-                'fields': ('category', 'name', 'hidden', 'position', )
+                'fields': ('category', 'parent', 'name', 'hidden', 'position', )
                 }
          ),
         (_('Additional options'), {

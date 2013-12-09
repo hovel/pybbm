@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import time, datetime
+import time
+import datetime
 import os
 
 from django.contrib.auth.models import Permission
@@ -424,6 +425,54 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual(
             [t.unread for t in pybb_topic_unread([topic_1, topic_2, topic_3], user_ann)],
             [False, False, False])
+
+    def test_is_forum_unread_filter(self):
+        Forum.objects.all().delete()
+
+        forum_parent = Forum.objects.create(name='f1', category=self.category)
+        forum_child1 = Forum.objects.create(name='f2', category=self.category, parent=forum_parent)
+        forum_child2 = Forum.objects.create(name='f3', category=self.category, parent=forum_parent)
+        topic_1 = Topic.objects.create(name='topic_1', forum=forum_parent, user=self.user)
+        topic_2 = Topic.objects.create(name='topic_2', forum=forum_child1, user=self.user)
+        topic_3 = Topic.objects.create(name='topic_3', forum=forum_child2, user=self.user)
+
+        Post(topic=topic_1, user=self.user, body='one').save()
+        Post(topic=topic_2, user=self.user, body='two').save()
+        Post(topic=topic_3, user=self.user, body='three').save()
+
+        user_ann = User.objects.create_user('ann', 'ann@localhost', 'ann')
+        client_ann = Client()
+        client_ann.login(username='ann', password='ann')
+
+        forum_parent = Forum.objects.get(id=forum_parent.id)
+        forum_child1 = Forum.objects.get(id=forum_child1.id)
+        forum_child2 = Forum.objects.get(id=forum_child2.id)
+        self.assertListEqual([f.unread for f in pybb_forum_unread([forum_parent, forum_child1, forum_child2], user_ann)],
+                             [True, True, True])
+
+        # unless we read parent topic, there is unreaded topics in child forums
+        client_ann.get(topic_1.get_absolute_url())
+        forum_parent = Forum.objects.get(id=forum_parent.id)
+        forum_child1 = Forum.objects.get(id=forum_child1.id)
+        forum_child2 = Forum.objects.get(id=forum_child2.id)
+        self.assertListEqual([f.unread for f in pybb_forum_unread([forum_parent, forum_child1, forum_child2], user_ann)],
+                             [True, True, True])
+
+        # still unreaded topic in one of the child forums
+        client_ann.get(topic_2.get_absolute_url())
+        forum_parent = Forum.objects.get(id=forum_parent.id)
+        forum_child1 = Forum.objects.get(id=forum_child1.id)
+        forum_child2 = Forum.objects.get(id=forum_child2.id)
+        self.assertListEqual([f.unread for f in pybb_forum_unread([forum_parent, forum_child1, forum_child2], user_ann)],
+                             [True, False, True])
+
+        # all topics readed
+        client_ann.get(topic_3.get_absolute_url())
+        forum_parent = Forum.objects.get(id=forum_parent.id)
+        forum_child1 = Forum.objects.get(id=forum_child1.id)
+        forum_child2 = Forum.objects.get(id=forum_child2.id)
+        self.assertListEqual([f.unread for f in pybb_forum_unread([forum_parent, forum_child1, forum_child2], user_ann)],
+                             [False, False, False])
 
     def test_read_tracker_when_topics_forum_changed(self):
         forum_1 = Forum.objects.create(name='f1', description='bar', category=self.category)

@@ -20,6 +20,8 @@
 
         {% include "pybb/pagination.html" %}
 
+        {% include 'pybb/forum_list.html' with forum_list=forum.forums_accessed category='' parent_forum=forum %}
+
         {% include "pybb/topic_list.html" %}
 
         {% include "pybb/pagination.html" %}
