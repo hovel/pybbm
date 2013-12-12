@@ -22,6 +22,7 @@ from pybb.util import build_cache_key
 
 try:
     from pure_pagination import Paginator
+    pure_pagination = True
 except ImportError:
     # the simplest emulation of django-pure-pagination behavior
     from django.core.paginator import Paginator, Page
@@ -29,6 +30,7 @@ except ImportError:
         def querystring(self):
             return 'page=%s' % self
     Page.pages = lambda self: [PageRepr(i) for i in range(1, self.paginator.num_pages + 1)]
+    pure_pagination = False
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
@@ -40,6 +42,14 @@ from pybb.permissions import perms
 from pybb import util
 User = util.get_user_model()
 username_field = util.get_username_field()
+
+
+class PaginatorMixin(object):
+    def get_paginator(self, queryset, per_page, orphans=0, allow_empty_first_page=True, **kwargs):
+        kwargs = {}
+        if pure_pagination:
+            kwargs['request'] = self.request
+        return Paginator(queryset, per_page, orphans=0, allow_empty_first_page=True, **kwargs)
 
 
 class RedirectToLoginMixin(object):
@@ -103,12 +113,11 @@ class CategoryView(RedirectToLoginMixin, generic.DetailView):
         return ctx
 
 
-class ForumView(RedirectToLoginMixin, generic.ListView):
+class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
     paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
     context_object_name = 'topic_list'
     template_name = 'pybb/forum.html'
-    paginator_class = Paginator
 
     def get_login_redirect_url(self):
         return reverse('pybb:forum', args=(self.kwargs['pk'],))
@@ -129,12 +138,11 @@ class ForumView(RedirectToLoginMixin, generic.ListView):
         return qs
 
 
-class LatestTopicsView(generic.ListView):
+class LatestTopicsView(PaginatorMixin, generic.ListView):
 
     paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
     context_object_name = 'topic_list'
     template_name = 'pybb/latest_topics.html'
-    paginator_class = Paginator
 
     def get_queryset(self):
         qs = Topic.objects.all().select_related()
@@ -142,11 +150,10 @@ class LatestTopicsView(generic.ListView):
         return qs.order_by('-updated')
 
 
-class TopicView(RedirectToLoginMixin, generic.ListView):
+class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
-    paginator_class = Paginator
 
     def get_login_redirect_url(self):
         return reverse('pybb:topic', args=(self.kwargs['pk'],))
@@ -407,10 +414,9 @@ class UserView(generic.DetailView):
         return ctx
 
 
-class UserPosts(generic.ListView):
+class UserPosts(PaginatorMixin, generic.ListView):
     model = Post
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
-    paginator_class = Paginator
     template_name = 'pybb/user_posts.html'
 
     def dispatch(self, request, *args, **kwargs):
@@ -431,10 +437,9 @@ class UserPosts(generic.ListView):
         return context
 
 
-class UserTopics(generic.ListView):
+class UserTopics(PaginatorMixin, generic.ListView):
     model = Topic
     paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
-    paginator_class = Paginator
     template_name = 'pybb/user_topics.html'
 
     def dispatch(self, request, *args, **kwargs):
