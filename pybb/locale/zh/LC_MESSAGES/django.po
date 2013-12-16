@@ -127,7 +127,7 @@ msgstr "贴子数"
 
 #: models.py:85
 msgid "Topic count"
-msgstr "主题树"
+msgstr "主题数"
 
 #: models.py:88
 msgid "Headline"
