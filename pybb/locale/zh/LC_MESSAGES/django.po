@@ -159,7 +159,7 @@ msgstr "创建时间"
 
 #: models.py:152
 msgid "Views count"
-msgstr "浏览数"
+msgstr "浏览次数"
 
 #: models.py:153 templates/pybb/topic_list.html:27
 msgid "Sticky"
