@@ -234,19 +234,19 @@ msgstr "文件"
 
 #: models.py:393
 msgid "Topic read tracker"
-msgstr ""
+msgstr "主题阅读跟踪"
 
 #: models.py:394
 msgid "Topic read trackers"
-msgstr "主题"
+msgstr "主题阅读跟踪"
 
 #: models.py:429
 msgid "Forum read tracker"
-msgstr ""
+msgstr "讨论区阅读跟踪"
 
 #: models.py:430
 msgid "Forum read trackers"
-msgstr ""
+msgstr "讨论区阅读跟踪"
 
 #: models.py:436
 msgid "Text"
