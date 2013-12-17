@@ -95,15 +95,15 @@ msgstr "隐藏"
 
 #: models.py:49
 msgid "If checked, this category will be visible only for staff"
-msgstr "如果选中此选项，此类别近被员工可见"
+msgstr "如果选中此选项，此目录仅被员工可见"
 
 #: models.py:54 models.py:76
 msgid "Category"
-msgstr "类别"
+msgstr "目录"
 
 #: models.py:55
 msgid "Categories"
-msgstr "类别"
+msgstr "目录"
 
 #: models.py:77
 msgid "Parent forum"
@@ -452,11 +452,11 @@ msgstr "创建讨论区"
 
 #: templates/pybb/index.html:19
 msgid "Forum categories are not created"
-msgstr "没有创建讨论区分类"
+msgstr "没有创建讨论区目录"
 
 #: templates/pybb/index.html:20
 msgid "Add a category now"
-msgstr "增加新分类"
+msgstr "增加新目录"
 
 #: templates/pybb/index.html:25 templates/pybb/latest_topics.html:7
 #: templates/pybb/latest_topics.html:10 templates/pybb/latest_topics.html:17
