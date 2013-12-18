@@ -1,6 +1,11 @@
 Updating PyBBM Version
 ======================
 
+0.14.9 -> 0.15
+--------------
+* Python 3 support
+* Chinese translation
+
 0.14.8 -> 0.14.9
 ----------------
 * Two new methods added to permission handler: `may_attach_files` and `may_create_poll`. First method used for
