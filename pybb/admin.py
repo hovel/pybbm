@@ -1,5 +1,5 @@
 # -*- coding: utf-8
-
+from __future__ import unicode_literals
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
@@ -126,12 +126,12 @@ class AttachmentAdmin(admin.ModelAdmin):
     list_display = ['file', 'size', 'admin_view_post', 'admin_edit_post']
 
     def admin_view_post(self, obj):
-        return u'<a href="%s">view</a>' % obj.post.get_absolute_url()
+        return '<a href="%s">view</a>' % obj.post.get_absolute_url()
     admin_view_post.allow_tags = True
     admin_view_post.short_description = _('View post')
 
     def admin_edit_post(self, obj):
-        return u'<a href="%s">edit</a>' % reverse('admin:pybb_post_change', args=[obj.post.pk])
+        return '<a href="%s">edit</a>' % reverse('admin:pybb_post_change', args=[obj.post.pk])
     admin_edit_post.allow_tags = True
     admin_edit_post.short_description = _('Edit post')
 

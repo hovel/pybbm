@@ -75,6 +75,8 @@ Updating PyBBM Version
   in settings, if you don't use predefined `pybb.PybbProfile` model See :doc:`how to use custom user model
   with pybbm</customuser>`
 * Dropped support for django 1.3
+* Experimental support for python 3
+* Removed django-mailer from hard dependencies, you have to manually install it for using it's functionality
 
 0.12.4 -> 0.12.5
 ----------------

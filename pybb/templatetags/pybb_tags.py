@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import inspect
 
 import math
@@ -11,7 +12,7 @@ from django.template.base import get_library, InvalidTemplateLibrary, TemplateSy
 from django.template.defaulttags import LoadNode, CommentNode, IfNode
 from django.template.smartif import Literal
 from django.utils.safestring import mark_safe
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.utils import dateformat
@@ -64,7 +65,7 @@ class PybbTimeNode(template.Node):
                     msg = pytils.numeral.choose_plural(delta.seconds, msg)
                 else:
                     msg = _('seconds ago')
-                return u'%d %s' % (delta.seconds, msg)
+                return '%d %s' % (delta.seconds, msg)
 
             elif delta.seconds < 3600:
                 minutes = int(delta.seconds / 60)
@@ -73,7 +74,7 @@ class PybbTimeNode(template.Node):
                     msg = pytils.numeral.choose_plural(minutes, msg)
                 else:
                     msg = _('minutes ago')
-                return u'%d %s' % (minutes, msg)
+                return '%d %s' % (minutes, msg)
         if context['user'].is_authenticated():
             if time.daylight:
                 tz1 = time.altzone
@@ -90,14 +91,14 @@ class PybbTimeNode(template.Node):
 
 
 @register.simple_tag
-def pybb_link(object, anchor=u''):
+def pybb_link(object, anchor=''):
     """
     Return A tag with link to object.
     """
 
     url = hasattr(object, 'get_absolute_url') and object.get_absolute_url() or None
     #noinspection PyRedeclaration
-    anchor = anchor or smart_unicode(object)
+    anchor = anchor or smart_text(object)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
 
 

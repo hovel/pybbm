@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import django
 
 if django.VERSION[:2] >= (1, 5):

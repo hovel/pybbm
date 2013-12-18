@@ -2,6 +2,8 @@
 """
 Extensible permission system for pybbm
 """
+
+from __future__ import unicode_literals
 from django.utils.importlib import import_module
 from django.db.models import Q
 

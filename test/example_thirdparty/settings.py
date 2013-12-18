@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Django settings for example project.
-
+from __future__ import unicode_literals
 import os
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))

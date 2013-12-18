@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # vim:fileencoding=utf-8
 
+from __future__ import unicode_literals
 __author__ = 'zeus'
 
 from django.core.management.base import BaseCommand
@@ -8,7 +9,6 @@ from django.contrib.auth.models import User
 
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
-from django.db import models
 
 class Command(BaseCommand):
     args = ''

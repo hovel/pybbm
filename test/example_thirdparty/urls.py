@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from test.example_thirdparty.forms import SignupFormWithCaptcha
+from __future__ import unicode_literals
 
 try:
     from django.conf.urls import patterns, include, url

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from django.utils.timezone import now, timedelta
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count

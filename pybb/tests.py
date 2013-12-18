@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
 import time
 import datetime
 import os
@@ -74,7 +75,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = self.client.get(url)
         parser = html.HTMLParser(encoding='utf8')
         tree = html.fromstring(response.content, parser=parser)
-        self.assertContains(response, u'foo')
+        self.assertContains(response, 'foo')
         self.assertContains(response, self.forum.get_absolute_url())
         self.assertTrue(defaults.PYBB_DEFAULT_TITLE in tree.xpath('//title')[0].text_content())
         self.assertEqual(len(response.context['categories']), 1)
@@ -126,14 +127,14 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(len(response.context['topic_list']), defaults.PYBB_FORUM_PAGE_SIZE)
         self.assertTrue(response.context['is_paginated'])
         self.assertEqual(response.context['paginator'].num_pages,
-                         ((defaults.PYBB_FORUM_PAGE_SIZE + 3) / defaults.PYBB_FORUM_PAGE_SIZE) + 1)
+                         int((defaults.PYBB_FORUM_PAGE_SIZE + 3) / defaults.PYBB_FORUM_PAGE_SIZE) + 1)
 
     def test_bbcode_and_topic_title(self):
         response = self.client.get(self.topic.get_absolute_url())
         tree = html.fromstring(response.content)
         self.assertTrue(self.topic.name in tree.xpath('//title')[0].text_content())
         self.assertContains(response, self.post.body_html)
-        self.assertContains(response, u'bbcode <strong>test</strong>')
+        self.assertContains(response, 'bbcode <strong>test</strong>')
 
     def test_topic_addition(self):
         self.login_client()
@@ -1183,7 +1184,7 @@ class AttachmentTest(TestCase, SharedTestModule):
         defaults.PYBB_ATTACHMENT_ENABLE = True
         self.ORIG_PYBB_PREMODERATION = defaults.PYBB_PREMODERATION
         defaults.PYBB_PREMODERATION = False
-        self.file = open(os.path.join(os.path.dirname(__file__), 'static', 'pybb', 'img', 'attachment.png'))
+        self.file_name = os.path.join(os.path.dirname(__file__), 'static', 'pybb', 'img', 'attachment.png')
         self.create_user()
         self.create_initial()
 
@@ -1191,10 +1192,11 @@ class AttachmentTest(TestCase, SharedTestModule):
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
         self.login_client()
         response = self.client.get(add_post_url)
-        values = self.get_form_values(response)
-        values['body'] = 'test attachment'
-        values['attachments-0-file'] = self.file
-        response = self.client.post(add_post_url, values, follow=True)
+        with open(self.file_name, 'rb') as fp:
+            values = self.get_form_values(response)
+            values['body'] = 'test attachment'
+            values['attachments-0-file'] = fp
+            response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Post.objects.filter(body='test attachment').exists())
 
@@ -1202,13 +1204,14 @@ class AttachmentTest(TestCase, SharedTestModule):
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
         self.login_client()
         response = self.client.get(add_post_url)
-        values = self.get_form_values(response)
-        values['body'] = 'test attachment'
-        values['attachments-0-file'] = self.file
-        del values['attachments-INITIAL_FORMS']
-        del values['attachments-TOTAL_FORMS']
-        with self.assertRaises(ValidationError):
-            self.client.post(add_post_url, values, follow=True)
+        with open(self.file_name, 'rb') as fp:
+            values = self.get_form_values(response)
+            values['body'] = 'test attachment'
+            values['attachments-0-file'] = fp
+            del values['attachments-INITIAL_FORMS']
+            del values['attachments-TOTAL_FORMS']
+            with self.assertRaises(ValidationError):
+                self.client.post(add_post_url, values, follow=True)
 
     def tearDown(self):
         defaults.PYBB_ATTACHMENT_ENABLE = self.PYBB_ATTACHMENT_ENABLE
@@ -1411,10 +1414,10 @@ class FiltersTest(TestCase, SharedTestModule):
         self.login_client()
         response = self.client.get(add_post_url)
         values = self.get_form_values(response)
-        values['body'] = u'test\n \n \n\nmultiple empty lines\n'
+        values['body'] = 'test\n \n \n\nmultiple empty lines\n'
         response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Post.objects.all()[0].body, u'test\nmultiple empty lines')
+        self.assertEqual(Post.objects.all()[0].body, 'test\nmultiple empty lines')
 
 
 from pybb import permissions
