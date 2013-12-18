@@ -440,7 +440,7 @@ msgstr "订阅的主题"
 
 #: templates/pybb/forum_list.html:17
 msgid "Last posts"
-msgstr "最新的帖子"
+msgstr "最近更新"
 
 #: templates/pybb/forum_list.html:43
 msgid "No forums created"
@@ -565,7 +565,7 @@ msgstr "浏览数"
 
 #: templates/pybb/topic_list.html:16
 msgid "Last post"
-msgstr "最近帖子"
+msgstr "最近更新"
 
 #: templates/pybb/topic_list.html:26
 msgid "Go to first unread post"
