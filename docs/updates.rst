@@ -6,7 +6,7 @@ Updating PyBBM Version
 * Two new methods added to permission handler: `may_attach_files` and `may_create_poll`. First method used for
   restrict attaching files to post by user. By default it depends on `PYBB_ATTACHMENT_ENABLE` setting.
   Second may be used to restrict some users to create/edit polls. By default it always return `True`.
-  For disabling polls on your forum, just write you custom permission handler and return from this method `False`
+  For disabling polls on your forum, just write custom permission handler and return from this method `False`
 
 0.14.7 -> 0.14.8
 ----------------
@@ -22,7 +22,7 @@ Updating PyBBM Version
 * unblock user functionality added
 
 0.14.5 -> 0.14.6
--------------
+----------------
 * Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
   This value can be changed by setting `PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
   `pybbm_calc_topic_views` that calc actual views count for topic
@@ -44,7 +44,7 @@ Updating PyBBM Version
 * Show only available topics (by permission handler) in ForumView
 
 0.14.1 -> 0.14.2
---------------
+----------------
 * Fixed MultipleObjectReturned when topic has more than one moderator
 
 0.14 -> 0.14.1
@@ -52,7 +52,7 @@ Updating PyBBM Version
 * Fixed circular import issue
 
 0.13.1 -> 0.14
--------------
+--------------
 
 * Restored views for rendering user's posts and topics and link to that views from profile info page
 * Broken hard dependency from EditProfileView and EditProfileForm classes in forum
