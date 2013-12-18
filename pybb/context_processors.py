@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from pybb import defaults
-from django.conf import settings
 
 __author__ = 'zeus'
 
@@ -14,7 +13,7 @@ def processor(request):
         'PYBB_MARKUP',
         'PYBB_DEFAULT_TITLE',
         'PYBB_ENABLE_ANONYMOUS_POST',
-        'PYBB_ATTACHMENT_ENABLE',
+        'PYBB_ATTACHMENT_ENABLE', # deprecated, should be used pybb_may_attach_files filter, will be removed
         'PYBB_AVATAR_WIDTH',
         'PYBB_AVATAR_HEIGHT'
     ):

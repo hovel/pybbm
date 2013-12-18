@@ -250,11 +250,18 @@ def load_perms_filters():
             return getattr(perms_obj, func_name)(user, obj)
         return newfunc
 
+    def partial_no_param(func_name, perms_obj):
+        def newfunc(user):
+            return getattr(perms_obj, func_name)(user)
+        return newfunc
+
     for method in inspect.getmembers(perms):
-        if inspect.ismethod(method[1]) and len(inspect.getargspec(method[1]).args) == 3 and\
-                inspect.getargspec(method[1]).args[0] == 'self' and\
+        if inspect.ismethod(method[1]) and inspect.getargspec(method[1]).args[0] == 'self' and\
                 (method[0].startswith('may') or method[0].startswith('filter')):
-            register.filter('%s%s' % ('pybb_', method[0]), partial(method[0], perms))
+            if len(inspect.getargspec(method[1]).args) == 3:
+                register.filter('%s%s' % ('pybb_', method[0]), partial(method[0], perms))
+            elif len(inspect.getargspec(method[1]).args) == 2: # only user should be passed to permission method
+                register.filter('%s%s' % ('pybb_', method[0]), partial_no_param(method[0], perms))
 load_perms_filters()
 
 # next two tags copied from https://bitbucket.org/jaap3/django-friendly-tag-loader

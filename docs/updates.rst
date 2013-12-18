@@ -1,11 +1,18 @@
 Updating PyBBM Version
 ======================
 
-0.14.7 -> 0.14.8
+0.14.8 -> dev
 -------------
+* Two new methods added to permission handler: `may_attach_files` and `may_create_poll`. First method used for
+  restrict attaching files to post by user. By default it depends on `PYBB_ATTACHMENT_ENABLE` setting.
+  Second may be used to restrict some users to create/edit polls. By default it always return `True`.
+  For disabling polls on your forum, just write you custom permission handler and return from this method `False`
+
+0.14.7 -> 0.14.8
+----------------
 * Improved javascript functionality: quote selected text, qoute full original message via ajax,
-insert nickname in post body. For enabling this functionality you should satisfy :doc:`some requirements</javascript>`
-in your templates
+  insert nickname in post body. For enabling this functionality you should satisfy :doc:`some requirements</javascript>`
+  in your templates
 * Support for nested forums
 * `PybbProfile` abstract model moved to `pybb.profiles` module to avoid circular imports when checking models.
 
