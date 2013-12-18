@@ -497,7 +497,7 @@ def user_saved(instance, created, **kwargs):
     try:
         add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
         add_topic_permission = Permission.objects.get_by_natural_key('add_topic', 'pybb', 'topic')
-    except Permission.DoesNotExist, ContentType.DoesNotExist:
+    except (Permission.DoesNotExist, ContentType.DoesNotExist):
         return
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()
