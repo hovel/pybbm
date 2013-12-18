@@ -73,10 +73,11 @@ class PostForm(forms.ModelForm):
         self.ip = kwargs.pop('ip', None)
         self.topic = kwargs.pop('topic', None)
         self.forum = kwargs.pop('forum', None)
+        self.may_create_poll = kwargs.pop('may_create_poll', True)
         if not (self.topic or self.forum or ('instance' in kwargs)):
             raise ValueError('You should provide topic, forum or instance')
             #Handle topic subject, poll type and question if editing topic head
-        if ('instance' in kwargs) and kwargs['instance'] and (kwargs['instance'].topic.head == kwargs['instance']):
+        if kwargs.get('instance', None) and (kwargs['instance'].topic.head == kwargs['instance']):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
             kwargs.setdefault('initial', {})['poll_type'] = kwargs['instance'].topic.poll_type
             kwargs.setdefault('initial', {})['poll_question'] = kwargs['instance'].topic.poll_question
@@ -86,6 +87,9 @@ class PostForm(forms.ModelForm):
         # remove topic specific fields
         if not (self.forum or (self.instance.pk and (self.instance.topic.head == self.instance))):
             del self.fields['name']
+            del self.fields['poll_type']
+            del self.fields['poll_question']
+        elif not self.may_create_poll:
             del self.fields['poll_type']
             del self.fields['poll_question']
 
@@ -117,8 +121,9 @@ class PostForm(forms.ModelForm):
                 post.user = self.user
             if post.topic.head == post:
                 post.topic.name = self.cleaned_data['name']
-                post.topic.poll_type = self.cleaned_data['poll_type']
-                post.topic.poll_question = self.cleaned_data['poll_question']
+                if self.may_create_poll:
+                    post.topic.poll_type = self.cleaned_data['poll_type']
+                    post.topic.poll_question = self.cleaned_data['poll_question']
                 post.topic.updated = tznow()
                 if commit:
                     post.topic.save()
@@ -134,8 +139,8 @@ class PostForm(forms.ModelForm):
                 forum=self.forum,
                 user=self.user,
                 name=self.cleaned_data['name'],
-                poll_type=self.cleaned_data['poll_type'],
-                poll_question=self.cleaned_data['poll_question'],
+                poll_type=self.cleaned_data.get('poll_type', Topic.POLL_TYPE_NONE),
+                poll_question=self.cleaned_data.get('poll_question', None),
             )
             if not allow_post:
                 topic.on_moderation = True

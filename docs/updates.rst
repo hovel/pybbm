@@ -1,11 +1,18 @@
 Updating PyBBM Version
 ======================
 
-0.14.7 -> 0.14.8
+0.14.8 -> dev
 -------------
+* Two new methods added to permission handler: `may_attach_files` and `may_create_poll`. First method used for
+  restrict attaching files to post by user. By default it depends on `PYBB_ATTACHMENT_ENABLE` setting.
+  Second may be used to restrict some users to create/edit polls. By default it always return `True`.
+  For disabling polls on your forum, just write custom permission handler and return from this method `False`
+
+0.14.7 -> 0.14.8
+----------------
 * Improved javascript functionality: quote selected text, qoute full original message via ajax,
-insert nickname in post body. For enabling this functionality you should satisfy :doc:`some requirements</javascript>`
-in your templates
+  insert nickname in post body. For enabling this functionality you should satisfy :doc:`some requirements</javascript>`
+  in your templates
 * Support for nested forums
 * `PybbProfile` abstract model moved to `pybb.profiles` module to avoid circular imports when checking models.
 
@@ -15,7 +22,7 @@ in your templates
 * unblock user functionality added
 
 0.14.5 -> 0.14.6
--------------
+----------------
 * Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
   This value can be changed by setting `PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
   `pybbm_calc_topic_views` that calc actual views count for topic
@@ -37,7 +44,7 @@ in your templates
 * Show only available topics (by permission handler) in ForumView
 
 0.14.1 -> 0.14.2
---------------
+----------------
 * Fixed MultipleObjectReturned when topic has more than one moderator
 
 0.14 -> 0.14.1
@@ -45,7 +52,7 @@ in your templates
 * Fixed circular import issue
 
 0.13.1 -> 0.14
--------------
+--------------
 
 * Restored views for rendering user's posts and topics and link to that views from profile info page
 * Broken hard dependency from EditProfileView and EditProfileForm classes in forum

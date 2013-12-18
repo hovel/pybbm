@@ -219,7 +219,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             ctx['form'] = PostForm(topic=self.topic)
         else:
             ctx['form'] = None
-        if defaults.PYBB_ATTACHMENT_ENABLE:
+        if perms.may_attach_files(self.request.user):
             aformset = AttachmentFormSet()
             ctx['aformset'] = aformset
         if defaults.PYBB_FREEZE_FIRST_POST:
@@ -270,9 +270,9 @@ class PostEditMixin(object):
 
     def get_context_data(self, **kwargs):
         ctx = super(PostEditMixin, self).get_context_data(**kwargs)
-        if defaults.PYBB_ATTACHMENT_ENABLE and (not 'aformset' in kwargs):
+        if perms.may_attach_files(self.request.user) and (not 'aformset' in kwargs):
             ctx['aformset'] = AttachmentFormSet(instance=self.object if getattr(self, 'object') else None)
-        if 'pollformset' not in kwargs:
+        if perms.may_create_poll(self.request.user) and ('pollformset' not in kwargs):
             ctx['pollformset'] = PollAnswerFormSet(instance=self.object.topic if getattr(self, 'object') else None)
         return ctx
 
@@ -282,26 +282,29 @@ class PostEditMixin(object):
         save_poll_answers = False
         self.object = form.save(commit=False)
 
-        if defaults.PYBB_ATTACHMENT_ENABLE:
+        if perms.may_attach_files(self.request.user):
             aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
             if aformset.is_valid():
                 save_attachments = True
             else:
                 success = False
         else:
-            aformset = AttachmentFormSet()
+            aformset = None
 
-        pollformset = PollAnswerFormSet()
-        if getattr(self, 'forum', None) or self.object.topic.head == self.object:
-            if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
-                pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
-                if pollformset.is_valid():
-                    save_poll_answers = True
+        if perms.may_create_poll(self.request.user):
+            pollformset = PollAnswerFormSet()
+            if getattr(self, 'forum', None) or self.object.topic.head == self.object:
+                if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
+                    pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                    if pollformset.is_valid():
+                        save_poll_answers = True
+                    else:
+                        success = False
                 else:
-                    success = False
-            else:
-                self.object.topic.poll_question = None
-                self.object.topic.poll_answers.all().delete()
+                    self.object.topic.poll_question = None
+                    self.object.topic.poll_answers.all().delete()
+        else:
+            pollformset = None
 
         if success:
             self.object.topic.save()
@@ -363,8 +366,9 @@ class AddPostView(PostEditMixin, generic.CreateView):
                            ip=ip, initial={}))
         if getattr(self, 'quote', None):
             form_kwargs['initial']['body'] = self.quote
-        if self.user.is_staff:
+        if perms.may_post_as_admin(self.user):
             form_kwargs['initial']['login'] = getattr(self.user, username_field)
+        form_kwargs['may_create_poll'] = perms.may_create_poll(self.user)
         return form_kwargs
 
     def get_context_data(self, **kwargs):
@@ -390,6 +394,11 @@ class EditPostView(PostEditMixin, generic.UpdateView):
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         return super(EditPostView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super(EditPostView, self).get_form_kwargs()
+        form_kwargs['may_create_poll'] = perms.may_create_poll(self.request.user)
+        return form_kwargs
 
     def get_object(self, queryset=None):
         post = super(EditPostView, self).get_object(queryset)

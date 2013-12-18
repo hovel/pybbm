@@ -1458,6 +1458,9 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     def may_view_post(self, user, post):
         return self.may_view_forum(user, post.topic.forum)
 
+    def may_create_poll(self, user):
+        return False
+
 
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """
@@ -1467,17 +1470,16 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
 
         self.create_user()
         # create public and hidden categories, forums, posts
-        c_pub = Category(name='public');
+        c_pub = Category(name='public')
         c_pub.save()
-        c_hid = Category(name='private', hidden=True);
+        c_hid = Category(name='private', hidden=True)
         c_hid.save()
-        Forum(name='pub1', category=c_pub).save()
-        Forum(name='priv1', category=c_hid).save()
-        Forum(name='private_in_public_cat', hidden=True, category=c_pub).save()
+        self.forum = Forum.objects.create(name='pub1', category=c_pub)
+        Forum.objects.create(name='priv1', category=c_hid)
+        Forum.objects.create(name='private_in_public_cat', hidden=True, category=c_pub)
         for f in Forum.objects.all():
-            t = Topic(name='a topic', forum=f, user=self.user)
-            t.save()
-            Post(topic=t, user=self.user, body='test').save()
+            t = Topic.objects.create(name='a topic', forum=f, user=self.user)
+            Post.objects.create(topic=t, user=self.user, body='test')
         # make some topics closed => hidden
         for t in Topic.objects.all()[0:2]:
             t.closed = True
@@ -1525,6 +1527,24 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
             self.assertEqual(r.status_code, 302 if p.topic.forum.hidden or p.topic.forum.category.hidden else 301)
             r = self.get_with_user(p.get_absolute_url(), 'zeus', 'zeus')
             self.assertEqual(r.status_code, 301)
+
+    def test_poll_add(self):
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
+        self.login_client()
+        response = self.client.get(add_topic_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test poll body'
+        values['name'] = 'test poll name'
+        values['poll_type'] = 1 # poll_type = 1, create topic with poll
+        values['poll_question'] = 'q1'
+        values['poll_answers-0-text'] = 'answer1'
+        values['poll_answers-1-text'] = 'answer2'
+        values['poll_answers-TOTAL_FORMS'] = 2
+        response = self.client.post(add_topic_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_topic = Topic.objects.get(name='test poll name')
+        self.assertIsNone(new_topic.poll_question)
+        self.assertFalse(PollAnswer.objects.filter(topic=new_topic).exists()) # no answers here
 
 
 class LogonRedirectTest(TestCase, SharedTestModule):
