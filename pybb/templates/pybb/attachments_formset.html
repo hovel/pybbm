@@ -1,4 +1,6 @@
-{% if PYBB_ATTACHMENT_ENABLE %}
+{% load pybb_tags %}
+
+{% if request.user|pybb_may_attach_files %}
     {% load i18n %}
     <div class='attachments-form'>
         <a class='attachment-link' onclick='$("div.attachments-form table").toggle();return false;' href='#'>{% trans "Add attachments" %}</a>

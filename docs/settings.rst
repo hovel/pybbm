@@ -262,6 +262,9 @@ Directory in your media path for uploaded attacments. `pybb_upload/attachments` 
 Polls
 -----
 
+Note: For disabling polls on your forum, write custom permission handler and return from `may_create_poll` method `False`
+See `PYBB_PERMISSION_HANDLER` setting.
+
 PYBB_POLL_MAX_ANSWERS
 .....................
 
@@ -284,4 +287,4 @@ user groups), you can set `PYBB_PERMISSION_HANDLER` to a class which inherits fr
 `may_*` method. For details, look at the source of `pybb.permissions.DefaultPermissionHandler`.
 All methods from permission handler (custom or default) can be used in templates as filters,
 if loaded pybb_tags. In template will be loaded methods which start with 'may' or 'filter'
-and with three arguments (include 'self' argument)
+and with three or two arguments (include 'self' argument)

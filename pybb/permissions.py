@@ -160,5 +160,19 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may block `user_to_block` """
         return user.has_perm('pybb.block_users')
 
+    def may_attach_files(self, user):
+        """
+        return True if `user` may attach files to posts, False otherwise.
+        By default controlled by PYBB_ATTACHMENT_ENABLE setting
+        """
+        return defaults.PYBB_ATTACHMENT_ENABLE
+
+    def may_create_poll(self, user):
+        """
+        return True if `user` may attach files to posts, False otherwise.
+        By default always True
+        """
+        return True
+
 
 perms = _resolve_class(defaults.PYBB_PERMISSION_HANDLER)
