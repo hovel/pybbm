@@ -42,6 +42,7 @@ except ImportError:
     from django.db.transaction import commit_on_success as atomic_func
 
 
+@python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)

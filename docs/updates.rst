@@ -1,6 +1,11 @@
 Updating PyBBM Version
 ======================
 
+0.15 -> 0.15.1
+--------------
+* Hot fixes for python 3 support
+* Fixed for Chinese translation
+
 0.14.9 -> 0.15
 --------------
 * Python 3 support
