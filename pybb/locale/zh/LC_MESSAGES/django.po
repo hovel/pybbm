@@ -127,7 +127,7 @@ msgstr "贴子数"
 
 #: models.py:85
 msgid "Topic count"
-msgstr "主题树"
+msgstr "主题数"
 
 #: models.py:88
 msgid "Headline"
@@ -159,7 +159,7 @@ msgstr "创建时间"
 
 #: models.py:152
 msgid "Views count"
-msgstr "浏览数"
+msgstr "浏览次数"
 
 #: models.py:153 templates/pybb/topic_list.html:27
 msgid "Sticky"
@@ -234,19 +234,19 @@ msgstr "文件"
 
 #: models.py:393
 msgid "Topic read tracker"
-msgstr ""
+msgstr "主题阅读跟踪"
 
 #: models.py:394
 msgid "Topic read trackers"
-msgstr "主题"
+msgstr "主题阅读跟踪"
 
 #: models.py:429
 msgid "Forum read tracker"
-msgstr ""
+msgstr "讨论区阅读跟踪"
 
 #: models.py:430
 msgid "Forum read trackers"
-msgstr ""
+msgstr "讨论区阅读跟踪"
 
 #: models.py:436
 msgid "Text"
