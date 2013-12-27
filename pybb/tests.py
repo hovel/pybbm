@@ -11,8 +11,11 @@ from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.test import TestCase
 from django.test.client import Client
+from django.test.utils import override_settings
+from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
     pybb_get_latest_topics, pybb_get_latest_posts
 
@@ -1420,10 +1423,6 @@ class FiltersTest(TestCase, SharedTestModule):
         self.assertEqual(Post.objects.all()[0].body, 'test\nmultiple empty lines')
 
 
-from pybb import permissions
-from django.db.models import Q
-
-
 class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     """ 
     a custom permission handler which changes the meaning of "hidden" forum:
@@ -1465,12 +1464,26 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
         return False
 
 
+def _attach_perms_class(class_name):
+    """
+    override the permission handler. this cannot be done with @override_settings as
+    permissions.perms is already imported at import point, instead we got to monkeypatch
+    the modules (not really nice, but only an issue in tests)
+    """
+    pybb_views.perms = permissions.perms = permissions._resolve_class(class_name)
+
+
+def _detach_perms_class():
+    """
+    reset permission handler (otherwise other tests may fail)
+    """
+    pybb_views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
+
+
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """
 
     def setUp(self):
-        from pybb import views
-
         self.create_user()
         # create public and hidden categories, forums, posts
         c_pub = Category(name='public')
@@ -1487,15 +1500,11 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
         for t in Topic.objects.all()[0:2]:
             t.closed = True
             t.save()
-        # override the permission handler. this cannot be done with @override_settings as
-        # permissions.perms is already imported at this point, instead we got to monkeypatch
-        # the modules (not really nice, but only an issue in tests)
-        views.perms = permissions.perms = permissions._resolve_class('pybb.tests.CustomPermissionHandler')
+
+        _attach_perms_class('pybb.tests.CustomPermissionHandler')
 
     def tearDown(self):
-        from pybb import views
-        # reset permission handler (otherwise other tests may fail)
-        views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
+        _detach_perms_class()
 
     def test_category_permission(self):
         for c in Category.objects.all():
@@ -1548,6 +1557,17 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
         new_topic = Topic.objects.get(name='test poll name')
         self.assertIsNone(new_topic.poll_question)
         self.assertFalse(PollAnswer.objects.filter(topic=new_topic).exists()) # no answers here
+
+
+class RestrictEditingHandler(permissions.DefaultPermissionHandler):
+        def may_create_topic(self, user, forum):
+            return False
+
+        def may_create_post(self, user, topic):
+            return False
+
+        def may_edit_post(self, user, post):
+            return False
 
 
 class LogonRedirectTest(TestCase, SharedTestModule):
@@ -1616,4 +1636,40 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         r = self.get_with_user(self.post.get_absolute_url(), 'staff', 'staff')
         self.assertEquals(r.status_code, 301)
 
-    
+    @override_settings(PYBB_ENABLE_ANONYMOUS_POST=False)
+    def test_redirect_topic_add(self):
+        _attach_perms_class('pybb.tests.RestrictEditingHandler')
+
+        # access without user should be redirected
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
+        r = self.get_with_user(add_topic_url)
+        self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % add_topic_url)
+
+        # access with (unauthorized) user should get 403 (forbidden)
+        r = self.get_with_user(add_topic_url, 'staff', 'staff')
+        self.assertEquals(r.status_code, 403)
+
+        _detach_perms_class()
+
+        # allowed user is allowed
+        r = self.get_with_user(add_topic_url, 'staff', 'staff')
+        self.assertEquals(r.status_code, 200)
+
+    def test_redirect_post_edit(self):
+        _attach_perms_class('pybb.tests.RestrictEditingHandler')
+
+        # access without user should be redirected
+        edit_post_url = reverse('pybb:edit_post', kwargs={'pk': self.post.id})
+        r = self.get_with_user(edit_post_url)
+        self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % edit_post_url)
+
+        # access with (unauthorized) user should get 403 (forbidden)
+        r = self.get_with_user(edit_post_url, 'staff', 'staff')
+        self.assertEquals(r.status_code, 403)
+
+        _detach_perms_class()
+
+        # allowed user is allowed
+        r = self.get_with_user(edit_post_url, 'staff', 'staff')
+        self.assertEquals(r.status_code, 200)
+
