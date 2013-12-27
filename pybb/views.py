@@ -220,6 +220,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             ctx['form'] = PostForm(topic=self.topic)
         else:
             ctx['form'] = None
+            ctx['next'] = self.get_login_redirect_url()
         if perms.may_attach_files(self.request.user):
             aformset = AttachmentFormSet()
             ctx['aformset'] = aformset
