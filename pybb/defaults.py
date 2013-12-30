@@ -90,3 +90,5 @@ PYBB_USE_DJANGO_MAILER = getattr(settings, 'PYBB_USE_DJANGO_MAILER', False)
 PYBB_PERMISSION_HANDLER = getattr(settings, 'PYBB_PERMISSION_HANDLER', 'pybb.permissions.DefaultPermissionHandler')
 
 PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb_profile')
+
+PYBB_ENABLE_POLL_QUESTION = getattr(settings, 'PYBB_ENABLE_POLL_QUESTION', True)
