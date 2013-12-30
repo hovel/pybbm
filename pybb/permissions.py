@@ -174,6 +174,8 @@ class DefaultPermissionHandler(object):
         return True if `user` may attach files to posts, False otherwise.
         By default always True
         """
+        if not defaults.PYBB_ENABLE_POLL_QUESTION:
+            return False
         return True
 
 
