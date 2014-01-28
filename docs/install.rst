@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-PyBBM required next packages to be installed:
+PyBBM requires the following packages:
 
 * django
 * markdown
@@ -12,7 +12,7 @@ PyBBM required next packages to be installed:
 * django-annoying
 
 
-All packages can be installed as a dependency for PyBBM if you install it with pip or easy_install::
+By installing PyBBM with ``pip`` or ``easy_install``, all the above dependencies will be installed automatically::
 
     pip install pybbm
 
