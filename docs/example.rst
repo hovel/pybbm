@@ -1,23 +1,26 @@
-Example project
-===============
+Example projects
+================
 
-Project tree contains two example projects in `test/example_bootstrap` and `test/example_thirdparty` folders,
-it is fully deployed and ready to use forum applications. Only one distinction between this projects:
-example_bootstrap includes Twitter bootstrap's less files while example_thirdparty leave this to thirdparty app -
-pinax-theme-bootstrap. We recommend to use thirdparty apps to start with.
-If you starting from scratch it's probaly the best way to begin.
+The PyBBM source code contains two example projects under the ``test/example_bootstrap`` and ``test/example_thirdparty`` directories.
+Both are fully deployed and ready to use forum applications.
 
-Running example project
------------------------
+There is only one difference between these projects:
 
-You need to install next packages for running example projects:
+* ``example_bootstrap`` includes the LESS (a CSS preprocessor) files from Twitter Bootstrap.
+* ``example_thirdparty`` leaves this to the thirdparty app ``pinax-theme-bootstrap``.
 
-* pybb
-* south
+We recommend to use ``example_thirdparty`` to start with. If you starting from scratch it's probaly the best way to begin.
 
-For example_bootstrap project also install django-registration application
+Running the example projects
+----------------------------
 
-you can do it by running this command::
+The ``example_bootstrap`` project requires the following dependencies:
+
+* ``pybbm``
+* ``south``
+* ``django-registration``
+
+You can do it by running this command::
 
     pip install pybbm south django-registration
 
@@ -25,10 +28,12 @@ or with easy_install::
 
     easy_install pybbm south django-registration
 
-To run example_thirdparty project you need to install next apps:
+The ``example_thirdparty`` project requires the following dependencies:
 
-* django-user-accounts
-* pinax-theme-bootstrap
+* ``pybbm``
+* ``south``
+* ``django-user-accounts``
+* ``pinax-theme-bootstrap``
 
 Example directory contains requirements.txt file, you can run::
 
