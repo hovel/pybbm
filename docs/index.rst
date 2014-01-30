@@ -1,11 +1,11 @@
 PyBBM - Django forum solution
 =============================
 
-PyBBM is a full-featured django forum solution with these features:
+PyBBM is a complete Django forum solution with the following features:
 
 * Avatars
-* Custom profiles and support of Custom User Model (since django 1.5)
-* Post editing
+* Custom profiles and support of Custom User Model (since Django 1.5)
+* Editable posts
 * Pre-moderation
 * Custom sanitization
 * Anonymous posting
@@ -13,14 +13,13 @@ PyBBM is a full-featured django forum solution with these features:
 * Polls
 * ...
 
-All features is based on:
+All features are based on:
 
-* 95% tests covered code
-* Twitter bootstrap 2 default theme
-* Ready to use example project
+* 95% test code coverage
+* Twitter Bootstrap 2 default theme
+* Ready to use example projects
 
-The main point in development of pybb is to build it so it could be
-*easily* integrated to existing django based site. This mean that pybb does not provide features like user registration, password restoring.  It does not provide authentication page. (But example project provides ;))
+The main focus in the development of PyBMM is to build it in a way that allows *easy* integration in existing Django-based sites. This means that PyBMM does not provide features like user registration, password restoring or the user login page. (But the example projects show how to do these tasks ;))
 
 
 Contents:
