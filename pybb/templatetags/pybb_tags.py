@@ -122,6 +122,13 @@ def pybb_editable_by(post, user):
                   DeprecationWarning)
     return perms.may_edit_post(user, post)
 
+@register.filter
+def pybb_may_create_poll(post, user):
+    """
+    Check if the user can create polls.
+    """
+    return perms.may_edit_post(user)
+
 
 @register.filter
 def pybb_posted_by(post, user):

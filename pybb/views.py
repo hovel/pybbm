@@ -34,9 +34,10 @@ except ImportError:
     pure_pagination = False
 
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
-from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 from pybb import defaults
+from pybb import defaults_forms
+from pybb.forms import AttachmentFormSet, PollAnswerFormSet
 
 from pybb.permissions import perms
 
@@ -211,13 +212,13 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if perms.may_post_as_admin(self.request.user):
-                ctx['form'] = AdminPostForm(initial={'login': getattr(self.request.user, username_field)},
+                ctx['form'] = defaults_forms.PYBB_ADMIN_POST_FORM(initial={'login': getattr(self.request.user, username_field)},
                                             topic=self.topic)
             else:
-                ctx['form'] = PostForm(topic=self.topic)
+                ctx['form'] = defaults_forms.PYBB_POST_FORM(topic=self.topic)
             self.mark_read(self.request.user, self.topic)
         elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
-            ctx['form'] = PostForm(topic=self.topic)
+            ctx['form'] = defaults_forms.PYBB_POST_FORM(topic=self.topic)
         else:
             ctx['form'] = None
             ctx['next'] = self.get_login_redirect_url()
@@ -232,7 +233,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
         if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
            pybb_topic_poll_not_voted(self.topic, self.request.user):
-            ctx['poll_form'] = PollForm(self.topic)
+            ctx['poll_form'] = defaults_forms.PYBB_POLL_FORM(self.topic)
 
         return ctx
 
@@ -266,9 +267,9 @@ class PostEditMixin(object):
 
     def get_form_class(self):
         if perms.may_post_as_admin(self.request.user):
-            return AdminPostForm
+            return defaults_forms.PYBB_ADMIN_POST_FORM
         else:
-            return PostForm
+            return defaults_forms.PYBB_POST_FORM
 
     def get_context_data(self, **kwargs):
         ctx = super(PostEditMixin, self).get_context_data(**kwargs)
@@ -504,8 +505,7 @@ class ProfileEditView(generic.UpdateView):
 
     def get_form_class(self):
         if not self.form_class:
-            from pybb.forms import EditProfileForm
-            return EditProfileForm
+            return defaults_forms.PYBB_PROFILE_FORM
         else:
             return super(ProfileEditView, self).get_form_class()
 
@@ -604,7 +604,7 @@ class OpenTopicView(TopicActionBaseView):
 class TopicPollVoteView(generic.UpdateView):
     model = Topic
     http_method_names = ['post', ]
-    form_class = PollForm
+    form_class = defaults_forms.PYBB_POLL_FORM
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
