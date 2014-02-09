@@ -156,8 +156,25 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
 
+    post_form_class = PostForm
+    admin_post_form_class = AdminPostForm
+    poll_form_class = PollForm
+    attachment_formset_class = AttachmentFormSet
+
     def get_login_redirect_url(self):
         return reverse('pybb:topic', args=(self.kwargs['pk'],))
+
+    def get_post_form_class(self):
+        return self.post_form_class
+
+    def get_admin_post_form_class(self):
+        return self.admin_post_form_class
+
+    def get_poll_form_class(self):
+        return self.poll_form_class
+
+    def get_attachment_formset_class(self):
+        return self.attachment_formset_class
 
     def dispatch(self, request, *args, **kwargs):
         self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
@@ -207,22 +224,24 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
+
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if perms.may_post_as_admin(self.request.user):
-                ctx['form'] = AdminPostForm(initial={'login': getattr(self.request.user, username_field)},
-                                            topic=self.topic)
+                ctx['form'] = self.get_admin_post_form_class()(
+                    initial={'login': getattr(self.request.user, username_field)},
+                    topic=self.topic)
             else:
-                ctx['form'] = PostForm(topic=self.topic)
+                ctx['form'] = self.get_post_form_class()(topic=self.topic)
             self.mark_read(self.request.user, self.topic)
         elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
-            ctx['form'] = PostForm(topic=self.topic)
+            ctx['form'] = self.get_post_form_class()(topic=self.topic)
         else:
             ctx['form'] = None
             ctx['next'] = self.get_login_redirect_url()
         if perms.may_attach_files(self.request.user):
-            aformset = AttachmentFormSet()
+            aformset = self.get_attachment_formset_class()()
             ctx['aformset'] = aformset
         if defaults.PYBB_FREEZE_FIRST_POST:
             ctx['first_post'] = self.topic.head
@@ -232,7 +251,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
         if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
            pybb_topic_poll_not_voted(self.topic, self.request.user):
-            ctx['poll_form'] = PollForm(self.topic)
+            ctx['poll_form'] = self.get_poll_form_class()(self.topic)
 
         return ctx
 
@@ -264,6 +283,11 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
 class PostEditMixin(object):
 
+    poll_answer_formset_class = PollAnswerFormSet
+
+    def get_poll_answer_formset_class(self):
+        return self.poll_answer_formset_class
+
     def get_form_class(self):
         if perms.may_post_as_admin(self.request.user):
             return AdminPostForm
@@ -275,7 +299,9 @@ class PostEditMixin(object):
         if perms.may_attach_files(self.request.user) and (not 'aformset' in kwargs):
             ctx['aformset'] = AttachmentFormSet(instance=self.object if getattr(self, 'object') else None)
         if perms.may_create_poll(self.request.user) and ('pollformset' not in kwargs):
-            ctx['pollformset'] = PollAnswerFormSet(instance=self.object.topic if getattr(self, 'object') else None)
+            ctx['pollformset'] = self.get_poll_answer_formset_class()(
+                instance=self.object.topic if getattr(self, 'object') else None
+            )
         return ctx
 
     def form_valid(self, form):
@@ -294,10 +320,11 @@ class PostEditMixin(object):
             aformset = None
 
         if perms.may_create_poll(self.request.user):
-            pollformset = PollAnswerFormSet()
+            pollformset = self.get_poll_answer_formset_class()()
             if getattr(self, 'forum', None) or self.object.topic.head == self.object:
                 if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
-                    pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                    pollformset = self.get_poll_answer_formset_class()(self.request.POST,
+                                                                       instance=self.object.topic)
                     if pollformset.is_valid():
                         save_poll_answers = True
                     else:
