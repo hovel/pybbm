@@ -48,7 +48,7 @@ class SharedTestModule(object):
         self.forum = Forum.objects.create(name='xfoo', description='bar', category=self.category)
         self.topic = Topic.objects.create(name='etopic', forum=self.forum, user=self.user)
         if post:
-            self.post = Post.objects.create(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
+            self.post = Post.objects.create(topic=self.topic, user=self.user, body='bbcode [b]test[/b]')
 
     def get_form_values(self, response, form="post-form"):
         return dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % form)[0].form_values())
@@ -172,7 +172,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertTrue(Topic.objects.filter(name='new topic name').exists())
 
     def test_post_deletion(self):
-        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
+        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[/b]')
         post.save()
         post.delete()
         Topic.objects.get(id=self.topic.id)
@@ -751,7 +751,7 @@ class FeaturesTest(TestCase, SharedTestModule):
     def test_user_blocking(self):
         user = User.objects.create_user('test', 'test@localhost', 'test')
         topic = Topic.objects.create(name='topic', forum=self.forum, user=self.user)
-        self.post = Post.objects.create(topic=topic, user=user, body='bbcode [b]test[b]')
+        self.post = Post.objects.create(topic=topic, user=user, body='bbcode [b]test[/b]')
         self.user.is_superuser = True
         self.user.save()
         self.login_client()
@@ -790,7 +790,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
     def test_ajax_preview(self):
         self.login_client()
-        response = self.client.post(reverse('pybb:post_ajax_preview'), data={'data': '[b]test bbcode ajax preview[b]'})
+        response = self.client.post(reverse('pybb:post_ajax_preview'), data={'data': '[b]test bbcode ajax preview[/b]'})
         self.assertContains(response, '<strong>test bbcode ajax preview</strong>')
 
     def test_headline(self):
@@ -921,13 +921,13 @@ class FeaturesTest(TestCase, SharedTestModule):
         topic = Topic(name='etopic', forum=self.forum, user=self.user)
         topic.save()
         time.sleep(1)
-        post = Post(topic=topic, user=self.user, body='bbcode [b]test[b]')
+        post = Post(topic=topic, user=self.user, body='bbcode [b]test[/b]')
         post.save()
         client = Client()
         response = client.get(self.forum.get_absolute_url())
         self.assertEqual(response.context['topic_list'][0], topic)
         time.sleep(1)
-        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[b]')
+        post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[/b]')
         post.save()
         client = Client()
         response = client.get(self.forum.get_absolute_url())
