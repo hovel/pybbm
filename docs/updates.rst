@@ -1,6 +1,15 @@
 PyBBM Changelog
 ===============
 
+0.15.1 -> 0.15.2
+----------------
+* Pybbm specific forms moved to views' attributes, added new functions to views to get such forms dynamically.
+  This makes overriding pybbm forms much easier
+* Moving from unmaintained postmarkup package to bbcode project as default bbcode render engine
+  Changed output html for [code] tag. It will be <code></code> tags instead of <div class="code"></div>.
+  So you should duplicate styles applied to div.code for code html tag.
+* Japanese translation
+
 0.15 -> 0.15.1
 --------------
 * Hot fixes for Python 3 support

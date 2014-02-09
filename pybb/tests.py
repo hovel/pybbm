@@ -132,6 +132,26 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.context['paginator'].num_pages,
                          int((defaults.PYBB_FORUM_PAGE_SIZE + 3) / defaults.PYBB_FORUM_PAGE_SIZE) + 1)
 
+    def test_default_bbcode_processor(self):
+        bbcode_to_html_map = [
+            ['[b]bold[/b]', '<strong>bold</strong>'],
+            ['[i]italic[/i]', '<em>italic</em>'],
+            ['[u]underline[/u]', '<u>underline</u>'],
+            ['[s]striked[/s]', '<strike>striked</strike>'],
+            ['[img]http://domain.com/image.png[/img]', '<img src="http://domain.com/image.png"></img>',
+                                                       '<img src="http://domain.com/image.png">'],
+            ['[url=google.com]search in google[/url]', '<a href="http://google.com">search in google</a>'],
+            ['[list][*]1[*]2[/list]', '<ul><li>1</li><li>2</li></ul>'],
+            ['[list=1][*]1[*]2[/list]', '<ol><li>1</li><li>2</li></ol>',
+                                        '<ol style="list-style-type:decimal;"><li>1</li><li>2</li></ol>'],
+            ['[quote]quote[/quote]', '<blockquote>quote</blockquote>'],
+            ['[code]code[/code]', '<div class="code"><pre>code</pre></div>',
+                                  '<code>code</code>'],
+        ]
+
+        for item in bbcode_to_html_map:
+            self.assertIn(defaults.PYBB_MARKUP_ENGINES['bbcode'](item[0]), item[1:])
+
     def test_bbcode_and_topic_title(self):
         response = self.client.get(self.topic.get_absolute_url())
         tree = html.fromstring(response.content)

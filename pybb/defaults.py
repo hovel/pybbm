@@ -30,7 +30,7 @@ PYBB_DEFAULT_AVATAR_URL = getattr(settings,'PYBB_DEFAULT_AVATAR_URL',
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 
-from postmarkup import render_bbcode
+import bbcode
 from markdown import Markdown
 from django.utils.html import urlize
 
@@ -57,8 +57,11 @@ def smile_it(str):
         s = s.replace(smile, '<img src="%s%s%s" alt="smile" />' % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url))
     return s
 
+bbcode_parser = bbcode.Parser(replace_links=False)
+bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">')
+
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
-    'bbcode': lambda str: urlize(smile_it(render_bbcode(str, exclude_tags=['size', 'center']))),
+    'bbcode': lambda str: urlize(smile_it(bbcode_parser.format(str))),
     'markdown': lambda str: urlize(smile_it(Markdown(safe_mode='escape').convert(str)))
 })
 
