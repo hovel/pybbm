@@ -141,6 +141,7 @@ class FeaturesTest(TestCase, SharedTestModule):
             ['[img]http://domain.com/image.png[/img]', '<img src="http://domain.com/image.png"></img>',
                                                        '<img src="http://domain.com/image.png">'],
             ['[url=google.com]search in google[/url]', '<a href="http://google.com">search in google</a>'],
+            ['http://google.com', '<a href="http://google.com">http://google.com</a>'],
             ['[list][*]1[*]2[/list]', '<ul><li>1</li><li>2</li></ul>'],
             ['[list=1][*]1[*]2[/list]', '<ol><li>1</li><li>2</li></ol>',
                                         '<ol style="list-style-type:decimal;"><li>1</li><li>2</li></ol>'],

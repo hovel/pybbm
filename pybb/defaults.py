@@ -57,12 +57,12 @@ def smile_it(str):
         s = s.replace(smile, '<img src="%s%s%s" alt="smile" />' % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url))
     return s
 
-bbcode_parser = bbcode.Parser(replace_links=False)
-bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">')
+bbcode_parser = bbcode.Parser()
+bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links=False)
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
-    'bbcode': lambda str: urlize(smile_it(bbcode_parser.format(str))),
-    'markdown': lambda str: urlize(smile_it(Markdown(safe_mode='escape').convert(str)))
+    'bbcode': lambda str: smile_it(bbcode_parser.format(str)),
+    'markdown': lambda str: smile_it(Markdown(safe_mode='escape').convert(str))
 })
 
 PYBB_QUOTE_ENGINES = getattr(settings, 'PYBB_QUOTE_ENGINES', {
