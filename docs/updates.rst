@@ -1,6 +1,10 @@
 PyBBM Changelog
 ===============
 
+0.15.2 -> 0.15.3
+----------------
+* bbcode engine simplified
+
 0.15.1 -> 0.15.2
 ----------------
 * Pybbm specific forms moved to views' attributes, added new functions to views to get such forms dynamically.
