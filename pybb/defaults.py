@@ -59,6 +59,15 @@ def smile_it(str):
 
 bbcode_parser = bbcode.Parser()
 bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links=False)
+bbcode_parser.add_simple_formatter('code', '<code><pre>%(value)s</pre></code>', render_embedded=False, transform_newlines=False, swallow_trailing_newline=True)
+def _render_quote(name, value, options, parent, context):
+    if options and 'quote' in options:
+        origin_author = '<em>%s</em>' % options['quote']
+    else:
+        origin_author = ''
+    return '<blockquote>%s<br>%s</blockquote>' % (origin_author, value)
+bbcode_parser.add_formatter('quote', _render_quote, strip=True, swallow_trailing_newline=True)
+
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
     'bbcode': lambda str: smile_it(bbcode_parser.format(str)),

@@ -145,9 +145,9 @@ class FeaturesTest(TestCase, SharedTestModule):
             ['[list][*]1[*]2[/list]', '<ul><li>1</li><li>2</li></ul>'],
             ['[list=1][*]1[*]2[/list]', '<ol><li>1</li><li>2</li></ol>',
                                         '<ol style="list-style-type:decimal;"><li>1</li><li>2</li></ol>'],
-            ['[quote]quote[/quote]', '<blockquote>quote</blockquote>'],
+            ['[quote="post author"]quote[/quote]', '<blockquote><em>post author</em><br>quote</blockquote>'],
             ['[code]code[/code]', '<div class="code"><pre>code</pre></div>',
-                                  '<code>code</code>'],
+                                  '<code><pre>code</pre></code>'],
         ]
 
         for item in bbcode_to_html_map:
