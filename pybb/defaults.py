@@ -62,10 +62,10 @@ bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links
 bbcode_parser.add_simple_formatter('code', '<pre><code>%(value)s</code></pre>', render_embedded=False, transform_newlines=False, swallow_trailing_newline=True)
 def _render_quote(name, value, options, parent, context):
     if options and 'quote' in options:
-        origin_author = '<em>%s</em>' % options['quote']
+        origin_author_html = '<em>%s</em><br>' % options['quote']
     else:
-        origin_author = ''
-    return '<blockquote>%s<br>%s</blockquote>' % (origin_author, value)
+        origin_author_html = ''
+    return '<blockquote>%s%s</blockquote>' % (origin_author_html, value)
 bbcode_parser.add_formatter('quote', _render_quote, strip=True, swallow_trailing_newline=True)
 
 
