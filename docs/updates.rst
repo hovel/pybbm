@@ -1,6 +1,10 @@
 PyBBM Changelog
 ===============
 
+0.15.3 -> 0.15.4
+----------------
+* Hot fixes to bbcode transform
+
 0.15.2 -> 0.15.3
 ----------------
 * bbcode engine simplified

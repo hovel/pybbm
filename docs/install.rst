@@ -8,7 +8,7 @@ PyBBM requires the following packages:
 
 * django
 * markdown
-* postmarkup
+* bbcode
 * django-annoying
 
 
