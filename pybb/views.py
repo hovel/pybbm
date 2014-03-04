@@ -249,8 +249,8 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             ctx['first_post'] = None
         ctx['topic'] = self.topic
 
-        if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
-           pybb_topic_poll_not_voted(self.topic, self.request.user):
+        if perms.may_vote_in_topic(self.request.user, self.topic) and \
+                pybb_topic_poll_not_voted(self.topic, self.request.user):
             ctx['poll_form'] = self.get_poll_form_class()(self.topic)
 
         return ctx
@@ -644,7 +644,8 @@ class TopicPollVoteView(generic.UpdateView):
 
     def form_valid(self, form):
         # already voted
-        if not pybb_topic_poll_not_voted(self.object, self.request.user):
+        if not perms.may_vote_in_topic(self.request.user, self.object) or \
+           not pybb_topic_poll_not_voted(self.object, self.request.user):
             return HttpResponseForbidden()
 
         answers = form.cleaned_data['answers']

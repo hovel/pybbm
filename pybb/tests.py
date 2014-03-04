@@ -1424,6 +1424,21 @@ class PollTest(TestCase, SharedTestModule):
         self.assertListEqual([a.votes() for a in PollAnswer.objects.all()], [1, 1])
         self.assertListEqual([a.votes_percent() for a in PollAnswer.objects.all()], [50.0, 50.0])
 
+    def test_poll_voting_on_closed_topic(self):
+        self.login_client()
+        self.topic.poll_type = Topic.POLL_TYPE_SINGLE
+        self.topic.save()
+        PollAnswer.objects.create(topic=self.topic, text='answer1')
+        PollAnswer.objects.create(topic=self.topic, text='answer2')
+        self.topic.closed = True
+        self.topic.save()
+
+        vote_url = reverse('pybb:topic_poll_vote', kwargs={'pk': self.topic.id})
+        my_answer = PollAnswer.objects.all()[0]
+        values = {'answers': my_answer.id}
+        response = self.client.post(vote_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 403)
+
     def tearDown(self):
         defaults.PYBB_POLL_MAX_ANSWERS = self.PYBB_POLL_MAX_ANSWERS
 

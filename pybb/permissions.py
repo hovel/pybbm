@@ -8,6 +8,7 @@ from django.utils.importlib import import_module
 from django.db.models import Q
 
 from pybb import defaults
+from pybb.models import Topic, PollAnswerUser
 
 
 def _resolve_class(name):
@@ -97,6 +98,13 @@ class DefaultPermissionHandler(object):
     def may_unstick_topic(self, user, topic):
         """ return True if `user` may unstick `topic` """
         return self.may_moderate_topic(user, topic)
+
+    def may_vote_in_topic(self, user, topic):
+        """ return True if `user` may unstick `topic` """
+        return (
+            user.is_authenticated() and topic.poll_type != Topic.POLL_TYPE_NONE and not topic.closed and
+            not PollAnswerUser.objects.filter(poll_answer__topic=topic, user=user).exists()
+        )
 
     def may_create_post(self, user, topic):
         """ return True if `user` is allowed to create a new post in `topic` """
