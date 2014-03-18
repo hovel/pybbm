@@ -73,6 +73,25 @@ class RedirectToLoginMixin(object):
         return '/'
 
 
+class BreadcrumbMixin(object):
+    """ insert in the context, the object to be used in the breadcrumb
+    """
+    context_breadcrumb_object_name = 'object'
+
+    def update_breadcrumb_ctx(self, ctx):
+        ctx['breadcrumb_object'] = self.get_breadcrumb_object(ctx)
+
+    def get_breadcrumb_object(self, ctx):
+        obj_name = getattr(self, 'context_breadcrumb_object_name', None)
+
+        if not obj_name:
+            # Fallback
+            obj_name = getattr(self, 'context_object_name', None)
+
+        if obj_name:
+            return ctx.get(obj_name)
+
+
 class IndexView(generic.ListView):
 
     template_name = 'pybb/index.html'
@@ -90,7 +109,7 @@ class IndexView(generic.ListView):
         return perms.filter_categories(self.request.user, Category.objects.all())
 
 
-class CategoryView(RedirectToLoginMixin, generic.DetailView):
+class CategoryView(RedirectToLoginMixin, BreadcrumbMixin, generic.DetailView):
 
     template_name = 'pybb/index.html'
     context_object_name = 'category'
@@ -111,13 +130,15 @@ class CategoryView(RedirectToLoginMixin, generic.DetailView):
         ctx = super(CategoryView, self).get_context_data(**kwargs)
         ctx['category'].forums_accessed = perms.filter_forums(self.request.user, ctx['category'].forums.filter(parent=None))
         ctx['categories'] = [ctx['category']]
+        self.update_breadcrumb_ctx(ctx)
         return ctx
 
 
-class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
+class ForumView(RedirectToLoginMixin, PaginatorMixin, BreadcrumbMixin, generic.ListView):
 
     paginate_by = defaults.PYBB_FORUM_PAGE_SIZE
     context_object_name = 'topic_list'
+    context_breadcrumb_object_name = 'forum'
     template_name = 'pybb/forum.html'
 
     def get_login_redirect_url(self):
@@ -127,6 +148,7 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         ctx = super(ForumView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
         ctx['forum'].forums_accessed = perms.filter_forums(self.request.user, self.forum.child_forums.all())
+        self.update_breadcrumb_ctx(ctx)
         return ctx
 
     def get_queryset(self):
@@ -151,7 +173,7 @@ class LatestTopicsView(PaginatorMixin, generic.ListView):
         return qs.order_by('-updated')
 
 
-class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
+class TopicView(RedirectToLoginMixin, PaginatorMixin, BreadcrumbMixin, generic.ListView):
     paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
@@ -160,6 +182,8 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     admin_post_form_class = AdminPostForm
     poll_form_class = PollForm
     attachment_formset_class = AttachmentFormSet
+
+    context_breadcrumb_object_name = 'topic'
 
     def get_login_redirect_url(self):
         return reverse('pybb:topic', args=(self.kwargs['pk'],))
@@ -252,6 +276,8 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         if perms.may_vote_in_topic(self.request.user, self.topic) and \
                 pybb_topic_poll_not_voted(self.topic, self.request.user):
             ctx['poll_form'] = self.get_poll_form_class()(self.topic)
+
+        self.update_breadcrumb_ctx(ctx)
 
         return ctx
 
@@ -348,9 +374,10 @@ class PostEditMixin(object):
             return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
 
 
-class AddPostView(PostEditMixin, generic.CreateView):
+class AddPostView(PostEditMixin, BreadcrumbMixin, generic.CreateView):
 
     template_name = 'pybb/add_post.html'
+    context_breadcrumb_object_name = 'topic'
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
@@ -404,6 +431,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
         ctx = super(AddPostView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
         ctx['topic'] = self.topic
+        self.update_breadcrumb_ctx(ctx)
         return ctx
 
     def get_success_url(self):
@@ -412,7 +440,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
         return super(AddPostView, self).get_success_url()
 
 
-class EditPostView(PostEditMixin, generic.UpdateView):
+class EditPostView(PostEditMixin, BreadcrumbMixin, generic.UpdateView):
 
     model = Post
 
@@ -434,6 +462,11 @@ class EditPostView(PostEditMixin, generic.UpdateView):
         if not perms.may_edit_post(self.request.user, post):
             raise PermissionDenied
         return post
+
+    def get_context_data(self, **kwargs):
+        ctx = super(EditPostView, self).get_context_data(**kwargs)
+        self.update_breadcrumb_ctx(ctx)
+        return ctx
 
 
 class UserView(generic.DetailView):
@@ -545,7 +578,7 @@ class ProfileEditView(generic.UpdateView):
         return reverse('pybb:edit_profile')
 
 
-class DeletePostView(generic.DeleteView):
+class DeletePostView(BreadcrumbMixin, generic.DeleteView):
 
     template_name = 'pybb/delete_post.html'
     context_object_name = 'post'
@@ -579,6 +612,11 @@ class DeletePostView(generic.DeleteView):
                 return self.topic.get_absolute_url()
             else:
                 return ""
+
+    def get_context_data(self, **kwargs):
+        ctx = super(DeletePostView, self).get_context_data(**kwargs)
+        self.update_breadcrumb_ctx(ctx)
+        return ctx
 
 
 class TopicActionBaseView(generic.View):
@@ -628,7 +666,7 @@ class OpenTopicView(TopicActionBaseView):
         topic.save()
 
 
-class TopicPollVoteView(generic.UpdateView):
+class TopicPollVoteView(BreadcrumbMixin, generic.UpdateView):
     model = Topic
     http_method_names = ['post', ]
     form_class = PollForm
@@ -662,6 +700,11 @@ class TopicPollVoteView(generic.UpdateView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+    def get_context_data(self, **kwargs):
+        ctx = super(TopicPollVoteView, self).get_context_data(**kwargs)
+        self.update_breadcrumb_ctx(ctx)
+        return ctx
 
 
 @login_required

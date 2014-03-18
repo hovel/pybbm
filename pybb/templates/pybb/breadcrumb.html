@@ -3,16 +3,16 @@
 <ul class='breadcrumb'>
     {% include "pybb/breadcrumb_top_extra_crumb.html" %}
     <li><a href="{% url 'pybb:index' %}">{% trans "Home" %}</a> <span class="divider">/</span></li>
-    {% if object %}
-        {% if object.get_parents %}
-            {% for obj in object.get_parents %}
+    {% if breadcrumb_object %}
+        {% if breadcrumb_object.get_parents %}
+            {% for obj in breadcrumb_object.get_parents %}
                 <li>{% pybb_link obj %} <span class="divider">/</span></li>
             {% endfor %}
         {% endif %}
         {% if extra_crumb %}
-            <li>{% pybb_link object %} <span class="divider">/</span></li>
+            <li>{% pybb_link breadcrumb_object %} <span class="divider">/</span></li>
         {% else %}
-            <li>{{ object }}</li>
+            <li>{{ breadcrumb_object }}</li>
         {% endif %}
     {% endif %}
     {% if extra_crumb %}
