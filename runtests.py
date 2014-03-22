@@ -31,7 +31,7 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
     if test_db == 'mysql':
         DATABASES['default'].update({
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'modeltranslation',
+            'NAME': 'pybbm',
             'USER': 'root',
             'TEST_COLLATION': 'utf8_general_ci',
         })
@@ -39,7 +39,7 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
         DATABASES['default'].update({
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'USER': 'postgres',
-            'NAME': 'modeltranslation',
+            'NAME': 'pybbm',
             'OPTIONS': {
                 'autocommit': True,
             }
