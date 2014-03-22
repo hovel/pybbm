@@ -25,7 +25,6 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': ':memory:',
             'TEST_CHARSET': 'utf8',
-            'TEST_COLLATION': 'utf8_general_ci'
         }
     }
     test_db = os.environ.get('DB', 'sqlite')
@@ -34,6 +33,7 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'modeltranslation',
             'USER': 'root',
+            'TEST_COLLATION': 'utf8_general_ci',
         })
     elif test_db == 'postgres':
         DATABASES['default'].update({
