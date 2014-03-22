@@ -9,7 +9,7 @@ from pybb.subscription import notify_topic_subscribers
 
 from django.db import models, transaction
 from django.core.urlresolvers import reverse
-from django.db.utils import IntegrityError
+from django.db import DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
@@ -374,11 +374,13 @@ class TopicReadTrackerManager(models.Manager):
         See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
         """
         is_new = True
+        sid = transaction.savepoint(using=self.db)
         try:
             with atomic_func():
                 obj = TopicReadTracker.objects.create(user=user, topic=topic)
-        except IntegrityError:
-            transaction.commit()
+            transaction.savepoint_commit(sid)
+        except DatabaseError:
+            transaction.savepoint_rollback(sid)
             obj = TopicReadTracker.objects.get(user=user, topic=topic)
             is_new = False
         return obj, is_new
@@ -410,11 +412,13 @@ class ForumReadTrackerManager(models.Manager):
         See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
         """
         is_new = True
+        sid = transaction.savepoint(using=self.db)
         try:
             with atomic_func():
                 obj = ForumReadTracker.objects.create(user=user, forum=forum)
-        except IntegrityError:
-            transaction.commit()
+            transaction.savepoint_commit(sid)
+        except DatabaseError:
+            transaction.savepoint_rollback(sid)
             is_new = False
             obj = ForumReadTracker.objects.get(user=user, forum=forum)
         return obj, is_new
