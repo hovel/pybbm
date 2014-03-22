@@ -20,12 +20,32 @@ TEMPLATE_CONTEXT_PROCESSORS = [
 # For convenience configure settings if they are not pre-configured or if we
 # haven't been provided settings to use by environment variable.
 if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
-    settings.configure(
-        DATABASES={
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+            'TEST_CHARSET': 'utf8',
+            'TEST_COLLATION': 'utf8_general_ci'
+        }
+    }
+    test_db = os.environ.get('DB', 'sqlite')
+    if test_db == 'mysql':
+        DATABASES['default'].update({
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'modeltranslation',
+            'USER': 'root',
+        })
+    elif test_db == 'postgres':
+        DATABASES['default'].update({
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'USER': 'postgres',
+            'NAME': 'modeltranslation',
+            'OPTIONS': {
+                'autocommit': True,
             }
-        },
+        })
+    settings.configure(
+        DATABASES=DATABASES,
         INSTALLED_APPS=[
             'django.contrib.auth',
             'django.contrib.admin',

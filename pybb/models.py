@@ -102,7 +102,7 @@ class Forum(models.Model):
         self.post_count = posts.count()
         self.topic_count = Topic.objects.filter(forum=self).count()
         try:
-            last_post = posts.order_by('-created')[0]
+            last_post = posts.order_by('-created', '-id')[0]
             self.updated = last_post.updated or last_post.created
         except IndexError:
             pass
@@ -119,7 +119,7 @@ class Forum(models.Model):
     @property
     def last_post(self):
         try:
-            return self.posts.order_by('-created')[0]
+            return self.posts.order_by('-created', '-id')[0]
         except IndexError:
             return None
 
@@ -177,7 +177,7 @@ class Topic(models.Model):
         Get first post and cache it for request
         """
         if not hasattr(self, "_head"):
-            self._head = self.posts.all().order_by('created')
+            self._head = self.posts.all().order_by('created', 'id')
         if not len(self._head):
             return None
         return self._head[0]
@@ -185,7 +185,7 @@ class Topic(models.Model):
     @property
     def last_post(self):
         if not getattr(self, '_last_post', None):
-            self._last_post = self.posts.order_by('-created').select_related('user')[0]
+            self._last_post = self.posts.order_by('-created', '-id').select_related('user')[0]
         return self._last_post
 
     def get_absolute_url(self):
@@ -214,7 +214,7 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        last_post = Post.objects.filter(topic_id=self.id).order_by('-created')[0]
+        last_post = Post.objects.filter(topic_id=self.id).order_by('-created', '-id')[0]
         self.updated = last_post.updated or last_post.created
         self.save()
 
@@ -308,7 +308,7 @@ class Post(RenderableItem):
 
     def delete(self, *args, **kwargs):
         self_id = self.id
-        head_post_id = self.topic.posts.order_by('created')[0].id
+        head_post_id = self.topic.posts.order_by('created', 'id')[0].id
 
         if self_id == head_post_id:
             self.topic.delete()

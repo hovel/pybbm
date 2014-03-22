@@ -14,7 +14,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'pybbm',
         'USER': 'root',
-        'PASSWORD': 'qwerty'
+        'PASSWORD': 'qwerty',
+        'TEST_CHARSET': 'utf8',
+        'TEST_COLLATION': 'utf8_general_ci'
     }
 }
 
