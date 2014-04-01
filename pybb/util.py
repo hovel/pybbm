@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import os
 import re
 import uuid
-import django
 from django.utils.translation import ugettext as _
+from pybb.compat import get_username_field, get_user_model
 
 
 def unescape(text):
@@ -31,23 +31,6 @@ def rstrip_str(user, str):
     if user.is_staff:
         return str
     return '\n'.join([s.rstrip() for s in str.splitlines()])
-
-
-def get_user_model():
-    if django.VERSION[:2] >= (1, 5):
-        from django.contrib.auth import get_user_model
-        return get_user_model()
-    else:
-        from django.contrib.auth.models import User
-        User.get_username = lambda u: u.username  # emulate new 1.5 method
-        return User
-
-
-def get_username_field():
-    if django.VERSION[:2] >= (1, 5):
-        return get_user_model().USERNAME_FIELD
-    else:
-        return 'username'
 
 
 def get_pybb_profile(user):
@@ -90,3 +73,4 @@ def get_file_path(instance, filename, to):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join(to, filename)
+

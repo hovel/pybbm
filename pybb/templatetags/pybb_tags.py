@@ -18,7 +18,6 @@ from django.utils.translation import ugettext as _
 from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
-from pybb.util import build_cache_key
 
 try:
     import pytils
@@ -358,5 +357,5 @@ def if_has_tag(parser, token):
 
 @register.filter
 def pybbm_calc_topic_views(topic):
-    cache_key = build_cache_key('anonymous_topic_views', topic_id=topic.id)
+    cache_key = util.build_cache_key('anonymous_topic_views', topic_id=topic.id)
     return topic.views + cache.get(cache_key, 0)

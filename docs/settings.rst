@@ -37,6 +37,11 @@ manage emails from your site in queue. But in this case you have to periodically
 send emails from queue. For more information see `app home page <https://github.com/pinax/django-mailer/>`_.
 (default False)
 
+PYBB_INITIAL_CUSTOM_USER_MIGRATION
+----------------------------------
+
+Name of initial south migration in app where placed custom user model (default '0001_initial.py')
+
 Emoticons
 ---------
 

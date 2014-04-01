@@ -1,6 +1,11 @@
 PyBBM Changelog
 ===============
 
+0.15.5 -> dev
+-------------
+* Make all migrations compatible with custom user model. Break dependency on sorl.thumbnail in migrations
+* Compatibility functions moved to compat.py module
+
 0.15.4 -> 0.15.5
 ----------------
 * Fixed bug when user can vote (or cancel vote) when topic was closed.

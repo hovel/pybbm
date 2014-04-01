@@ -9,7 +9,6 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
-from django.db.models.aggregates import Count
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,30 +18,16 @@ from django.views.decorators.http import require_POST
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
-from pybb.util import build_cache_key
-
-try:
-    from pure_pagination import Paginator
-    pure_pagination = True
-except ImportError:
-    # the simplest emulation of django-pure-pagination behavior
-    from django.core.paginator import Paginator, Page
-    class PageRepr(int):
-        def querystring(self):
-            return 'page=%s' % self
-    Page.pages = lambda self: [PageRepr(i) for i in range(1, self.paginator.num_pages + 1)]
-    pure_pagination = False
-
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb import compat, defaults, util
 from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
-from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
-from pybb import defaults
-
+from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
+from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 
-from pybb import util
-User = util.get_user_model()
-username_field = util.get_username_field()
+
+User = compat.get_user_model()
+username_field = compat.get_username_field()
+Paginator, pure_pagination = compat.get_paginator_class()
 
 
 class PaginatorMixin(object):
@@ -209,7 +194,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         if self.request.user.is_authenticated() or not defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER:
             Topic.objects.filter(id=self.topic.id).update(views=F('views') + 1)
         else:
-            cache_key = build_cache_key('anonymous_topic_views', topic_id=self.topic.id)
+            cache_key = util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)
             cache.add(cache_key, 0)
             if cache.incr(cache_key) % defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER == 0:
                 Topic.objects.filter(id=self.topic.id).update(views=F('views') +

@@ -1,23 +1,24 @@
 # encoding: utf-8
-try:
-    from django.contrib.auth import get_user_model
-except ImportError:  # django < 1.5
-    from django.contrib.auth.models import User
-else:
-    User = get_user_model()
 import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 from django.db.models import get_app
 from django.contrib.auth.management import create_permissions
+from django.db import transaction
+
+from pybb.compat import get_user_model_path, get_user_frozen_models, get_image_field_full_name
+
+
+AUTH_USER = get_user_model_path()
 
 
 class Migration(DataMigration):
 
     def forwards(self, orm):
         app = get_app('pybb')
-        create_permissions(app, (), 2)
+        with transaction.autocommit():
+            create_permissions(app, (), 2)
 
 
     def backwards(self, orm):
@@ -37,22 +38,6 @@ class Migration(DataMigration):
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
@@ -84,11 +69,11 @@ class Migration(DataMigration):
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'hidden': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'moderators': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name), 'null': 'True', 'blank': 'True'}),
+            'moderators': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['%s']"% AUTH_USER, 'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_forums'", 'symmetrical': 'False', 'through': "orm['pybb.ForumReadTracker']", 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
+            'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_forums'", 'symmetrical': 'False', 'through': "orm['pybb.ForumReadTracker']", 'to': "orm['%s']"% AUTH_USER}),
             'topic_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
@@ -97,7 +82,7 @@ class Migration(DataMigration):
             'forum': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pybb.Forum']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'time_stamp': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']"% AUTH_USER})
         },
         'pybb.post': {
             'Meta': {'ordering': "['created']", 'object_name': 'Post'},
@@ -109,12 +94,12 @@ class Migration(DataMigration):
             'markup': ('django.db.models.fields.CharField', [], {'default': "'bbcode'", 'max_length': '15'}),
             'topic': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['pybb.Topic']"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'posts'", 'to': "orm['%s']"% AUTH_USER}),
             'user_ip': ('django.db.models.fields.IPAddressField', [], {'default': "'0.0.0.0'", 'max_length': '15', 'blank': 'True'})
         },
         'pybb.profile': {
             'Meta': {'object_name': 'Profile'},
-            'avatar': ('sorl.thumbnail.fields.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'avatar': (get_image_field_full_name(), [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'ban_status': ('django.db.models.fields.SmallIntegerField', [], {'default': '0'}),
             'ban_till': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -125,7 +110,7 @@ class Migration(DataMigration):
             'signature': ('django.db.models.fields.TextField', [], {'max_length': '1024', 'blank': 'True'}),
             'signature_html': ('django.db.models.fields.TextField', [], {'max_length': '1054', 'blank': 'True'}),
             'time_zone': ('django.db.models.fields.FloatField', [], {'default': '3.0'}),
-            'user': ('annoying.fields.AutoOneToOneField', [], {'related_name': "'pybb_profile'", 'unique': 'True', 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
+            'user': ('annoying.fields.AutoOneToOneField', [], {'related_name': "'pybb_profile'", 'unique': 'True', 'to': "orm['%s']"% AUTH_USER})
         },
         'pybb.topic': {
             'Meta': {'ordering': "['-created']", 'object_name': 'Topic'},
@@ -135,11 +120,11 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_topics'", 'symmetrical': 'False', 'through': "orm['pybb.TopicReadTracker']", 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
+            'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_topics'", 'symmetrical': 'False', 'through': "orm['pybb.TopicReadTracker']", 'to': "orm['%s']"% AUTH_USER}),
             'sticky': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'subscriptions'", 'blank': 'True', 'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
+            'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'subscriptions'", 'blank': 'True', 'to': "orm['%s']"% AUTH_USER}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']"% AUTH_USER}),
             'views': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
         },
         'pybb.topicreadtracker': {
@@ -147,8 +132,9 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'time_stamp': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'topic': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pybb.Topic']", 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s.%s']"% (User._meta.app_label, User._meta.object_name)})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['%s']"% AUTH_USER})
         }
     }
+    models.update(get_user_frozen_models(AUTH_USER))
 
     complete_apps = ['pybb']

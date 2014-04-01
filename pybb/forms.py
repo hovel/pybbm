@@ -4,19 +4,18 @@ from __future__ import unicode_literals
 import re
 import inspect
 
-
 from django import forms
 from django.core.exceptions import FieldError
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
 
-from pybb import util
-User = util.get_user_model()
-username_field = util.get_username_field()
-
+from pybb import compat, defaults, util
 from pybb.models import Topic, Post, Attachment, PollAnswer
-from pybb import defaults
+
+
+User = compat.get_user_model()
+username_field = compat.get_username_field()
 
 
 class AttachmentForm(forms.ModelForm):
@@ -42,8 +41,8 @@ class BasePollAnswerFormset(BaseInlineFormSet):
     def clean(self):
         if any(self.errors):
             raise forms.ValidationError(self.errors)
-        forms_cnt = len(self.initial_forms) + len([form for form in self.extra_forms if form.has_changed()]) -\
-                    len(self.deleted_forms)
+        forms_cnt = (len(self.initial_forms) + len([form for form in self.extra_forms if form.has_changed()]) -
+                     len(self.deleted_forms))
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
             raise forms.ValidationError(
                 ugettext('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))

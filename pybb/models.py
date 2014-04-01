@@ -1,31 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import functools
+
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_delete, post_save
-from pybb.profiles import PybbProfile
-from pybb.subscription import notify_topic_subscribers
-
-from django.db import models, transaction
 from django.core.urlresolvers import reverse
-from django.db import DatabaseError
+from django.db.models.signals import post_delete, post_save
+from django.db import models, transaction, DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now as tznow
 
+from pybb.compat import get_user_model_path, get_username_field, get_user_model, get_atomic_func
+from pybb import defaults
+from pybb.profiles import PybbProfile
+from pybb.subscription import notify_topic_subscribers
+from pybb.util import unescape, get_pybb_profile_model, get_pybb_profile, get_file_path
+
 from annoying.fields import AutoOneToOneField
-
-from pybb.util import unescape, get_user_model, get_username_field, get_pybb_profile_model, get_pybb_profile, get_file_path
-
-User = get_user_model()
-username_field = get_username_field()
-
-try:
-    from hashlib import sha1
-except ImportError:
-    from sha import sha as sha1
 
 try:
     from south.modelsinspector import add_introspection_rules
@@ -33,13 +26,6 @@ try:
     add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
 except ImportError:
     pass
-
-from pybb import defaults
-
-try:
-    from django.db.transaction import atomic as atomic_func
-except ImportError:
-    from django.db.transaction import commit_on_success as atomic_func
 
 
 @python_2_unicode_compatible
@@ -81,12 +67,12 @@ class Forum(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
     description = models.TextField(_('Description'), blank=True)
-    moderators = models.ManyToManyField(User, blank=True, null=True, verbose_name=_('Moderators'))
+    moderators = models.ManyToManyField(get_user_model_path(), blank=True, null=True, verbose_name=_('Moderators'))
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
-    readed_by = models.ManyToManyField(User, through='ForumReadTracker', related_name='readed_forums')
+    readed_by = models.ManyToManyField(get_user_model_path(), through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
 
     class Meta(object):
@@ -151,14 +137,14 @@ class Topic(models.Model):
     name = models.CharField(_('Subject'), max_length=255)
     created = models.DateTimeField(_('Created'), null=True)
     updated = models.DateTimeField(_('Updated'), null=True)
-    user = models.ForeignKey(User, verbose_name=_('User'))
+    user = models.ForeignKey(get_user_model_path(), verbose_name=_('User'))
     views = models.IntegerField(_('Views count'), blank=True, default=0)
     sticky = models.BooleanField(_('Sticky'), blank=True, default=False)
     closed = models.BooleanField(_('Closed'), blank=True, default=False)
-    subscribers = models.ManyToManyField(User, related_name='subscriptions', verbose_name=_('Subscribers'),
+    subscribers = models.ManyToManyField(get_user_model_path(), related_name='subscriptions', verbose_name=_('Subscribers'),
         blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    readed_by = models.ManyToManyField(User, through='TopicReadTracker', related_name='readed_topics')
+    readed_by = models.ManyToManyField(get_user_model_path(), through='TopicReadTracker', related_name='readed_topics')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
     poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
     poll_question = models.TextField(_('Poll question'), blank=True, null=True)
@@ -256,7 +242,7 @@ class RenderableItem(models.Model):
 @python_2_unicode_compatible
 class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
-    user = models.ForeignKey(User, related_name='posts', verbose_name=_('User'))
+    user = models.ForeignKey(get_user_model_path(), related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True, db_index=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     user_ip = models.IPAddressField(_('User IP'), blank=True, default='0.0.0.0')
@@ -329,14 +315,14 @@ class Profile(PybbProfile):
     Profile class that can be used if you doesn't have
     your site profile.
     """
-    user = AutoOneToOneField(User, related_name='pybb_profile', verbose_name=_('User'))
+    user = AutoOneToOneField(get_user_model_path(), related_name='pybb_profile', verbose_name=_('User'))
 
     class Meta(object):
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
 
     def get_absolute_url(self):
-        return reverse('pybb:user', kwargs={'username': getattr(self.user, username_field)})
+        return reverse('pybb:user', kwargs={'username': getattr(self.user, get_username_field())})
 
 
 class Attachment(models.Model):
@@ -376,7 +362,7 @@ class TopicReadTrackerManager(models.Manager):
         is_new = True
         sid = transaction.savepoint(using=self.db)
         try:
-            with atomic_func():
+            with get_atomic_func()():
                 obj = TopicReadTracker.objects.create(user=user, topic=topic)
             transaction.savepoint_commit(sid)
         except DatabaseError:
@@ -390,7 +376,7 @@ class TopicReadTracker(models.Model):
     """
     Save per user topic read tracking
     """
-    user = models.ForeignKey(User, blank=False, null=False)
+    user = models.ForeignKey(get_user_model_path(), blank=False, null=False)
     topic = models.ForeignKey(Topic, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
 
@@ -414,7 +400,7 @@ class ForumReadTrackerManager(models.Manager):
         is_new = True
         sid = transaction.savepoint(using=self.db)
         try:
-            with atomic_func():
+            with get_atomic_func()():
                 obj = ForumReadTracker.objects.create(user=user, forum=forum)
             transaction.savepoint_commit(sid)
         except DatabaseError:
@@ -428,7 +414,7 @@ class ForumReadTracker(models.Model):
     """
     Save per user forum read tracking
     """
-    user = models.ForeignKey(User, blank=False, null=False)
+    user = models.ForeignKey(get_user_model_path(), blank=False, null=False)
     forum = models.ForeignKey(Forum, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
 
@@ -466,7 +452,7 @@ class PollAnswer(models.Model):
 @python_2_unicode_compatible
 class PollAnswerUser(models.Model):
     poll_answer = models.ForeignKey(PollAnswer, related_name='users', verbose_name=_('Poll answer'))
-    user = models.ForeignKey(User, related_name='poll_answers', verbose_name=_('User'))
+    user = models.ForeignKey(get_user_model_path(), related_name='poll_answers', verbose_name=_('User'))
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:

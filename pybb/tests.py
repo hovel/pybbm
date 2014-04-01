@@ -20,11 +20,10 @@ from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
     pybb_get_latest_topics, pybb_get_latest_posts
 
-from pybb import util
-from pybb.util import build_cache_key
+from pybb import compat, util
 
-User = util.get_user_model()
-username_field = util.get_username_field()
+User = compat.get_user_model()
+username_field = compat.get_username_field()
 
 try:
     from lxml import html
@@ -1052,18 +1051,18 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.assertEqual(Post.objects.get(body='test anonymous').user, self.user)
 
     def test_anonymous_cache_topic_views(self):
-        self.assertNotIn(build_cache_key('anonymous_topic_views', topic_id=self.topic.id), cache)
+        self.assertNotIn(util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id), cache)
         url = self.topic.get_absolute_url()
         self.client.get(url)
-        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 1)
+        self.assertEqual(cache.get(util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 1)
         for _ in range(defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER - 2):
             self.client.get(url)
         self.assertEqual(Topic.objects.get(id=self.topic.id).views, 0)
-        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)),
+        self.assertEqual(cache.get(util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)),
                          defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER - 1)
         self.client.get(url)
         self.assertEqual(Topic.objects.get(id=self.topic.id).views, defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
-        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
+        self.assertEqual(cache.get(util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
 
         views = Topic.objects.get(id=self.topic.id).views
 
