@@ -52,6 +52,7 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
             'django.contrib.contenttypes',
             'django.contrib.sessions',
             'django.contrib.sites',
+            'south',
             'test.test_project',
             'pybb',
         ],
