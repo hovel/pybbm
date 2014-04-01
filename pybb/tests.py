@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 from __future__ import unicode_literals
 import time
@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
+from django.utils import timezone
 from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
     pybb_get_latest_topics, pybb_get_latest_posts
@@ -273,6 +274,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 0)
 
         # user_ann reads topic_1, she should get one topic read tracker, there should be no forum read trackers
+        time.sleep(1)
         client_ann.get(topic_1.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 1)
@@ -280,6 +282,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 0)
 
         # user_bob reads topic_1, he should get one topic read tracker, there should be no forum read trackers
+        time.sleep(1)
         client_bob.get(topic_1.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 2)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
@@ -287,17 +290,17 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         # user_bob reads topic_2, he should get a forum read tracker, 
         #  there should be no topic read trackers for user_bob
+        time.sleep(1)
         client_bob.get(topic_2.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=user_bob).count(), 1)
         self.assertEqual(ForumReadTracker.objects.filter(user=user_bob, forum=self.forum).count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 0)
-        self.assertListEqual(
-            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_bob)],
-            [False, False])
+        self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_bob)], [False, False])
 
-        # user_ann creates topic_3, they should get a new topic read tracker in the db 
+        # user_ann creates topic_3, they should get a new topic read tracker in the db
+        time.sleep(1)
         add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
         response = client_ann.get(add_topic_url)
         values = self.get_form_values(response)
@@ -308,11 +311,11 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.all().count(), 2)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 2)
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
-
-        topic_3 = Topic.objects.order_by('-updated')[0]
+        topic_3 = Topic.objects.order_by('-updated', '-id')[0]
         self.assertEqual(topic_3.name, 'topic_3')
 
         # user_ann posts to topic_1, a topic they've already read, no new trackers should be created
+        time.sleep(1)
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': topic_1.id})
         response = client_ann.get(add_post_url)
         values = self.get_form_values(response)
@@ -325,25 +328,25 @@ class FeaturesTest(TestCase, SharedTestModule):
         # user_bob has two unread topics, 'topic_1' and 'topic_3'.
         #   This is because user_ann created a new topic and posted to an existing topic,
         #   after user_bob got his forum read tracker.
+
         # user_bob reads 'topic_1'
         #   user_bob gets a new topic read tracker, and the existing forum read tracker stays the same.
         #   'topic_3' appears unread for user_bob
         #
-        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         previous_time = ForumReadTracker.objects.all()[0].time_stamp
-
+        time.sleep(1)
         client_bob.get(topic_1.get_absolute_url())
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.all()[0].time_stamp, previous_time)
-        self.assertEqual(TopicReadTracker.objects.all().count(), 3)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
+        self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 2)
+        self.assertEqual(TopicReadTracker.objects.all().count(), 3)
 
         # user_bob reads the last unread topic, 'topic_3'.
         # user_bob's existing forum read tracker updates and his topic read tracker disappears
         #
-        self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         previous_time = ForumReadTracker.objects.all()[0].time_stamp
-
+        time.sleep(1)
         client_bob.get(topic_3.get_absolute_url())
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertGreater(ForumReadTracker.objects.all()[0].time_stamp, previous_time)
@@ -517,35 +520,26 @@ class FeaturesTest(TestCase, SharedTestModule):
         client_ann.login(username='ann', password='ann')
 
         # Everything is unread
-        self.assertListEqual(
-            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
-            [True, True])
-        self.assertListEqual(
-            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
-            [True, True])
+        self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [True, True])
+        self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, True])
 
         # read all
         client_ann.get(reverse('pybb:mark_all_as_read'))
-        self.assertListEqual(
-            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
-            [False, False])
-        self.assertListEqual(
-            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
-            [False, False])
+        self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, False])
+        self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [False, False])
 
+        time.sleep(1)
         post = Post.objects.create(topic=topic_1, user=self.user, body='three')
+        post = Post.objects.get(id=post.id)  # get post with timestamp from DB
 
         topic_1 = Topic.objects.get(id=topic_1.id)
         topic_2 = Topic.objects.get(id=topic_2.id)
         self.assertEqual(topic_1.updated, post.updated or post.created)
         self.assertEqual(forum_1.updated, post.updated or post.created)
-        self.assertListEqual(
-            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
-            [True, False])
-        self.assertListEqual(
-            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
-            [True, False])
+        self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [True, False])
+        self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, False])
 
+        time.sleep(1)
         post.topic = topic_2
         post.save()
         topic_1 = Topic.objects.get(id=topic_1.id)
@@ -554,13 +548,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         forum_2 = Forum.objects.get(id=forum_2.id)
         self.assertEqual(topic_2.updated, post.updated or post.created)
         self.assertEqual(forum_2.updated, post.updated or post.created)
-        self.assertListEqual(
-            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
-            [False, True])
-        self.assertListEqual(
-            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
-            [False, True])
+        self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, True])
+        self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [False, True])
 
+        time.sleep(1)
         topic_2.forum = forum_1
         topic_2.save()
         topic_1 = Topic.objects.get(id=topic_1.id)
@@ -568,12 +559,8 @@ class FeaturesTest(TestCase, SharedTestModule):
         forum_1 = Forum.objects.get(id=forum_1.id)
         forum_2 = Forum.objects.get(id=forum_2.id)
         self.assertEqual(forum_1.updated, post.updated or post.created)
-        self.assertListEqual(
-            [t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)],
-            [False, True])
-        self.assertListEqual(
-            [t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)],
-            [True, False])
+        self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, True])
+        self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, False])
 
     def test_open_first_unread_post(self):
         forum_1 = self.forum
@@ -588,38 +575,35 @@ class FeaturesTest(TestCase, SharedTestModule):
         client_ann = Client()
         client_ann.login(username='ann', password='ann')
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id}), data={'first-unread': 1},
-                                  follow=True)
-        self.assertRedirects(response,
-                             '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_1.id))
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id}), data={'first-unread': 1},
-                                  follow=True)
-        self.assertRedirects(response,
-                             '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_2.id))
+        response = client_ann.get(topic_1.get_absolute_url(), data={'first-unread': 1}, follow=True)
+        self.assertRedirects(response, '%s?page=%d#post-%d' % (topic_1.get_absolute_url(), 1, post_1_1.id))
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_2.id}), data={'first-unread': 1},
-                                  follow=True)
-        self.assertRedirects(response,
-                             '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_2.id}), 1, post_2_1.id))
+        response = client_ann.get(topic_1.get_absolute_url(), data={'first-unread': 1}, follow=True)
+        self.assertRedirects(response, '%s?page=%d#post-%d' % (topic_1.get_absolute_url(), 1, post_1_2.id))
 
+        response = client_ann.get(topic_2.get_absolute_url(), data={'first-unread': 1}, follow=True)
+        self.assertRedirects(response, '%s?page=%d#post-%d' % (topic_2.get_absolute_url(), 1, post_2_1.id))
+
+        time.sleep(1)
         post_1_3 = Post.objects.create(topic=topic_1, user=self.user, body='1_3')
         post_1_4 = Post.objects.create(topic=topic_1, user=self.user, body='1_4')
 
-        response = client_ann.get(reverse('pybb:topic', kwargs={'pk': topic_1.id}), data={'first-unread': 1},
-                                  follow=True)
-        self.assertRedirects(response,
-                             '%s?page=%d#post-%d' % (reverse('pybb:topic', kwargs={'pk': topic_1.id}), 1, post_1_3.id))
+        response = client_ann.get(topic_1.get_absolute_url(), data={'first-unread': 1}, follow=True)
+        self.assertRedirects(response, '%s?page=%d#post-%d' % (topic_1.get_absolute_url(), 1, post_1_3.id))
 
     def test_latest_topics(self):
         topic_1 = self.topic
-        topic_1.updated = datetime.datetime.utcnow()
+        topic_1.updated = timezone.now()
+        topic_1.save()
         topic_2 = Topic.objects.create(name='topic_2', forum=self.forum, user=self.user)
-        topic_2.updated = datetime.datetime.utcnow() + datetime.timedelta(days=-1)
+        topic_2.updated = timezone.now() + datetime.timedelta(days=-1)
+        topic_2.save()
 
         category_2 = Category.objects.create(name='cat2')
         forum_2 = Forum.objects.create(name='forum_2', category=category_2)
         topic_3 = Topic.objects.create(name='topic_3', forum=forum_2, user=self.user)
-        topic_3.updated = datetime.datetime.utcnow() + datetime.timedelta(days=-2)
+        topic_3.updated = timezone.now() + datetime.timedelta(days=-2)
+        topic_3.save()
 
         self.login_client()
         response = self.client.get(reverse('pybb:topic_latest'))
@@ -905,7 +889,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         values['body'] = 'test subscribtion юникод'
         response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        new_post = Post.objects.get(pk=2)
+        new_post = Post.objects.order_by('-id')[0]
 
         # there should only be one email in the outbox (to user2@example.com)
         self.assertEqual(len(mail.outbox), 1)
@@ -938,22 +922,26 @@ class FeaturesTest(TestCase, SharedTestModule):
         forum_1 = Forum.objects.create(name='new forum', category=self.category)
         topic_1 = Topic.objects.create(name='new topic', forum=forum_1, user=self.user)
         post_1 = Post.objects.create(topic=topic_1, user=self.user, body='test')
-        time.sleep(2)
+        post_1 = Post.objects.get(id=post_1.id)
+
         self.assertEqual(topic_1.updated, post_1.created)
         self.assertEqual(forum_1.updated, post_1.created)
 
         topic_2 = Topic.objects.create(name='another topic', forum=forum_1, user=self.user)
         post_2 = Post.objects.create(topic=topic_2, user=self.user, body='another test')
-        time.sleep(2)
+        post_2 = Post.objects.get(id=post_2.id)
+
         self.assertEqual(topic_2.updated, post_2.created)
         self.assertEqual(forum_1.updated, post_2.created)
 
         topic_2.delete()
+        forum_1 = Forum.objects.get(id=forum_1.id)
         self.assertEqual(forum_1.updated, post_1.created)
         self.assertEqual(forum_1.topic_count, 1)
         self.assertEqual(forum_1.post_count, 1)
 
         post_1.delete()
+        forum_1 = Forum.objects.get(id=forum_1.id)
         self.assertEqual(forum_1.topic_count, 0)
         self.assertEqual(forum_1.post_count, 0)
 
@@ -1125,7 +1113,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         self.assertNotContains(response, 'test premoderation')
 
         # But visible by superuser (with permissions)
-        user = User.objects.create_user('admin', 'zeus@localhost', 'admin')
+        user = User.objects.create_user('admin', 'admin@localhost', 'admin')
         user.is_superuser = True
         user.save()
         client.login(username='admin', password='admin')
@@ -1134,7 +1122,7 @@ class PreModerationTest(TestCase, SharedTestModule):
         self.assertContains(response, 'test premoderation')
 
         # user with names stats with allowed can post without premoderation
-        user = User.objects.create_user('allowed_zeus', 'zeus@localhost', 'allowed_zeus')
+        user = User.objects.create_user('allowed_zeus', 'allowed_zeus@localhost', 'allowed_zeus')
         client.login(username='allowed_zeus', password='allowed_zeus')
         response = client.get(add_post_url)
         values = self.get_form_values(response)

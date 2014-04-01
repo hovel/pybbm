@@ -213,7 +213,7 @@ class ForumView(PermissionsMixin, RedirectToLoginMixin, PaginatorMixin, generic.
         if not self.perms_may_view_forum(self.request.user, self.forum):
             raise PermissionDenied
 
-        qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
+        qs = self.forum.topics.order_by('-sticky', '-updated', '-id').select_related()
         qs = self.perms_filter_topics(self.request.user, qs)
         return qs
 
@@ -227,7 +227,7 @@ class LatestTopicsView(PermissionsMixin, PaginatorMixin, generic.ListView):
     def get_queryset(self):
         qs = Topic.objects.all().select_related()
         qs = self.perms_filter_topics(self.request.user, qs)
-        return qs.order_by('-updated')
+        return qs.order_by('-updated', '-id')
 
 
 class TopicView(PermissionsMixin, RedirectToLoginMixin, PaginatorMixin, generic.ListView):
@@ -273,7 +273,7 @@ class TopicView(PermissionsMixin, RedirectToLoginMixin, PaginatorMixin, generic.
                 read_date = read_dates and max(read_dates)
                 if read_date:
                     try:
-                        first_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created')[0]
+                        first_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created', 'id')[0]
                     except IndexError:
                         first_unread_topic = self.topic.last_post
                 else:
@@ -545,7 +545,7 @@ class UserPosts(PermissionsMixin, PaginatorMixin, generic.ListView):
         qs = super(UserPosts, self).get_queryset()
         qs = qs.filter(user=self.user)
         qs = self.perms_filter_posts(self.request.user, qs).select_related('topic')
-        qs = qs.order_by('-created', '-updated')
+        qs = qs.order_by('-created', '-updated', '-id')
         return qs
 
     def get_context_data(self, **kwargs):
@@ -568,7 +568,7 @@ class UserTopics(PermissionsMixin, PaginatorMixin, generic.ListView):
         qs = super(UserTopics, self).get_queryset()
         qs = qs.filter(user=self.user)
         qs = self.perms_filter_topics(self.user, qs)
-        qs = qs.order_by('-updated', '-created')
+        qs = qs.order_by('-updated', '-created', '-id')
         return qs
 
     def get_context_data(self, **kwargs):
