@@ -46,6 +46,7 @@ install:
   - pip install Django==$DJANGO --use-mirrors
   - pip install Pillow -U
   - pip install South -U
+  - pip install sorl-thumbnail -U
   - pip install -r test/test_project/requirements_test.txt
 script:
   - python setup.py test
