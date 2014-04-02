@@ -98,11 +98,11 @@ def get_file_path(instance, filename, to):
 
 
 def get_user_frozen_models(user_model):
+    from south.creator.freezer import freeze_apps
+    user_app, user_model = user_model.split('.')
     if user_model != 'auth.User':
         from south.migration.base import Migrations
         from south.exceptions import NoMigrations
-        from south.creator.freezer import freeze_apps
-        user_app, user_model = user_model.split('.')
         try:
             user_migrations = Migrations(user_app)
         except NoMigrations:
@@ -113,5 +113,5 @@ def get_user_frozen_models(user_model):
             initial_user_migration = user_migrations.migration(migration_name)
             extra_model = initial_user_migration.migration_class().models
     else:
-        extra_model = {}
+        extra_model = freeze_apps(user_app)
     return extra_model
