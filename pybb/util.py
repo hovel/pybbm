@@ -43,6 +43,11 @@ def get_user_model():
         return User
 
 
+def get_user_model_path():
+    User = get_user_model()
+    return "%s.%s" % (User._meta.app_label, User._meta.object_name)
+
+
 def get_username_field():
     if django.VERSION[:2] >= (1, 5):
         return get_user_model().USERNAME_FIELD
@@ -90,3 +95,23 @@ def get_file_path(instance, filename, to):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return os.path.join(to, filename)
+
+
+def get_user_frozen_models(user_model):
+    from south.creator.freezer import freeze_apps
+    user_app, user_model = user_model.split('.')
+    if user_model != 'auth.User':
+        from south.migration.base import Migrations
+        from south.exceptions import NoMigrations
+        try:
+            user_migrations = Migrations(user_app)
+        except NoMigrations:
+            extra_model = freeze_apps(user_app)
+        else:
+            from pybb import defaults
+            migration_name = defaults.PYBB_INITIAL_CUSTOM_USER_MIGRATION
+            initial_user_migration = user_migrations.migration(migration_name)
+            extra_model = initial_user_migration.migration_class().models
+    else:
+        extra_model = freeze_apps(user_app)
+    return extra_model
