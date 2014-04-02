@@ -1,10 +1,11 @@
 PyBBM Changelog
 ===============
 
-0.15.4 -> dev
--------------
+0.15.4 -> 0.15.5
+----------------
 * Fixed bug when user can vote (or cancel vote) when topic was closed.
 * Added `may_vote_in_topic` method to permission handler.
+* Fixed blocking user view
 
 0.15.3 -> 0.15.4
 ----------------

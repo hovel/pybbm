@@ -714,10 +714,23 @@ def block_user(request, username):
     if 'block_and_delete_messages' in request.POST:
         # individually delete each post and empty topic to fire method
         # with forum/topic counters recalculation
-        for p in Post.objects.filter(user=user):
-            p.delete()
-        for t in Topic.objects.annotate(cnt=Count('posts')).filter(cnt=0):
-            t.delete()
+        posts = Post.objects.filter(user=user)
+        topics = posts.values('topic_id').distinct()
+        forums = posts.values('topic__forum_id').distinct()
+        posts.delete()
+        Topic.objects.filter(user=user).delete()
+        for t in topics:
+            try:
+                Topic.objects.get(id=t['topic_id']).update_counters()
+            except Topic.DoesNotExist:
+                pass
+        for f in forums:
+            try:
+                Forum.objects.get(id=f['topic__forum_id']).update_counters()
+            except Forum.DoesNotExist:
+                pass
+
+
     msg = _('User successfuly blocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')

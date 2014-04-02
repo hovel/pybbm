@@ -735,8 +735,9 @@ class FeaturesTest(TestCase, SharedTestModule):
 
     def test_user_blocking(self):
         user = User.objects.create_user('test', 'test@localhost', 'test')
-        topic = Topic.objects.create(name='topic', forum=self.forum, user=self.user)
-        self.post = Post.objects.create(topic=topic, user=user, body='bbcode [b]test[/b]')
+        topic = Topic.objects.create(name='topic', forum=self.forum, user=user)
+        p1 = Post.objects.create(topic=topic, user=user, body='bbcode [b]test[/b]')
+        p2 = Post.objects.create(topic=topic, user=user, body='bbcode [b]test[/b]')
         self.user.is_superuser = True
         self.user.save()
         self.login_client()
@@ -747,16 +748,17 @@ class FeaturesTest(TestCase, SharedTestModule):
         user = User.objects.get(username=user.username)
         self.assertFalse(user.is_active)
         self.assertEqual(Topic.objects.filter().count(), 2)
-        self.assertEqual(Post.objects.filter(user=user).count(), 1)
+        self.assertEqual(Post.objects.filter(user=user).count(), 2)
 
         user.is_active = True
         user.save()
+        self.assertEqual(Topic.objects.count(), 2)
         response = self.client.post(reverse('pybb:block_user', args=[user.username]),
                                     data={'block_and_delete_messages': 'block_and_delete_messages'}, follow=True)
         self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=user.username)
         self.assertFalse(user.is_active)
-        self.assertEqual(Topic.objects.filter().count(), 1)
+        self.assertEqual(Topic.objects.count(), 1)
         self.assertEqual(Post.objects.filter(user=user).count(), 0)
 
     def test_user_unblocking(self):
