@@ -1069,7 +1069,7 @@ class AnonymousTest(TestCase, SharedTestModule):
         defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = None
         self.client.get(url)
         self.assertEqual(Topic.objects.get(id=self.topic.id).views, views + 1)
-        self.assertEqual(cache.get(build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
+        self.assertEqual(cache.get(util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
 
 
 def premoderate_test(user, post):
