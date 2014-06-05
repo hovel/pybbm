@@ -28,8 +28,8 @@ PyBBM includes ready to use `example/test project with instructions <http://read
 
 i18n support
 ============
-PYBB support English, Russian, Slovak, Ukrainian, Brazilian Portuguese, Polish, Hebrew, French, Chinese, Japanese
-translations now. Feel free to contribute translation for another language or to correct existing.
+PYBB support English, Russian, Slovak, Ukrainian, Brazilian Portuguese, Polish, Hebrew, French, Chinese, Japanese,
+German, Spanish translations now. Feel free to contribute translation for another language or to correct existing.
 You should enable django.middleware.locale.LocaleMiddleware to activate
 django locale autodetecting.
 
