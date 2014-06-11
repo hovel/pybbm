@@ -265,6 +265,8 @@ class Post(RenderableItem):
         created_at = tznow()
         if self.created is None:
             self.created = created_at
+        else:
+            self.updated = created_at
         self.render()
 
         new = self.pk is None
