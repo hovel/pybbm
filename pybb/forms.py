@@ -128,6 +128,7 @@ class PostForm(forms.ModelForm):
                 post.topic.updated = tznow()
                 if commit:
                     post.topic.save()
+            post.updated = tznow()
             if commit:
                 post.save()
             return post

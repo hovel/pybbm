@@ -797,6 +797,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         edit_post_url = reverse('pybb:edit_post', kwargs={'pk': self.post.id})
         response = self.client.get(edit_post_url)
         self.assertEqual(response.status_code, 200)
+        self.assertIsNone(Post.objects.get(id=self.post.id).updated)
         tree = html.fromstring(response.content)
         values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
         values['body'] = 'test edit'
@@ -805,6 +806,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(Post.objects.get(pk=self.post.id).body, 'test edit')
         response = self.client.get(self.post.get_absolute_url(), follow=True)
         self.assertContains(response, 'test edit')
+        self.assertIsNotNone(Post.objects.get(id=self.post.id).updated)
 
         # Check admin form
         self.user.is_staff = True
