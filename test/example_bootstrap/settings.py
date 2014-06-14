@@ -9,8 +9,8 @@ PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'testdb.sqlite',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'testdb.sqlite',
     }
 }
 
@@ -65,12 +65,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'pybb',
-    'pytils',
-    'registration',
-    'sorl.thumbnail',
-    'south',
-    'pure_pagination',
-
+    'registration'
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
