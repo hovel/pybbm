@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.validators import validate_email
 from django.template.loader import render_to_string
 from django.utils import translation
 from django.contrib.sites.models import Site
@@ -36,6 +37,12 @@ def notify_topic_subscribers(post):
 
         mails = tuple()
         for user in topic.subscribers.exclude(pk=post.user.pk):
+            try:
+                validate_email(user.email)
+            except:
+                # Invalid email
+                continue
+
             lang = util.get_pybb_profile(user).language or settings.LANGUAGE_CODE
             translation.activate(lang)
 
