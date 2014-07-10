@@ -328,7 +328,7 @@ class PostEditMixin(object):
                 aformset.save()
             if save_poll_answers:
                 pollformset.save()
-            return super(ModelFormMixin, self).form_valid(form)
+            return HttpResponseRedirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
 
