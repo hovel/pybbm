@@ -75,16 +75,13 @@
             </div>
         {% endif %}
 
-        {% if user.is_authenticated or PYBB_ENABLE_ANONYMOUS_POST %}
+        {% if user|pybb_may_create_post:topic %}
             {% pybb_get_profile user=user as user_profile %}
-
-            {% if not user_profile.is_banned %}
-                {% if not topic.closed %}
-                    {% include "pybb/post_form.html" %}
-                {% endif %}
-            {% endif %}
+            {% include "pybb/post_form.html" %}
         {% else %}
-            {% include 'pybb/_need_to_login_message.html' %}
+            {% if not user.is_authenticated %}
+                {% include 'pybb/_need_to_login_message.html' %}
+            {% endif %}
         {% endif %}
 
         {% if user.is_staff %}

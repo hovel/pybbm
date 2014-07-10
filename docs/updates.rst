@@ -5,6 +5,9 @@ PyBBM Changelog
 -------------
 * Make all migrations compatible with custom user model. Break dependency on sorl.thumbnail in migrations
 * Compatibility functions moved to compat.py module
+* Email notifications optimization
+* Example_bootstrap projects now based on bootstrap 3
+* Fixes and improvements
 
 0.15.4 -> 0.15.5
 ----------------

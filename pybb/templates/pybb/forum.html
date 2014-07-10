@@ -28,7 +28,7 @@
 
         {% pybb_get_profile user=user as user_profile %}
 
-        {% if PYBB_ENABLE_ANONYMOUS_POST or not user_profile.is_banned %}
+        {% if user|pybb_may_create_topic:forum %}
             <div class="controls">
                 {% include "pybb/_button_new_topic.html" %}
             </div>

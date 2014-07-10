@@ -75,7 +75,7 @@
                     {% endif %}
             {% endcomment %}
             <div class="post-related">
-                {% if user.is_authenticated %}
+                {% if user|pybb_may_create_post:post.topic %}
                     <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}" class="quote-link">{% trans "quote" %}</a>
                     <a href="#" class="quote-selected-link">{% trans "quote selected" %}</a>
                 {% endif %}

@@ -118,7 +118,7 @@ class DefaultPermissionHandler(object):
             return False
 
         # only user which have 'pybb.add_post' permission may post
-        return user.has_perm('pybb.add_post')
+        return defaults.PYBB_ENABLE_ANONYMOUS_POST or user.has_perm('pybb.add_post')
 
     def may_post_as_admin(self, user):
         """ return True if `user` may post as admin """
