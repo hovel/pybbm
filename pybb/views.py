@@ -161,6 +161,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     def get_attachment_formset_class(self):
         return self.attachment_formset_class
 
+    @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
 
