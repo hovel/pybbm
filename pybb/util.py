@@ -63,14 +63,24 @@ def build_cache_key(key_name, **kwargs):
         raise ValueError('Wrong key_name parameter passed: %s' % key_name)
 
 
-def get_file_path(instance, filename, to):
+class FilePathGenerator(object):
     """
-    This function generate filename with uuid4
-    it's useful if:
-    - you don't want to allow others to see original uploaded filenames
-    - users can upload images with unicode in filenames wich can confuse browsers and filesystem
+    Special class for generating random filenames
+    Can be deconstructed for correct migration
     """
-    ext = filename.split('.')[-1]
-    filename = "%s.%s" % (uuid.uuid4(), ext)
-    return os.path.join(to, filename)
+    def __init__(self, to, *args, **kwargs):
+        self.to = to
 
+    def deconstruct(self, *args, **kwargs):
+        return 'pybb.util.FilePathGenerator', [], {'to': self.to}
+
+    def __call__(self, instance, filename):
+        """
+        This function generate filename with uuid4
+        it's useful if:
+        - you don't want to allow others to see original uploaded filenames
+        - users can upload images with unicode in filenames wich can confuse browsers and filesystem
+        """
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        return os.path.join(self.to, filename)

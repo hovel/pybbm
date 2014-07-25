@@ -1,49 +1,70 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
   - "3.2"
   - "3.3"
+  - "3.4"
 env:
-  - DJANGO=1.4.10 DB=sqlite
-  - DJANGO=1.4.10 DB=postgres
-  - DJANGO=1.4.10 DB=mysql
-  - DJANGO=1.5.5 DB=sqlite
-  - DJANGO=1.5.5 DB=postgres
-  - DJANGO=1.5.5 DB=mysql
-  - DJANGO=1.6.2 DB=sqlite
-  - DJANGO=1.6.2 DB=postgres
-  - DJANGO=1.6.2 DB=mysql
+  - DJANGO="Django==1.4.10" DB=sqlite
+  - DJANGO="Django==1.4.10" DB=postgres
+  - DJANGO="Django==1.4.10" DB=mysql
+  - DJANGO="Django==1.5.8" DB=sqlite
+  - DJANGO="Django==1.5.8" DB=postgres
+  - DJANGO="Django==1.5.8" DB=mysql
+  - DJANGO="Django==1.6.5" DB=sqlite
+  - DJANGO="Django==1.6.5" DB=postgres
+  - DJANGO="Django==1.6.5" DB=mysql
+  - DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=sqlite
+  - DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=postgres
+  - DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
 matrix:
   exclude:
     - python: "3.2"
-      env: DJANGO=1.4.10 DB=sqlite
+      env: DJANGO="Django==1.4.10" DB=sqlite
     - python: "3.2"
-      env: DJANGO=1.4.10 DB=postgres
+      env: DJANGO="Django==1.4.10" DB=postgres
     - python: "3.2"
-      env: DJANGO=1.4.10 DB=mysql
+      env: DJANGO="Django==1.4.10" DB=mysql
     - python: "3.3"
-      env: DJANGO=1.4.10 DB=sqlite
+      env: DJANGO="Django==1.4.10" DB=sqlite
     - python: "3.3"
-      env: DJANGO=1.4.10 DB=postgres
+      env: DJANGO="Django==1.4.10" DB=postgres
     - python: "3.3"
-      env: DJANGO=1.4.10 DB=mysql
+      env: DJANGO="Django==1.4.10" DB=mysql
+    - python: "3.4"
+      env: DJANGO="Django==1.4.10" DB=sqlite
+    - python: "3.4"
+      env: DJANGO="Django==1.4.10" DB=postgres
+    - python: "3.4"
+      env: DJANGO="Django==1.4.10" DB=mysql
 
     - python: "3.2"
-      env: DJANGO=1.5.5 DB=mysql
+      env: DJANGO="Django==1.5.8" DB=mysql
     - python: "3.3"
-      env: DJANGO=1.5.5 DB=mysql
+      env: DJANGO="Django==1.5.8" DB=mysql
+    - python: "3.4"
+      env: DJANGO="Django==1.5.8" DB=mysql
+
     - python: "3.2"
-      env: DJANGO=1.6.2 DB=mysql
+      env: DJANGO="Django==1.6.5" DB=mysql
     - python: "3.3"
-      env: DJANGO=1.6.2 DB=mysql
+      env: DJANGO="Django==1.6.5" DB=mysql
+    - python: "3.4"
+      env: DJANGO="Django==1.6.5" DB=mysql
+
+    - python: "3.2"
+      env: DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
+    - python: "3.3"
+      env: DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
+    - python: "3.4"
+      env: DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
 before_script:
   - mysql -e 'create database pybbm;'
   - psql -c 'create database pybbm;' -U postgres
 install:
   - if [[ $DB == mysql ]]; then pip install -q mysql-python --use-mirrors; fi
   - if [[ $DB == postgres ]]; then pip install -q psycopg2 --use-mirrors; fi
-  - pip install Django==$DJANGO --use-mirrors
+  - pip install $DJANGO --use-mirrors
   - pip install Pillow -U
   - pip install South -U
   - CFLAGS="-O0" pip install lxml

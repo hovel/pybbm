@@ -67,7 +67,7 @@ ROOT_URLCONF = 'example_thirdparty.urls'
 WSGI_APPLICATION = 'example_thirdparty.wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.path.join(PROJECT_ROOT, 'templates')
+    os.path.join(PROJECT_ROOT, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -78,15 +78,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'pybb',
+    'pybb.apps.PybbConfig',
     'pytils',
     'sorl.thumbnail',
-    'south',
     'pure_pagination',
     'account',
     'pinax_theme_bootstrap',
     'bootstrapform',
-    'captcha'
+    'captcha',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = [

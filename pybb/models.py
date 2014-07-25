@@ -1,27 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import functools
+import django
 
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
-from django.db.models.signals import post_delete, post_save
 from django.db import models, transaction, DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now as tznow
 
-from pybb.compat import get_user_model_path, get_username_field, get_user_model, get_atomic_func
+from pybb.compat import get_user_model_path, get_username_field, get_atomic_func
 from pybb import defaults
 from pybb.profiles import PybbProfile
-from pybb.subscription import notify_topic_subscribers
-from pybb.util import unescape, get_pybb_profile_model, get_pybb_profile, get_file_path
+from pybb.util import unescape, FilePathGenerator
 
 from annoying.fields import AutoOneToOneField
 
 try:
     from south.modelsinspector import add_introspection_rules
+
     add_introspection_rules([], ["^annoying\.fields\.JSONField"])
     add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
 except ImportError:
@@ -33,8 +30,7 @@ class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
-        help_text = _('If checked, this category will be visible only for staff')
-    )
+                                 help_text=_('If checked, this category will be visible only for staff'))
 
     class Meta(object):
         ordering = ['position']
@@ -141,8 +137,8 @@ class Topic(models.Model):
     views = models.IntegerField(_('Views count'), blank=True, default=0)
     sticky = models.BooleanField(_('Sticky'), blank=True, default=False)
     closed = models.BooleanField(_('Closed'), blank=True, default=False)
-    subscribers = models.ManyToManyField(get_user_model_path(), related_name='subscriptions', verbose_name=_('Subscribers'),
-        blank=True)
+    subscribers = models.ManyToManyField(get_user_model_path(), related_name='subscriptions',
+                                         verbose_name=_('Subscribers'), blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     readed_by = models.ManyToManyField(get_user_model_path(), through='TopicReadTracker', related_name='readed_topics')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
@@ -254,9 +250,9 @@ class Post(RenderableItem):
         verbose_name_plural = _('Posts')
 
     def summary(self):
-        LIMIT = 50
-        tail = len(self.body) > LIMIT and '...' or ''
-        return self.body[:LIMIT] + tail
+        limit = 50
+        tail = len(self.body) > limit and '...' or ''
+        return self.body[:limit] + tail
 
     def __str__(self):
         return self.summary()
@@ -326,7 +322,6 @@ class Profile(PybbProfile):
 
 
 class Attachment(models.Model):
-
     class Meta(object):
         verbose_name = _('Attachment')
         verbose_name_plural = _('Attachments')
@@ -334,7 +329,7 @@ class Attachment(models.Model):
     post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
     file = models.FileField(_('File'),
-                            upload_to=functools.partial(get_file_path, to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
+                            upload_to=FilePathGenerator(to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
 
     def save(self, *args, **kwargs):
         self.size = self.file.size
@@ -464,39 +459,6 @@ class PollAnswerUser(models.Model):
         return '%s - %s' % (self.poll_answer.topic, self.user)
 
 
-def post_saved(instance, **kwargs):
-    notify_topic_subscribers(instance)
-
-    if get_pybb_profile(instance.user).autosubscribe:
-        instance.topic.subscribers.add(instance.user)
-
-    if kwargs['created']:
-        profile = get_pybb_profile(instance.user)
-        profile.post_count = instance.user.posts.count()
-        profile.save()
-
-
-def post_deleted(instance, **kwargs):
-    profile = get_pybb_profile(instance.user)
-    profile.post_count = instance.user.posts.count()
-    profile.save()
-
-
-def user_saved(instance, created, **kwargs):
-    if not created:
-        return
-    try:
-        add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
-        add_topic_permission = Permission.objects.get_by_natural_key('add_topic', 'pybb', 'topic')
-    except (Permission.DoesNotExist, ContentType.DoesNotExist):
-        return
-    instance.user_permissions.add(add_post_permission, add_topic_permission)
-    instance.save()
-    if get_pybb_profile_model() == Profile:
-        Profile(user=instance).save()
-
-
-post_save.connect(post_saved, sender=Post)
-post_delete.connect(post_deleted, sender=Post)
-if defaults.PYBB_AUTO_USER_PERMISSIONS:
-    post_save.connect(user_saved, sender=get_user_model())
+if django.VERSION[:2] < (1, 7):
+    from pybb import signals
+    signals.setup()

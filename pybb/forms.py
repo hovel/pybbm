@@ -39,8 +39,6 @@ class PollAnswerForm(forms.ModelForm):
 
 class BasePollAnswerFormset(BaseInlineFormSet):
     def clean(self):
-        if any(self.errors):
-            raise forms.ValidationError(self.errors)
         forms_cnt = (len(self.initial_forms) + len([form for form in self.extra_forms if form.has_changed()]) -
                      len(self.deleted_forms))
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:

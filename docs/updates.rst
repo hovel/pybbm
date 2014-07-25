@@ -1,8 +1,12 @@
 PyBBM Changelog
 ===============
 
-0.15.5 -> dev
+0.15.6 -> dev
 -------------
+* Django 1.7 compatibility.
+
+0.15.5 -> 0.15.6
+----------------
 * Make all migrations compatible with custom user model. Break dependency on sorl.thumbnail in migrations
 * Compatibility functions moved to compat.py module
 * Email notifications optimization
