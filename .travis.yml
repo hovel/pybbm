@@ -5,59 +5,59 @@ python:
   - "3.3"
   - "3.4"
 env:
-  - DJANGO="Django==1.4.10" DB=sqlite
-  - DJANGO="Django==1.4.10" DB=postgres
-  - DJANGO="Django==1.4.10" DB=mysql
-  - DJANGO="Django==1.5.8" DB=sqlite
-  - DJANGO="Django==1.5.8" DB=postgres
-  - DJANGO="Django==1.5.8" DB=mysql
-  - DJANGO="Django==1.6.5" DB=sqlite
-  - DJANGO="Django==1.6.5" DB=postgres
-  - DJANGO="Django==1.6.5" DB=mysql
-  - DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=sqlite
-  - DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=postgres
-  - DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
+  - DJANGO="Django>=1.4,<1.5" DB=sqlite
+  - DJANGO="Django>=1.4,<1.5" DB=postgres
+  - DJANGO="Django>=1.4,<1.5" DB=mysql
+  - DJANGO="Django>=1.5,<1.6" DB=sqlite
+  - DJANGO="Django>=1.5,<1.6" DB=postgres
+  - DJANGO="Django>=1.5,<1.6" DB=mysql
+  - DJANGO="Django>=1.6,<1.7" DB=sqlite
+  - DJANGO="Django>=1.6,<1.7" DB=postgres
+  - DJANGO="Django>=1.6,<1.7" DB=mysql
+  - DJANGO="Django>=1.7,<1.8" DB=sqlite
+  - DJANGO="Django>=1.7,<1.8" DB=postgres
+  - DJANGO="Django>=1.7,<1.8" DB=mysql
 matrix:
   exclude:
     - python: "3.2"
-      env: DJANGO="Django==1.4.10" DB=sqlite
+      env: DJANGO="Django>=1.4,<1.5" DB=sqlite
     - python: "3.2"
-      env: DJANGO="Django==1.4.10" DB=postgres
+      env: DJANGO="Django>=1.4,<1.5" DB=postgres
     - python: "3.2"
-      env: DJANGO="Django==1.4.10" DB=mysql
+      env: DJANGO="Django>=1.4,<1.5" DB=mysql
     - python: "3.3"
-      env: DJANGO="Django==1.4.10" DB=sqlite
+      env: DJANGO="Django>=1.4,<1.5" DB=sqlite
     - python: "3.3"
-      env: DJANGO="Django==1.4.10" DB=postgres
+      env: DJANGO="Django>=1.4,<1.5" DB=postgres
     - python: "3.3"
-      env: DJANGO="Django==1.4.10" DB=mysql
+      env: DJANGO="Django>=1.4,<1.5" DB=mysql
     - python: "3.4"
-      env: DJANGO="Django==1.4.10" DB=sqlite
+      env: DJANGO="Django>=1.4,<1.5" DB=sqlite
     - python: "3.4"
-      env: DJANGO="Django==1.4.10" DB=postgres
+      env: DJANGO="Django>=1.4,<1.5" DB=postgres
     - python: "3.4"
-      env: DJANGO="Django==1.4.10" DB=mysql
+      env: DJANGO="Django>=1.4,<1.5" DB=mysql
 
     - python: "3.2"
-      env: DJANGO="Django==1.5.8" DB=mysql
+      env: DJANGO="Django>=1.5,<1.6" DB=mysql
     - python: "3.3"
-      env: DJANGO="Django==1.5.8" DB=mysql
+      env: DJANGO="Django>=1.5,<1.6" DB=mysql
     - python: "3.4"
-      env: DJANGO="Django==1.5.8" DB=mysql
+      env: DJANGO="Django>=1.5,<1.6" DB=mysql
 
     - python: "3.2"
-      env: DJANGO="Django==1.6.5" DB=mysql
+      env: DJANGO="Django>=1.6,<1.7" DB=mysql
     - python: "3.3"
-      env: DJANGO="Django==1.6.5" DB=mysql
+      env: DJANGO="Django>=1.6,<1.7" DB=mysql
     - python: "3.4"
-      env: DJANGO="Django==1.6.5" DB=mysql
+      env: DJANGO="Django>=1.6,<1.7" DB=mysql
 
     - python: "3.2"
-      env: DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
+      env: DJANGO="Django>=1.7,<1.8" DB=mysql
     - python: "3.3"
-      env: DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
+      env: DJANGO="Django>=1.7,<1.8" DB=mysql
     - python: "3.4"
-      env: DJANGO="git+https://github.com/django/django.git@stable/1.7.x#egg=django" DB=mysql
+      env: DJANGO="Django>=1.7,<1.8" DB=mysql
 before_script:
   - mysql -e 'create database pybbm;'
   - psql -c 'create database pybbm;' -U postgres
