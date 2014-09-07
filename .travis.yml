@@ -66,7 +66,7 @@ install:
   - if [[ $DB == postgres ]]; then pip install -q psycopg2 --use-mirrors; fi
   - pip install $DJANGO --use-mirrors
   - pip install Pillow -U
-  - pip install South -U
+  - pip install hg+https://bitbucket.org/andrewgodwin/south#egg=south -U
   - CFLAGS="-O0" pip install lxml
 script:
   - python setup.py test
