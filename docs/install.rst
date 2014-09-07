@@ -134,7 +134,7 @@ Since django 1.7 release you have several combinations of installed packages tha
 * **django <1.7, south not installed**
   just type::
 
-    python manage.pt syncdb
+    python manage.py syncdb
 
   to get actual database state for your pybbm release
 
