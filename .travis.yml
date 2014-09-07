@@ -62,12 +62,12 @@ before_script:
   - mysql -e 'create database pybbm;'
   - psql -c 'create database pybbm;' -U postgres
 install:
-  - if [[ $DB == mysql ]]; then pip install -q mysql-python --use-mirrors; fi
-  - if [[ $DB == postgres ]]; then pip install -q psycopg2 --use-mirrors; fi
-  - pip install $DJANGO --use-mirrors
-  - pip install Pillow -U
+  - if [[ $DB == mysql ]]; then pip install -qU mysql-python; fi
+  - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
+  - pip install -qU $DJANGO
+  - pip install -qU Pillow
   - pip install hg+https://bitbucket.org/andrewgodwin/south#egg=south -U
-  - CFLAGS="-O0" pip install lxml
+  - CFLAGS="-O0" pip install -q lxml
 script:
   - python setup.py test
 

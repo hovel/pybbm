@@ -21,11 +21,16 @@ Optional dependencies
 
 The following dependencies are optional. You can install them with ``pip install``:
 
-* We strongly recommend to use ``south`` to enable database migration in your projects.
+* We strongly recommend to use ``south`` (with django<1.7) and django migrations since 1.7 version
+  to smoothly migrate database schema in your projects.
 
 * For better perfomance and easy images thumbnailing you can use any thumbnail django application.
   PyBBM by default uses ``sorl.thumbnail`` if it is installed and included in your ``INSTALLED_APPS`` setting.
-  It is used for defining the `avatar` field in the `PybbProfile` model and for resizing the avatar in the ``pybb/avatar.html`` template.
+  It is used for defining the `avatar` field in the `PybbProfile` model and for resizing the avatar
+  in the ``pybb/avatar.html`` template. If you decide to install ``sorl.thumbnail`` with django 1.7 you
+  have to install at least 11.12.1b version with::
+
+    pip install "sorl-thumbnail>=11.12.1b"
 
 * ``PIL`` (Python Imaging Library) or its more up-to-date fork ``Pillow`` is optional if you configure ``sorl.thumbnail``
   to use different backend or don't use ``sorl.thumbnail`` in general, but remember that using an ImageField in forms
