@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from django.utils import translation
 from django.contrib.sites.models import Site
 
-from pybb import defaults, util
+from pybb import defaults, util, compat
 
 if defaults.PYBB_USE_DJANGO_MAILER:
     try:
@@ -30,8 +30,8 @@ def notify_topic_subscribers(post):
         from_email = settings.DEFAULT_FROM_EMAIL
 
         subject = render_to_string('pybb/mail_templates/subscription_email_subject.html',
-                                   { 'site': current_site,
-                                     'post': post })
+                                   {'site': current_site,
+                                    'post': post})
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
 
@@ -43,14 +43,17 @@ def notify_topic_subscribers(post):
                 # Invalid email
                 continue
 
+            if user.email == '%s@example.com' % getattr(user, compat.get_username_field()):
+                continue
+
             lang = util.get_pybb_profile(user).language or settings.LANGUAGE_CODE
             translation.activate(lang)
 
             message = render_to_string('pybb/mail_templates/subscription_email_body.html',
-                                       { 'site': current_site,
-                                         'post': post,
-                                         'delete_url': delete_url,
-                                         'user': user })
+                                       {'site': current_site,
+                                        'post': post,
+                                        'delete_url': delete_url,
+                                        'user': user})
             mails += ((subject, message, from_email, [user.email]),)
 
         # Send mails

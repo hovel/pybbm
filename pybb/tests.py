@@ -877,12 +877,15 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
 
     def test_subscription(self):
-        user = User.objects.create_user(username='user2', password='user2', email='user2@example.com')
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@someserver.com')
+        user3 = User.objects.create_user(username='user3', password='user3', email='user3@example.com')
         client = Client()
         client.login(username='user2', password='user2')
         response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(user in list(self.topic.subscribers.all()))
+        self.assertIn(user2, self.topic.subscribers.all())
+
+        self.topic.subscribers.add(user3)
 
         # create a new reply (with another user)
         self.client.login(username='zeus', password='zeus')
@@ -894,8 +897,9 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         new_post = Post.objects.order_by('-id')[0]
 
-        # there should only be one email in the outbox (to user2@example.com)
+        # there should only be one email in the outbox (to user2)
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to[0], user2.email)
         self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
 
         # unsubscribe
@@ -903,7 +907,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
         response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(user not in list(self.topic.subscribers.all()))
+        self.assertNotIn(user2, self.topic.subscribers.all())
 
     def test_topic_updated(self):
         topic = Topic(name='etopic', forum=self.forum, user=self.user)
