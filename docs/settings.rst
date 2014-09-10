@@ -17,17 +17,17 @@ Number of topics in forum page (default 10)
 PYBB_FREEZE_FIRST_POST
 ......................
 
-Freeze first post in topics (show on every page)
+Freeze first post in topics (show on every page) (default False)
 
 PYBB_DEFAULT_TITLE
 ..................
 
-Default title for forum index page
+Default title for forum index page (default 'PYBB Powered Forum')
 
 PYBB_DEFAULT_AUTOSUBSCRIBE
 ..........................
 
-Users will be automatically subscribed to topic when create post in it.
+Users will be automatically subscribed to topic when create post in it. (default True)
 
 PYBB_USE_DJANGO_MAILER
 ......................
@@ -91,7 +91,7 @@ PYBB_PROFILE_RELATED_NAME
 .........................
 
 Related name from profile's OneToOne relationship to User model. If profile model is User
-model itselt then set it to `None`
+model itselt then set it to `None` (default 'pybb_profile')
 
 For more information see :doc:`how to use custom user model with pybbm</customuser>`
 
@@ -114,17 +114,17 @@ Default time zone for forum as integer. E.g. setting to 1 means GMT+1 zone. (def
 PYBB_SIGNATURE_MAX_LENGTH
 .........................
 
-Limit of sybmols in user signature
+Limit of sybmols in user signature (default 1024)
 
 PYBB_SIGNATURE_MAX_LINES
 ........................
 
-Limit of lines in user signature
+Limit of lines in user signature (default 3)
 
 PYBB_DEFAULT_AVATAR_URL
 .......................
 
-Will be used if user doesn't upload avatar
+Will be used if user doesn't upload avatar (default settings.STATIC_URL + 'pybb/img/default_avatar.jpg')
 
 Style
 -----
@@ -283,14 +283,14 @@ Permissions
 PYBB_AUTO_USER_PERMISSIONS
 ..........................
 
-Automatically adds add post and add topic permissions to users on user.save().
+Automatically adds add post and add topic permissions to users on user.save(). (default True)
 
 PYBB_PERMISSION_HANDLER
 .......................
 
 If you need custom permissions (for example, private forums based on application-specific 
 user groups), you can set `PYBB_PERMISSION_HANDLER` to a class which inherits from 
-`pybb.permissions.DefaultPermissionHandler`, and override any of the `filter_*` and 
+`pybb.permissions.DefaultPermissionHandler` (default), and override any of the `filter_*` and
 `may_*` method. For details, look at the source of `pybb.permissions.DefaultPermissionHandler`.
 All methods from permission handler (custom or default) can be used in templates as filters,
 if loaded pybb_tags. In template will be loaded methods which start with 'may' or 'filter'
