@@ -120,7 +120,10 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             raise PermissionDenied
 
         qs = self.forum.topics.order_by('-sticky', '-updated', '-id').select_related()
-        qs = perms.filter_topics(self.request.user, qs)
+        if defaults.PYBB_TOPIC_SORT_REVERSE:
+            qs = perms.filter_topics(self.request.user, qs).order_by('-created')
+        else:
+            qs = perms.filter_topics(self.request.user, qs)
         return qs
 
 
@@ -203,9 +206,16 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
                 cache.set(cache_key, 0)
         qs = self.topic.posts.all().select_related('user')
         if defaults.PYBB_PROFILE_RELATED_NAME:
-            qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)
+            if defaults.PYBB_POST_SORT_REVERSE:
+                qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME).order_by('-created')
+            else:
+                qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)
+
         if not perms.may_moderate_topic(self.request.user, self.topic):
-            qs = perms.filter_posts(self.request.user, qs)
+            if defaults.PYBB_POST_SORT_REVERSE:
+                qs = perms.filter_posts(self.request.user, qs).order_by('-created')
+            else:
+                qs = perms.filter_posts(self.request.user, qs)
         return qs
 
     def get_context_data(self, **kwargs):
