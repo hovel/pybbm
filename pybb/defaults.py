@@ -36,6 +36,7 @@ import bbcode
 from markdown import Markdown
 from django.utils.html import urlize
 
+
 PYBB_SMILES_PREFIX = getattr(settings, 'PYBB_SMILES_PREFIX', 'pybb/emoticons/')
 
 PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
@@ -69,6 +70,19 @@ def _render_quote(name, value, options, parent, context):
         origin_author_html = ''
     return '<blockquote>%s%s</blockquote>' % (origin_author_html, value)
 bbcode_parser.add_formatter('quote', _render_quote, strip=True, swallow_trailing_newline=True)
+
+def _render_size(name, value, options,parent, context):
+    
+
+    if options['size']=="50":
+        return '<font size="2"> %s </font>' % (value)
+    if options['size']=="100":
+        return '<font size="4"> %s </font>' % (value)
+    if options['size']=="200":
+        return '<font size="6"> %s </font>' % (value)    
+
+bbcode_parser.add_formatter('size', _render_size, swallow_trailing_newline=True)
+
 
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
