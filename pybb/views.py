@@ -120,10 +120,7 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             raise PermissionDenied
 
         qs = self.forum.topics.order_by('-sticky', '-updated', '-id').select_related()
-        if defaults.PYBB_TOPIC_SORT_REVERSE:
-            qs = perms.filter_topics(self.request.user, qs).order_by('-created')
-        else:
-            qs = perms.filter_topics(self.request.user, qs)
+        qs = perms.filter_topics(self.request.user, qs)
         return qs
 
 

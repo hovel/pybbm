@@ -30,7 +30,7 @@ PYBB_DEFAULT_AVATAR_URL = getattr(settings,'PYBB_DEFAULT_AVATAR_URL',
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 PYBB_POST_SORT_REVERSE = getattr(settings, 'PYBB_POST_SORT_REVERSE', False )
-PYBB_TOPIC_SORT_REVERSE = getattr(settings, 'PYBB_TOPIC_SORT_REVERSE', False )
+
 
 import bbcode
 from markdown import Markdown
