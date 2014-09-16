@@ -35,6 +35,8 @@ PYBB_POST_SORT_REVERSE = getattr(settings, 'PYBB_POST_SORT_REVERSE', False )
 import bbcode
 from markdown import Markdown
 from django.utils.html import urlize
+#import pdb
+import re
 
 
 PYBB_SMILES_PREFIX = getattr(settings, 'PYBB_SMILES_PREFIX', 'pybb/emoticons/')
@@ -83,6 +85,14 @@ def _render_size(name, value, options,parent, context):
 
 bbcode_parser.add_formatter('size', _render_size, swallow_trailing_newline=True)
 
+def _render_youtube(name, value, options, parent, context):
+    result = re.match('^[^v]+v=(.{11}).*', options['youtube'])
+    return """<object width="640" height="360"> <param name="movie" value="http://www.youtube.com/v/%s"></param>  
+                <param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param> 
+                <embed src="http://www.youtube.com/v/%s" type="application/x-shockwave-flash" allowscriptaccess="always" 
+                allowfullscreen="true" width="640" height="360"></embed> </object>""" % (result.group(1) , result.group(1))
+ 
+bbcode_parser.add_formatter('youtube', _render_youtube, swallow_trailing_newline=True)
 
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
