@@ -35,7 +35,7 @@ PYBB_POST_SORT_REVERSE = getattr(settings, 'PYBB_POST_SORT_REVERSE', False )
 import bbcode
 from markdown import Markdown
 from django.utils.html import urlize
-#import pdb
+
 import re
 
 
