@@ -47,4 +47,4 @@ class LastTopics(PybbFeed):
         return request.user
 
     def items(self, user):
-        return perms.filter_topics(user, Topic.objects.all()).selected_related('forum').order_by('-created', '-id')[:15]
+        return perms.filter_topics(user, Topic.objects.all()).select_related('forum').order_by('-created', '-id')[:15]
