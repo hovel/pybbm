@@ -1703,4 +1703,21 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         # allowed user is allowed
         r = self.get_with_user(edit_post_url, 'staff', 'staff')
         self.assertEquals(r.status_code, 200)
+        
+    def test_profile_autocreation_signal_on(self):
+        user = User.objects.create_user('cronos', 'cronos@localhost', 'cronos')
+        profile = getattr(user, defaults.PYBB_PROFILE_RELATED_NAME, None)
+        self.assertIsNotNone(profile)
+        self.assertEqual(type(profile), util.get_pybb_profile_model())
+        user.delete()
 
+    def test_profile_autocreation_middleware(self):
+        user = User.objects.create_user('cronos', 'cronos@localhost', 'cronos')
+        getattr(user, defaults.PYBB_PROFILE_RELATED_NAME).delete()
+        #just display a page : the middleware should create the profile
+        self.get_with_user('/', 'cronos', 'cronos')
+        user = User.objects.get(username='cronos')
+        profile = getattr(user, defaults.PYBB_PROFILE_RELATED_NAME, None)
+        self.assertIsNotNone(profile)
+        self.assertEqual(type(profile), util.get_pybb_profile_model())
+        user.delete()
