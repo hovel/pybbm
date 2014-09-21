@@ -5,13 +5,13 @@
     <a href="{{ user_profile.get_absolute_url }}">
         {% if_has_tag thumbnail %}
             {% thumbnail user_profile.avatar PYBB_AVATAR_DIMENSIONS as avatar %}
-                <img src="{{ avatar.url }}" alt="{{ user }} avatar" />
+                <img src="{{ avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" />
             {% empty %}
                 <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" />
             {% endthumbnail %}
         {% else %}
             {% if user_profile.avatar %}
-                <img src="{{ user_profile.avatar.url }}" alt="{{ user }} avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
+                <img src="{{ user_profile.avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
             {% else %}
                 <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
             {% endif %}

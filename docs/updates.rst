@@ -4,6 +4,8 @@ PyBBM Changelog
 0.15.6 -> dev
 -------------
 * Django 1.7 compatibility.
+* New required get_display_name method for profile model used to unification displaying username through
+  forum
 
 0.15.5 -> 0.15.6
 ----------------

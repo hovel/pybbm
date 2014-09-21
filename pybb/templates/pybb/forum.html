@@ -26,8 +26,6 @@
 
         {% include "pybb/pagination.html" %}
 
-        {% pybb_get_profile user=user as user_profile %}
-
         {% if user|pybb_may_create_topic:forum %}
             <div class="controls">
                 {% include "pybb/_button_new_topic.html" %}

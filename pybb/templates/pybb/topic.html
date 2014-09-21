@@ -76,7 +76,6 @@
         {% endif %}
 
         {% if user|pybb_may_create_post:topic %}
-            {% pybb_get_profile user=user as user_profile %}
             {% include "pybb/post_form.html" %}
         {% else %}
             {% if not user.is_authenticated %}
@@ -88,7 +87,11 @@
             <div class="subscriber-list">
                 {% trans "Subscribers" %}:
                 {% for subscriber in topic.subscribers.all %}
-                    <a href="{% url 'pybb:user' subscriber.username %}">{{ subscriber.username }}</a>,
+                    {% pybb_get_profile user=subscriber as subscriber_profile %}
+                    <a href="{% url 'pybb:user' subscriber.get_username %}">
+                        {{ subscriber.get_display_name }}
+                    </a>
+                    {% if not forloop.last %},{% endif %}
                 {% endfor %}
             </div>
         {% endif %}
