@@ -23,13 +23,15 @@ def get_image_field_full_name():
 
 
 def get_user_model():
+
     if django.VERSION[:2] >= (1, 5):
         from django.contrib.auth import get_user_model
-        return get_user_model()
+        user_class = get_user_model()
     else:
         from django.contrib.auth.models import User
-        User.get_username = lambda u: u.username  # emulate new 1.5 method
-        return User
+        user_class = User
+
+    return user_class
 
 
 def get_user_model_path():
