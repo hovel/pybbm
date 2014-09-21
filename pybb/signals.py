@@ -29,6 +29,7 @@ def post_deleted(instance, **kwargs):
 def user_saved(instance, created, **kwargs):
     if not created:
         return
+
     try:
         add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
         add_topic_permission = Permission.objects.get_by_natural_key('add_topic', 'pybb', 'topic')
@@ -36,8 +37,13 @@ def user_saved(instance, created, **kwargs):
         return
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()
-    if util.get_pybb_profile_model() == Profile:
-        Profile(user=instance).save()
+    
+    from pybb import defaults
+    if defaults.PYBB_PROFILE_RELATED_NAME :
+        ModelProfile = util.get_pybb_profile_model()
+        profile = ModelProfile()
+        setattr(instance, defaults.PYBB_PROFILE_RELATED_NAME, profile)
+        profile.save()
 
 
 def setup():
