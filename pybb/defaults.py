@@ -90,11 +90,11 @@ bbcode_parser.add_formatter('size', _render_size, swallow_trailing_newline=True)
 
 def _render_youtube(name, value, options, parent, context):
     result = re.match('^[^v]+v=(.{11}).*', options['youtube'])
-    return """<div class="embed-responsive embed-responsive-16by9"><object width="640" height="360"> <param name="movie" value="http://www.youtube.com/v/%s"></param>  
+    return """<div class="embed-responsive embed-responsive-16by9"><object > <param name="movie" value="http://www.youtube.com/v/%s"></param>  
                 <param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param> 
                 <embed src="http://www.youtube.com/v/%s" type="application/x-shockwave-flash" allowscriptaccess="always" 
-                allowfullscreen="true" ></embed> </object></div>""" % (result.group(1) , result.group(1))
- 
+                allowfullscreen="true" ></embed> </object></div> """ % (result.group(1) , result.group(1))
+  
 bbcode_parser.add_formatter('youtube', _render_youtube, swallow_trailing_newline=True)
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
