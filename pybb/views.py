@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 import math
+import pdb
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -500,8 +501,14 @@ class PostView(RedirectToLoginMixin, generic.RedirectView):
         post = get_object_or_404(Post.objects.all(), pk=self.kwargs['pk'])
         if not perms.may_view_post(self.request.user, post):
             raise PermissionDenied
+        
         count = post.topic.posts.filter(created__lt=post.created).count() + 1
-        page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
+        pdb.set_trace()
+        if defaults.PYBB_POST_SORT_REVERSE:
+            page = 1
+        else:    
+            page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
+        
         return '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)
 
 
