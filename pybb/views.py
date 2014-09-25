@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 import math
-import pdb
+
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -503,7 +503,7 @@ class PostView(RedirectToLoginMixin, generic.RedirectView):
             raise PermissionDenied
         
         count = post.topic.posts.filter(created__lt=post.created).count() + 1
-        pdb.set_trace()
+        
         if defaults.PYBB_POST_SORT_REVERSE:
             page = 1
         else:    
