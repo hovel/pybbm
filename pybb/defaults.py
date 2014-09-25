@@ -84,7 +84,9 @@ def _render_size(name, value, options,parent, context):
     if options['size']=="100":
         return '<font size="4"> %s </font>' % (value)
     if options['size']=="200":
-        return '<font size="6"> %s </font>' % (value)    
+        return '<font size="6"> %s </font>' % (value)
+    else:
+         return '<font size="4"> %s </font>' % (value)   
 
 bbcode_parser.add_formatter('size', _render_size, swallow_trailing_newline=True)
 
