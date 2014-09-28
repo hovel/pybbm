@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, post_delete
-from pybb.models import Profile, Post
+from pybb.models import Post
 from pybb.subscription import notify_topic_subscribers
 from pybb import util, defaults, compat
 
@@ -37,9 +37,8 @@ def user_saved(instance, created, **kwargs):
         return
     instance.user_permissions.add(add_post_permission, add_topic_permission)
     instance.save()
-    
-    from pybb import defaults
-    if defaults.PYBB_PROFILE_RELATED_NAME :
+
+    if defaults.PYBB_PROFILE_RELATED_NAME:
         ModelProfile = util.get_pybb_profile_model()
         profile = ModelProfile()
         setattr(instance, defaults.PYBB_PROFILE_RELATED_NAME, profile)
