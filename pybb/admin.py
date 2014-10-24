@@ -6,8 +6,8 @@ from django.core.urlresolvers import reverse
 
 from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer
 
-from pybb import util
-username_field = util.get_username_field()
+from pybb import compat, util
+username_field = compat.get_username_field()
 
 
 class ForumInlineAdmin(admin.TabularInline):

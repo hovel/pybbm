@@ -18,17 +18,14 @@ class PybbMiddleware(object):
                 # and grant permissions for add posts
                 # It should be caused rarely, so we move import signal here
                 # to prevent circular import
-                from pybb.models import user_saved
+                from .signals import user_saved
                 user_saved(request.user, created=True)
                 profile = util.get_pybb_profile(request.user)
 
-            language = translation.get_language_from_request(request)
-
             if not profile.language:
-                profile.language = language
+                profile.language = translation.get_language_from_request(request)
                 profile.save()
 
-            if profile.language and profile.language != language:
-                request.session['django_language'] = profile.language
-                translation.activate(profile.language)
-                request.LANGUAGE_CODE = translation.get_language()
+            request.session['django_language'] = profile.language
+            translation.activate(profile.language)
+            request.LANGUAGE_CODE = translation.get_language()

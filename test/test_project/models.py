@@ -18,11 +18,10 @@ if django.VERSION[:2] >= (1, 5):
             user.save(using=self._db)
             return user
 
-
     class CustomUser(AbstractBaseUser, PermissionsMixin):
         username = models.CharField('username', unique=True, max_length=100)
         email = models.EmailField('email')
-        is_staff = models.BooleanField('staff')
+        is_staff = models.BooleanField('staff', default=False)
         is_active = models.BooleanField('active', default=True)
         date_joined = models.DateTimeField('date joined', default=timezone.now)
 

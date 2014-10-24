@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import os
 import re
 import uuid
-import django
 from django.utils.translation import ugettext as _
+from pybb.compat import get_username_field, get_user_model
 
 
 def unescape(text):
@@ -33,23 +33,6 @@ def rstrip_str(user, str):
     return '\n'.join([s.rstrip() for s in str.splitlines()])
 
 
-def get_user_model():
-    if django.VERSION[:2] >= (1, 5):
-        from django.contrib.auth import get_user_model
-        return get_user_model()
-    else:
-        from django.contrib.auth.models import User
-        User.get_username = lambda u: u.username  # emulate new 1.5 method
-        return User
-
-
-def get_username_field():
-    if django.VERSION[:2] >= (1, 5):
-        return get_user_model().USERNAME_FIELD
-    else:
-        return 'username'
-
-
 def get_pybb_profile(user):
     from pybb import defaults
 
@@ -68,7 +51,7 @@ def get_pybb_profile(user):
 def get_pybb_profile_model():
     from pybb import defaults
     if defaults.PYBB_PROFILE_RELATED_NAME:
-        return get_user_model()._meta.get_field_by_name(defaults.PYBB_PROFILE_RELATED_NAME)[0].model
+        return getattr(get_user_model(), defaults.PYBB_PROFILE_RELATED_NAME).related.model
     else:
         return get_user_model()
 
@@ -80,13 +63,24 @@ def build_cache_key(key_name, **kwargs):
         raise ValueError('Wrong key_name parameter passed: %s' % key_name)
 
 
-def get_file_path(instance, filename, to):
+class FilePathGenerator(object):
     """
-    This function generate filename with uuid4
-    it's useful if:
-    - you don't want to allow others to see original uploaded filenames
-    - users can upload images with unicode in filenames wich can confuse browsers and filesystem
+    Special class for generating random filenames
+    Can be deconstructed for correct migration
     """
-    ext = filename.split('.')[-1]
-    filename = "%s.%s" % (uuid.uuid4(), ext)
-    return os.path.join(to, filename)
+    def __init__(self, to, *args, **kwargs):
+        self.to = to
+
+    def deconstruct(self, *args, **kwargs):
+        return 'pybb.util.FilePathGenerator', [], {'to': self.to}
+
+    def __call__(self, instance, filename):
+        """
+        This function generate filename with uuid4
+        it's useful if:
+        - you don't want to allow others to see original uploaded filenames
+        - users can upload images with unicode in filenames wich can confuse browsers and filesystem
+        """
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        return os.path.join(self.to, filename)

@@ -75,8 +75,10 @@
                     {% endif %}
             {% endcomment %}
             <div class="post-related">
-                <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}" class="quote-link">{% trans "quote" %}</a>
-                <a href="#" class="quote-selected-link">{% trans "quote selected" %}</a>
+                {% if user|pybb_may_create_post:post.topic %}
+                    <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}" class="quote-link">{% trans "quote" %}</a>
+                    <a href="#" class="quote-selected-link">{% trans "quote selected" %}</a>
+                {% endif %}
                 <div class='attachments'>
                     {% for attachment in post.attachments.all %}
                         <a href="{{ attachment.file.url }}"><img src="{{ STATIC_URL }}pybb/img/attachment.png"> {{ attachment.size_display }}</a>

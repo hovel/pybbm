@@ -1,10 +1,45 @@
-Updating PyBBM Version
-======================
+PyBBM Changelog
+===============
+
+0.15.6 -> dev
+-------------
+* Django 1.7 compatibility.
+
+0.15.5 -> 0.15.6
+----------------
+* Make all migrations compatible with custom user model. Break dependency on sorl.thumbnail in migrations
+* Compatibility functions moved to compat.py module
+* Email notifications optimization
+* Example_bootstrap projects now based on bootstrap 3
+* Fixes and improvements
+
+0.15.4 -> 0.15.5
+----------------
+* Fixed bug when user can vote (or cancel vote) when topic was closed.
+* Added `may_vote_in_topic` method to permission handler.
+* Fixed blocking user view
+
+0.15.3 -> 0.15.4
+----------------
+* Hot fixes to bbcode transform
+
+0.15.2 -> 0.15.3
+----------------
+* bbcode engine simplified
+
+0.15.1 -> 0.15.2
+----------------
+* Pybbm specific forms moved to views' attributes, added new functions to views to get such forms dynamically.
+  This makes overriding pybbm forms much easier
+* Moving from unmaintained postmarkup package to bbcode project as default bbcode render engine
+  Changed output html for [code] tag. It will be <code></code> tags instead of <div class="code"></div>.
+  So you should duplicate styles applied to div.code for code html tag.
+* Japanese translation
 
 0.15 -> 0.15.1
 --------------
-* Hot fixes for python 3 support
-* Fixed for Chinese translation
+* Hot fixes for Python 3 support
+* Fixes for Chinese translation
 
 0.14.9 -> 0.15
 --------------

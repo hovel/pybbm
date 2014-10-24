@@ -33,7 +33,7 @@ class LastPosts(PybbFeed):
         return request.user
 
     def items(self, user):
-        ids = [p.id for p in perms.filter_posts(user, Post.objects.only('id')).order_by('-created')[:15]]
+        ids = [p.id for p in perms.filter_posts(user, Post.objects.only('id')).order_by('-created', '-id')[:15]]
         return Post.objects.filter(id__in=ids).select_related('topic', 'topic__forum', 'user')
 
 
@@ -47,4 +47,4 @@ class LastTopics(PybbFeed):
         return request.user
 
     def items(self, user):
-        return perms.filter_topics(user, Topic.objects.all()).order_by('-created')[:15]
+        return perms.filter_topics(user, Topic.objects.all()).select_related('forum').order_by('-created', '-id')[:15]

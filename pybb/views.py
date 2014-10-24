@@ -9,7 +9,6 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
-from django.db.models.aggregates import Count
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -19,30 +18,16 @@ from django.views.decorators.http import require_POST
 from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
-from pybb.util import build_cache_key
-
-try:
-    from pure_pagination import Paginator
-    pure_pagination = True
-except ImportError:
-    # the simplest emulation of django-pure-pagination behavior
-    from django.core.paginator import Paginator, Page
-    class PageRepr(int):
-        def querystring(self):
-            return 'page=%s' % self
-    Page.pages = lambda self: [PageRepr(i) for i in range(1, self.paginator.num_pages + 1)]
-    pure_pagination = False
-
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb import compat, defaults, util
 from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
-from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
-from pybb import defaults
-
+from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
+from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 
-from pybb import util
-User = util.get_user_model()
-username_field = util.get_username_field()
+
+User = compat.get_user_model()
+username_field = compat.get_username_field()
+Paginator, pure_pagination = compat.get_paginator_class()
 
 
 class PaginatorMixin(object):
@@ -134,7 +119,7 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         if not perms.may_view_forum(self.request.user, self.forum):
             raise PermissionDenied
 
-        qs = self.forum.topics.order_by('-sticky', '-updated').select_related()
+        qs = self.forum.topics.order_by('-sticky', '-updated', '-id').select_related()
         qs = perms.filter_topics(self.request.user, qs)
         return qs
 
@@ -148,7 +133,7 @@ class LatestTopicsView(PaginatorMixin, generic.ListView):
     def get_queryset(self):
         qs = Topic.objects.all().select_related()
         qs = perms.filter_topics(self.request.user, qs)
-        return qs.order_by('-updated')
+        return qs.order_by('-updated', '-id')
 
 
 class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
@@ -156,9 +141,27 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
 
+    post_form_class = PostForm
+    admin_post_form_class = AdminPostForm
+    poll_form_class = PollForm
+    attachment_formset_class = AttachmentFormSet
+
     def get_login_redirect_url(self):
         return reverse('pybb:topic', args=(self.kwargs['pk'],))
 
+    def get_post_form_class(self):
+        return self.post_form_class
+
+    def get_admin_post_form_class(self):
+        return self.admin_post_form_class
+
+    def get_poll_form_class(self):
+        return self.poll_form_class
+
+    def get_attachment_formset_class(self):
+        return self.attachment_formset_class
+
+    @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
 
@@ -177,7 +180,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
                 read_date = read_dates and max(read_dates)
                 if read_date:
                     try:
-                        first_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created')[0]
+                        first_unread_topic = self.topic.posts.filter(created__gt=read_date).order_by('created', 'id')[0]
                     except IndexError:
                         first_unread_topic = self.topic.last_post
                 else:
@@ -192,7 +195,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         if self.request.user.is_authenticated() or not defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER:
             Topic.objects.filter(id=self.topic.id).update(views=F('views') + 1)
         else:
-            cache_key = build_cache_key('anonymous_topic_views', topic_id=self.topic.id)
+            cache_key = util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)
             cache.add(cache_key, 0)
             if cache.incr(cache_key) % defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER == 0:
                 Topic.objects.filter(id=self.topic.id).update(views=F('views') +
@@ -207,22 +210,24 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
+
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if perms.may_post_as_admin(self.request.user):
-                ctx['form'] = AdminPostForm(initial={'login': getattr(self.request.user, username_field)},
-                                            topic=self.topic)
+                ctx['form'] = self.get_admin_post_form_class()(
+                    initial={'login': getattr(self.request.user, username_field)},
+                    topic=self.topic)
             else:
-                ctx['form'] = PostForm(topic=self.topic)
+                ctx['form'] = self.get_post_form_class()(topic=self.topic)
             self.mark_read(self.request.user, self.topic)
         elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
-            ctx['form'] = PostForm(topic=self.topic)
+            ctx['form'] = self.get_post_form_class()(topic=self.topic)
         else:
             ctx['form'] = None
             ctx['next'] = self.get_login_redirect_url()
         if perms.may_attach_files(self.request.user):
-            aformset = AttachmentFormSet()
+            aformset = self.get_attachment_formset_class()()
             ctx['aformset'] = aformset
         if defaults.PYBB_FREEZE_FIRST_POST:
             ctx['first_post'] = self.topic.head
@@ -230,9 +235,9 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
             ctx['first_post'] = None
         ctx['topic'] = self.topic
 
-        if self.request.user.is_authenticated() and self.topic.poll_type != Topic.POLL_TYPE_NONE and \
-           pybb_topic_poll_not_voted(self.topic, self.request.user):
-            ctx['poll_form'] = PollForm(self.topic)
+        if perms.may_vote_in_topic(self.request.user, self.topic) and \
+                pybb_topic_poll_not_voted(self.topic, self.request.user):
+            ctx['poll_form'] = self.get_poll_form_class()(self.topic)
 
         return ctx
 
@@ -264,6 +269,11 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
 class PostEditMixin(object):
 
+    poll_answer_formset_class = PollAnswerFormSet
+
+    def get_poll_answer_formset_class(self):
+        return self.poll_answer_formset_class
+
     def get_form_class(self):
         if perms.may_post_as_admin(self.request.user):
             return AdminPostForm
@@ -275,7 +285,9 @@ class PostEditMixin(object):
         if perms.may_attach_files(self.request.user) and (not 'aformset' in kwargs):
             ctx['aformset'] = AttachmentFormSet(instance=self.object if getattr(self, 'object') else None)
         if perms.may_create_poll(self.request.user) and ('pollformset' not in kwargs):
-            ctx['pollformset'] = PollAnswerFormSet(instance=self.object.topic if getattr(self, 'object') else None)
+            ctx['pollformset'] = self.get_poll_answer_formset_class()(
+                instance=self.object.topic if getattr(self, 'object') else None
+            )
         return ctx
 
     def form_valid(self, form):
@@ -294,10 +306,11 @@ class PostEditMixin(object):
             aformset = None
 
         if perms.may_create_poll(self.request.user):
-            pollformset = PollAnswerFormSet()
+            pollformset = self.get_poll_answer_formset_class()()
             if getattr(self, 'forum', None) or self.object.topic.head == self.object:
                 if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
-                    pollformset = PollAnswerFormSet(self.request.POST, instance=self.object.topic)
+                    pollformset = self.get_poll_answer_formset_class()(self.request.POST,
+                                                                       instance=self.object.topic)
                     if pollformset.is_valid():
                         save_poll_answers = True
                     else:
@@ -316,7 +329,7 @@ class PostEditMixin(object):
                 aformset.save()
             if save_poll_answers:
                 pollformset.save()
-            return super(ModelFormMixin, self).form_valid(form)
+            return HttpResponseRedirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
 
@@ -439,7 +452,7 @@ class UserPosts(PaginatorMixin, generic.ListView):
         qs = super(UserPosts, self).get_queryset()
         qs = qs.filter(user=self.user)
         qs = perms.filter_posts(self.request.user, qs).select_related('topic')
-        qs = qs.order_by('-created', '-updated')
+        qs = qs.order_by('-created', '-updated', '-id')
         return qs
 
     def get_context_data(self, **kwargs):
@@ -462,7 +475,7 @@ class UserTopics(PaginatorMixin, generic.ListView):
         qs = super(UserTopics, self).get_queryset()
         qs = qs.filter(user=self.user)
         qs = perms.filter_topics(self.user, qs)
-        qs = qs.order_by('-updated', '-created')
+        qs = qs.order_by('-updated', '-created', '-id')
         return qs
 
     def get_context_data(self, **kwargs):
@@ -617,7 +630,8 @@ class TopicPollVoteView(generic.UpdateView):
 
     def form_valid(self, form):
         # already voted
-        if not pybb_topic_poll_not_voted(self.object, self.request.user):
+        if not perms.may_vote_in_topic(self.request.user, self.object) or \
+           not pybb_topic_poll_not_voted(self.object, self.request.user):
             return HttpResponseForbidden()
 
         answers = form.cleaned_data['answers']
@@ -686,10 +700,23 @@ def block_user(request, username):
     if 'block_and_delete_messages' in request.POST:
         # individually delete each post and empty topic to fire method
         # with forum/topic counters recalculation
-        for p in Post.objects.filter(user=user):
-            p.delete()
-        for t in Topic.objects.annotate(cnt=Count('posts')).filter(cnt=0):
-            t.delete()
+        posts = Post.objects.filter(user=user)
+        topics = posts.values('topic_id').distinct()
+        forums = posts.values('topic__forum_id').distinct()
+        posts.delete()
+        Topic.objects.filter(user=user).delete()
+        for t in topics:
+            try:
+                Topic.objects.get(id=t['topic_id']).update_counters()
+            except Topic.DoesNotExist:
+                pass
+        for f in forums:
+            try:
+                Forum.objects.get(id=f['topic__forum_id']).update_counters()
+            except Forum.DoesNotExist:
+                pass
+
+
     msg = _('User successfuly blocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')

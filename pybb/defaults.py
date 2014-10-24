@@ -30,7 +30,7 @@ PYBB_DEFAULT_AVATAR_URL = getattr(settings,'PYBB_DEFAULT_AVATAR_URL',
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 
-from postmarkup import render_bbcode
+import bbcode
 from markdown import Markdown
 from django.utils.html import urlize
 
@@ -57,8 +57,20 @@ def smile_it(str):
         s = s.replace(smile, '<img src="%s%s%s" alt="smile" />' % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url))
     return s
 
+bbcode_parser = bbcode.Parser()
+bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links=False)
+bbcode_parser.add_simple_formatter('code', '<pre><code>%(value)s</code></pre>', render_embedded=False, transform_newlines=False, swallow_trailing_newline=True)
+def _render_quote(name, value, options, parent, context):
+    if options and 'quote' in options:
+        origin_author_html = '<em>%s</em><br>' % options['quote']
+    else:
+        origin_author_html = ''
+    return '<blockquote>%s%s</blockquote>' % (origin_author_html, value)
+bbcode_parser.add_formatter('quote', _render_quote, strip=True, swallow_trailing_newline=True)
+
+
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
-    'bbcode': lambda str: urlize(smile_it(render_bbcode(str, exclude_tags=['size', 'center']))),
+    'bbcode': lambda str: smile_it(bbcode_parser.format(str)),
     'markdown': lambda str: urlize(smile_it(Markdown(safe_mode='escape').convert(str)))
 })
 
@@ -90,3 +102,5 @@ PYBB_USE_DJANGO_MAILER = getattr(settings, 'PYBB_USE_DJANGO_MAILER', False)
 PYBB_PERMISSION_HANDLER = getattr(settings, 'PYBB_PERMISSION_HANDLER', 'pybb.permissions.DefaultPermissionHandler')
 
 PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb_profile')
+
+PYBB_INITIAL_CUSTOM_USER_MIGRATION = getattr(settings, 'PYBB_INITIAL_CUSTOM_USER_MIGRATION', None)

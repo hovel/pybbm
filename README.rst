@@ -1,6 +1,8 @@
 PyBBM - Django forum solution
 =============================
 
+.. image:: https://travis-ci.org/hovel/pybbm.png?branch=master
+
 PyBBM is a full-featured django forum solution with these features:
 
 * Avatars
@@ -26,8 +28,8 @@ PyBBM includes ready to use `example/test project with instructions <http://read
 
 i18n support
 ============
-PYBB support English, Russian, Slovak, Ukrainian, Brazilian Portuguese, Polish, Hebrew, French, Chinese translations now.
-Feel free to contribute translation for another language or to correct existing.
+PYBB support English, Russian, Slovak, Ukrainian, Brazilian Portuguese, Polish, Hebrew, French, Chinese, Japanese,
+German, Spanish, Italian translations now. Feel free to contribute translation for another language or to correct existing.
 You should enable django.middleware.locale.LocaleMiddleware to activate
 django locale autodetecting.
 

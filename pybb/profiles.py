@@ -1,15 +1,10 @@
 # coding=utf-8
-import functools
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from pybb import defaults
-from pybb.util import get_file_path
+from pybb import defaults, util
+from pybb.compat import get_image_field_class
 
-try:
-    from sorl.thumbnail import ImageField
-except ImportError:
-    from django.db.models import ImageField
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
 (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
@@ -46,8 +41,8 @@ class PybbProfile(models.Model):
     show_signatures = models.BooleanField(_('Show signatures'), blank=True,
         default=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    avatar = ImageField(_('Avatar'), blank=True, null=True,
-        upload_to=functools.partial(get_file_path, to='pybb/avatar'))
+    avatar = get_image_field_class()(_('Avatar'), blank=True, null=True,
+        upload_to=util.FilePathGenerator(to='pybb/avatar'))
     autosubscribe = models.BooleanField(_('Automatically subscribe'),
         help_text=_('Automatically subscribe to topics that you answer'),
         default=defaults.PYBB_DEFAULT_AUTOSUBSCRIBE)

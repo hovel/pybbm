@@ -11,5 +11,4 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     (r'^', include('pybb.urls', namespace='pybb')),
     (r'^accounts/', include('registration.urls')),
-
 )

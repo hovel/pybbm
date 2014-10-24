@@ -1,5 +1,4 @@
 {% load url from future %}
-{% load pytils_numeral %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,11 +8,11 @@
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link rel="stylesheet" href="{{ STATIC_URL }}example_bootstrap.css" type='text/css'>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/smoothness/jquery-ui.css" type="text/css"/>
 
-    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/smoothness/jquery-ui.css" type="text/css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/i18n/jquery-ui-i18n.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/i18n/jquery-ui-i18n.min.js"></script>
     <script src="http://yandex.st/json2/2011-01-18/json2.min.js"></script>
     <script src="{{ STATIC_URL }}csrf.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/pybbjs.js"></script>
@@ -31,11 +30,19 @@
 </head>
 <body>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <a class="brand" href="/">PYBB Modified. Django forum solution.</a>
-            <ul class="nav">
+<div class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-pybbm">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">PYBB Modified. Django forum solution.</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-pybbm">
+            <ul class="nav navbar-nav">
                 {% if request.user.is_authenticated %}
                     <li>
                         <a href="{% url 'pybb:edit_profile' %}">Profile [logged as {{ request.user.username }}]</a>
@@ -48,7 +55,6 @@
                             <a href="{% url 'admin:index' %}">Admin interface</a>
                         </li>
                     {% endif %}
-
                 {% else %}
                     <li>
                         <a href="{% url 'auth_login' %}">Login</a>
@@ -66,9 +72,7 @@
 </div>
 
 <div class="container">
-
-    <!-- Main hero unit for a primary marketing message or call to action -->
-    <div class="hero-unit">
+    <div class="jumbotron">
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
@@ -94,36 +98,50 @@
         </div>
     </div>
     {% if request.path == '/' %}
-    <div class="row">
-        <div class="span5">
-            <h2>Fully Documented</h2>
-            <p>Everything explained</p>
-            <p><a class="btn" href="http://readthedocs.org/docs/pybbm/en/latest/">Read docs now &raquo;</a></p>
-        </div>
-        <div class="span5">
-            <h2>Heavily tested</h2>
-            <p> 95% code coverage!</p>
-            <p><a class="btn" href="https://github.com/hovel/pybbm/blob/master/pybb/tests.py">View tests &raquo;</a></p>
-        </div>
-        <div class="span5">
-            <h2>Want a fast start?</h2>
-            <p>Start from ready to use example project</p>
-            <p><a class="btn" href="http://readthedocs.org/docs/pybbm/en/latest/example.html">Read more &raquo;</a></p>
-        </div>
-    </div>
+        <div class="row">
+            <div class="col-md-4">
+                <h2>Fully Documented</h2>
 
-    <div class="row spaced">
-        <div class="span5">
-            <h2>Django application</h2>
-            <p>Easy to embed to any django project</p>
-            <p><a class="btn success" href="http://readthedocs.org/docs/pybbm/en/latest/install.html">Learn how to install &raquo;</a></p>
+                <p>Everything explained</p>
+
+                <p><a class="btn btn-default" href="http://readthedocs.org/docs/pybbm/en/latest/">Read docs now &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
+                <h2>Heavily tested</h2>
+
+                <p> 95% code coverage!</p>
+
+                <p><a class="btn btn-default" href="https://github.com/hovel/pybbm/blob/master/pybb/tests.py">View tests &raquo;</a>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h2>Want a fast start?</h2>
+
+                <p>Start from ready to use example project</p>
+
+                <p><a class="btn btn-default" href="http://readthedocs.org/docs/pybbm/en/latest/example.html">Read more &raquo;</a>
+                </p>
+            </div>
         </div>
-        <div class="span5">
-            <h2>Help welcomed</h2>
-            <p>Extended PyBBM? Push your changes.</p>
-            <p><a class="btn" href="https://github.com/hovel/pybbm">Fork repo &raquo;</a></p>
+
+        <div class="row spaced">
+            <div class="col-md-4">
+                <h2>Django application</h2>
+
+                <p>Easy to embed to any django project</p>
+
+                <p>
+                    <a class="btn btn-success" href="http://readthedocs.org/docs/pybbm/en/latest/install.html">Learn how to install &raquo;</a>
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h2>Help welcomed</h2>
+
+                <p>Extended PyBBM? Push your changes.</p>
+
+                <p><a class="btn btn-default" href="https://github.com/hovel/pybbm">Fork repo &raquo;</a></p>
+            </div>
         </div>
-    </div>
     {% endif %}
 
     <footer>
@@ -132,6 +150,6 @@
         <a href="http://www.pybbm.org">pybbm</a>
     </footer>
 
-</div> <!-- /container -->
+</div>
 </body>
 </html>
