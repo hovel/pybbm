@@ -26,6 +26,11 @@ this model manually. You can use fields from another app (such as `avatar` or `l
 but you have to define proxy properties in forum profile model and build custom
 edit profile view, which will be override default pybb profile edit view in urls.py.
 
+Next define `get_display_name` method for your profile model if you want custom username
+rendering everywhere in forum. Default `pybb.Profile` model return user's username field
+as display name, base `pybb.profiles.PybbProfile` class trying to return `self.user.get_username()`
+or `self.get_username()`.
+
 Last step is to correctly set `PYBB_PROFILE_RELATED_NAME` setting. You have to set this
 setting to related_name parameter from profile's model from OneToOne relation to User model.
 If you use custom user model and this model is profile model itself, then you have to set

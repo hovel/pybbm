@@ -7,6 +7,7 @@ PyBBM Changelog
 * Fixed creating custom profile model of any class defined in settings with right related name to user model.
   *Migration note*: If you have workaround for creating profile in your code, you should remove it for
   preventing possible dubplicate unique key error on user creating.
+* New get_display_name method for profile model used to unification displaying username through forum
 
 0.15.5 -> 0.15.6
 ----------------
