@@ -183,7 +183,10 @@ in myapp.pybb_markup_engines :
     # -*- coding: utf-8 -*-
     from __future__ import unicode_literals
 
-    from pybb.markup_engines import PARSERS, bbcode, markdown
+    from pybb.markup_engines import PARSERS, bbcode, markdown, init_bbcode_parser, init_markdown_parser
+    
+    init_bbcode_parser()
+    init_markdown_parser()
 
     #PARSERS['bbcode'] is the instance of the bbcode parser
     #So you can add formatting rules to it.
