@@ -674,7 +674,7 @@ def add_subscription(request, topic_id):
 @login_required
 def post_ajax_preview(request):
     content = request.POST.get('data')
-    html = defaults.PYBB_MARKUP_ENGINES[defaults.PYBB_MARKUP](content)
+    html = util.get_markup_engine()(content)
     return render(request, 'pybb/_markitup_preview.html', {'html': html})
 
 
