@@ -106,3 +106,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Pybb
 PYBB_TEMPLATE = "site_base.html"
 PYBB_ATTACHMENT_ENABLE = True
+PYBB_MARKUP_ENGINES = {
+    'bbcode': 'srn.pybb_adapter.markup_engines.bbcode',
+    'markdown': 'srn.pybb_adapter.markup_engines.markdown',
+}

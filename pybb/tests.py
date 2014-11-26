@@ -151,7 +151,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         ]
 
         for item in bbcode_to_html_map:
-            self.assertIn(defaults.PYBB_MARKUP_ENGINES['bbcode'](item[0]), item[1:])
+            self.assertIn(util.get_markup_engine('bbcode')(item[0]), item[1:])
 
     def test_bbcode_and_topic_title(self):
         response = self.client.get(self.topic.get_absolute_url())
@@ -1510,6 +1510,49 @@ def _detach_perms_class():
     """
     pybb_views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
 
+
+class CustomParserTest(TestCase, SharedTestModule):
+
+    def setUp(self):
+        self.ORIG_PYBB_MARKUP_ENGINES = defaults.PYBB_MARKUP_ENGINES
+        defaults.PYBB_MARKUP_ENGINES = {
+            'bbcode':'test.test_project.pybb_adapters.bbcode',
+            'liberator':'test.test_project.pybb_adapters.liberator',
+        }
+        util.MARKUP_ENGINES = {}
+
+    def test_custom_bbcode_processor(self):
+        #Réinit Engines because they are stored in memory and the current bbcode engine stored
+        #may be the old one, depending the test order exec.
+        bbcode_to_html_map = [
+            ['[ul][li]1[/li][li]2[/li][/ul]', '<ul><li>1</li><li>2</li></ul>'],
+            [
+                '[youtube]video_id[/youtube]', 
+                (
+                    '<iframe src="http://www.youtube.com/embed/video_id?wmode=opaque" '
+                    'data-youtube-id="video_id" allowfullscreen="" frameborder="0" '
+                    'height="315" width="560"></iframe>'
+                )
+            ],
+        ]
+        for item in bbcode_to_html_map:
+            self.assertIn(util.get_markup_engine('bbcode')(item[0]), item[1:])
+
+    def test_custom_specific_processor(self):
+        specific_to_html_map = [
+            [
+                'Windows and Mac OS are wonderfull OS !', 
+                'GNU Linux and FreeBSD are wonderfull OS !'
+            ],
+            ['I love PHP', 'I love Python'],
+        ]
+
+        for item in specific_to_html_map:
+            self.assertIn(util.get_markup_engine('liberator')(item[0]), item[1:])
+    
+    def tearDown(self):
+        defaults.PYBB_MARKUP_ENGINES = self.ORIG_PYBB_MARKUP_ENGINES
+        util.MARKUP_ENGINES = {}
 
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """

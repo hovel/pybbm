@@ -5,9 +5,6 @@ import os.path
 
 from django.conf import settings
 
-from pybb.util import filter_blanks, rstrip_str
-
-
 PYBB_TOPIC_PAGE_SIZE = getattr(settings, 'PYBB_TOPIC_PAGE_SIZE', 10)
 PYBB_FORUM_PAGE_SIZE = getattr(settings, 'PYBB_FORUM_PAGE_SIZE', 20)
 PYBB_AVATAR_WIDTH = getattr(settings, 'PYBB_AVATAR_WIDTH', 80)
@@ -30,10 +27,6 @@ PYBB_DEFAULT_AVATAR_URL = getattr(settings,'PYBB_DEFAULT_AVATAR_URL',
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 
-import bbcode
-from markdown import Markdown
-from django.utils.html import urlize
-
 PYBB_SMILES_PREFIX = getattr(settings, 'PYBB_SMILES_PREFIX', 'pybb/emoticons/')
 
 PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
@@ -51,35 +44,56 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
     ';)': 'wink.png'
 })
 
-def smile_it(str):
-    s = str
-    for smile, url in PYBB_SMILES.items():
-        s = s.replace(smile, '<img src="%s%s%s" alt="smile" />' % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url))
-    return s
+#TODO In a near future, this code will be deleted when callable settings will not 
+#supported anymore.
+import warnings
+from django.utils.six import string_types
+from django.utils.translation import ugettext as _
+warning = _('%(setting_name)s should not be a callabled anymore but a path to the callable.'\
+    'ex : myproject.markup_engines.my_own_bbcode')
 
-bbcode_parser = bbcode.Parser()
-bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links=False)
-bbcode_parser.add_simple_formatter('code', '<pre><code>%(value)s</code></pre>', render_embedded=False, transform_newlines=False, swallow_trailing_newline=True)
-def _render_quote(name, value, options, parent, context):
-    if options and 'quote' in options:
-        origin_author_html = '<em>%s</em><br>' % options['quote']
+
+def deprecated_check(setting_name):
+    setting = globals().get(setting_name)
+    values = setting if type(setting) is not dict else setting.values()
+    for value in values:
+        if isinstance(value, string_types):
+            continue
+        warnings.warn(
+            warning % {'setting_name':setting_name,}, 
+            DeprecationWarning
+        )
+
+if not hasattr(settings, 'PYBB_MARKUP_ENGINES'):
+    #TODO In a near future, thoses settings will be pathes to callable
+    #We let it "as it" for now for backward compatibility
+    from .markup_engines import init_bbcode_parser, init_markdown_parser, bbcode, markdown
+    init_bbcode_parser()
+    init_markdown_parser()
+    PYBB_MARKUP_ENGINES = {'bbcode':bbcode, 'markdown': markdown,}
+else:
+    PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES')
+    deprecated_check('PYBB_MARKUP_ENGINES')
+
+if not hasattr(settings, 'PYBB_QUOTE_ENGINES'):
+    #TODO In a near future, thoses settings will be pathes to callable
+    #We let it "as it" for now for backward compatibility
+    from .markup_engines import bbcode_quote, markdown_quote
+    PYBB_QUOTE_ENGINES = {'bbcode': bbcode_quote, 'markdown': markdown_quote,}
+else:
+    PYBB_QUOTE_ENGINES = getattr(settings, 'PYBB_QUOTE_ENGINES')
+    deprecated_check('PYBB_QUOTE_ENGINES')
+
+PYBB_MARKUP = getattr(settings, 'PYBB_MARKUP', None)
+if not PYBB_MARKUP or not PYBB_MARKUP in PYBB_MARKUP_ENGINES:
+    if not PYBB_MARKUP_ENGINES:
+        PYBB_MARKUP = None
+    elif 'bbcode' in PYBB_MARKUP_ENGINES:
+        #Backward compatibility. bbcode is the default markup
+        PYBB_MARKUP = 'bbcode'
     else:
-        origin_author_html = ''
-    return '<blockquote>%s%s</blockquote>' % (origin_author_html, value)
-bbcode_parser.add_formatter('quote', _render_quote, strip=True, swallow_trailing_newline=True)
-
-
-PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
-    'bbcode': lambda str: smile_it(bbcode_parser.format(str)),
-    'markdown': lambda str: urlize(smile_it(Markdown(safe_mode='escape').convert(str)))
-})
-
-PYBB_QUOTE_ENGINES = getattr(settings, 'PYBB_QUOTE_ENGINES', {
-    'bbcode': lambda text, username="": '[quote="%s"]%s[/quote]\n' % (username, text),
-    'markdown': lambda text, username="": '>'+text.replace('\n','\n>').replace('\r','\n>') + '\n'
-})
-
-PYBB_MARKUP = getattr(settings, 'PYBB_MARKUP', 'bbcode')
+        #If a dev define his own markups, auto choose the first one to save a line in settings :)
+        PYBB_MARKUP_ENGINES.keys()[0]
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
@@ -89,7 +103,14 @@ PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = getattr(settings, 'PYBB_ANONYMOUS_VIEWS_CACH
 
 PYBB_PREMODERATION = getattr(settings, 'PYBB_PREMODERATION', False)
 
-PYBB_BODY_CLEANERS = getattr(settings, 'PYBB_BODY_CLEANERS', [rstrip_str, filter_blanks])
+if not hasattr(settings, 'PYBB_BODY_CLEANERS'):
+    #TODO In a near future, thoses settings will be pathes to callable
+    #We let it "as it" for now for backward compatibility
+    from pybb.util import filter_blanks, rstrip_str
+    PYBB_BODY_CLEANERS = [rstrip_str, filter_blanks]
+else:
+    PYBB_BODY_CLEANERS = getattr(settings, 'PYBB_BODY_CLEANERS')
+    deprecated_check('PYBB_BODY_CLEANERS')
 
 PYBB_BODY_VALIDATOR = getattr(settings, 'PYBB_BODY_VALIDATOR', None)
 
@@ -104,3 +125,8 @@ PYBB_PERMISSION_HANDLER = getattr(settings, 'PYBB_PERMISSION_HANDLER', 'pybb.per
 PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb_profile')
 
 PYBB_INITIAL_CUSTOM_USER_MIGRATION = getattr(settings, 'PYBB_INITIAL_CUSTOM_USER_MIGRATION', None)
+
+#Backward compatibility : import old functions which was defined here if some devs did used it
+#TODO in a near future : delete those imports
+from .util import smile_it, _render_quote
+from .markup_engines import bbcode, markdown

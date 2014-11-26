@@ -1,10 +1,108 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import os
 import re
 import uuid
+
+from django.utils.importlib import import_module
+from django.utils.six import string_types
 from django.utils.translation import ugettext as _
+
 from pybb.compat import get_username_field, get_user_model
+
+MARKUP_ENGINES = {}
+QUOTE_ENGINES = {}
+SMILES_DICT = None
+
+def _init_smilies():
+    """
+    Initializes the smilies replacement only once
+    This is in a function to avoid recursive import problems because we need
+    some pybb.defaults and pybb.defaults, for backward compat reason, need smile_it
+    
+    """
+    global SMILES_DICT
+    if SMILES_DICT is not None:
+        return
+    from django.conf import settings
+    from pybb.defaults import PYBB_SMILES, PYBB_SMILES_PREFIX
+    if PYBB_SMILES:
+        SMILES_DICT = {}
+        for smile, url in PYBB_SMILES.items():
+            SMILES_DICT[smile] = '<img src="%s%s%s" alt="smile" />' % (
+                settings.STATIC_URL, 
+                PYBB_SMILES_PREFIX, 
+                url
+            )
+    else:
+        SMILES_DICT = False
+
+
+def smile_it(s):
+    global SMILES_DICT
+    if SMILES_DICT is None:
+        _init_smilies()
+    for k, v in SMILES_DICT.items():
+        s = s.replace(k, v)
+    return s
+
+def _render_quote(name, value, options, parent, context):
+    if options and 'quote' in options:
+        origin_author_html = '<em>%s</em><br>' % options['quote']
+    else:
+        origin_author_html = ''
+    return '<blockquote>%s%s</blockquote>' % (origin_author_html, value)
+
+
+def import_from_path(path):
+    if path :
+        path = path.split('.')
+        to_import = path.pop()
+        module = import_module('.'.join(path))
+        if module :
+            return getattr(module, to_import)
+    return None
+
+
+def get_markup_engine(name=None):
+    """
+    Returns the named parse engine, or the default parser if name is not given.
+    """
+    if not name:
+        from pybb.defaults import PYBB_MARKUP
+        name = PYBB_MARKUP
+    if name not in MARKUP_ENGINES:
+        from pybb.defaults import PYBB_MARKUP_ENGINES
+        if not name in PYBB_MARKUP_ENGINES:
+            return
+        engine = PYBB_MARKUP_ENGINES.get(name)
+        if isinstance(engine, string_types):
+            #This is a path, import it
+            engine = import_from_path(engine)
+        MARKUP_ENGINES[name] = engine
+    return MARKUP_ENGINES.get(name, None)
+
+
+def get_quote_engine(name=None):
+    """
+    Returns the named quote engine, or the default quoter if name is not given.
+    """
+    if not name:
+        from pybb.defaults import PYBB_MARKUP
+        name = PYBB_MARKUP
+    if name not in QUOTE_ENGINES:
+        from pybb.defaults import PYBB_QUOTE_ENGINES
+        if not name in PYBB_QUOTE_ENGINES:
+            return
+        engine = PYBB_QUOTE_ENGINES.get(name)
+        #TODO In a near future, we should stop to support callable :
+        #settings files should be simplest as possible and not define or import things.
+        if isinstance(engine, string_types):
+            #This is a path, import it
+            engine = import_from_path(engine)
+        QUOTE_ENGINES[name] = engine
+    return QUOTE_ENGINES.get(name, None)
 
 
 def unescape(text):
