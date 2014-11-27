@@ -65,7 +65,7 @@ class PostForm(forms.ModelForm):
         fields = ('body',)
 
     def __init__(self, *args, **kwargs):
-    #Move args to kwargs
+        # Move args to kwargs
         if args:
             kwargs.update(dict(zip(inspect.getargspec(super(PostForm, self).__init__)[0][1:], args)))
         self.user = kwargs.pop('user', None)
@@ -75,7 +75,7 @@ class PostForm(forms.ModelForm):
         self.may_create_poll = kwargs.pop('may_create_poll', True)
         if not (self.topic or self.forum or ('instance' in kwargs)):
             raise ValueError('You should provide topic, forum or instance')
-            #Handle topic subject, poll type and question if editing topic head
+            # Handle topic subject, poll type and question if editing topic head
         if kwargs.get('instance', None) and (kwargs['instance'].topic.head == kwargs['instance']):
             kwargs.setdefault('initial', {})['name'] = kwargs['instance'].topic.name
             kwargs.setdefault('initial', {})['poll_type'] = kwargs['instance'].topic.poll_type
@@ -102,7 +102,7 @@ class PostForm(forms.ModelForm):
             defaults.PYBB_BODY_VALIDATOR(user, body)
 
         for cleaner in defaults.PYBB_BODY_CLEANERS:
-            body = cleaner(user, body)
+            body = util.get_body_cleaner(cleaner)(user, body)
         return body
 
     def clean(self):

@@ -4,18 +4,10 @@ Extensible permission system for pybbm
 """
 
 from __future__ import unicode_literals
-from django.utils.importlib import import_module
 from django.db.models import Q
 
-from pybb import defaults
+from pybb import defaults, util
 from pybb.models import Topic, PollAnswerUser
-
-
-def _resolve_class(name):
-    """ resolves a class function given as string, returning the function """
-    if not name: return False
-    modname, funcname = name.rsplit('.', 1)
-    return getattr(import_module(modname), funcname)()
 
 
 class DefaultPermissionHandler(object):
@@ -185,4 +177,4 @@ class DefaultPermissionHandler(object):
         return True
 
 
-perms = _resolve_class(defaults.PYBB_PERMISSION_HANDLER)
+perms = util.resolve_class(defaults.PYBB_PERMISSION_HANDLER)

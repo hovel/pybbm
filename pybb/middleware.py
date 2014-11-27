@@ -18,7 +18,7 @@ class PybbMiddleware(object):
                 # and grant permissions for add posts
                 # It should be caused rarely, so we move import signal here
                 # to prevent circular import
-                from .signals import user_saved
+                from pybb.signals import user_saved
                 user_saved(request.user, created=True)
                 profile = util.get_pybb_profile(request.user)
 

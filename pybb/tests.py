@@ -132,27 +132,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.context['paginator'].num_pages,
                          int((defaults.PYBB_FORUM_PAGE_SIZE + 3) / defaults.PYBB_FORUM_PAGE_SIZE) + 1)
 
-    def test_default_bbcode_processor(self):
-        bbcode_to_html_map = [
-            ['[b]bold[/b]', '<strong>bold</strong>'],
-            ['[i]italic[/i]', '<em>italic</em>'],
-            ['[u]underline[/u]', '<u>underline</u>'],
-            ['[s]striked[/s]', '<strike>striked</strike>'],
-            ['[img]http://domain.com/image.png[/img]', '<img src="http://domain.com/image.png"></img>',
-                                                       '<img src="http://domain.com/image.png">'],
-            ['[url=google.com]search in google[/url]', '<a href="http://google.com">search in google</a>'],
-            ['http://google.com', '<a href="http://google.com">http://google.com</a>'],
-            ['[list][*]1[*]2[/list]', '<ul><li>1</li><li>2</li></ul>'],
-            ['[list=1][*]1[*]2[/list]', '<ol><li>1</li><li>2</li></ol>',
-                                        '<ol style="list-style-type:decimal;"><li>1</li><li>2</li></ol>'],
-            ['[quote="post author"]quote[/quote]', '<blockquote><em>post author</em><br>quote</blockquote>'],
-            ['[code]code[/code]', '<div class="code"><pre>code</pre></div>',
-                                  '<pre><code>code</code></pre>'],
-        ]
-
-        for item in bbcode_to_html_map:
-            self.assertIn(util.get_markup_engine('bbcode')(item[0]), item[1:])
-
     def test_bbcode_and_topic_title(self):
         response = self.client.get(self.topic.get_absolute_url())
         tree = html.fromstring(response.content)
@@ -1495,39 +1474,69 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
         return False
 
 
-def _attach_perms_class(class_name):
-    """
-    override the permission handler. this cannot be done with @override_settings as
-    permissions.perms is already imported at import point, instead we got to monkeypatch
-    the modules (not really nice, but only an issue in tests)
-    """
-    pybb_views.perms = permissions.perms = permissions._resolve_class(class_name)
-
-
-def _detach_perms_class():
-    """
-    reset permission handler (otherwise other tests may fail)
-    """
-    pybb_views.perms = permissions.perms = permissions._resolve_class('pybb.permissions.DefaultPermissionHandler')
-
-
-class CustomParserTest(TestCase, SharedTestModule):
+class MarkupParserTest(TestCase, SharedTestModule):
 
     def setUp(self):
-        self.ORIG_PYBB_MARKUP_ENGINES = defaults.PYBB_MARKUP_ENGINES
-        defaults.PYBB_MARKUP_ENGINES = {
-            'bbcode':'test.test_project.pybb_adapters.bbcode',
-            'liberator':'test.test_project.pybb_adapters.liberator',
+        # Reinit Engines because they are stored in memory and the current bbcode engine stored
+        # may be the old one, depending the test order exec.
+        self.ORIG_PYBB_MARKUP_ENGINES = util.PYBB_MARKUP_ENGINES
+        self.ORIG_PYBB_QUOTE_ENGINES = util.PYBB_QUOTE_ENGINES
+        util.PYBB_MARKUP_ENGINES = {
+            'bbcode': 'pybb.markup.BBCodeParser',  # default parser
+            'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
+            'fake': 'pybb.markup.BaseParser',  # base parser
+            'markdown': defaults.markdown  # old-style callable parser,
         }
-        util.MARKUP_ENGINES = {}
+        util.PYBB_QUOTE_ENGINES = {
+            'bbcode': 'pybb.markup.BBCodeParser',  # default parser
+            'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
+            'fake': 'pybb.markup.BaseParser',  # base parser
+            'markdown': lambda text, username="": '>' + text.replace('\n', '\n>').replace('\r', '\n>') + '\n'  # old-style callable parser
+        }
 
-    def test_custom_bbcode_processor(self):
-        #Réinit Engines because they are stored in memory and the current bbcode engine stored
-        #may be the old one, depending the test order exec.
-        bbcode_to_html_map = [
+    def tearDown(self):
+        util.PYBB_MARKUP_ENGINES = self.ORIG_PYBB_MARKUP_ENGINES
+        util.PYBB_QUOTE_ENGINES = self.ORIG_PYBB_QUOTE_ENGINES
+
+    def test_markup_engines(self):
+
+        def _test_engine(parser_name, text_to_html_map):
+            for item in text_to_html_map:
+                self.assertIn(util.get_markup_engine(parser_name)(item[0]), item[1:])
+
+        text_to_html_map = [
+            ['[b]bold[/b]', '<strong>bold</strong>'],
+            ['[i]italic[/i]', '<em>italic</em>'],
+            ['[u]underline[/u]', '<u>underline</u>'],
+            ['[s]striked[/s]', '<strike>striked</strike>'],
+            [
+                '[img]http://domain.com/image.png[/img]',
+                '<img src="http://domain.com/image.png"></img>',
+                '<img src="http://domain.com/image.png">'
+            ],
+            ['[url=google.com]search in google[/url]', '<a href="http://google.com">search in google</a>'],
+            ['http://google.com', '<a href="http://google.com">http://google.com</a>'],
+            ['[list][*]1[*]2[/list]', '<ul><li>1</li><li>2</li></ul>'],
+            [
+                '[list=1][*]1[*]2[/list]',
+                '<ol><li>1</li><li>2</li></ol>',
+                '<ol style="list-style-type:decimal;"><li>1</li><li>2</li></ol>'
+            ],
+            ['[quote="post author"]quote[/quote]', '<blockquote><em>post author</em><br>quote</blockquote>'],
+            [
+                '[code]code[/code]',
+                '<div class="code"><pre>code</pre></div>',
+                '<pre><code>code</code></pre>']
+            ,
+        ]
+        _test_engine('bbcode', text_to_html_map)
+
+        text_to_html_map = text_to_html_map + [
             ['[ul][li]1[/li][li]2[/li][/ul]', '<ul><li>1</li><li>2</li></ul>'],
             [
-                '[youtube]video_id[/youtube]', 
+                '[youtube]video_id[/youtube]',
                 (
                     '<iframe src="http://www.youtube.com/embed/video_id?wmode=opaque" '
                     'data-youtube-id="video_id" allowfullscreen="" frameborder="0" '
@@ -1535,24 +1544,103 @@ class CustomParserTest(TestCase, SharedTestModule):
                 )
             ],
         ]
-        for item in bbcode_to_html_map:
-            self.assertIn(util.get_markup_engine('bbcode')(item[0]), item[1:])
+        _test_engine('bbcode_custom', text_to_html_map)
 
-    def test_custom_specific_processor(self):
-        specific_to_html_map = [
-            [
-                'Windows and Mac OS are wonderfull OS !', 
-                'GNU Linux and FreeBSD are wonderfull OS !'
-            ],
+        text_to_html_map = [
+            ['Windows and Mac OS are wonderfull OS !', 'GNU Linux and FreeBSD are wonderfull OS !'],
             ['I love PHP', 'I love Python'],
         ]
+        _test_engine('liberator', text_to_html_map)
 
-        for item in specific_to_html_map:
-            self.assertIn(util.get_markup_engine('liberator')(item[0]), item[1:])
-    
-    def tearDown(self):
-        defaults.PYBB_MARKUP_ENGINES = self.ORIG_PYBB_MARKUP_ENGINES
-        util.MARKUP_ENGINES = {}
+        text_to_html_map = [
+            ['[b]bold[/b]', '[b]bold[/b]'],
+            ['*italic*', '*italic*'],
+        ]
+        _test_engine('fake', text_to_html_map)
+        _test_engine('not_existent', text_to_html_map)
+
+        text_to_html_map = [
+            ['**bold**', '<p><strong>bold</strong></p>'],
+            ['*italic*', '<p><em>italic</em></p>'],
+            [
+                '![alt text](http://domain.com/image.png title)',
+                '<p><img alt="alt text" src="http://domain.com/image.png" title="title" /></p>'
+            ],
+            [
+                '[search in google](https://www.google.com)',
+                '<p><a href="https://www.google.com">search in google</a></p>'
+            ],
+            [
+                '[google] some text\n[google]: https://www.google.com',
+                '<p><a href="https://www.google.com">google</a> some text</p>'
+            ],
+            ['* 1\n* 2', '<ul>\n<li>1</li>\n<li>2</li>\n</ul>'],
+            ['1. 1\n2. 2', '<ol>\n<li>1</li>\n<li>2</li>\n</ol>'],
+            ['> quote', '<blockquote>\n<p>quote</p>\n</blockquote>'],
+            ['```\ncode\n```', '<p><code>code</code></p>'],
+        ]
+        _test_engine('markdown', text_to_html_map)
+
+    def test_quote_engines(self):
+
+        def _test_engine(parser_name, text_to_quote_map):
+            for item in text_to_quote_map:
+                self.assertEqual(util.get_quote_engine(parser_name)(item[0]), item[1])
+                self.assertEqual(util.get_quote_engine(parser_name)(item[0], 'username'), item[2])
+
+        text_to_quote_map = [
+            ['quote text', '[quote=""]quote text[/quote]\n', '[quote="username"]quote text[/quote]\n']
+        ]
+        _test_engine('bbcode', text_to_quote_map)
+        _test_engine('bbcode_custom', text_to_quote_map)
+
+        text_to_quote_map = [
+            ['quote text', 'quote text', 'posted by: username\nquote text']
+        ]
+        _test_engine('liberator', text_to_quote_map)
+
+        text_to_quote_map = [
+            ['quote text', 'quote text', 'quote text']
+        ]
+        _test_engine('fake', text_to_quote_map)
+        _test_engine('not_existent', text_to_quote_map)
+
+        text_to_quote_map = [
+            ['quote\r\ntext', '>quote\n>\n>text\n', '>quote\n>\n>text\n']
+        ]
+        _test_engine('markdown', text_to_quote_map)
+
+    def test_body_cleaners(self):
+        user = User.objects.create_user('zeus', 'zeus@localhost', 'zeus')
+        staff = User.objects.create_user('staff', 'staff@localhost', 'staff')
+        staff.is_staff = True
+        staff.save()
+
+        from pybb.markup import rstrip_str
+        cleaners_map = [
+            ['pybb.markup.filter_blanks', 'some\n\n\n\ntext\n\nwith\nnew\nlines', 'some\ntext\n\nwith\nnew\nlines'],
+            [rstrip_str, 'text    \n    \nwith whitespaces     ', 'text\n\nwith whitespaces'],
+        ]
+        for cleaner, source, dest in cleaners_map:
+            self.assertEqual(util.get_body_cleaner(cleaner)(user, source), dest)
+            self.assertEqual(util.get_body_cleaner(cleaner)(staff, source), source)
+
+
+def _attach_perms_class(class_name):
+    """
+    override the permission handler. this cannot be done with @override_settings as
+    permissions.perms is already imported at import point, instead we got to monkeypatch
+    the modules (not really nice, but only an issue in tests)
+    """
+    pybb_views.perms = permissions.perms = util.resolve_class(class_name)
+
+
+def _detach_perms_class():
+    """
+    reset permission handler (otherwise other tests may fail)
+    """
+    pybb_views.perms = permissions.perms = util.resolve_class('pybb.permissions.DefaultPermissionHandler')
+
 
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """
@@ -1634,14 +1722,14 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
 
 
 class RestrictEditingHandler(permissions.DefaultPermissionHandler):
-        def may_create_topic(self, user, forum):
-            return False
+    def may_create_topic(self, user, forum):
+        return False
 
-        def may_create_post(self, user, topic):
-            return False
+    def may_create_post(self, user, topic):
+        return False
 
-        def may_edit_post(self, user, post):
-            return False
+    def may_edit_post(self, user, post):
+        return False
 
 
 class LogonRedirectTest(TestCase, SharedTestModule):

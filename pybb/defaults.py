@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
 import os.path
-
+import warnings
+from collections import OrderedDict
 from django.conf import settings
+from django.utils.six import string_types
+from django.utils.translation import ugettext as _
 
 PYBB_TOPIC_PAGE_SIZE = getattr(settings, 'PYBB_TOPIC_PAGE_SIZE', 10)
 PYBB_FORUM_PAGE_SIZE = getattr(settings, 'PYBB_FORUM_PAGE_SIZE', 20)
 PYBB_AVATAR_WIDTH = getattr(settings, 'PYBB_AVATAR_WIDTH', 80)
-PYBB_AVATAR_HEIGHT = getattr(settings, 'PYBB_AVATAR_HEIGHT',80)
-PYBB_MAX_AVATAR_SIZE = getattr(settings, 'PYBB_MAX_AVATAR_SIZE', 1024*50)
+PYBB_AVATAR_HEIGHT = getattr(settings, 'PYBB_AVATAR_HEIGHT', 80)
+PYBB_MAX_AVATAR_SIZE = getattr(settings, 'PYBB_MAX_AVATAR_SIZE', 1024 * 50)
 PYBB_DEFAULT_TIME_ZONE = getattr(settings, 'PYBB_DEFAULT_TIME_ZONE', 3)
 
 PYBB_SIGNATURE_MAX_LENGTH = getattr(settings, 'PYBB_SIGNATURE_MAX_LENGTH', 1024)
@@ -22,8 +24,8 @@ PYBB_ATTACHMENT_SIZE_LIMIT = getattr(settings, 'PYBB_ATTACHMENT_SIZE_LIMIT', 102
 PYBB_ATTACHMENT_ENABLE = getattr(settings, 'PYBB_ATTACHMENT_ENABLE', False)
 PYBB_ATTACHMENT_UPLOAD_TO = getattr(settings, 'PYBB_ATTACHMENT_UPLOAD_TO', os.path.join('pybb_upload', 'attachments'))
 
-PYBB_DEFAULT_AVATAR_URL = getattr(settings,'PYBB_DEFAULT_AVATAR_URL',
-    getattr(settings, 'STATIC_URL', '') + 'pybb/img/default_avatar.jpg')
+PYBB_DEFAULT_AVATAR_URL = getattr(settings, 'PYBB_DEFAULT_AVATAR_URL',
+                                  getattr(settings, 'STATIC_URL', '') + 'pybb/img/default_avatar.jpg')
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
 
@@ -44,56 +46,47 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
     ';)': 'wink.png'
 })
 
-#TODO In a near future, this code will be deleted when callable settings will not 
-#supported anymore.
-import warnings
-from django.utils.six import string_types
-from django.utils.translation import ugettext as _
-warning = _('%(setting_name)s should not be a callabled anymore but a path to the callable.'\
-    'ex : myproject.markup_engines.my_own_bbcode')
+# TODO In a near future, this code will be deleted when callable settings will not supported anymore.
+warning = _('%(setting_name)s should not be a callable anymore but a path to the parser classes.'
+            'ex : myproject.markup.CustomBBCodeParser')
 
 
-def deprecated_check(setting_name):
-    setting = globals().get(setting_name)
-    values = setting if type(setting) is not dict else setting.values()
+def getsetting_with_deprecation_check(all_settings, setting_name):
+    setting_value = getattr(all_settings, setting_name)
+    values = setting_value if type(setting_value) is not dict else setting_value.values()
     for value in values:
         if isinstance(value, string_types):
             continue
         warnings.warn(
-            warning % {'setting_name':setting_name,}, 
+            warning % {'setting_name': setting_name, },
             DeprecationWarning
         )
+    return setting_value
+
 
 if not hasattr(settings, 'PYBB_MARKUP_ENGINES'):
-    #TODO In a near future, thoses settings will be pathes to callable
-    #We let it "as it" for now for backward compatibility
-    from .markup_engines import init_bbcode_parser, init_markdown_parser, bbcode, markdown
-    init_bbcode_parser()
-    init_markdown_parser()
-    PYBB_MARKUP_ENGINES = {'bbcode':bbcode, 'markdown': markdown,}
+    PYBB_MARKUP_ENGINES = {'bbcode': 'pybb.markup.BBCodeParser',
+                           'markdown': 'pybb.markup.MarkdownParser'}
 else:
-    PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES')
-    deprecated_check('PYBB_MARKUP_ENGINES')
+    PYBB_MARKUP_ENGINES = getsetting_with_deprecation_check(settings, 'PYBB_MARKUP_ENGINES')
 
 if not hasattr(settings, 'PYBB_QUOTE_ENGINES'):
-    #TODO In a near future, thoses settings will be pathes to callable
-    #We let it "as it" for now for backward compatibility
-    from .markup_engines import bbcode_quote, markdown_quote
-    PYBB_QUOTE_ENGINES = {'bbcode': bbcode_quote, 'markdown': markdown_quote,}
+    PYBB_QUOTE_ENGINES = {'bbcode': 'pybb.markup.BBCodeParser',
+                          'markdown': 'pybb.markup.MarkdownParser'}
 else:
-    PYBB_QUOTE_ENGINES = getattr(settings, 'PYBB_QUOTE_ENGINES')
-    deprecated_check('PYBB_QUOTE_ENGINES')
+    PYBB_QUOTE_ENGINES = getsetting_with_deprecation_check(settings, 'PYBB_QUOTE_ENGINES')
 
 PYBB_MARKUP = getattr(settings, 'PYBB_MARKUP', None)
-if not PYBB_MARKUP or not PYBB_MARKUP in PYBB_MARKUP_ENGINES:
+if not PYBB_MARKUP or PYBB_MARKUP not in PYBB_MARKUP_ENGINES:
     if not PYBB_MARKUP_ENGINES:
         PYBB_MARKUP = None
     elif 'bbcode' in PYBB_MARKUP_ENGINES:
-        #Backward compatibility. bbcode is the default markup
+        # Backward compatibility. bbcode is the default markup
         PYBB_MARKUP = 'bbcode'
     else:
-        #If a dev define his own markups, auto choose the first one to save a line in settings :)
-        PYBB_MARKUP_ENGINES.keys()[0]
+        # If a developer define his own markups without specifing default,
+        # auto choose the first one in alphabetical order
+        PYBB_MARKUP = OrderedDict(PYBB_MARKUP_ENGINES).keys()[0]
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
@@ -104,13 +97,9 @@ PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER = getattr(settings, 'PYBB_ANONYMOUS_VIEWS_CACH
 PYBB_PREMODERATION = getattr(settings, 'PYBB_PREMODERATION', False)
 
 if not hasattr(settings, 'PYBB_BODY_CLEANERS'):
-    #TODO In a near future, thoses settings will be pathes to callable
-    #We let it "as it" for now for backward compatibility
-    from pybb.util import filter_blanks, rstrip_str
-    PYBB_BODY_CLEANERS = [rstrip_str, filter_blanks]
+    PYBB_BODY_CLEANERS = ['pybb.markup.rstrip_str', 'pybb.markup.filter_blanks']
 else:
-    PYBB_BODY_CLEANERS = getattr(settings, 'PYBB_BODY_CLEANERS')
-    deprecated_check('PYBB_BODY_CLEANERS')
+    PYBB_BODY_CLEANERS = getsetting_with_deprecation_check(settings, 'PYBB_BODY_CLEANERS')
 
 PYBB_BODY_VALIDATOR = getattr(settings, 'PYBB_BODY_VALIDATOR', None)
 
@@ -126,7 +115,30 @@ PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb
 
 PYBB_INITIAL_CUSTOM_USER_MIGRATION = getattr(settings, 'PYBB_INITIAL_CUSTOM_USER_MIGRATION', None)
 
-#Backward compatibility : import old functions which was defined here if some devs did used it
-#TODO in a near future : delete those imports
-from .util import smile_it, _render_quote
-from .markup_engines import bbcode, markdown
+# Backward compatibility : define old functions which was defined here if some devs did used it
+# TODO in a near future : delete those functions
+
+def bbcode(s):
+    warnings.warn('pybb.defaults.bbcode function is deprecated. Use pybb.markup.BBCodeParser instead.',
+                  DeprecationWarning)
+    from pybb.markup import BBCodeParser
+    return BBCodeParser().format(s)
+
+def markdown(s):
+    warnings.warn('pybb.defaults.markdown function is deprecated. Use pybb.markup.MarkdownParser instead.',
+                  DeprecationWarning)
+    from pybb.markup import MarkdownParser
+    return MarkdownParser().format(s)
+
+def _render_quote(name, value, options, parent, context):
+    warnings.warn('pybb.defaults._render_quote function is deprecated. '
+                  'This function is internal of new pybb.markup.BBCodeParser class.',
+                  DeprecationWarning)
+    from pybb.markup import BBCodeParser
+    return BBCodeParser()._render_quote(name, value, options, parent, context)
+
+def smile_it(s):
+    warnings.warn('pybb.defaults.smile_it function is deprecated. Use pybb.markup.smile_it instead.',
+                  DeprecationWarning)
+    from pybb.markup import smile_it as real_smile_it
+    return real_smile_it(s)
