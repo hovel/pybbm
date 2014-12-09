@@ -143,74 +143,44 @@ Markup engines
 PYBB_MARKUP
 ...........
 
-Markup engine used in forum (default is 'bbcode' if you have a defined bbcode engine, else it is
-the "first" markup defined (this is not really the first because dict are not ordered, but it is 
-usefull if your have only one defined engine and don't want to set this setting)
+Markup engine used in forum (default is 'bbcode' if you have a defined bbcode engine)
 See PYBB_MARKUP_ENGINES below
 
 PYBB_MARKUP_ENGINES
 ...................
 
-Dict with avaiable markup engines path. One of them should be selected with PYBB_DEFAULT_MARKUP
+Dict with avaiable markup engines path. One of them should be selected with PYBB_MARKUP
 
-Markup engine should be a path to a function, that accept post.body as first argument, and return
-output as rendered html. Markup engine should take care of replacing smiles in body with
+Markup engine should be a path to a class, that has ``format`` and ``quote`` methods.
+Markup engine should take care of replacing smiles in body with
 related emoticons.
 
 by default PyBBM support `bbcode` and `markdown` markup::
 
     {
-        'bbcode': 'pybb.markup_engines.bbcode',
-        'markdown': 'pybb.markup_engines.markdown'
+        'bbcode': 'pybb.markup.bbcode.BBCodeParser',
+        'markdown': 'pybb.markup.markdown.MarkdownParser'
     }
 
-Please note, that `size` and `center` tags are disabled by default, enable them if you have right markup for them.
-
-Please note, that previous version of pybb wanted a funciton (and not the path to the function).
+Please note, that previous version of pybb wanted a funciton (and not the path to the class).
 This is still supported, but is deprecated.
 
-If you want to add some codes to the bbcode parser, you can do like that :
+For more information see :doc:`markup`
 
-in your settings.py :
+PYBB_QUOTE_ENGINES (deprecated)
+...............................
 
-    PYBB_MARKUP_ENGINES = {
-        'bbcode': 'myapp.pybb_markup_engines.bbcode',
-        'markdown': 'myapp.pybb_markup_engines.markdown'
-    }
+**Deprecation note: Every markup class have to have ``format`` and ``quote`` methods**
 
-in myapp.pybb_markup_engines :
+**For more information see :doc:`markup`**
 
-    # -*- coding: utf-8 -*-
-    from __future__ import unicode_literals
-
-    from pybb.markup_engines import PARSERS, bbcode, markdown, init_bbcode_parser, init_markdown_parser
-    
-    init_bbcode_parser()
-    init_markdown_parser()
-
-    #PARSERS['bbcode'] is the instance of the bbcode parser
-    #So you can add formatting rules to it.
-    #when the function "bbcode" will be called, it performs a PARSERS['bbcode'].format(s) call
-    PARSERS['bbcode'].add_simple_formatter(
-        'youtube', 
-        (
-            '<iframe src="http://www.youtube.com/embed/%(value)s?wmode=opaque" '
-            'data-youtube-id="%(value)s" allowfullscreen="" frameborder="0" '
-            'height="315" width="560"></iframe>'
-        ), 
-        replace_links=False,
-    )
-
-PYBB_QUOTE_ENGINES
-..................
-
-Dict with quoting function path for every markup engines in PYBB_MARKUP_ENGINES
+Should be the same dict with paths to markup engine classes as PYBB_MARKUP_ENGINES setting
 
 default is::
 
     {
-        'bbcode': 'pybb.markup_engines.bbcode_quote',
-        'markdown': 'pybb.markup_engines.markdown_quote',
+        'bbcode': 'pybb.markup.bbcode.BBCodeParser',
+        'markdown': 'pybb.markup.markdown.MarkdownParser',
     }
 
 Post cleaning/validation
@@ -219,7 +189,7 @@ Post cleaning/validation
 PYBB_BODY_CLEANERS
 ..................
 
-List of 'cleaner' functions for body post to automatically remove undesirable content from posts.
+List of paths to 'cleaner' functions for body post to automatically remove undesirable content from posts.
 Cleaners are user-aware, so you can disable them for some types of users.
 
 Each function in list should accept `auth.User` instance as first argument and `string` instance as second, returned value will be sended to next function on list or saved and rendered as post body.
@@ -233,8 +203,7 @@ for example this is enabled by default `rstrip_str` cleaner::
 
 default is::
 
-    from pybb.util import filter_blanks, rstrip_str
-    PYBB_BODY_CLEANERS = [rstrip_str, filter_blanks]
+    PYBB_BODY_CLEANERS = ['pybb.markup.base.rstrip_str', 'pybb.markup.base.filter_blanks']
 
 PYBB_BODY_VALIDATOR
 ...................
@@ -245,13 +214,14 @@ Called as::
 
     PYBB_BODY_VALIDATOR(user, body)
 
-at `clean_body` method of `PostForm` Here you can do various checks based on user stats. E.g. allow moderators to post links and don't allow others. By raising::
+at `clean_body` method of `PostForm` Here you can do various checks based on user stats.
+E.g. allow moderators to post links and don't allow others. By raising::
 
     forms.ValidationError('Here Error Message')
 
 You can show user what is going wrong during validation.
 
-You can use it for example for time limit between posts, preventing URLs, ...
+You can use it for example for time limit between posts, preventing URLs, etc.
 
 default is None
 

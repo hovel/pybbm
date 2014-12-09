@@ -12,8 +12,6 @@ setup(
     include_package_data=True,
     package_data={'': ['pybb/templates', 'pybb/static']},
     install_requires=[
-        'markdown',
-        'bbcode',
         'django-annoying',
     ],
     test_suite='runtests.runtests',

@@ -1482,21 +1482,23 @@ class MarkupParserTest(TestCase, SharedTestModule):
         self.ORIG_PYBB_MARKUP_ENGINES = util.PYBB_MARKUP_ENGINES
         self.ORIG_PYBB_QUOTE_ENGINES = util.PYBB_QUOTE_ENGINES
         util.PYBB_MARKUP_ENGINES = {
-            'bbcode': 'pybb.markup.BBCodeParser',  # default parser
+            'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
             'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
             'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
-            'fake': 'pybb.markup.BaseParser',  # base parser
+            'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': defaults.markdown  # old-style callable parser,
         }
         util.PYBB_QUOTE_ENGINES = {
-            'bbcode': 'pybb.markup.BBCodeParser',  # default parser
+            'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
             'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
             'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
-            'fake': 'pybb.markup.BaseParser',  # base parser
+            'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': lambda text, username="": '>' + text.replace('\n', '\n>').replace('\r', '\n>') + '\n'  # old-style callable parser
         }
 
     def tearDown(self):
+        util._MARKUP_ENGINES = {}
+        util._QUOTE_ENGINES = {}
         util.PYBB_MARKUP_ENGINES = self.ORIG_PYBB_MARKUP_ENGINES
         util.PYBB_QUOTE_ENGINES = self.ORIG_PYBB_QUOTE_ENGINES
 
@@ -1616,9 +1618,9 @@ class MarkupParserTest(TestCase, SharedTestModule):
         staff.is_staff = True
         staff.save()
 
-        from pybb.markup import rstrip_str
+        from pybb.markup.base import rstrip_str
         cleaners_map = [
-            ['pybb.markup.filter_blanks', 'some\n\n\n\ntext\n\nwith\nnew\nlines', 'some\ntext\n\nwith\nnew\nlines'],
+            ['pybb.markup.base.filter_blanks', 'some\n\n\n\ntext\n\nwith\nnew\nlines', 'some\ntext\n\nwith\nnew\nlines'],
             [rstrip_str, 'text    \n    \nwith whitespaces     ', 'text\n\nwith whitespaces'],
         ]
         for cleaner, source, dest in cleaners_map:

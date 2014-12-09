@@ -10,7 +10,11 @@ from django.utils.translation import ugettext as _
 
 from pybb.compat import get_username_field, get_user_model
 from pybb.defaults import PYBB_MARKUP, PYBB_MARKUP_ENGINES, PYBB_QUOTE_ENGINES
-from pybb.markup import BaseParser
+from pybb.markup.base import BaseParser
+
+
+_MARKUP_ENGINES = {}
+_QUOTE_ENGINES = {}
 
 
 def resolve_class(name):
@@ -36,14 +40,21 @@ def get_markup_engine(name=None):
     Returns the named parse engine, or the default parser if name is not given.
     """
     name = name or PYBB_MARKUP
-    if name not in PYBB_MARKUP_ENGINES:
-        return BaseParser().format
 
-    engine = PYBB_MARKUP_ENGINES[name]
-    # TODO In a near future, we should stop to support callable
-    if isinstance(engine, string_types):
-        # This is a path, import it
-        engine = resolve_class(engine).format
+    engine = _MARKUP_ENGINES.get(name)
+    if engine:
+        return engine
+
+    if name not in PYBB_MARKUP_ENGINES:
+        engine = BaseParser().format
+    else:
+        engine = PYBB_MARKUP_ENGINES[name]
+        # TODO In a near future, we should stop to support callable
+        if isinstance(engine, string_types):
+            # This is a path, import it
+            engine = resolve_class(engine).format
+
+    _MARKUP_ENGINES[name] = engine
     return engine
 
 
@@ -53,14 +64,20 @@ def get_quote_engine(name=None):
     """
     name = name or PYBB_MARKUP
 
-    if name not in PYBB_QUOTE_ENGINES:
-        return BaseParser().quote
+    engine = _QUOTE_ENGINES.get(name)
+    if engine:
+        return engine
 
-    engine = PYBB_QUOTE_ENGINES[name]
-    # TODO In a near future, we should stop to support callable:
-    if isinstance(engine, string_types):
-        # This is a path, import it
-        engine = resolve_class(engine).quote
+    if name not in PYBB_QUOTE_ENGINES:
+        engine = BaseParser().quote
+    else:
+        engine = PYBB_QUOTE_ENGINES[name]
+        # TODO In a near future, we should stop to support callable:
+        if isinstance(engine, string_types):
+            # This is a path, import it
+            engine = resolve_class(engine).quote
+
+    _QUOTE_ENGINES[name] = engine
     return engine
 
 

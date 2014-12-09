@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from pybb.markup import BBCodeParser, BaseParser
+from pybb.markup.base import BaseParser
+from pybb.markup.bbcode import BBCodeParser
 
 
 class CustomBBCodeParser(BBCodeParser):

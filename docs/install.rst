@@ -41,6 +41,9 @@ The following dependencies are optional. You can install them with ``pip install
 
 * For better support of the Russian language ``ru``, install ``pytils``.
 
+* Choose from ``bbcode`` and ``markdown`` libraries if you use one of the attached to pybbm markup engines.
+  For more information see :doc:`markup`
+
 Fresh project
 -------------
 
