@@ -64,8 +64,8 @@ before_script:
 install:
   - if [[ $DB == mysql ]]; then pip install -qU mysql-python; fi
   - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
-  - pip install -qU $DJANGO Pillow south
-  - CFLAGS="-O0" pip install -q lxml
+  - pip install -qU $DJANGO
+  - CFLAGS="-O0" pip install -qU -r test/test_project/requirements_test.txt
 script:
   - python setup.py test
 
