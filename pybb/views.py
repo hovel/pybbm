@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 import math
 
+
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
@@ -203,9 +204,16 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
                 cache.set(cache_key, 0)
         qs = self.topic.posts.all().select_related('user')
         if defaults.PYBB_PROFILE_RELATED_NAME:
-            qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)
+            if defaults.PYBB_POST_SORT_REVERSE:
+                qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME).order_by('-created')
+            else:
+                qs = qs.select_related('user__%s' % defaults.PYBB_PROFILE_RELATED_NAME)
+
         if not perms.may_moderate_topic(self.request.user, self.topic):
-            qs = perms.filter_posts(self.request.user, qs)
+            if defaults.PYBB_POST_SORT_REVERSE:
+                qs = perms.filter_posts(self.request.user, qs).order_by('-created')
+            else:
+                qs = perms.filter_posts(self.request.user, qs)
         return qs
 
     def get_context_data(self, **kwargs):
@@ -494,8 +502,14 @@ class PostView(RedirectToLoginMixin, generic.RedirectView):
         post = get_object_or_404(Post.objects.all(), pk=self.kwargs['pk'])
         if not perms.may_view_post(self.request.user, post):
             raise PermissionDenied
+        
         count = post.topic.posts.filter(created__lt=post.created).count() + 1
-        page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
+        
+        if defaults.PYBB_POST_SORT_REVERSE:
+            page = 1
+        else:    
+            page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
+        
         return '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)
 
 

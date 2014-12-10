@@ -29,10 +29,16 @@ PYBB_DEFAULT_AVATAR_URL = getattr(settings,'PYBB_DEFAULT_AVATAR_URL',
     getattr(settings, 'STATIC_URL', '') + 'pybb/img/default_avatar.jpg')
 
 PYBB_DEFAULT_TITLE = getattr(settings, 'PYBB_DEFAULT_TITLE', 'PYBB Powered Forum')
+PYBB_POST_SORT_REVERSE = getattr(settings, 'PYBB_POST_SORT_REVERSE', False )
+
 
 import bbcode
 from markdown import Markdown
 from django.utils.html import urlize
+import pdb
+
+import re
+
 
 PYBB_SMILES_PREFIX = getattr(settings, 'PYBB_SMILES_PREFIX', 'pybb/emoticons/')
 
@@ -58,7 +64,9 @@ def smile_it(str):
     return s
 
 bbcode_parser = bbcode.Parser()
-bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links=False)
+#Removed in favorof enhanced parser
+#bbcode_parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links=False)
+bbcode_parser.add_simple_formatter('img', '<img src="%(value)s"  class="img-responsive img-responsive-post"/>',  replace_links=False)
 bbcode_parser.add_simple_formatter('code', '<pre><code>%(value)s</code></pre>', render_embedded=False, transform_newlines=False, swallow_trailing_newline=True)
 def _render_quote(name, value, options, parent, context):
     if options and 'quote' in options:
@@ -68,6 +76,28 @@ def _render_quote(name, value, options, parent, context):
     return '<blockquote>%s%s</blockquote>' % (origin_author_html, value)
 bbcode_parser.add_formatter('quote', _render_quote, strip=True, swallow_trailing_newline=True)
 
+def _render_size(name, value, options,parent, context):
+    
+
+    if options['size']=="50":
+        return '<font size="2"> %s </font>' % (value)
+    if options['size']=="100":
+        return '<font size="4"> %s </font>' % (value)
+    if options['size']=="200":
+        return '<font size="6"> %s </font>' % (value)
+    else:
+         return '<font size="4"> %s </font>' % (value)   
+
+bbcode_parser.add_formatter('size', _render_size, swallow_trailing_newline=True)
+
+def _render_youtube(name, value, options, parent, context):
+    result = re.match('^[^v]+v=(.{11}).*', options['youtube'])
+    return """<div class="embed-responsive embed-responsive-16by9"><object > <param name="movie" value="http://www.youtube.com/v/%s"></param>  
+                <param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param> 
+                <embed src="http://www.youtube.com/v/%s" type="application/x-shockwave-flash" allowscriptaccess="always" 
+                allowfullscreen="true" ></embed> </object></div> """ % (result.group(1) , result.group(1))
+  
+bbcode_parser.add_formatter('youtube', _render_youtube, swallow_trailing_newline=True)
 
 PYBB_MARKUP_ENGINES = getattr(settings, 'PYBB_MARKUP_ENGINES', {
     'bbcode': lambda str: smile_it(bbcode_parser.format(str)),
