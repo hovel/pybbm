@@ -62,20 +62,28 @@ def getsetting_with_deprecation_check(all_settings, setting_name):
         )
     return setting_value
 
-
-if not hasattr(settings, 'PYBB_MARKUP_ENGINES'):
-    PYBB_MARKUP_ENGINES = {'bbcode': 'pybb.markup.bbcode.BBCodeParser',
+if not hasattr(settings, 'PYBB_MARKUP_ENGINES_PATHS'):
+    PYBB_MARKUP_ENGINES_PATHS = {'bbcode': 'pybb.markup.bbcode.BBCodeParser',
                            'markdown': 'pybb.markup.markdown.MarkdownParser'}
 else:
+    PYBB_MARKUP_ENGINES_PATHS = getattr(settings, 'PYBB_MARKUP_ENGINES_PATHS')
+
+#TODO in the next major release : delete PYBB_MARKUP_ENGINES and PYBB_QUOTE_ENGINES settings
+if not hasattr(settings, 'PYBB_MARKUP_ENGINES'):
+    PYBB_MARKUP_ENGINES = PYBB_MARKUP_ENGINES_PATHS
+else:
+    warnings.warn(_('%(setting)s setting will be removed in next pybbm version. '
+                  'Place your custom quote functions in markup class and override '
+                  'PYBB_MARKUP_ENGINES_PATHS/PYBB_MARKUP settings') % 'PYBB_MARKUP_ENGINES',
+                  DeprecationWarning)
     PYBB_MARKUP_ENGINES = getsetting_with_deprecation_check(settings, 'PYBB_MARKUP_ENGINES')
 
 if not hasattr(settings, 'PYBB_QUOTE_ENGINES'):
-    PYBB_QUOTE_ENGINES = {'bbcode': 'pybb.markup.bbcode.BBCodeParser',
-                          'markdown': 'pybb.markup.markdown.MarkdownParser'}
+    PYBB_QUOTE_ENGINES = PYBB_MARKUP_ENGINES_PATHS
 else:
-    warnings.warn('PYBB_QUOTE_ENGINES setting will be removed in next pybbm version. '
-                  'Place your custom quote functions in markup class and '
-                  'override PYBB_MARKUP_ENGINES/PYBB_MARKUP settings',
+    warnings.warn(_('%(setting)s setting will be removed in next pybbm version. '
+                  'Place your custom quote functions in markup class and override '
+                  'PYBB_MARKUP_ENGINES_PATHS/PYBB_MARKUP settings') % 'PYBB_QUOTE_ENGINES',
                   DeprecationWarning)
     PYBB_QUOTE_ENGINES = getsetting_with_deprecation_check(settings, 'PYBB_QUOTE_ENGINES')
 
@@ -87,14 +95,8 @@ if not PYBB_MARKUP or PYBB_MARKUP not in PYBB_MARKUP_ENGINES:
         # Backward compatibility. bbcode is the default markup
         PYBB_MARKUP = 'bbcode'
     else:
-        # If a developer define his own markups without specifing default,
-        # auto choose the first one in alphabetical order
-        PYBB_MARKUP = sorted(PYBB_MARKUP_ENGINES.keys())[0]
-        warnings.warn('Since you overrided PYBB_MARKUP_ENGINES and it isn''t '
-                      'include default bbcode engine, we selected %s automatically. '
-                      'In next pybbm release you will have to explicitly set PYBB_MARKUP setting.' % PYBB_MARKUP,
-                      DeprecationWarning)
-
+        raise Exception(_('PYBB_MARKUP must be defined to an existing key of '
+                          'PYBB_MARKUP_ENGINES_PATHS'))
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
@@ -127,26 +129,38 @@ PYBB_INITIAL_CUSTOM_USER_MIGRATION = getattr(settings, 'PYBB_INITIAL_CUSTOM_USER
 # TODO in a near future : delete those functions
 
 def bbcode(s):
-    warnings.warn('pybb.defaults.bbcode function is deprecated. Use pybb.markup.bbcode.BBCodeParser instead.',
-                  DeprecationWarning)
+    warnings.warn(
+        _('%(bad)s function is deprecated. Use %(good)s instead.') % {
+            'bad':'pybb.defaults.bbcode',
+            'good':'pybb.markup.bbcode.BBCodeParser',
+        },
+        DeprecationWarning)
     from pybb.markup.bbcode import BBCodeParser
     return BBCodeParser().format(s)
 
 def markdown(s):
-    warnings.warn('pybb.defaults.markdown function is deprecated. Use pybb.markup.markdown.MarkdownParser instead.',
-                  DeprecationWarning)
+    warnings.warn(
+        _('%(bad)s function is deprecated. Use %(good)s instead.') % {
+            'bad':'pybb.defaults.markdown',
+            'good':'pybb.markup.markdown.MarkdownParser',
+        },
+        DeprecationWarning)
     from pybb.markup.markdown import MarkdownParser
     return MarkdownParser().format(s)
 
 def _render_quote(name, value, options, parent, context):
-    warnings.warn('pybb.defaults._render_quote function is deprecated. '
-                  'This function is internal of new pybb.markup.bbcode.BBCodeParser class.',
+    warnings.warn(_('pybb.defaults._render_quote function is deprecated. '
+                    'This function is internal of new pybb.markup.bbcode.BBCodeParser class.'),
                   DeprecationWarning)
     from pybb.markup.bbcode import BBCodeParser
     return BBCodeParser()._render_quote(name, value, options, parent, context)
 
 def smile_it(s):
-    warnings.warn('pybb.defaults.smile_it function is deprecated. Use pybb.markup.base.smile_it instead.',
-                  DeprecationWarning)
+    warnings.warn(
+        _('%(bad)s function is deprecated. Use %(good)s instead.') % {
+            'bad':'pybb.defaults.smile_it',
+            'good':'pybb.markup.base.smile_it',
+        },
+        DeprecationWarning)
     from pybb.markup.base import smile_it as real_smile_it
     return real_smile_it(s)

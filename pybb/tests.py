@@ -1506,7 +1506,7 @@ class MarkupParserTest(TestCase, SharedTestModule):
 
         def _test_engine(parser_name, text_to_html_map):
             for item in text_to_html_map:
-                self.assertIn(util.get_markup_engine(parser_name)(item[0]), item[1:])
+                self.assertIn(util._get_markup_formatter(parser_name)(item[0]), item[1:])
 
         text_to_html_map = [
             ['[b]bold[/b]', '<strong>bold</strong>'],
@@ -1587,8 +1587,8 @@ class MarkupParserTest(TestCase, SharedTestModule):
 
         def _test_engine(parser_name, text_to_quote_map):
             for item in text_to_quote_map:
-                self.assertEqual(util.get_quote_engine(parser_name)(item[0]), item[1])
-                self.assertEqual(util.get_quote_engine(parser_name)(item[0], 'username'), item[2])
+                self.assertEqual(util._get_markup_quoter(parser_name)(item[0]), item[1])
+                self.assertEqual(util._get_markup_quoter(parser_name)(item[0], 'username'), item[2])
 
         text_to_quote_map = [
             ['quote text', '[quote=""]quote text[/quote]\n', '[quote="username"]quote text[/quote]\n']

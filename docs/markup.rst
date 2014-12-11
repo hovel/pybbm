@@ -8,22 +8,24 @@ Every time user save new post, message parsed by markup parser to it's html repr
 It will include only allowed by engine html tags, html tags should be html-encoded and rendered
 as simple text to prevent XSS attacks.
 
-Pybbm includes two default engines. Actions needed to use this engines:
+Pybbm includes two default engines. Actions needed to use these engines:
 
     - bbcode engine: install required package with ``pip install bbcode`` command and set PYBB_MARKUP to ``'bbcode'``
     - markdown engine: install required package with ``pip install markdown`` command and set PYBB_MARKUP to ``'markdown'``
 
-This is class with two required methods:
+Engine classes must inherit from `pybb.markup.base.BaseParser` 
+which defines three required methods:
 
     - ``def format(self, text)`` method receives post's text as parameter and returns parsed message as html fragment
     - ``def quote(self, text, username='')`` method receives quoted post's text and username and returns quoted string
       in terms of markup engine
+    - ``def get_widget_cls(cls)`` class method which return the class to use as the widget 
+      for the body field
 
 How to change
 -------------
 
-If you want to write your custom engine you can override ``pybb.markup.base.BaseParser``
-or write new class from scratch with required methods above.
+If you want to write your custom engine you can write a new class which extends ``pybb.markup.base.BaseParser``
 
 To change behavior of one of the default parsers you can override ``pybb.markup.bbcode.BBCodeParser`` or
 ``pybb.markup.markdown.MarkdownParser``.
@@ -39,13 +41,13 @@ For example, for adding additional formatter to bbcode parser you can write your
             self._parser.add_simple_formatter('li', '<li>%(value)s</li>', transform_newlines=False, strip=True)
 
 
-include it in ``PYBB_MARKUP_ENGINES`` setting dict and point pybbm to use it by ``PYBB_MARKUP`` setting::
+include it in ``PYBB_MARKUP_ENGINES_PATHS`` setting dict and point pybbm to use it by ``PYBB_MARKUP`` setting::
 
-    PYBB_MARKUP_ENGINES = {'custom_bbcode': 'myproject.markup_engines.CustomBBCodeParser'}
+    PYBB_MARKUP_ENGINES_PATHS = {'custom_bbcode': 'myproject.markup_engines.CustomBBCodeParser'}
     PYBB_MARKUP = 'custom_bbcode'
 
 or you can override default bbcode engine in settings.py::
 
-    PYBB_MARKUP_ENGINES = {'bbcode': 'myproject.markup_engines.CustomBBCodeParser'}
+    PYBB_MARKUP_ENGINES_PATHS = {'bbcode': 'myproject.markup_engines.CustomBBCodeParser'}
     PYBB_MARKUP = 'bbcode' # don't required because 'bbcode' is default value
 

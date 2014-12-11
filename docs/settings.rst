@@ -146,14 +146,13 @@ PYBB_MARKUP
 Markup engine used in forum (default is 'bbcode' if you have a defined bbcode engine)
 See PYBB_MARKUP_ENGINES below
 
-PYBB_MARKUP_ENGINES
-...................
+PYBB_MARKUP_ENGINES_PATHS
+.........................
 
 Dict with avaiable markup engines path. One of them should be selected with PYBB_MARKUP
 
-Markup engine should be a path to a class, that has ``format`` and ``quote`` methods.
-Markup engine should take care of replacing smiles in body with
-related emoticons.
+Markup engine should be a path to a class, that inherits from `pybb.markup.base.BaseParser`.
+Markup engine should take care of replacing smiles in body with related emoticons.
 
 by default PyBBM support `bbcode` and `markdown` markup::
 
@@ -162,26 +161,29 @@ by default PyBBM support `bbcode` and `markdown` markup::
         'markdown': 'pybb.markup.markdown.MarkdownParser'
     }
 
-Please note, that previous version of pybb wanted a funciton (and not the path to the class).
+Please note, that previous version of pybb used two different settings : 
+`PYBB_MARKUP_ENGINES` and `PYBB_QUOTE_ENGINES` which were callables.
 This is still supported, but is deprecated.
+
+PYBB_MARKUP_ENGINES (deprecated)
+................................
+
+Should be the same dict with paths to markup engine classes as `PYBB_MARKUP_ENGINES_PATH` setting
+
+default is `PYBB_MARKUP_ENGINES_PATHS`.
 
 For more information see :doc:`markup`
 
 PYBB_QUOTE_ENGINES (deprecated)
 ...............................
 
-**Deprecation note: Every markup class have to have ``format`` and ``quote`` methods**
+**Deprecation note: Every markup class must inherit from  `pybb.markup.base.BaseParser`**
 
 **For more information see :doc:`markup`**
 
-Should be the same dict with paths to markup engine classes as PYBB_MARKUP_ENGINES setting
+Should be the same dict with paths to markup engine classes as `PYBB_MARKUP_ENGINES_PATH` setting
 
-default is::
-
-    {
-        'bbcode': 'pybb.markup.bbcode.BBCodeParser',
-        'markdown': 'pybb.markup.markdown.MarkdownParser',
-    }
+default is `PYBB_MARKUP_ENGINES_PATHS`.
 
 Post cleaning/validation
 ------------------------

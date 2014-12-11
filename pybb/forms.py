@@ -63,6 +63,9 @@ class PostForm(forms.ModelForm):
     class Meta(object):
         model = Post
         fields = ('body',)
+        widgets = {
+            'body': util.get_markup_engine().get_widget_cls(),
+        }
 
     def __init__(self, *args, **kwargs):
         # Move args to kwargs

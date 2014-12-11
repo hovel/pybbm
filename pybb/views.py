@@ -369,7 +369,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
                 else:
                     post = get_object_or_404(Post, pk=quote_id)
                     profile = util.get_pybb_profile(post.user)
-                    self.quote = util.get_quote_engine(defaults.PYBB_MARKUP)(post.body, profile.get_display_name())
+                    self.quote = util._get_markup_quoter(defaults.PYBB_MARKUP)(post.body, profile.get_display_name())
 
                 if self.quote and request.is_ajax():
                     return HttpResponse(self.quote)
@@ -675,7 +675,7 @@ def add_subscription(request, topic_id):
 @login_required
 def post_ajax_preview(request):
     content = request.POST.get('data')
-    html = util.get_markup_engine()(content)
+    html = util._get_markup_formatter()(content)
     return render(request, 'pybb/_markitup_preview.html', {'html': html})
 
 

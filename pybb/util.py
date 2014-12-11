@@ -9,12 +9,16 @@ from django.utils.six import string_types
 from django.utils.translation import ugettext as _
 
 from pybb.compat import get_username_field, get_user_model
-from pybb.defaults import PYBB_MARKUP, PYBB_MARKUP_ENGINES, PYBB_QUOTE_ENGINES
+from pybb.defaults import (
+    PYBB_MARKUP, PYBB_MARKUP_ENGINES_PATHS, 
+    PYBB_MARKUP_ENGINES, PYBB_QUOTE_ENGINES
+)
 from pybb.markup.base import BaseParser
 
-
+#TODO in the next major release : delete _MARKUP_ENGINES_FORMATTERS and _MARKUP_ENGINES_QUOTERS
 _MARKUP_ENGINES = {}
-_QUOTE_ENGINES = {}
+_MARKUP_ENGINES_FORMATTERS = {}
+_MARKUP_ENGINES_QUOTERS = {}
 
 
 def resolve_class(name):
@@ -37,49 +41,82 @@ def resolve_function(path):
 
 def get_markup_engine(name=None):
     """
-    Returns the named parse engine, or the default parser if name is not given.
+    Returns the named markup engine instance, or the default one if name is not given.
+    This function will replace _get_markup_formatter and _get_markup_quoter in the
+    next major release.
     """
     name = name or PYBB_MARKUP
-
     engine = _MARKUP_ENGINES.get(name)
     if engine:
         return engine
-
-    if name not in PYBB_MARKUP_ENGINES:
-        engine = BaseParser().format
+    if name not in PYBB_MARKUP_ENGINES_PATHS:
+        #XXX : should'nt we raise a warning or an Exception here ?
+        engine = BaseParser()
     else:
         engine = PYBB_MARKUP_ENGINES[name]
         # TODO In a near future, we should stop to support callable
         if isinstance(engine, string_types):
             # This is a path, import it
-            engine = resolve_class(engine).format
-
+            engine = resolve_class(engine)
     _MARKUP_ENGINES[name] = engine
     return engine
 
-
-def get_quote_engine(name=None):
+#TODO In the next major release, delete this function
+def _get_markup_formatter(name=None):
     """
-    Returns the named quote engine, or the default quoter if name is not given.
+    Returns the named parse engine, or the default parser if name is not given.
+    In the next major release, this function will be deleted. 
+    It is here for backward compatibility. Please don\'t use it and :
+
+    * configure correctly the PYBB_MARKUP_ENGINES_PATHS
+    * use get_markup_engine().format(content) instead of _get_markup_formatter()(content)
+
     """
     name = name or PYBB_MARKUP
 
-    engine = _QUOTE_ENGINES.get(name)
+    engine = _MARKUP_ENGINES_FORMATTERS.get(name)
+    if engine:
+        return engine
+    if name not in PYBB_MARKUP_ENGINES:
+        #XXX : should'nt we raise a warning or an Exception here ?
+        engine = BaseParser().format
+    else:
+        engine = PYBB_MARKUP_ENGINES[name]
+        if isinstance(engine, string_types):
+            # This is a path, import it
+            engine = resolve_class(engine).format
+
+    _MARKUP_ENGINES_FORMATTERS[name] = engine
+    return engine
+
+#TODO In the next major release, delete this function
+def _get_markup_quoter(name=None):
+    """
+    Returns the named quote engine, or the default quoter if name is not given.
+    In the next major release, this function will be deleted. 
+    It is here for backward compatibility. Please don\'t use it and :
+
+    * configure correctly the PYBB_MARKUP_ENGINES_PATHS
+    * use get_markup_engine().quote(content) instead of _get_markup_quoter()(content)
+
+    """
+    name = name or PYBB_MARKUP
+
+    engine = _MARKUP_ENGINES_QUOTERS.get(name)
     if engine:
         return engine
 
     if name not in PYBB_QUOTE_ENGINES:
+        #XXX : should'nt we raise a warning or an Exception here ?
         engine = BaseParser().quote
     else:
         engine = PYBB_QUOTE_ENGINES[name]
-        # TODO In a near future, we should stop to support callable:
         if isinstance(engine, string_types):
             # This is a path, import it
             engine = resolve_class(engine).quote
 
-    _QUOTE_ENGINES[name] = engine
+    _MARKUP_ENGINES_QUOTERS[name] = engine
     return engine
-
 
 def get_body_cleaner(name):
     return resolve_function(name) if isinstance(name, string_types) else name

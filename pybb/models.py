@@ -12,7 +12,7 @@ from django.utils.timezone import now as tznow
 from pybb.compat import get_user_model_path, get_username_field, get_atomic_func
 from pybb import defaults
 from pybb.profiles import PybbProfile
-from pybb.util import unescape, FilePathGenerator, get_markup_engine
+from pybb.util import unescape, FilePathGenerator, _get_markup_formatter
 
 from annoying.fields import AutoOneToOneField
 
@@ -228,7 +228,7 @@ class RenderableItem(models.Model):
     body_text = models.TextField(_('Text version'))
 
     def render(self):
-        self.body_html = get_markup_engine()(self.body)
+        self.body_html = _get_markup_formatter()(self.body)
         # Remove tags which was generated with the markup processor
         text = strip_tags(self.body_html)
         # Unescape entities which was generated with the markup processor

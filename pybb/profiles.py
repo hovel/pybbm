@@ -45,7 +45,7 @@ class PybbProfile(models.Model):
                                         default=defaults.PYBB_DEFAULT_AUTOSUBSCRIBE)
 
     def save(self, *args, **kwargs):
-        self.signature_html = util.get_markup_engine()(self.signature)
+        self.signature_html = util._get_markup_formatter()(self.signature)
         super(PybbProfile, self).save(*args, **kwargs)
 
     @property

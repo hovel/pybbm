@@ -3,9 +3,13 @@
 
 {% block title %}{% trans "Editing the post" %}{% endblock title %}
 
+{% block extra_head %}
+    {{ block.super }}
+    {{ form.media.css }}
+{% endblock %}
 {% block extra_script %}
     {{ block.super }}
-    {% include "pybb/_markitup.html" %}
+    {{ form.media.js }}
     <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/jquery.formset.min.js"></script>
 {% endblock %}
 
