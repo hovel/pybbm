@@ -37,7 +37,7 @@ $(function() {
         {name:'{% trans 'Clean' %}', className:"clean", replaceWith:function(markitup) { return markitup.selection.replace(/\[(.*?)\]/g, "") } },
         {name:'{% trans 'Preview' %}', className:"preview", call:'preview' }
     ];
-    $('textarea:not([class="no-markitup"])').markItUp(mySettings);alert('fuck !');
+    $('textarea:not([class="no-markitup"])').markItUp(mySettings);
 
     $('#emoticons a').click(function() {
         var emoticon = $(this).attr("title");
