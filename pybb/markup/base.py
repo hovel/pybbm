@@ -7,6 +7,7 @@ from django.utils.html import escape
 from pybb.defaults import PYBB_SMILES, PYBB_SMILES_PREFIX
 from django.forms import Textarea
 
+
 def smile_it(s):
     for smile, url in PYBB_SMILES.items():
         s = s.replace(smile, '<img src="%s%s%s" alt="smile" />' % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url))
@@ -33,7 +34,7 @@ def rstrip_str(user, str):
 
 
 class BaseParser(object):
-    Widget = Textarea
+    widget_class = Textarea
 
     def format(self, text):
         return escape(text)
@@ -49,4 +50,4 @@ class BaseParser(object):
         javascript and CSS and/or define your custom "render" function
         which will allow you to add specific markup or javascript.
         """
-        return cls.Widget
+        return cls.widget_class

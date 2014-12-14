@@ -38,10 +38,10 @@ send emails from queue. For more information see `app home page <https://github.
 (default False)
 
 PYBB_INITIAL_CUSTOM_USER_MIGRATION
-----------------------------------
+..................................
 
 Name of initial south migration in app where placed custom user model.
-None means that if app with custom user model has migrations, then '0001_initial.py' will be used by default
+``None`` means that if app with custom user model has migrations, then '0001_initial.py' will be used by default
 (default None)
 
 Emoticons

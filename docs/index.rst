@@ -28,7 +28,6 @@ Contents:
    :maxdepth: 2
 
    install
-   updates
    settings
    customuser
    premoderation
@@ -39,6 +38,7 @@ Contents:
    markup
    javascript
    testing
+   updates
    pybbmigrate
    originalpybb
    problems

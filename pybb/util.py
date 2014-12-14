@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import os
+import warnings
 import uuid
 
 from django.utils.importlib import import_module
@@ -10,15 +11,19 @@ from django.utils.translation import ugettext as _
 
 from pybb.compat import get_username_field, get_user_model
 from pybb.defaults import (
-    PYBB_MARKUP, PYBB_MARKUP_ENGINES_PATHS, 
+    PYBB_MARKUP, PYBB_MARKUP_ENGINES_PATHS,
     PYBB_MARKUP_ENGINES, PYBB_QUOTE_ENGINES
 )
 from pybb.markup.base import BaseParser
 
-#TODO in the next major release : delete _MARKUP_ENGINES_FORMATTERS and _MARKUP_ENGINES_QUOTERS
+# TODO in the next major release : delete _MARKUP_ENGINES_FORMATTERS and _MARKUP_ENGINES_QUOTERS
 _MARKUP_ENGINES = {}
 _MARKUP_ENGINES_FORMATTERS = {}
 _MARKUP_ENGINES_QUOTERS = {}
+
+deprecated_func_warning = ('Deprecated function. Please configure correctly the PYBB_MARKUP_ENGINES_PATHS and'
+                           'use get_markup_engine().%(replace)s() instead of %(old)s()(content).'
+                           'In the next major release, this function will be deleted.')
 
 
 def resolve_class(name):
@@ -50,7 +55,6 @@ def get_markup_engine(name=None):
     if engine:
         return engine
     if name not in PYBB_MARKUP_ENGINES_PATHS:
-        #XXX : should'nt we raise a warning or an Exception here ?
         engine = BaseParser()
     else:
         engine = PYBB_MARKUP_ENGINES[name]
@@ -61,24 +65,20 @@ def get_markup_engine(name=None):
     _MARKUP_ENGINES[name] = engine
     return engine
 
-#TODO In the next major release, delete this function
+
+# TODO In the next major release, delete this function
 def _get_markup_formatter(name=None):
     """
     Returns the named parse engine, or the default parser if name is not given.
-    In the next major release, this function will be deleted. 
-    It is here for backward compatibility. Please don\'t use it and :
-
-    * configure correctly the PYBB_MARKUP_ENGINES_PATHS
-    * use get_markup_engine().format(content) instead of _get_markup_formatter()(content)
-
     """
+    warnings.warn(deprecated_func_warning % {'replace': 'format', 'old': '_get_markup_formatter'},
+                  DeprecationWarning)
     name = name or PYBB_MARKUP
 
     engine = _MARKUP_ENGINES_FORMATTERS.get(name)
     if engine:
         return engine
     if name not in PYBB_MARKUP_ENGINES:
-        #XXX : should'nt we raise a warning or an Exception here ?
         engine = BaseParser().format
     else:
         engine = PYBB_MARKUP_ENGINES[name]
@@ -89,17 +89,14 @@ def _get_markup_formatter(name=None):
     _MARKUP_ENGINES_FORMATTERS[name] = engine
     return engine
 
-#TODO In the next major release, delete this function
+
+# TODO In the next major release, delete this function
 def _get_markup_quoter(name=None):
     """
     Returns the named quote engine, or the default quoter if name is not given.
-    In the next major release, this function will be deleted. 
-    It is here for backward compatibility. Please don\'t use it and :
-
-    * configure correctly the PYBB_MARKUP_ENGINES_PATHS
-    * use get_markup_engine().quote(content) instead of _get_markup_quoter()(content)
-
     """
+    warnings.warn(deprecated_func_warning % {'replace': 'quote', 'old': '_get_markup_quoter'},
+                  DeprecationWarning)
     name = name or PYBB_MARKUP
 
     engine = _MARKUP_ENGINES_QUOTERS.get(name)
@@ -107,7 +104,6 @@ def _get_markup_quoter(name=None):
         return engine
 
     if name not in PYBB_QUOTE_ENGINES:
-        #XXX : should'nt we raise a warning or an Exception here ?
         engine = BaseParser().quote
     else:
         engine = PYBB_QUOTE_ENGINES[name]
@@ -117,6 +113,7 @@ def _get_markup_quoter(name=None):
 
     _MARKUP_ENGINES_QUOTERS[name] = engine
     return engine
+
 
 def get_body_cleaner(name):
     return resolve_function(name) if isinstance(name, string_types) else name

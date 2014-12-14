@@ -2,33 +2,35 @@
 from __future__ import unicode_literals, absolute_import
 
 from bbcode import Parser
-from django.core.urlresolvers import resolve
+from django.forms import Textarea
 from django.template import Context
 from django.template.loader import get_template
 from pybb.markup.base import smile_it, BaseParser
 
 
+class BBCodeWidget(Textarea):
+    class Media:
+        css = {
+            'all': (
+                'markitup/skins/simple/style.css',
+                'markitup/sets/bbcode/style.css',
+            ),
+        }
+        js = (
+            'markitup/ajax_csrf.js',
+            'markitup/jquery.markitup.js',
+            'markitup/sets/bbcode/set.js',
+            'pybb/js/markitup.js',
+        )
+
+    def render(self, *args, **kwargs):
+        tpl = get_template('pybb/markup/bbcode_widget.html')
+        ctx = Context({'widget_output': super(BBCodeWidget, self).render(*args, **kwargs)})
+        return tpl.render(ctx)
+
+
 class BBCodeParser(BaseParser):
-
-    class Widget(BaseParser.Widget):
-        class Media:
-            css = {
-                'all':(
-                    'markitup/skins/simple/style.css',
-                    'markitup/sets/bbcode/style.css',
-                ),
-            }
-            js = (
-                'markitup/ajax_csrf.js',
-                'markitup/jquery.markitup.js',
-                'markitup/sets/bbcode/set.js',
-                'pybb/js/markitup.js',
-            )
-
-        def render(self, *args, **kwargs):
-            tpl = get_template('pybb/markup/bbcode_widget.html')
-            ctx = Context({'widget_output':super(BBCodeParser.Widget, self).render(*args, **kwargs)})
-            return tpl.render(ctx)
+    widget_class = BBCodeWidget
 
     def _render_quote(self, name, value, options, parent, context):
         if options and 'quote' in options:
