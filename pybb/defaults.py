@@ -48,7 +48,7 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
 # TODO In a near future, this code will be deleted when callable settings will not supported anymore.
 callable_warning = ('%(setting_name)s should not be a callable anymore but a path to the parser classes.'
                     'ex : myproject.markup.CustomBBCodeParser. It will stop working in next pybbm release.')
-wrong_setting_warning = ('%(setting)s setting will be removed in next pybbm version. '
+wrong_setting_warning = ('%s setting will be removed in next pybbm version. '
                          'Place your custom quote functions in markup class and override '
                          'PYBB_MARKUP_ENGINES_PATHS/PYBB_MARKUP settings')
 bad_function_warning = '%(bad)s function is deprecated. Use %(good)s instead.'
