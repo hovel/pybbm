@@ -1,8 +1,8 @@
 PyBBM Changelog
 ===============
 
-0.15.6 -> dev
--------------
+0.15.6 -> 0.16
+--------------
 * Django 1.7 compatibility.
 * Fixed creating custom profile model of any class defined in settings with right related name to user model.
   *Migration note*: If you have workaround for creating profile in your code, you should remove it for
