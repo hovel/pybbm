@@ -1,6 +1,10 @@
 PyBBM Changelog
 ===============
 
+0.16 -> 0.16.1
+--------------
+* Fast fixes
+
 0.15.6 -> 0.16
 --------------
 * Django 1.7 compatibility.
