@@ -59,7 +59,7 @@ class PybbTimeNode(template.Node):
 
         if delta.days == 0:
             if delta.seconds < 60:
-                if context['LANGUAGE_CODE'].startswith('ru') and pytils_enabled:
+                if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
                     msg = _('seconds ago,seconds ago,seconds ago')
                     msg = pytils.numeral.choose_plural(delta.seconds, msg)
                 else:
@@ -68,7 +68,7 @@ class PybbTimeNode(template.Node):
 
             elif delta.seconds < 3600:
                 minutes = int(delta.seconds / 60)
-                if context['LANGUAGE_CODE'].startswith('ru') and pytils_enabled:
+                if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
                     msg = _('minutes ago,minutes ago,minutes ago')
                     msg = pytils.numeral.choose_plural(minutes, msg)
                 else:
