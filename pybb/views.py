@@ -9,6 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
+from django.db import transaction, connection
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -322,13 +323,21 @@ class PostEditMixin(object):
             pollformset = None
 
         if success:
-            self.object.topic.save()
-            self.object.topic = self.object.topic
-            self.object.save()
-            if save_attachments:
-                aformset.save()
-            if save_poll_answers:
-                pollformset.save()
+            with transaction.commit_on_success():
+                topic_is_new = not self.object.topic.pk
+                self.object.topic.save()
+                self.object.topic = self.object.topic
+                try:
+                    self.object.save()
+                except:
+                    if topic_is_new and not connection.features.supports_transactions:
+                       self.object.topic.delete()
+                    raise
+                else:
+                    if save_attachments:
+                        aformset.save()
+                    if save_poll_answers:
+                        pollformset.save()
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))

@@ -6,6 +6,7 @@ import inspect
 
 from django import forms
 from django.core.exceptions import FieldError
+from django.db import transaction, connection
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
@@ -117,6 +118,7 @@ class PostForm(forms.ModelForm):
         return self.cleaned_data
 
     def save(self, commit=True):
+        commit_topic = False
         if self.instance.pk:
             post = super(PostForm, self).save(commit=False)
             if self.user:
@@ -127,11 +129,13 @@ class PostForm(forms.ModelForm):
                     post.topic.poll_type = self.cleaned_data['poll_type']
                     post.topic.poll_question = self.cleaned_data['poll_question']
                 post.topic.updated = tznow()
-                if commit:
-                    post.topic.save()
+                commit_topic = commit
             post.updated = tznow()
             if commit:
-                post.save()
+                with transaction.commit_on_success():
+                    if commit_topic:
+                        post.topic.save()
+                    post.save()
             return post
 
         allow_post = True
@@ -147,15 +151,22 @@ class PostForm(forms.ModelForm):
             )
             if not allow_post:
                 topic.on_moderation = True
-            if commit:
-                topic.save()
+            commit_topic = commit
         else:
             topic = self.topic
         post = Post(topic=topic, user=self.user, user_ip=self.ip, body=self.cleaned_data['body'])
         if not allow_post:
             post.on_moderation = True
         if commit:
-            post.save()
+            with transaction.commit_on_success():
+                if commit_topic:
+                    topic.save()
+                try:
+                    post.save()
+                except:
+                    if commit_topic and not connection.features.supports_transactions:
+                        topic.delete()
+                    raise
         return post
 
 
