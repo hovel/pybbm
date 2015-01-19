@@ -175,7 +175,7 @@ class Topic(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.created = tznow()
+            self.created = self.updated = tznow()
 
         forum_changed = False
         old_topic = None

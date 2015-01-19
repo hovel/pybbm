@@ -163,7 +163,11 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
-        self.topic = get_object_or_404(Topic.objects.select_related('forum'), pk=kwargs['pk'])
+        self.topic = get_object_or_404(
+            Topic.objects.select_related('forum'), 
+            pk=kwargs['pk'], 
+            post_count__gt=0
+        )
 
         if request.GET.get('first-unread'):
             if request.user.is_authenticated():
