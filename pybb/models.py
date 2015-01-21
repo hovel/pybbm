@@ -80,15 +80,18 @@ class Forum(models.Model):
         return self.name
 
     def update_counters(self):
-        posts = Post.objects.filter(topic__forum_id=self.id)
-        self.post_count = posts.count()
         self.topic_count = Topic.objects.filter(forum=self).count()
-        try:
-            last_post = posts.order_by('-created', '-id')[0]
-            self.updated = last_post.updated or last_post.created
-        except IndexError:
-            pass
-
+        if self.topic_count:
+            posts = Post.objects.filter(topic__forum_id=self.id)
+            self.post_count = posts.count()
+            if self.post_count:
+                try:
+                    last_post = posts.order_by('-created', '-id')[0]
+                    self.updated = last_post.updated or last_post.created
+                except IndexError:
+                    pass
+        else:
+            self.post_count = 0
         self.save()
 
     def get_absolute_url(self):
@@ -100,10 +103,12 @@ class Forum(models.Model):
 
     @property
     def last_post(self):
-        try:
-            return self.posts.order_by('-created', '-id')[0]
-        except IndexError:
-            return None
+        if not getattr(self, '_last_post', None):
+            try:
+                self._last_post = self.posts.order_by('-created', '-id')[0]
+            except IndexError:
+                return None
+        return self._last_post
 
     def get_parents(self):
         """
@@ -158,16 +163,20 @@ class Topic(models.Model):
         """
         Get first post and cache it for request
         """
-        if not hasattr(self, "_head"):
-            self._head = self.posts.all().order_by('created', 'id')
-        if not len(self._head):
-            return None
-        return self._head[0]
+        if not hasattr(self, '_head'):
+            try:
+                self._head = self.posts.all().order_by('created', 'id')[0]
+            except IndexError:
+                return None
+        return self._head
 
     @property
     def last_post(self):
         if not getattr(self, '_last_post', None):
-            self._last_post = self.posts.order_by('-created', '-id').select_related('user')[0]
+            try:
+                self._last_post = self.posts.order_by('-created', '-id').select_related('user')[0]
+            except IndexError:
+                return None
         return self._last_post
 
     def get_absolute_url(self):
@@ -196,8 +205,10 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        last_post = Post.objects.filter(topic_id=self.id).order_by('-created', '-id')[0]
-        self.updated = last_post.updated or last_post.created
+        #force cache overwrite to get the real latest updated post
+        self._last_post = None
+        if self.last_post:
+            self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
     def get_parents(self):

@@ -181,6 +181,9 @@ class FeaturesTest(TestCase, SharedTestModule):
         #before correction, raised TypeError: can't compare datetime.datetime to NoneType
         pybb_topic_unread([topic,], user_ann)
         
+        #before correction, raised IndexError: list index out of range
+        last_post = topic.last_post
+        
         #post creation now.
         Post(topic=topic, user=self.user, body='one').save()
         
