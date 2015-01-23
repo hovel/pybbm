@@ -668,6 +668,8 @@ def delete_subscription(request, topic_id):
 @login_required
 def add_subscription(request, topic_id):
     topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=topic_id)
+    if not perms.may_subscribe_topic(request.user, topic):
+        raise PermissionDenied
     topic.subscribers.add(request.user)
     return HttpResponseRedirect(topic.get_absolute_url())
 

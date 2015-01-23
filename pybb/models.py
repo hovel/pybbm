@@ -149,6 +149,7 @@ class Topic(models.Model):
         ordering = ['-created']
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
+        permissions = (('subscribe_topic', _('Subscribe to topics')),)
 
     def __str__(self):
         return self.name

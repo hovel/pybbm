@@ -6,12 +6,14 @@ from django.db.models.signals import post_save, post_delete
 from pybb.models import Post
 from pybb.subscription import notify_topic_subscribers
 from pybb import util, defaults, compat
+from pybb.permissions import perms
 
 
 def post_saved(instance, **kwargs):
     notify_topic_subscribers(instance)
 
-    if util.get_pybb_profile(instance.user).autosubscribe:
+    if util.get_pybb_profile(instance.user).autosubscribe and \
+        perms.may_subscribe_topic(user, instance.topic):
         instance.topic.subscribers.add(instance.user)
 
     if kwargs['created']:
