@@ -13,7 +13,7 @@ def post_saved(instance, **kwargs):
     notify_topic_subscribers(instance)
 
     if util.get_pybb_profile(instance.user).autosubscribe and \
-        perms.may_subscribe_topic(user, instance.topic):
+        perms.may_subscribe_topic(instance.user, instance.topic):
         instance.topic.subscribers.add(instance.user)
 
     if kwargs['created']:
