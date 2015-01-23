@@ -3,10 +3,14 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, post_delete
-from pybb.models import Post
-from pybb.subscription import notify_topic_subscribers
+from pybb.models import Topic, Post
+from pybb.subscription import notify_topic_subscribers, notify_forum_subscribers
 from pybb import util, defaults, compat
 
+
+def topic_saved(instance, **kwargs):
+    if kwargs['created']:
+        notify_forum_subscribers(instance)
 
 def post_saved(instance, **kwargs):
     notify_topic_subscribers(instance)
@@ -46,6 +50,7 @@ def user_saved(instance, created, **kwargs):
 
 
 def setup():
+    post_save.connect(topic_saved, sender=Topic)
     post_save.connect(post_saved, sender=Post)
     post_delete.connect(post_deleted, sender=Post)
     if defaults.PYBB_AUTO_USER_PERMISSIONS:

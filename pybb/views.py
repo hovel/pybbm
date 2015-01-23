@@ -9,8 +9,9 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
-from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
-    HttpResponseForbidden
+from django.http import (
+    HttpResponseRedirect, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, 
+    Http404, )
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
@@ -19,8 +20,12 @@ from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 from pybb import compat, defaults, util
-from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
-from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
+from pybb.forms import (
+    PostForm, AdminPostForm, PollForm, ForumSubscriptionForm,
+    AttachmentFormSet, PollAnswerFormSet, )
+from pybb.models import (
+    Category, Forum, Topic, Post, ForumSubscription,
+    TopicReadTracker, ForumReadTracker, PollAnswerUser, )
 from pybb.permissions import perms
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 
@@ -111,6 +116,16 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ForumView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
+        if self.request.user.is_authenticated():
+            try:
+                ctx['subscription'] = ForumSubscription.objects.get(
+                    user=self.request.user, 
+                    forum=self.forum
+                )
+            except ForumSubscription.DoesNotExist:
+                ctx['subscription'] = None
+        else:
+            ctx['subscription'] = None
         ctx['forum'].forums_accessed = perms.filter_forums(self.request.user, self.forum.child_forums.all())
         return ctx
 
@@ -123,6 +138,64 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         qs = perms.filter_topics(self.request.user, qs)
         return qs
 
+
+class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
+    template_name = 'pybb/forum_subscription.html'
+    form_class = ForumSubscriptionForm
+
+    def get_login_redirect_url(self):
+        return reverse('pybb:forum_subscription', args=(self.kwargs['pk'],))
+
+    def get_success_url(self):
+        return self.forum.get_absolute_url()
+
+    def get_form_kwargs(self, **kwargs):
+        kw = super(ForumSubscriptionView, self).get_form_kwargs(**kwargs)
+        self.get_objects()
+        kw['instance'] = self.forum_subscription
+        kw['user'] = self.request.user
+        kw['forum'] = self.forum
+        return kw
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ForumSubscriptionView, self).get_context_data(**kwargs)
+        ctx['forum'] = self.forum
+        ctx['forum_subscription'] = self.forum_subscription
+        return ctx
+
+    def form_valid(self, form):
+        result = form.process()
+        if result == 'subscribe-all':
+            msg = _((
+                'You subscribed to all existant topics on this forum '
+                'and you will auto-subscribed to all its new topics.'
+            ))
+        elif result == 'delete':
+            msg = _((
+                'You won\'t be notified anymore each time a new topic '
+                'is posted on this forum.'
+            ))
+        elif result == 'delete-all':
+            msg = _((
+                'You have been subscribed to all current topics in this forum and you won\'t'
+                'be auto-subscribed anymore for each new topic posted on this forum.'
+            ))
+        else:
+            msg = _((
+                'You will be notified each time a new topic is posted on this forum.'
+            ))
+        messages.success(self.request, msg, fail_silently=True)
+        return super(ForumSubscriptionView, self).form_valid(form)
+
+    def get_objects(self):
+        self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
+        try:
+            self.forum_subscription = ForumSubscription.objects.get(
+                user=self.request.user, 
+                forum=self.forum
+            )
+        except ForumSubscription.DoesNotExist:
+            self.forum_subscription = None
 
 class LatestTopicsView(PaginatorMixin, generic.ListView):
 

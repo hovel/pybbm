@@ -11,7 +11,7 @@ from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
     OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView,\
-    UserTopics, UserPosts, topic_cancel_poll_vote
+    UserTopics, UserPosts, topic_cancel_poll_vote, ForumSubscriptionView
 
 
 urlpatterns = patterns('',
@@ -64,6 +64,8 @@ urlpatterns += patterns('pybb.views',
                             'delete_subscription', name='delete_subscription'),
                         url('^subscription/topic/(\d+)/add/$',
                             'add_subscription', name='add_subscription'),
+                        url('^subscription/forum/(?P<pk>\d+)/$',
+                            ForumSubscriptionView.as_view(), name='forum_subscription'),
 
                         # API
                         url('^api/post_ajax_preview/$', 'post_ajax_preview', name='post_ajax_preview'),
