@@ -30,8 +30,8 @@ except ImportError:
     raise Exception('PyBB requires lxml for self testing')
 
 from pybb import defaults
-from pybb.models import Topic, TopicReadTracker, Forum, ForumReadTracker, Post, Category, PollAnswer
-
+from pybb.models import Category, Forum, Topic, Post, PollAnswer, TopicReadTracker, \
+    ForumReadTracker, ForumSubscription
 
 Profile = util.get_pybb_profile_model()
 
@@ -997,6 +997,129 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(len(mail.outbox), 0)
         
         defaults.PYBB_DISABLE_NOTIFICATIONS = orig_conf
+
+    def test_forum_subscription(self):
+        url = reverse('pybb:forum_subscription', kwargs={'pk': self.forum.id})
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@dns.com')
+        user3 = User.objects.create_user(username='user3', password='user3', email='user3@dns.com')
+        client = Client()
+        client.login(username='user2', password='user2')
+        parser = html.HTMLParser(encoding='utf8')
+
+        #Check we have the "Subscribe" link
+        response = client.get(reverse('pybb:forum', args=[self.forum.id]))
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertTrue(['Subscribe'], tree.xpath('//a[@href="%s"]/text()' % url))
+
+        #click on this link
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+
+        #Check we have 4 radio inputs
+        radio_ids = tree.xpath('//input[@type="radio"]/@id')
+        self.assertEqual(['id_type_0', 'id_type_1', 'id_topics_0', 'id_topics_1'], radio_ids)
+
+        #submit the form to be notified for new topics
+        values = self.get_form_values(response, form='forum_subscription')
+        values.update({'type': ForumSubscription.TYPE_NOTIFY, 'topics': 'new', })
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('subscription' in response.context_data)
+        self.assertEqual(response.context_data['subscription'].forum, self.forum)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertTrue(['Manage subscription'], tree.xpath('//a[@href="%s"]/text()' % url))
+
+        client = Client()
+        client.login(username='user3', password='user3')
+        response = client.get(url)
+        values = self.get_form_values(response, form='forum_subscription')
+        values.update({'type': ForumSubscription.TYPE_SUBSCRIBE, 'topics': 'new', })
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('subscription' in response.context_data)
+        self.assertTrue(response.context_data['subscription'].forum, self.forum)
+        #Check there is still only zeus who subscribe to topic
+        usernames = list(self.topic.subscribers.all().values_list('username', flat=True))
+        self.assertEqual(usernames, [self.user.username, ])
+
+        topic = Topic(name='newtopic', forum=self.forum, user=self.user)
+        topic.save()
+        #user2 should have a mail
+        self.assertEqual(1, len(mail.outbox))
+        self.assertEqual([user2.email, ], mail.outbox[0].to)
+        self.assertEqual('New topic in forum that you subscribed.', mail.outbox[0].subject)
+        self.assertTrue('User zeus post a new topic' in mail.outbox[0].body)
+        self.assertTrue(topic.get_absolute_url() in mail.outbox[0].body)
+        self.assertTrue(url in mail.outbox[0].body)
+        post = Post(topic=topic, user=self.user, body='body')
+        post.save()
+
+        #Now, user3 should be subscribed to this new topic
+        usernames = list(topic.subscribers.all().values_list('username', flat=True))
+        self.assertEqual(usernames, [self.user.username, 'user3', ])
+        self.assertEqual(2, len(mail.outbox))
+        self.assertEqual([user3.email, ], mail.outbox[1].to)
+        self.assertEqual('New answer in topic that you subscribed.', mail.outbox[1].subject)
+
+        #Now, we unsubscribe user3 to be auto subscribed
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+
+        #Check we have 5 radio inputs
+        radio_ids = tree.xpath('//input[@type="radio"]/@id')
+        expected_inputs = [
+            'id_type_0', 'id_type_1', 'id_type_2', 
+            'id_topics_0', 'id_topics_1'
+        ]
+        self.assertEqual(expected_inputs, radio_ids)
+        self.assertEqual(tree.xpath('//input[@id="id_type_2"]/@value'), ['unsubscribe', ])
+        self.assertEqual(tree.xpath('//input[@id="id_type_1"]/@checked'), ['checked', ])
+        values = self.get_form_values(response, form='forum_subscription')
+        values['type'] = 'unsubscribe'
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('subscription' in response.context_data)
+        self.assertIsNone(response.context_data['subscription'])
+        #user3 should not be subscribed anymore to any forum
+        with self.assertRaises(ForumSubscription.DoesNotExist):
+            ForumSubscription.objects.get(user=user3)
+        #but should still be still subscribed to the topic
+        usernames = list(topic.subscribers.all().values_list('username', flat=True))
+        self.assertEqual(usernames, [self.user.username, 'user3', ])
+
+        #Update user2's subscription to be autosubscribed to all posts
+        client = Client()
+        client.login(username='user2', password='user2')
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertEqual(tree.xpath('//input[@id="id_type_0"]/@checked'), ['checked', ])
+        values = self.get_form_values(response, form='forum_subscription')
+        values['type'] = ForumSubscription.TYPE_SUBSCRIBE
+        values['topics'] = 'all'
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        #user2 shoud now be subscribed to all self.forum's topics
+        subscribed_topics = list(user2.subscriptions.all().order_by('name').values_list('name', flat=True))
+        expected_topics = list(self.forum.topics.all().order_by('name').values_list('name', flat=True))
+        self.assertEqual(subscribed_topics,expected_topics)
+
+        #unsubscribe user2 to all topics
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertEqual(tree.xpath('//input[@id="id_type_2"]/@value'), ['unsubscribe', ])
+        values = self.get_form_values(response, form='forum_subscription')
+        values['type'] = 'unsubscribe'
+        values['topics'] = 'all'
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        #user2 shoud now be subscribed to zero topic
+        topics = list(user2.subscriptions.all().values_list('name', flat=True))
+        self.assertEqual(topics, [])
 
     @skipUnlessDBFeature('supports_microsecond_precision')
     def test_topic_updated(self):
