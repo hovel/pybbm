@@ -19,6 +19,7 @@ from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 from pybb import compat, defaults, util
+from pybb.compat import get_atomic_func
 from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
@@ -136,18 +137,13 @@ class LatestTopicsView(PaginatorMixin, generic.ListView):
         return qs.order_by('-updated', '-id')
 
 
-class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
-    paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
-    template_object_name = 'post_list'
-    template_name = 'pybb/topic.html'
+class PybbFormsMixin(object):
 
     post_form_class = PostForm
     admin_post_form_class = AdminPostForm
-    poll_form_class = PollForm
     attachment_formset_class = AttachmentFormSet
-
-    def get_login_redirect_url(self):
-        return reverse('pybb:topic', args=(self.kwargs['pk'],))
+    poll_form_class = PollForm
+    poll_answer_formset_class = PollAnswerFormSet
 
     def get_post_form_class(self):
         return self.post_form_class
@@ -155,11 +151,23 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     def get_admin_post_form_class(self):
         return self.admin_post_form_class
 
+    def get_attachment_formset_class(self):
+        return self.attachment_formset_class
+
     def get_poll_form_class(self):
         return self.poll_form_class
 
-    def get_attachment_formset_class(self):
-        return self.attachment_formset_class
+    def get_poll_answer_formset_class(self):
+        return self.poll_answer_formset_class
+
+
+class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.ListView):
+    paginate_by = defaults.PYBB_TOPIC_PAGE_SIZE
+    template_object_name = 'post_list'
+    template_name = 'pybb/topic.html'
+
+    def get_login_redirect_url(self):
+        return reverse('pybb:topic', args=(self.kwargs['pk'],))
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
@@ -267,27 +275,32 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
                 forum_mark.save()
 
 
-class PostEditMixin(object):
+class PostEditMixin(PybbFormsMixin):
 
-    poll_answer_formset_class = PollAnswerFormSet
-
-    def get_poll_answer_formset_class(self):
-        return self.poll_answer_formset_class
+    @method_decorator(get_atomic_func())
+    def post(self, request, *args, **kwargs):
+        return super(PostEditMixin, self).post(request, *args, **kwargs)
 
     def get_form_class(self):
         if perms.may_post_as_admin(self.request.user):
-            return AdminPostForm
+            return self.get_admin_post_form_class()
         else:
-            return PostForm
+            return self.get_post_form_class()
 
     def get_context_data(self, **kwargs):
+
         ctx = super(PostEditMixin, self).get_context_data(**kwargs)
+
         if perms.may_attach_files(self.request.user) and (not 'aformset' in kwargs):
-            ctx['aformset'] = AttachmentFormSet(instance=self.object if getattr(self, 'object') else None)
+            ctx['aformset'] = self.get_attachment_formset_class()(
+                instance=self.object if getattr(self, 'object') else None
+            )
+
         if perms.may_create_poll(self.request.user) and ('pollformset' not in kwargs):
             ctx['pollformset'] = self.get_poll_answer_formset_class()(
                 instance=self.object.topic if getattr(self, 'object') else None
             )
+
         return ctx
 
     def form_valid(self, form):
@@ -297,7 +310,9 @@ class PostEditMixin(object):
         self.object = form.save(commit=False)
 
         if perms.may_attach_files(self.request.user):
-            aformset = AttachmentFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            aformset = self.get_attachment_formset_class()(
+                self.request.POST, self.request.FILES, instance=self.object
+            )
             if aformset.is_valid():
                 save_attachments = True
             else:
@@ -615,14 +630,16 @@ class OpenTopicView(TopicActionBaseView):
         topic.save()
 
 
-class TopicPollVoteView(generic.UpdateView):
+class TopicPollVoteView(PybbFormsMixin, generic.UpdateView):
     model = Topic
     http_method_names = ['post', ]
-    form_class = PollForm
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         return super(TopicPollVoteView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_class(self):
+        return self.get_poll_form_class()
 
     def get_form_kwargs(self):
         kwargs = super(ModelFormMixin, self).get_form_kwargs()
