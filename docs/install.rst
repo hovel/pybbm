@@ -144,9 +144,12 @@ Since django 1.7 release you have several combinations of installed packages tha
 WARNING
 '''''''
 
-If you have south enabled and use profile class under south control (like 'pybb.Profile'),
+* If you have south enabled and use profile class under south control (like 'pybb.Profile'),
 the profile for superuser will not be created after syncdb/migrate. It will be created during
 first login of this user to the site by `pybb.middleware.PybbMiddleware`.
+
+* We recommend to use database engine that supports transaction management (all django backends except sqlite).
+  Otherwise you have small chance to face some inconsistency in DB after failed post/topic creation.
 
 Templates
 ---------
