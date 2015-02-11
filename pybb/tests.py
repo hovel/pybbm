@@ -1164,7 +1164,9 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = self.client.post(
             reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([self.forum, forum2], [forum for forum in moderator.forum_set.all()])
+        correct_list = sorted([self.forum, forum2], key=lambda forum: forum.pk)
+        moderator_list = sorted([forum for forum in moderator.forum_set.all()], key=lambda forum: forum.pk)
+        self.assertEqual(correct_list, moderator_list)
 
         # test to remove user as moderator
         values['cat_%d' % self.category.pk] = [self.forum.pk, ]
