@@ -5,13 +5,14 @@ import re
 import inspect
 
 from django import forms
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
 
 from pybb import compat, defaults, util
-from pybb.models import Topic, Post, Attachment, PollAnswer
+from pybb.models import Topic, Post, Attachment, PollAnswer, Category
+from pybb.permissions import perms
 
 
 User = compat.get_user_model()
@@ -255,3 +256,24 @@ class PollForm(forms.Form):
             return [answers]
         else:
             return answers
+
+
+class ModeratorForm(forms.Form):
+
+    def __init__(self, user, *args, **kwargs):
+        super(ModeratorForm, self).__init__(*args, **kwargs)
+        categories = Category.objects.all()
+        for category in categories:
+            forums = [forum.pk for forum in category.forums.all() if perms.may_change_forum(user, forum)]
+            self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
+                label=category.name,
+                queryset=category.forums.filter(pk__in=forums),
+                widget=forms.CheckboxSelectMultiple(),
+                required=False
+            )
+        if not self.fields:
+            raise PermissionDenied()
+
+    def process(self, target_user):
+        forums = self.cleaned_data.values()
+        target_user.forum_set = [forum for queryset in forums for forum in queryset]

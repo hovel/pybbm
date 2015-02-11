@@ -1113,6 +1113,75 @@ class FeaturesTest(TestCase, SharedTestModule):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
+    def test_managing_forums(self):
+        forum2 = Forum.objects.create(name='foo2', description='bar2', category=self.category)
+        Forum.objects.create(name='foo3', description='bar3', category=self.category)
+        moderator = User.objects.create_user('moderator', 'moderator@localhost', 'moderator')
+        Post.objects.create(topic=self.topic, user=moderator, body='test')
+        self.login_client()
+
+        #test the visibility of the button
+        response = self.client.get(reverse('pybb:user', kwargs={'username': moderator.username}))
+        self.assertNotContains(
+            response, '<a href="%s"' % reverse(
+                    'pybb:edit_privileges', kwargs={'username': moderator.username}
+                )
+            )
+        response = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
+        self.assertNotContains(
+            response, '<a href="%s"' % reverse(
+                    'pybb:edit_privileges', kwargs={'username': self.user.username}
+                )
+            )
+
+        add_moderator_permission = Permission.objects.get_by_natural_key('change_forum','pybb','forum')
+        self.user.user_permissions.add(add_moderator_permission)
+
+        response = self.client.get(reverse('pybb:user', kwargs={'username': moderator.username}))
+        self.assertContains(
+            response, '<a href="%s"' % reverse(
+                    'pybb:edit_privileges', kwargs={'username': moderator.username}
+                )
+            )
+        response = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
+        self.assertContains(
+            response, '<a href="%s"' % reverse(
+                    'pybb:edit_privileges', kwargs={'username': self.user.username}
+                )
+            )
+
+        # test the permission to acces the page
+        response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': moderator.username}))
+        self.assertEqual(response.status_code, 200)
+
+        # test if there are as many chechkboxs as forums in the category
+        inputs = dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % "privileges-edit")[0].inputs)
+        self.assertEqual(len(self.category.forums.all()),len(inputs['cat_%d' % self.category.pk]))
+
+        # test to add user as moderator
+        values = self.get_form_values(response, "privileges-edit")
+        values['cat_%d' % self.category.pk] = [self.forum.pk, forum2.pk]
+        response = self.client.post(
+            reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([self.forum, forum2], [forum for forum in moderator.forum_set.all()])
+
+        # test to remove user as moderator
+        values['cat_%d' % self.category.pk] = [self.forum.pk, ]
+        response = self.client.post(
+                reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([self.forum, ], [forum for forum in moderator.forum_set.all()])
+
+        values['cat_%d' % self.category.pk] = []
+        response = self.client.post(
+                reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(0, moderator.forum_set.count())
+        self.user.user_permissions.remove(add_moderator_permission)
+
 
 class AnonymousTest(TestCase, SharedTestModule):
     def setUp(self):

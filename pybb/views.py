@@ -21,7 +21,9 @@ from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 from pybb import compat, defaults, util
 from pybb.compat import get_atomic_func
-from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
+from pybb.forms import (
+    PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm, ModeratorForm
+)
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
@@ -731,6 +733,43 @@ class TopicPollVoteView(PybbFormsMixin, generic.UpdateView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+
+class UserEditPrivilegesView(generic.edit.FormMixin, generic.edit.ProcessFormView, generic.DetailView):
+
+    template_name = 'pybb/edit_privileges.html'
+    form_class = ModeratorForm
+    model = User
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_success_url(self):
+        return reverse('pybb:edit_privileges', kwargs={'username': self.object.username})
+
+    def get_initial(self):
+        initial = super(UserEditPrivilegesView, self).get_initial()
+        categories = Category.objects.all()
+        for category in categories:
+            initial['cat_%d' % category.pk] = category.forums.filter(moderators=self.object.pk)
+        return initial
+
+    def get_form_kwargs(self):
+        form_kwargs = super(UserEditPrivilegesView, self).get_form_kwargs()
+        form_kwargs['user'] = self.request.user
+        return form_kwargs
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UserEditPrivilegesView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UserEditPrivilegesView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.process(self.object)
+        messages.success(self.request, _("Privileges updated"))
+        return super(UserEditPrivilegesView, self).form_valid(form)
 
 
 @login_required

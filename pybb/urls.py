@@ -12,7 +12,7 @@ from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView,\
     OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView,\
-    UserTopics, UserPosts, topic_cancel_poll_vote
+    UserTopics, UserPosts, topic_cancel_poll_vote, UserEditPrivilegesView
 
 
 urlpatterns = patterns('',
@@ -33,6 +33,7 @@ urlpatterns += patterns('pybb.views',
                         url('^unblock_user/([^/]+)/$', 'unblock_user', name='unblock_user'),
                         url(r'^users/(?P<username>[^/]+)/topics/$', UserTopics.as_view(), name='user_topics'),
                         url(r'^users/(?P<username>[^/]+)/posts/$', UserPosts.as_view(), name='user_posts'),
+                        url(r'^users/(?P<username>[^/]+)/edit-privileges/$', UserEditPrivilegesView.as_view(), name='edit_privileges'),
 
                         # Profile
                         url('^profile/edit/$', ProfileEditView.as_view(), name='edit_profile'),
