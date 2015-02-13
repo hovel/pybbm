@@ -1012,7 +1012,12 @@ class FeaturesTest(TestCase, SharedTestModule):
         tree = html.fromstring(response.content, parser=parser)
         self.assertTrue(['Subscribe'], tree.xpath('//a[@href="%s"]/text()' % url))
 
-        #click on this link
+        #check anonymous can't subscribe :
+        anonymous_client = Client()
+        response = anonymous_client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        #click on this link with a logged account
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content, parser=parser)
