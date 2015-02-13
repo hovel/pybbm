@@ -188,6 +188,8 @@ class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
         return super(ForumSubscriptionView, self).form_valid(form)
 
     def get_objects(self):
+        if not self.request.user.is_authenticated():
+            raise PermissionDenied
         self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
         try:
             self.forum_subscription = ForumSubscription.objects.get(

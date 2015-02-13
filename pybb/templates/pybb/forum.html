@@ -26,11 +26,11 @@
 
         {% include "pybb/pagination.html" %}
 
-        {% if user|pybb_may_create_topic:forum %}
-            <div class="controls">
+        <div class="controls">
+            {% if user|pybb_may_create_topic:forum %}
                 {% include "pybb/_button_new_topic.html" %}
-                {% include "pybb/_button_forum_subscription.html" %}
-            </div>
-        {% endif %}
+            {% endif %}
+            {% include "pybb/_button_forum_subscription.html" %}
+        </div>
     </div>
 {% endblock content %}
