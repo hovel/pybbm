@@ -15,12 +15,12 @@ class Command(BaseCommand):
                       .filter(counter=0)
 
         count = topics.count()
-        print 'Found %d invalid topics' % count
+        print('Found %d invalid topics' % count)
         if count:
             answer = raw_input('Are you sure you want delete them? [y/n]:')
             if answer.lower() == 'y':
-                print 'Deleting topics'
+                print('Deleting topics')
                 topics.delete()
-                print 'Deletion completed'
+                print('Deletion completed')
             else:
-                print 'Aborting'
+                print('Aborting')
