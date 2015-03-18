@@ -31,7 +31,10 @@ except ImportError:
     raise Exception('PyBB requires lxml for self testing')
 
 from pybb import defaults
-from pybb.models import Topic, TopicReadTracker, Forum, ForumReadTracker, Post, Category, PollAnswer, Profile
+from pybb.models import Topic, TopicReadTracker, Forum, ForumReadTracker, Post, Category, PollAnswer
+
+
+Profile = util.get_pybb_profile_model()
 
 __author__ = 'zeus'
 
@@ -1854,3 +1857,18 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.assertIsNotNone(profile)
         self.assertEqual(type(profile), util.get_pybb_profile_model())
         user.delete()
+
+    def test_user_delete_cascade(self):
+        user = User.objects.create_user('cronos', 'cronos@localhost', 'cronos')
+        profile = getattr(user, defaults.PYBB_PROFILE_RELATED_NAME, None)
+        self.assertIsNotNone(profile)
+        post = Post(topic=self.topic, user=user, body='I \'ll be back')
+        post.save()
+        user_pk = user.pk
+        profile_pk = profile.pk
+        post_pk = post.pk
+
+        user.delete()
+        self.assertFalse(User.objects.filter(pk=user_pk).exists())
+        self.assertFalse(Profile.objects.filter(pk=profile_pk).exists())
+        self.assertFalse(Post.objects.filter(pk=post_pk).exists())

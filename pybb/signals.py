@@ -21,9 +21,16 @@ def post_saved(instance, **kwargs):
 
 
 def post_deleted(instance, **kwargs):
-    profile = util.get_pybb_profile(instance.user)
-    profile.post_count = instance.user.posts.count()
-    profile.save()
+    Profile = util.get_pybb_profile_model()
+    User = compat.get_user_model()
+    try:
+        profile = util.get_pybb_profile(instance.user)
+    except (Profile.DoesNotExist, User.DoesNotExist) as e:
+        #When we cascade delete an user, profile and posts are also deleted
+        pass
+    else:
+        profile.post_count = instance.user.posts.count()
+        profile.save()
 
 
 def user_saved(instance, created, **kwargs):
