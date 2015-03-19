@@ -36,39 +36,38 @@ jQuery(function ($) {
                     if (textarea.val())
                         textarea.val(textarea.val() + '\n');
                     textarea.val(textarea.val() + data);
+                    window.location.hash = '#id_body' ;
                 }
             );
         });
 
         $('.quote-selected-link').on('click', function (e) {
+            if(!window.pybb.markup){
+                return true;
+            }
             e.preventDefault();
             var selectedText = getSelectedText();
             if (selectedText != '') {
                 if (textarea.val())
                     textarea.val(textarea.val() + '\n');
-
-                var nickName = '';
+                var username = '';
                 if ($(this).closest('.post-row').length == 1 &&
                     $(this).closest('.post-row').find('.post-username').length == 1) {
-                    nickName = $(this).closest('.post').find('.post-username').text();
+                    username = $.trim($(this).closest('.post').find('.post-username').text());
                 }
-
-                textarea.val(
-                    textarea.val() +
-                    (nickName ? ('[quote="' + $.trim(nickName) + '"]') : '[quote]') +
-                    selectedText +
-                    '[/quote]\n'
-                );
+                textarea.val(textarea.val() + window.pybb.markup.quote(selectedText, username));
+                window.location.hash = '#id_body' ;
             }
         });
 
         $('.post-row .post-username').on('click', function (e) {
-            if (e.shiftKey) {
-                var nick = $.trim($(this).text());
+            if (window.pybb.markup && e.shiftKey ) {
+                e.preventDefault();
+                var username = $.trim($(this).text());
                 if (textarea.val())
                     textarea.val(textarea.val() + '\n');
-                textarea.val(textarea.val() + '[b]' + nick + '[/b], ');
-                return e.preventDefault();
+                textarea.val(textarea.val() + window.pybb.markup.username(username));
+                window.location.hash = '#id_body' ;
             }
         });
     }

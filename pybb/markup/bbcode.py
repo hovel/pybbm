@@ -21,6 +21,7 @@ class BBCodeWidget(Textarea):
             'markitup/jquery.markitup.js',
             'markitup/sets/bbcode/set.js',
             'pybb/js/markitup.js',
+            'pybb/js/pybbjs.js',
         )
 
     def render(self, *args, **kwargs):
