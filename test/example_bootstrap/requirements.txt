@@ -1,0 +1,13 @@
+django>=1.6,<1.7
+
+#exemple_bootstrap dependencies
+django-registration
+
+#pybb strong dependencies
+django-annoying
+bbcode
+Pillow>=2.7,<2.8
+
+#for test purpose only
+#lxml
+#markdown
