@@ -2,6 +2,8 @@
 
 {% load url from future %}
 
+{% load staticfiles %}
+
 {% load pybb_tags i18n %}
 
 {% block title %}{{ topic }}{% endblock %}
@@ -13,7 +15,7 @@
 {% block extra_script %}
     {{ block.super }}
     {{ form.media.js }}
-    <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/jquery.formset.min.js"></script>
+    <script type="text/javascript" src="{% static 'pybb/js/jquery.formset.min.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumb %}

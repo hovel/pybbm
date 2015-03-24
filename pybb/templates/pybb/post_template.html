@@ -1,4 +1,5 @@
 {% load url from future %}
+{% load staticfiles %}
 {% load i18n pybb_tags %}
 
 {% pybb_get_profile user=post.user as post_user_profile %}
@@ -85,7 +86,7 @@
                 {% endif %}
                 <div class='attachments'>
                     {% for attachment in post.attachments.all %}
-                        <a href="{{ attachment.file.url }}"><img src="{{ STATIC_URL }}pybb/img/attachment.png"> {{ attachment.size_display }}</a>
+                        <a href="{{ attachment.file.url }}"><img src="{% static 'pybb/img/attachment.png' %}"> {{ attachment.size_display }}</a>
                     {% endfor %}
                 </div>
             </div>

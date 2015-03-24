@@ -1,4 +1,5 @@
 {% extends 'pybb/base.html' %}
+{% load staticfiles %}
 {% load i18n pybb_tags %}
 
 {% block title %}
@@ -12,7 +13,7 @@
 {% block extra_script %}
     {{ block.super }}
     {{ form.media.js }}
-    <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/jquery.formset.min.js"></script>
+    <script type="text/javascript" src="{% static 'pybb/js/jquery.formset.min.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumb %}
