@@ -6,7 +6,7 @@
             {{ field.field.label }}
         </label>
     {% endif %}
-    <div class="form-control">
+    <div> <!--class="form-control" disabled-->
         {{ field }}
         {% for error in field.errors %}
             <span class="field-errors">{{ field.errors }}</span>
