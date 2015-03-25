@@ -262,6 +262,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if perms.may_attach_files(self.request.user):
             aformset = self.get_attachment_formset_class()()
             ctx['aformset'] = aformset
+            ctx['attachment_max_size'] = defaults.PYBB_ATTACHMENT_SIZE_LIMIT
         if defaults.PYBB_FREEZE_FIRST_POST:
             ctx['first_post'] = self.topic.head
         else:
@@ -394,6 +395,9 @@ class PostEditMixin(PybbFormsMixin):
                 self.object.save()
                 if save_attachments:
                     aformset.save()
+                    if self.object.attachments.count():
+                        #re-parse the body to replace attachment's references by URLs
+                        self.object.save()
                 if save_poll_answers:
                     pollformset.save()
                 return HttpResponseRedirect(self.get_success_url())
