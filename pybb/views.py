@@ -119,12 +119,11 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         ctx['forum'] = self.forum
         if self.request.user.is_authenticated():
             try:
-                ctx['subscription'] = ForumSubscription.objects.get(
-                    user=self.request.user, 
-                    forum=self.forum
-                )
+                subscription = self.forum.subscriptions.get(user=self.request.user)
+                ctx['subscription_form'] = ForumSubscriptionForm(initial={'type': subscription.type})
             except ForumSubscription.DoesNotExist:
                 ctx['subscription'] = None
+                ctx['subscription_form'] = ForumSubscriptionForm()
         else:
             ctx['subscription'] = None
         ctx['forum'].forums_accessed = perms.filter_forums(self.request.user, self.forum.child_forums.all())
@@ -144,19 +143,21 @@ class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
     template_name = 'pybb/forum_subscription.html'
     form_class = ForumSubscriptionForm
 
-    def get_login_redirect_url(self):
-        return reverse('pybb:forum_subscription', args=(self.kwargs['pk'],))
-
-    def get_success_url(self):
-        return self.forum.get_absolute_url()
-
     def get_form_kwargs(self, **kwargs):
-        kw = super(ForumSubscriptionView, self).get_form_kwargs(**kwargs)
+        kw = super(ForumSubscriptionView, self).get_form_kwargs()
         self.get_objects()
-        kw['instance'] = self.forum_subscription
-        kw['user'] = self.request.user
-        kw['forum'] = self.forum
+        if self.forum_subscription:
+            kw['initial']['type'] = self.forum_subscription.type
         return kw
+
+    def get_objects(self):
+        if not self.request.user.is_authenticated():
+            raise PermissionDenied()
+        self.forum = get_object_or_404(
+            perms.filter_forums(self.request.user, Forum.objects.all()),
+            pk=self.kwargs['pk']
+        )
+        self.forum_subscription = self.forum.subscriptions.filter(user=self.request.user).first()
 
     def get_context_data(self, **kwargs):
         ctx = super(ForumSubscriptionView, self).get_context_data(**kwargs)
@@ -165,40 +166,32 @@ class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
         return ctx
 
     def form_valid(self, form):
-        result = form.process()
-        if result == 'subscribe-all':
-            msg = _((
-                'You subscribed to all existant topics on this forum '
-                'and you will auto-subscribed to all its new topics.'
-            ))
-        elif result == 'delete':
-            msg = _((
-                'You won\'t be notified anymore each time a new topic '
-                'is posted on this forum.'
-            ))
-        elif result == 'delete-all':
-            msg = _((
-                'You have been subscribed to all current topics in this forum and you won\'t'
-                'be auto-subscribed anymore for each new topic posted on this forum.'
-            ))
+        if form.cleaned_data['type'] == 0:
+            if self.forum_subscription:
+                self.forum_subscription.delete()
+                messages.success(self.request, 'Your subscription deleted successfully', fail_silently=True)
         else:
-            msg = _((
-                'You will be notified each time a new topic is posted on this forum.'
-            ))
-        messages.success(self.request, msg, fail_silently=True)
+            if not self.forum_subscription:
+                subscription = ForumSubscription(
+                    user=self.request.user,
+                    forum=self.forum,
+                    type=form.cleaned_data['type']
+                )
+                action = 'created'
+            else:
+                subscription = self.forum_subscription
+                subscription.type = form.cleaned_data['type']
+                action = 'updated'
+            subscription.save()
+            messages.success(self.request, 'Your subscription %s successfully' % action, fail_silently=True)
         return super(ForumSubscriptionView, self).form_valid(form)
 
-    def get_objects(self):
-        if not self.request.user.is_authenticated():
-            raise PermissionDenied
-        self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
-        try:
-            self.forum_subscription = ForumSubscription.objects.get(
-                user=self.request.user, 
-                forum=self.forum
-            )
-        except ForumSubscription.DoesNotExist:
-            self.forum_subscription = None
+    def get_login_redirect_url(self):
+        return reverse('pybb:forum', args=(self.kwargs['pk'],))
+
+    def get_success_url(self):
+        return self.request.POST.get('next') or self.forum.get_absolute_url()
+
 
 class LatestTopicsView(PaginatorMixin, generic.ListView):
 
@@ -297,6 +290,9 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
+            self.request.user.forum_subscription = \
+                self.topic.forum.subscriptions.filter(user=self.request.user).first()
+
             if perms.may_post_as_admin(self.request.user):
                 ctx['form'] = self.get_admin_post_form_class()(
                     initial={'login': getattr(self.request.user, username_field)},
@@ -751,17 +747,19 @@ def topic_cancel_poll_vote(request, pk):
 
 
 @login_required
-def delete_subscription(request, topic_id):
-    topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=topic_id)
-    topic.subscribers.remove(request.user)
-    return HttpResponseRedirect(topic.get_absolute_url())
-
-
-@login_required
+@require_POST
 def add_subscription(request, topic_id):
     topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=topic_id)
     topic.subscribers.add(request.user)
-    return HttpResponseRedirect(topic.get_absolute_url())
+    return HttpResponseRedirect(request.POST.get('next') or topic.get_absolute_url())
+
+
+@login_required
+@require_POST
+def delete_subscription(request, topic_id):
+    topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=topic_id)
+    topic.subscribers.remove(request.user)
+    return HttpResponseRedirect(request.POST.get('next') or topic.get_absolute_url())
 
 
 @login_required

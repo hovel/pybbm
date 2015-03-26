@@ -12,13 +12,15 @@ def topic_saved(instance, **kwargs):
     if kwargs['created']:
         notify_forum_subscribers(instance)
 
-def post_saved(instance, **kwargs):
-    notify_topic_subscribers(instance)
 
-    if util.get_pybb_profile(instance.user).autosubscribe:
-        instance.topic.subscribers.add(instance.user)
+def post_saved(instance, **kwargs):
 
     if kwargs['created']:
+        notify_topic_subscribers(instance)
+
+        if util.get_pybb_profile(instance.user).autosubscribe:
+            instance.topic.subscribers.add(instance.user)
+
         profile = util.get_pybb_profile(instance.user)
         profile.post_count = instance.user.posts.count()
         profile.save()
@@ -43,8 +45,8 @@ def user_saved(instance, created, **kwargs):
     instance.save()
 
     if defaults.PYBB_PROFILE_RELATED_NAME:
-        ModelProfile = util.get_pybb_profile_model()
-        profile = ModelProfile()
+        profile_model_class = util.get_pybb_profile_model()
+        profile = profile_model_class()
         setattr(instance, defaults.PYBB_PROFILE_RELATED_NAME, profile)
         profile.save()
 

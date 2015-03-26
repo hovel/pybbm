@@ -19,14 +19,12 @@
     </form>
     <h1>{% trans "Subscriptions on topics" %}</h1>
     <ul>
-        {% for sub in user.subscriptions.all %}
-            <li>
-                {% pybb_link sub %}
-                &mdash;
-                <strong>
-                    <a href="{% url 'pybb:delete_subscription' sub.id %}">{% trans "delete" %}</a>
-                </strong>
-            </li>
+        {% for sub_topic in user.subscriptions.all %}
+            <form action="{% url 'pybb:delete_subscription' sub_topic.id %}" method="post">{% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <a href="{{ sub_topic.get_absolute_url }}">{{ sub_topic }}</a>
+                <input type="submit" value="{% trans "Unsubscribe" %}">
+            </form>
         {% endfor %}
     </ul>
 {% endblock content %}

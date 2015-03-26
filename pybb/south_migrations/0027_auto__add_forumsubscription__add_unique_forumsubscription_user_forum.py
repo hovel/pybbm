@@ -13,8 +13,8 @@ class Migration(SchemaMigration):
         # Adding model 'ForumSubscription'
         db.create_table('pybb_forumsubscription', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='forum_subscriptions+', to=orm[AUTH_USER])),
-            ('forum', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions+', to=orm['pybb.Forum'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='forum_subscriptions', to=orm[AUTH_USER])),
+            ('forum', self.gf('django.db.models.fields.related.ForeignKey')(related_name='subscriptions', to=orm['pybb.Forum'])),
             ('type', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
         ))
         db.send_create_signal('pybb', ['ForumSubscription'])

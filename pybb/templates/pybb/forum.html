@@ -30,7 +30,19 @@
             {% if user|pybb_may_create_topic:forum %}
                 {% include "pybb/_button_new_topic.html" %}
             {% endif %}
-            {% include "pybb/_button_forum_subscription.html" %}
+            {% include "pybb/_form_forum_subscription.html" %}
         </div>
+
+        {% if user.is_staff %}
+            <div class="subscriber-list">
+                {% trans "Subscribers" %}:
+                {% for sub in forum.subscriptions.all %}
+                    {% pybb_get_profile user=sub.user as subscriber_profile %}
+                    <a href="{% url 'pybb:user' sub.user.get_username %}">{{ subscriber_profile.get_display_name }}</a>
+                    ({{ sub.get_type_display }})
+                    {% if not forloop.last %},{% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 {% endblock content %}

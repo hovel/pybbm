@@ -44,7 +44,7 @@ class BasePollAnswerFormset(BaseInlineFormSet):
                      len(self.deleted_forms))
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
             raise forms.ValidationError(
-                ugettext('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
+                ugettext('You can\'t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
         if forms_cnt < 2:
             raise forms.ValidationError(ugettext('Add two or more answers for this poll'))
 
@@ -252,44 +252,9 @@ class PollForm(forms.Form):
 
 
 class ForumSubscriptionForm(forms.Form):
-    def __init__(self, user, forum, instance=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(ForumSubscriptionForm, self).__init__(*args, **kwargs)
-        self.user = user
-        self.forum = forum
-        self.instance = instance
-        topic_choices = (
-            ('new', _('only new topics')),
-            ('all', _('all topics of the forum')),
-        )
-        type_choices = list(ForumSubscription.TYPE_CHOICES)
-        if instance :
-            type_choices.append((
-                'unsubscribe', 
-                _('be unsubscribe from this forum')
-            ))
 
-        initial = ForumSubscription.TYPE_NOTIFY if not instance else instance.type
-        self.fields['type'] = forms.ChoiceField(
-            label=_('You want to'), choices=type_choices, initial=initial,
-            widget=forms.RadioSelect())
-        self.fields['topics'] = forms.ChoiceField(
-            label=_('Concerned topics'), choices=topic_choices, initial=topic_choices[0][0],
-            widget=forms.RadioSelect())
-    
-    def process(self):
-        """
-        saves or deletes the ForumSubscription's instance
-        """
-        action = self.cleaned_data.get('type')
-        all_topics = self.cleaned_data.get('topics') == 'all'
-        if action == 'unsubscribe':
-            self.instance.delete(all_topics=all_topics)
-            return 'delete-all' if all_topics else 'delete'
-        else:
-            if not self.instance:
-                self.instance = ForumSubscription()
-                self.instance.user = self.user
-                self.instance.forum = self.forum
-            self.instance.type = int(self.cleaned_data.get('type'))
-            self.instance.save(all_topics=all_topics)
-            return 'subscribe-all' if all_topics else 'subscribe'
+        choices = list(ForumSubscription.TYPE_CHOICES)
+        choices.insert(0, (0, _('No subscription')))
+        self.fields['type'] = forms.TypedChoiceField(choices=choices, required=True, coerce=int, label='')

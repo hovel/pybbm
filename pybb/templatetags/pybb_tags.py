@@ -96,7 +96,6 @@ def pybb_link(object, anchor=''):
     """
 
     url = hasattr(object, 'get_absolute_url') and object.get_absolute_url() or None
-    #noinspection PyRedeclaration
     anchor = anchor or smart_text(object)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
 

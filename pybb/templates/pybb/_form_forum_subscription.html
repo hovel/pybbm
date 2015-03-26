@@ -1,0 +1,9 @@
+{% load url from future %}
+{% load i18n %}
+<form action="{% url 'pybb:forum_subscription' pk=forum.id %}" method="post">
+    {% include 'pybb/form.html' with form=subscription_form %}
+    <input type="submit" class="btn btn-primary" value="{% trans 'Save' %}">
+    <a href="{% url 'pybb:forum_subscription' pk=forum.id %}" class="forum-subscription btn btn-primary">
+        {% trans "Subscribtion management" %}
+    </a>
+</form>

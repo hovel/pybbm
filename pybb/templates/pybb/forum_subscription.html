@@ -1,55 +1,38 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_tags i18n %}
 
-{% block title %}{{ forum.name }} - {% trans 'Subscription' %}{% endblock title %}
+{% block title %}{{ forum.name }} - {% trans 'Subscription management' %}{% endblock title %}
 
 {% block breadcrumb %}
-    {% with forum as object %}
-        {% include "pybb/breadcrumb.html" %}
-    {% endwith %}
+    {% include "pybb/breadcrumb.html" with object=forum extra_crumb=_('Subscription management') %}
 {% endblock %}
 
 {% block content %}
     <div class="forum_subscription">
-        <h1>{{ forum.name }} - {% trans 'Subscription' %}</h1>
+
+        <h1>{{ forum.name }} - {% trans 'Subscription management' %}</h1>
+
+        <h2>{% trans 'Forum subscription' %}</h2>
+
         <form class="forum_subscription" action="" method="POST">
-            {% csrf_token %}
-            {% include "pybb/form_errors.html" %}
-            {% with form.type as field %}
-            <div id="pybb_subscription_type" class="{% if field.is_required %}required{% endif %} {% if field.errors %}error{% endif %}">
-                <label for="{{ field.auto_id }}">{{ field.field.label }}</label>
-                <div class="form-control">
-                    {{ field }}
-                    {% for error in field.errors %}
-                        <span class="field-errors">{{ field.errors }}</span>
-                    {% endfor %}
-                    {% if field.help %}
-                        <p class="help">{{ field.help|linebreaks }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            {% endwith %}
-
-            {% with form.topics as field %}
-            <div id="pybb_concerned_topics" class="{% if field.is_required %}required{% endif %} {% if field.errors %}error{% endif %}">
-                <label for="{{ field.auto_id }}">{{ field.field.label }}</label>
-                <div class="form-control">
-                    {{ field }}
-                    {% for error in field.errors %}
-                        <span class="field-errors">{{ field.errors }}</span>
-                    {% endfor %}
-                    {% if field.help %}
-                        <p class="help">{{ field.help|linebreaks }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            {% endwith %}
-
-            {% for field in form.hidden_fields %}
-                {{ field }}
-            {% endfor %}
-            <a class="btn btn-secondary" href="{{ forum.get_absolute_url }}">{% trans 'Cancel' %}</a>
-            <input type="submit" class="btn btn-primary" value="{% trans 'Submit' %}" />
+            {% include 'pybb/form.html' with form=form %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <input type="submit" class="btn btn-primary" value="{% trans 'Submit' %}">
+            <a class="btn btn-secondary" href="{{ forum.get_absolute_url }}">{% trans 'Back to forum' %}</a>
         </form>
+
+        <h2>{% trans 'Topic subscriptions' %}</h2>
+
+        <div>
+            {% for sub_topic in user.subscriptions.all %}
+                {% if sub_topic.forum == forum %}
+                    <form action="{% url 'pybb:delete_subscription' sub_topic.id %}" method="post">{% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <a href="{{ sub_topic.get_absolute_url }}">{{ sub_topic }}</a>
+                        <input type="submit" value="{% trans "Unsubscribe" %}">
+                    </form>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock content %}

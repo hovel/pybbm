@@ -17,9 +17,7 @@
 {% endblock %}
 
 {% block breadcrumb %}
-    {% with object=topic %}
-        {% include "pybb/breadcrumb.html" %}
-    {% endwith %}
+    {% include "pybb/breadcrumb.html" with object=topic %}
 {% endblock %}
 
 {% block content %}
@@ -70,11 +68,15 @@
             <a href="{% url 'pybb:merge_topics' %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
             {% endcomment %}
                 {% endif %}
-
-                {% if user.is_subscribed %}
-                    <a href="{% url 'pybb:delete_subscription' topic.id %}?from_topic">{% trans "Unsubscribe" %}</a>
+                {% if user.forum_subscription.type == 2 %}
+                    {% trans 'You already has subscription for each post in forum' %}
                 {% else %}
-                    <a href="{% url 'pybb:add_subscription' topic.id %}">{% trans "Subscribe" %}</a>
+                    <form action="{% if user.is_subscribed %}{% url 'pybb:delete_subscription' topic.id %}{% else %}{% url 'pybb:add_subscription' topic.id %}{% endif %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <a href="{{ sub_topic.get_absolute_url }}">{{ sub_topic }}</a>
+                        <input type="submit" value="{% if user.is_subscribed %}{% trans "Unsubscribe" %}{% else %}{% trans "Subscribe" %}{% endif %}">
+                    </form>
                 {% endif %}
             </div>
         {% endif %}
@@ -93,7 +95,7 @@
                 {% for subscriber in topic.subscribers.all %}
                     {% pybb_get_profile user=subscriber as subscriber_profile %}
                     <a href="{% url 'pybb:user' subscriber.get_username %}">
-                        {{ subscriber.get_display_name }}
+                        {{ subscriber_profile.get_display_name }}
                     </a>
                     {% if not forloop.last %},{% endif %}
                 {% endfor %}

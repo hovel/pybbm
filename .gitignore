@@ -7,3 +7,4 @@ dist
 testdb.sqlite
 test/example/media/pybb_upload
 docs/_build/
+.tox

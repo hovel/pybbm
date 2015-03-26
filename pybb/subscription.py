@@ -19,26 +19,33 @@ if defaults.PYBB_USE_DJANGO_MAILER:
 else:
     from django.core.mail import send_mass_mail
 
+
 def notify_forum_subscribers(topic):
     forum = topic.forum
-    qs = ForumSubscription.objects.exclude(user=topic.user).filter(forum=topic.forum)
-    notifications = qs.filter(type=ForumSubscription.TYPE_NOTIFY)
-    if notifications.count():
-        users = (n.user for n in notifications.select_related('user'))
+    subscriptions = forum.subscriptions.exclude(user=topic.user)\
+                                       .select_related('user')
+    if subscriptions:
+        users = [s.user for s in subscriptions]
         context = {
             'manage_url': reverse('pybb:forum_subscription', kwargs={'pk': forum.id}),
             'topic': topic,
         }
         send_notification(users, 'forum_subscription_email', context)
-    subscriptions = qs.filter(type=ForumSubscription.TYPE_SUBSCRIBE)
-    if subscriptions.count():
-        users = (s.user for s in subscriptions.select_related('user'))
-        topic.subscribers.add(*users)
+
 
 def notify_topic_subscribers(post):
     topic = post.topic
-    users = topic.subscribers.exclude(pk=post.user.pk)
-    if users.count():
+    users = set(topic.subscribers.exclude(pk=post.user.pk))
+
+    # forum subscribers with TYPE_SUBSCRIBE subscription type
+    # already notified in `notify_forum_subscribers` function
+    if post != topic.head:
+        forum_subscribers = {s.user for s in topic.forum.subscriptions.exclude(user=topic.user)\
+                                                                      .filter(type=ForumSubscription.TYPE_SUBSCRIBE)\
+                                                                      .select_related('user')}
+        users = users.union(forum_subscribers)
+
+    if users:
         # Define constants for templates rendering
         context = {
             'delete_url': reverse('pybb:delete_subscription', args=[post.topic.id]),
@@ -46,15 +53,14 @@ def notify_topic_subscribers(post):
         }
         send_notification(users, 'subscription_email', context)
 
-def send_notification(users, template, context={}):
-    if not 'site' in context:
+
+def send_notification(users, template, context=None):
+    if not context:
+        context = {}
+    if 'site' not in context:
         context['site'] = Site.objects.get_current()
     old_lang = translation.get_language()
     from_email = settings.DEFAULT_FROM_EMAIL
-
-    subject = render_to_string('pybb/mail_templates/%s_subject.html' % template, context)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
 
     mails = tuple()
     for user in users:
@@ -69,6 +75,10 @@ def send_notification(users, template, context={}):
 
         lang = util.get_pybb_profile(user).language or settings.LANGUAGE_CODE
         translation.activate(lang)
+
+        subject = render_to_string('pybb/mail_templates/%s_subject.html' % template, context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
 
         context['user'] = user
         message = render_to_string('pybb/mail_templates/%s_body.html' % template, context)

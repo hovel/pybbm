@@ -17,9 +17,9 @@ class Migration(migrations.Migration):
             name='ForumSubscription',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('type', models.PositiveSmallIntegerField(help_text="The auto-subscription works like you manually subscribe to watch each topic :\nyou will receive a notification when a topic will receive an answer. \nIf you choose to be notified only when a new topic is added, you will only be notified once when the topic is created : if its receive answers later, you won't be notified", verbose_name='Subscription type', choices=[(1, 'be notified only when a new topic is added'), (2, 'be auto-subscribed to topics')])),
-                ('forum', models.ForeignKey(related_name='subscriptions+', verbose_name='Subscriptions', to='pybb.Forum')),
-                ('user', models.ForeignKey(related_name='forum_subscriptions+', verbose_name='Subscriber', to=settings.AUTH_USER_MODEL)),
+                ('type', models.PositiveSmallIntegerField(help_text="The auto-subscription works like you manually subscribed to watch each topic:\nyou will be notified when a topic will receive an answer. \nYou can choose to be notified only when a new topic is added. It meansyou will be notified only once when the topic is created: you won't be notified for the answers.", verbose_name='Subscription type', choices=[(1, 'New topics only'), (2, 'All new topics and posts')])),
+                ('forum', models.ForeignKey(related_name='subscriptions', verbose_name='Forum', to='pybb.Forum')),
+                ('user', models.ForeignKey(related_name='forum_subscriptions', verbose_name='Subscriber', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Subscription to forum',
