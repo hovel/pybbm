@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import django
 
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, DatabaseError
@@ -461,8 +460,3 @@ class PollAnswerUser(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.poll_answer.topic, self.user)
-
-
-if django.VERSION[:2] < (1, 7):
-    from pybb import signals
-    signals.setup()

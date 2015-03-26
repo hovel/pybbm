@@ -876,7 +876,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         new_post = Post.objects.order_by('-id')[0]
 
-        # there should only be one email in the outbox (to user2)
+        # there should only be one email in the outbox (to user2) because @example.com are ignored
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to[0], user2.email)
         self.assertTrue([msg for msg in mail.outbox if new_post.get_absolute_url() in msg.body])
@@ -887,6 +887,74 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = client.get(reverse('pybb:delete_subscription', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(user2, self.topic.subscribers.all())
+
+    def test_subscription_perm_mode(self):
+        orig_conf = defaults.PYBB_TOPIC_SUBSCRIBE_MODE
+        defaults.PYBB_TOPIC_SUBSCRIBE_MODE = defaults.SUBSCRIBE_MODE_PERM
+
+        subscribe_topic_permission = Permission.objects.get_by_natural_key('subscribe_topic', 'pybb', 'topic')
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@someserver.com')
+        user2.user_permissions.add(subscribe_topic_permission)
+        user3 = User.objects.create_user(username='user3', password='user3', email='user3@someserver.com')
+        client = Client()
+        
+        client.login(username='user2', password='user2')
+        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(user2, self.topic.subscribers.all())
+
+        client.login(username='user3', password='user3')
+        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
+        self.assertEqual(response.status_code, 403)
+        
+        defaults.PYBB_TOPIC_SUBSCRIBE_MODE = orig_conf
+
+    def test_subscription_disabled(self):
+        """
+        SUBSCRIBE_MODE_DISABLED does not mean that notifications will not be sent :
+        already subscribed users will receive notifications.
+        It's PYBB_DISABLE_NOTIFICATIONS which will disabled notifications.
+        """
+        orig_conf = defaults.PYBB_TOPIC_SUBSCRIBE_MODE
+        defaults.PYBB_TOPIC_SUBSCRIBE_MODE = defaults.SUBSCRIBE_MODE_DISABLED
+
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@someserver.com')
+        client = Client()
+
+        client.login(username='user2', password='user2')
+        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
+        self.assertEqual(response.status_code, 403)
+
+        defaults.PYBB_TOPIC_SUBSCRIBE_MODE = orig_conf
+
+    def test_notifications_disabled(self):
+        orig_conf = defaults.PYBB_DISABLE_NOTIFICATIONS
+        defaults.PYBB_DISABLE_NOTIFICATIONS = True
+
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@someserver.com')
+        user3 = User.objects.create_user(username='user3', password='user3', email='user3@someserver.com')
+        client = Client()
+
+        client.login(username='user2', password='user2')
+        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
+        self.assertEqual(response.status_code, 403)
+
+        self.topic.subscribers.add(user3)
+
+        # create a new reply (with another user)
+        self.client.login(username='zeus', password='zeus')
+        add_post_url = reverse('pybb:add_post', args=[self.topic.id])
+        response = self.client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test subscribtion юникод'
+        response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_post = Post.objects.order_by('-id')[0]
+
+        # there should be no email in the outbox
+        self.assertEqual(len(mail.outbox), 0)
+        
+        defaults.PYBB_DISABLE_NOTIFICATIONS = orig_conf
 
     def test_topic_updated(self):
         topic = Topic(name='etopic', forum=self.forum, user=self.user)

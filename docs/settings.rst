@@ -29,6 +29,22 @@ PYBB_DEFAULT_AUTOSUBSCRIBE
 
 Users will be automatically subscribed to topic when create post in it. (default True)
 
+PYBB_TOPIC_SUBSCRIBE_MODE
+.........................
+
+Available values are defined in pybb.defaults and are:
+
+- ``SUBSCRIBE_MODE_ALL`` : every authenticated user can subscribe to a topic (default value)
+- ``SUBSCRIBE_MODE_PERM`` : only users with ``pybb.subscribe_topic`` permission will be able to subscribe to a topic
+- ``SUBSCRIBE_MODE_DISABLED`` : topic subscriptions are disabled
+
+
+PYBB_DISABLE_NOTIFICATIONS
+..........................
+
+Users won't be able to subscribe to topics and alread subscribed users won't receive
+notifications when a post is added / updated. Default to ``False``.
+
 PYBB_USE_DJANGO_MAILER
 ......................
 
