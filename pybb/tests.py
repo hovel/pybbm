@@ -1352,8 +1352,9 @@ class AttachmentTest(TestCase, SharedTestModule):
         src1 = imgs[0].attrib.get('src')
         src2 = imgs[1].attrib.get('src')
         src3 = imgs[2].attrib.get('src')
-        self.assertEqual(src1, post.attachments.all()[0].file.url)
-        self.assertEqual(src2, post.attachments.all()[1].file.url)
+        attachments = [a for a in post.attachments.order_by('pk')]
+        self.assertEqual(src1, attachments[0].file.url)
+        self.assertEqual(src2, attachments[1].file.url)
         self.assertEqual(src1, src3)
 
     def tearDown(self):
