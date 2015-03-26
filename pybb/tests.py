@@ -903,12 +903,12 @@ class FeaturesTest(TestCase, SharedTestModule):
         user3 = User.objects.create_user(username='user3', password='user3', email='user3@dns.com')
         client = Client()
         client.login(username='user2', password='user2')
-        parser = html.HTMLParser(encoding='utf8')
 
         # Check we have the "Subscribe" link
         response = client.get(reverse('pybb:forum', args=[self.forum.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<a href="%s"' % url)
+        self.assertIn('subscription_form', response.context)
 
         # check anonymous can't subscribe :
         anonymous_client = Client()
@@ -921,16 +921,20 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         response = client.post(url, data={'type': ForumSubscription.TYPE_NOTIFY}, follow=True)
         self.assertRedirects(response, self.forum.get_absolute_url())
-        self.assertIn('Your subscription created successfully', [unicode(m) for m in response.context['messages']])
+        if 'messages' in response.context:
+            self.assertIn('Your subscription created successfully', [unicode(m) for m in response.context['messages']])
+        self.assertEqual(ForumSubscription.objects.get(forum=self.forum, user=user2).type, ForumSubscription.TYPE_NOTIFY)
 
         response = client.post(url, data={'type': ForumSubscription.TYPE_SUBSCRIBE}, follow=True)
         self.assertRedirects(response, self.forum.get_absolute_url())
-        self.assertIn('Your subscription updated successfully', [unicode(m) for m in response.context['messages']])
+        if 'messages' in response.context:
+            self.assertIn('Your subscription updated successfully', [unicode(m) for m in response.context['messages']])
+        self.assertEqual(ForumSubscription.objects.get(forum=self.forum, user=user2).type, ForumSubscription.TYPE_SUBSCRIBE)
 
         response = client.post(url, data={'type': 0, 'next': url}, follow=True)
         self.assertRedirects(response, url)
-        self.assertIn('Your subscription deleted successfully', [unicode(m) for m in response.context['messages']])
-
+        if 'messages' in response.context:
+            self.assertIn('Your subscription deleted successfully', [unicode(m) for m in response.context['messages']])
         self.assertEqual(ForumSubscription.objects.count(), 0)
 
         topic1 = Topic.objects.create(name='topic1', forum=self.forum, user=self.user)

@@ -157,7 +157,7 @@ class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
             perms.filter_forums(self.request.user, Forum.objects.all()),
             pk=self.kwargs['pk']
         )
-        self.forum_subscription = self.forum.subscriptions.filter(user=self.request.user).first()
+        self.forum_subscription = self.forum.get_subscription(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         ctx = super(ForumSubscriptionView, self).get_context_data(**kwargs)
@@ -290,8 +290,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
-            self.request.user.forum_subscription = \
-                self.topic.forum.subscriptions.filter(user=self.request.user).first()
+            self.request.user.forum_subscription = self.topic.forum.get_subscription(user=self.request.user)
 
             if perms.may_post_as_admin(self.request.user):
                 ctx['form'] = self.get_admin_post_form_class()(

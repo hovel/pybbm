@@ -116,6 +116,12 @@ class Forum(models.Model):
             parent = parent.parent
         return parents
 
+    def get_subscription(self, user):
+        try:
+            return self.subscriptions.get(user=user)
+        except ForumSubscription.DoesNotExist:
+            return None
+
 
 @python_2_unicode_compatible
 class ForumSubscription(models.Model):
