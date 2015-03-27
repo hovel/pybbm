@@ -118,14 +118,9 @@ class DefaultPermissionHandler(object):
 
     def may_subscribe_topic(self, user, forum):
         """ return True if `user` is allowed to subscribe to a `topic` """
-        if defaults.PYBB_DISABLE_NOTIFICATIONS:
+        if defaults.PYBB_DISABLE_NOTIFICATIONS or defaults.PYBB_DISABLE_SUBSCRIPTIONS:
             return False
-        if defaults.PYBB_TOPIC_SUBSCRIBE_MODE == defaults.SUBSCRIBE_MODE_ALL:
-            return True
-        elif defaults.PYBB_TOPIC_SUBSCRIBE_MODE == defaults.SUBSCRIBE_MODE_PERM:
-            return user.has_perm('pybb.subscribe_topic')
-        else:
-            return False
+        return True
 
     #
     # permission checks on posts
