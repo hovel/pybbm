@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 from django.db.models import Q
 
 from pybb import defaults, util
-from pybb.models import Topic, PollAnswerUser
 
 
 class DefaultPermissionHandler(object):
@@ -94,8 +93,8 @@ class DefaultPermissionHandler(object):
     def may_vote_in_topic(self, user, topic):
         """ return True if `user` may unstick `topic` """
         return (
-            user.is_authenticated() and topic.poll_type != Topic.POLL_TYPE_NONE and not topic.closed and
-            not PollAnswerUser.objects.filter(poll_answer__topic=topic, user=user).exists()
+            user.is_authenticated() and topic.poll_type != topic.POLL_TYPE_NONE and not topic.closed and
+            not user.poll_answers.filter(poll_answer__topic=topic).exists()
         )
 
     def may_create_post(self, user, topic):
@@ -118,9 +117,7 @@ class DefaultPermissionHandler(object):
 
     def may_subscribe_topic(self, user, forum):
         """ return True if `user` is allowed to subscribe to a `topic` """
-        if defaults.PYBB_DISABLE_SUBSCRIPTIONS:
-            return False
-        return True
+        return not defaults.PYBB_DISABLE_SUBSCRIPTIONS
 
     #
     # permission checks on posts

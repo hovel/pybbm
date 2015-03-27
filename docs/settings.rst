@@ -33,9 +33,9 @@ PYBB_DISABLE_SUBSCRIPTIONS
 ..........................
 
 Users won't be able to subscribe to topic. (default : False)
-If you want to have a more advanced mode than enable / disable and use permissions for exemple,
-you juste have to overwrite the "can_subscribe_topic" method of the Permission handler.
-If you disabled topic subscriptions, already subscribed users will still receive notification :
+If you want to have a more advanced mode than enable / disable (for example, use model permissions),
+you just have to overwrite the "may_subscribe_topic" method of the Permission handler.
+If you disabled topic subscriptions, already subscribed users will still receive notifications:
 see ``PYBB_DISABLE_NOTIFICATIONS`` to stop notifications sending.
 
 
@@ -44,7 +44,7 @@ PYBB_DISABLE_NOTIFICATIONS
 
 Users which have subscribed to a topic won't receive notifications but still be able to subscribe
 to topics. See ``PYBB_DISABLE_NOTIFICATIONS`` to disable topic subscription too.
-This is usefull if you want to to use your own notification system for e.g.
+This is usefull if you want to to use your own notification system
 Default to ``False``.
 
 PYBB_USE_DJANGO_MAILER
