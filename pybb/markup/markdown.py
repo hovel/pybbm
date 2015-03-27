@@ -22,7 +22,6 @@ class MarkdownWidget(Textarea):
             'markitup/jquery.markitup.js',
             'markitup/sets/markdown/set.js',
             'pybb/js/markitup.js',
-            'pybb/js/pybbjs.js',
         )
 
     def render(self, *args, **kwargs):

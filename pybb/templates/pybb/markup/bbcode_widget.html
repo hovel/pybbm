@@ -36,18 +36,18 @@ if(!window.pybb.get_markitup_settings){
     };
 }
 
-if(!window.pybb.markup){
+if (!window.pybb.markup) {
     /*
-    This object will be used to perform some action specific to the current Markup engine.
-    eg : quote button, SHIT + click on an username, etc.
-    */
+     This object will be used to perform some action specific to the current Markup engine.
+     eg : quote button, SHIT + click on an username, etc.
+     */
     window.pybb.markup = {
-        quote: function(text, username){
-            return '[quote'+(username ? ('="'+username+'"'):'')+']' + text + '[/quote]\n';
+        quote: function (text, username) {
+            return '[quote' + (username ? ('="' + username + '"') : '') + ']' + text + '[/quote]\n';
         },
-        username: function(username){
+        username: function (username) {
             return '[b]' + username + '[/b], ';
-        },
+        }
     }
 }
 </script>
