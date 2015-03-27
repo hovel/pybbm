@@ -5,6 +5,7 @@ import django
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now as tznow
@@ -80,15 +81,18 @@ class Forum(models.Model):
         return self.name
 
     def update_counters(self):
-        posts = Post.objects.filter(topic__forum_id=self.id)
-        self.post_count = posts.count()
         self.topic_count = Topic.objects.filter(forum=self).count()
-        try:
-            last_post = posts.order_by('-created', '-id')[0]
-            self.updated = last_post.updated or last_post.created
-        except IndexError:
-            pass
-
+        if self.topic_count:
+            posts = Post.objects.filter(topic__forum_id=self.id)
+            self.post_count = posts.count()
+            if self.post_count:
+                try:
+                    last_post = posts.order_by('-created', '-id')[0]
+                    self.updated = last_post.updated or last_post.created
+                except IndexError:
+                    pass
+        else:
+            self.post_count = 0
         self.save()
 
     def get_absolute_url(self):
@@ -98,7 +102,7 @@ class Forum(models.Model):
     def posts(self):
         return Post.objects.filter(topic__forum=self).select_related()
 
-    @property
+    @cached_property
     def last_post(self):
         try:
             return self.posts.order_by('-created', '-id')[0]
@@ -153,29 +157,26 @@ class Topic(models.Model):
     def __str__(self):
         return self.name
 
-    @property
+    @cached_property
     def head(self):
-        """
-        Get first post and cache it for request
-        """
-        if not hasattr(self, "_head"):
-            self._head = self.posts.all().order_by('created', 'id')
-        if not len(self._head):
+        try:
+            return self.posts.all().order_by('created', 'id')[0]
+        except IndexError:
             return None
-        return self._head[0]
 
-    @property
+    @cached_property
     def last_post(self):
-        if not getattr(self, '_last_post', None):
-            self._last_post = self.posts.order_by('-created', '-id').select_related('user')[0]
-        return self._last_post
+        try:
+            return self.posts.order_by('-created', '-id').select_related('user')[0]
+        except IndexError:
+            return None
 
     def get_absolute_url(self):
         return reverse('pybb:topic', kwargs={'pk': self.id})
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.created = tznow()
+            self.created = self.updated = tznow()
 
         forum_changed = False
         old_topic = None
@@ -196,8 +197,11 @@ class Topic(models.Model):
 
     def update_counters(self):
         self.post_count = self.posts.count()
-        last_post = Post.objects.filter(topic_id=self.id).order_by('-created', '-id')[0]
-        self.updated = last_post.updated or last_post.created
+        # force cache overwrite to get the real latest updated post
+        if hasattr(self, 'last_post'):
+            del self.last_post
+        if self.last_post:
+            self.updated = self.last_post.updated or self.last_post.created
         self.save()
 
     def get_parents(self):

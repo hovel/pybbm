@@ -151,6 +151,48 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Topic.objects.filter(name='new topic name').exists())
 
+    def test_topic_read_before_post_addition(self):
+        """
+        Test if everything is okay when :
+            - user A create the topic
+            - but before associated post is created, user B display the forum
+        """
+        topic = Topic(name='xtopic', forum=self.forum, user=self.user)
+        topic.save()
+        #topic is saved, but post is not yet created at this time
+
+        #an other user is displaing the forum before the post creation
+        user_ann = User.objects.create_user('ann', 'ann@localhost', 'ann')
+        client = Client()
+        client.login(username='ann', password='ann')
+
+        self.assertEqual(client.get(topic.get_absolute_url()).status_code, 404)
+        self.assertEqual(topic.forum.post_count, 1)
+        self.assertEqual(topic.forum.topic_count, 1)
+        #do we need to correct this ?
+        #self.assertEqual(topic.forum.topics.count(), 1)
+        self.assertEqual(topic.post_count, 0)
+        
+        #Now, TopicReadTracker is not created because the topic detail view raise a 404
+        #If its creation is not finished. So we create it manually to add a test, just in case
+        #we have an other way where TopicReadTracker could be set for a not complete topic.
+        TopicReadTracker.objects.create(user=user_ann, topic=topic, time_stamp=topic.created)
+        
+        #before correction, raised TypeError: can't compare datetime.datetime to NoneType
+        pybb_topic_unread([topic,], user_ann)
+        
+        #before correction, raised IndexError: list index out of range
+        last_post = topic.last_post
+        
+        #post creation now.
+        Post(topic=topic, user=self.user, body='one').save()
+        
+        self.assertEqual(client.get(topic.get_absolute_url()).status_code, 200)
+        self.assertEqual(topic.forum.post_count, 2)
+        self.assertEqual(topic.forum.topic_count, 2)
+        self.assertEqual(topic.forum.topics.count(), 2)
+        self.assertEqual(topic.post_count, 1)
+
     def test_post_deletion(self):
         post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[/b]')
         post.save()
@@ -1017,6 +1059,7 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.category = Category.objects.create(name='foo')
         self.forum = Forum.objects.create(name='xfoo', description='bar', category=self.category)
         self.topic = Topic.objects.create(name='etopic', forum=self.forum, user=self.user)
+        self.post = Post.objects.create(body='body post', topic=self.topic, user=self.user)
         add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
         self.user.user_permissions.add(add_post_permission)
 
