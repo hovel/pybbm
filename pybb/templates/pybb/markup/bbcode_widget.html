@@ -3,7 +3,6 @@
 
 {{ widget_output }}
 
-
 <script type="text/javascript">
 if(!window.pybb){
     window.pybb = {};
@@ -35,5 +34,20 @@ if(!window.pybb.get_markitup_settings){
         ];
         return mySettings ;
     };
+}
+
+if (!window.pybb.markup) {
+    /*
+     This object will be used to perform some action specific to the current Markup engine.
+     eg : quote button, SHIT + click on an username, etc.
+     */
+    window.pybb.markup = {
+        quote: function (text, username) {
+            return '[quote' + (username ? ('="' + username + '"') : '') + ']' + text + '[/quote]\n';
+        },
+        username: function (username) {
+            return '[b]' + username + '[/b], ';
+        }
+    }
 }
 </script>

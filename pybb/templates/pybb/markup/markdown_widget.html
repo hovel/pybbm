@@ -41,4 +41,26 @@ if(!window.pybb.get_markitup_settings){
         return mySettings ;
     };
 }
+
+if (!window.pybb.markup) {
+    /*
+     This object will be used to perform some action specific to the current Markup engine.
+     eg : quote button, SHIT + click on an username, etc.
+     */
+    window.pybb.markup = {
+        quote: function (text, username) {
+            var output = '';
+            if (username) {
+                output += '> **' + username + '**: ';
+            } else {
+                output += '> ';
+            }
+            output += text.replace(/\n/g, '  \n> ');
+            return output;
+        },
+        username: function (username) {
+            return '**' + username + '**, ';
+        }
+    }
+}
 </script>
