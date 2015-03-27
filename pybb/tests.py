@@ -859,8 +859,14 @@ class FeaturesTest(TestCase, SharedTestModule):
         user2 = User.objects.create_user(username='user2', password='user2', email='user2@someserver.com')
         user3 = User.objects.create_user(username='user3', password='user3', email='user3@example.com')
         client = Client()
+
         client.login(username='user2', password='user2')
-        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
+        subscribe_url = reverse('pybb:add_subscription', args=[self.topic.id])
+        response = client.get(self.topic.get_absolute_url())
+        subscribe_links = html.fromstring(response.content).xpath('//a[@href="%s"]' % subscribe_url)
+        self.assertEqual(len(subscribe_links), 1)
+
+        response = client.get(subscribe_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(user2, self.topic.subscribers.all())
 
@@ -897,7 +903,12 @@ class FeaturesTest(TestCase, SharedTestModule):
         client = Client()
 
         client.login(username='user2', password='user2')
-        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
+        subscribe_url = reverse('pybb:add_subscription', args=[self.topic.id])
+        response = client.get(self.topic.get_absolute_url())
+        subscribe_links = html.fromstring(response.content).xpath('//a[@href="%s"]' % subscribe_url)
+        self.assertEqual(len(subscribe_links), 0)
+        
+        response = client.get(subscribe_url, follow=True)
         self.assertEqual(response.status_code, 403)
 
         self.topic.subscribers.add(user3)
@@ -912,7 +923,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         new_post = Post.objects.order_by('-id')[0]
 
-        # there should be no email in the outbox
+        # there should be one email in the outbox (user3)
         #because already subscribed users will still receive notifications.
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to[0], user3.email)
@@ -928,8 +939,12 @@ class FeaturesTest(TestCase, SharedTestModule):
         client = Client()
 
         client.login(username='user2', password='user2')
-        response = client.get(reverse('pybb:add_subscription', args=[self.topic.id]), follow=True)
-        self.assertEqual(response.status_code, 403)
+        subscribe_url = reverse('pybb:add_subscription', args=[self.topic.id])
+        response = client.get(self.topic.get_absolute_url())
+        subscribe_links = html.fromstring(response.content).xpath('//a[@href="%s"]' % subscribe_url)
+        self.assertEqual(len(subscribe_links), 1)
+        response = client.get(subscribe_url, follow=True)
+        self.assertEqual(response.status_code, 200)
 
         self.topic.subscribers.add(user3)
 

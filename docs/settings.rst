@@ -42,8 +42,10 @@ see ``PYBB_DISABLE_NOTIFICATIONS`` to stop notifications sending.
 PYBB_DISABLE_NOTIFICATIONS
 ..........................
 
-Users won't be able to subscribe to topics and alread subscribed users won't receive
-notifications anymore when a post is added / updated. Default to ``False``.
+Users which have subscribed to a topic won't receive notifications but still be able to subscribe
+to topics. See ``PYBB_DISABLE_NOTIFICATIONS`` to disable topic subscription too.
+This is usefull if you want to to use your own notification system for e.g.
+Default to ``False``.
 
 PYBB_USE_DJANGO_MAILER
 ......................
