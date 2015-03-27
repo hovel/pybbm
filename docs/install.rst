@@ -156,7 +156,7 @@ Templates
 
 Check that:
 
-* Your templates directory contains the "base.html" template. Otherwise, set a custom base template with ``PYBB_TEMPLATE``.
+* Your templates directory contains the "base.html" template. Otherwise, set a custom base template with :ref:`PYBB_TEMPLATE`.
 
 * Basic template contains at least a ``content`` block.
 

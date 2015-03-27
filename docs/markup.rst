@@ -10,8 +10,8 @@ as simple text to prevent XSS attacks.
 
 Pybbm includes two default engines. Actions needed to use these engines:
 
-    - bbcode engine: install required package with ``pip install bbcode`` command and set PYBB_MARKUP to ``'bbcode'``
-    - markdown engine: install required package with ``pip install markdown`` command and set PYBB_MARKUP to ``'markdown'``
+    - bbcode engine: install required package with ``pip install bbcode`` command and set :ref:`PYBB_MARKUP` to ``'bbcode'``
+    - markdown engine: install required package with ``pip install markdown`` command and set :ref:`PYBB_MARKUP` to ``'markdown'``
 
 Engine classes must inherit from `pybb.markup.base.BaseParser` 
 which defines three required methods:
@@ -41,7 +41,7 @@ For example, for adding additional formatter to bbcode parser you can write your
             self._parser.add_simple_formatter('li', '<li>%(value)s</li>', transform_newlines=False, strip=True)
 
 
-include it in ``PYBB_MARKUP_ENGINES_PATHS`` setting dict and point pybbm to use it by ``PYBB_MARKUP`` setting::
+include it in :ref:`PYBB_MARKUP_ENGINES_PATHS` setting dict and point pybbm to use it by :ref:`PYBB_MARKUP` setting::
 
     PYBB_MARKUP_ENGINES_PATHS = {'custom_bbcode': 'myproject.markup_engines.CustomBBCodeParser'}
     PYBB_MARKUP = 'custom_bbcode'

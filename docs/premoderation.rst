@@ -16,7 +16,7 @@ For example, next filter allow to post without pre-moderation only for superuser
             return True
         return False
 
-Told pybbm to use this function by setting `PYBB_PREMODERATION` in settings::
+Told pybbm to use this function by setting :ref:`PYBB_PREMODERATION` in settings::
 
     PYBB_PREMODERATION = check_superuser
 

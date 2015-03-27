@@ -7,6 +7,8 @@ PyBBM Changelog
 * All topic/post/poll related forms can be overrided when custom view inherites pybbm view
 * Demo data for example projects
 * Using active markup engine when quoting posts via javascript
+* Functionality to support disabling default pybbm subscriptions and notifications and
+  new settings: :ref:`PYBB_DISABLE_SUBSCRIPTIONS` and :ref:`PYBB_DISABLE_NOTIFICATIONS`
 
 0.16 -> 0.16.1
 --------------
@@ -65,7 +67,7 @@ PyBBM Changelog
 0.14.8 -> 0.14.9
 ----------------
 * Two new methods added to permission handler: `may_attach_files` and `may_create_poll`. First method used for
-  restrict attaching files to post by user. By default it depends on `PYBB_ATTACHMENT_ENABLE` setting.
+  restrict attaching files to post by user. By default it depends on :ref:`PYBB_ATTACHMENT_ENABLE` setting.
   Second may be used to restrict some users to create/edit polls. By default it always return `True`.
   For disabling polls on your forum, just write custom permission handler and return from this method `False`
 
@@ -85,7 +87,7 @@ PyBBM Changelog
 0.14.5 -> 0.14.6
 ----------------
 * Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
-  This value can be changed by setting `PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
+  This value can be changed by setting :ref:`PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
   `pybbm_calc_topic_views` that calc actual views count for topic
 * Fix for migration that may fails on clean mysql installation
 * Fixed perfomance issue with feed views
@@ -132,7 +134,7 @@ PyBBM Changelog
 
 * You can add first-unread get parameter to the topic url to provide link to first unread post from topic
 * Removed django-mailer, pytils, sorl-thumbnail, south, django-pure-pagination from hard dependencies
-* Support Custom User model introduced in django 1.5. Do not forget to define `PYBB_PROFILE_RELATED_NAME`
+* Support Custom User model introduced in django 1.5. Do not forget to define :ref:`PYBB_PROFILE_RELATED_NAME`
   in settings, if you don't use predefined `pybb.PybbProfile` model See :doc:`how to use custom user model
   with pybbm</customuser>`
 * Dropped support for django 1.3
@@ -146,13 +148,13 @@ PyBBM Changelog
   Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
 * Additional template for markitup preview
   You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
-* Improved permissions handling see `PYBB_PERMISSION_HANDLER` setting in :doc:`settings</settings>`
+* Improved permissions handling see :ref:`PYBB_PERMISSION_HANDLER` setting in :doc:`settings</settings>`
 * Fixed bugs and improved performance
 
 0.12.3 -> 0.12.4
 ----------------
 
-* `PYBB_USE_DJANGO_MAILER` setting
+* :ref:`PYBB_USE_DJANGO_MAILER` setting
 
 0.12.2 -> 0.12.3
 ----------------
@@ -172,7 +174,7 @@ PyBBM Changelog
 ------------
 
 * Ability to override standard message when user doesn't login and not alowed anonymous posts by
-  ``PYBB_ENABLE_ANONYMOUS_POST`` setting. It may be useful when project doesn't have ``registration_register``
+  :ref:`PYBB_ENABLE_ANONYMOUS_POST` setting. It may be useful when project doesn't have ``registration_register``
   and/or ``auth_login`` url names in ``urls.py``
 
 * Content in each ``topic.html`` and ``forum.html`` is wrapped in ``<div>`` tag with ``topic`` and ``forum`` classes
@@ -187,7 +189,7 @@ PyBBM Changelog
     * `example_bootstrap` shows how to include bootstrap files in your project
     * `example_thirdparty` shows how to use another project like `pinax-theme-bootstrap <https://github.com/pinax/pinax-theme-bootstrap>`_ to style forum
 * New poll feature added. When user creates new topic he can add poll question and some answers. Answers count
-  can vary from 2 to PYBB_POLL_MAX_ANSWERS setting (10 by default)
+  can vary from 2 to :ref:`PYBB_POLL_MAX_ANSWERS` setting (10 by default)
 * Dropped support for self containing CSS in pybb.css file and PYBB_ENABLE_SELF_CSS setting.
 
 0.8 -> 0.9
@@ -200,7 +202,7 @@ css styling methods are not enough.
 0.6 -> 0.7
 ----------
 
-If you use custom BODY_CLEANER in your settings, rename this setting to PYBB_BODY_VALIDATOR
+If you use custom BODY_CLEANER in your settings, rename this setting to :ref:`PYBB_BODY_VALIDATOR`
 
 0.5 -> 0.6
 ----------
@@ -208,7 +210,7 @@ If you use custom BODY_CLEANER in your settings, rename this setting to PYBB_BOD
 Version 0.6 has significant changes in template subsystem, with main goal to make them more configurable and simple.
 
 * CSS now not included with project.
-    * For a limited time legacy `pybb.css` can be enabled by activating `PYBB_ENABLE_SELF_CSS` settings (just set it for True).
+    * For a limited time legacy `pybb.css` can be enabled by activating :ref:`PYBB_ENABLE_SELF_CSS` settings (just set it for True).
 * Twitter bootstrap now included in project tree
 * Default templates now provide fine theme with twitter bootstrap, corresponded .less file 'pybb_bootstrap.less'
   and builded `pybb_bootstrap.css` can be located in static. You can find example of usage in test directory.
@@ -217,4 +219,4 @@ Version 0.6 has significant changes in template subsystem, with main goal to mak
     * pagination template changed from plain links to ul/li list
     * breadcrumb now live in separated template and changed from plain links to ul/li list
     * `add_post_form.html` template renamed to `post_form.html`
-* PYBB_FORUM_PAGE_SIZE default value changed from 10 to 20
+* :ref:`PYBB_FORUM_PAGE_SIZE` default value changed from 10 to 20
