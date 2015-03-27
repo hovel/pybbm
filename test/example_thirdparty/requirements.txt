@@ -12,4 +12,4 @@ pytils>=0.2.3
 django-simple-captcha
 pinax-theme-bootstrap==4.0
 django-bootstrap-form
-git+https://github.com/pinax/django-user-accounts.git
+django-user-accounts

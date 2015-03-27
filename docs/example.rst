@@ -14,30 +14,15 @@ We recommend to use ``example_thirdparty`` to start with. If you starting from s
 Running the example projects
 ----------------------------
 
-The ``example_bootstrap`` project requires the following dependencies:
-
-* ``pybbm``
-* ``south``
-* ``django-registration``
-
-You can do it by running this command::
-
-    pip install pybbm south django-registration
-
-or with easy_install::
-
-    easy_install pybbm south django-registration
-
-The ``example_thirdparty`` project requires the following dependencies:
-
-* ``pybbm``
-* ``south``
-* ``django-user-accounts``
-* ``pinax-theme-bootstrap``
-
-Example directory contains requirements.txt file, you can run::
+Each example directory contains requirements.txt file, you can run::
 
     pip install -r requirements.txt
 
 to install all dependencies.
 
+Also `example_bootstrap/fixtures` directory contains `demo_data.json` fiel with some example data.
+You can run::
+
+    python manage.py loaddata <path to example_bootstrap>/fixtures/demo_data.json
+
+from root directory to load some models in you database.
