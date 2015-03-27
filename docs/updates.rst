@@ -6,6 +6,7 @@ PyBBM Changelog
 * Topic and post creation wrapped in transaction
 * All topic/post/poll related forms can be overrided when custom view inherites pybbm view
 * Demo data for example projects
+* Using active markup engine when quoting posts via javascript
 
 0.16 -> 0.16.1
 --------------
