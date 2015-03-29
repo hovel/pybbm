@@ -1,8 +1,13 @@
 from __future__ import unicode_literals
+
 import django
+from django.core.urlresolvers import reverse
+from django.db import models
+
+from pybb.compat import get_user_model_path, get_username_field
+from pybb.profiles import PybbProfile
 
 if django.VERSION[:2] >= (1, 5):
-    from django.db import models
     from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
     from django.utils import timezone
 
@@ -31,3 +36,20 @@ if django.VERSION[:2] >= (1, 5):
 
         class Meta:
             abstract = False
+
+
+class CustomProfile(PybbProfile):
+    user = models.OneToOneField(get_user_model_path(),
+        verbose_name='linked account',
+        related_name='pybb_customprofile',
+        blank=False, null=False,)
+
+    class Meta(object):
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'
+
+    def get_absolute_url(self):
+        return reverse('pybb:user', kwargs={'username': getattr(self.user, get_username_field())})
+
+    def get_display_name(self):
+        return self.user.get_username()
