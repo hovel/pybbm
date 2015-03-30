@@ -1134,6 +1134,10 @@ class FeaturesTest(TestCase, SharedTestModule):
                 )
             )
 
+        # test the permission to acces the page
+        response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': self.user.username}))
+        self.assertEqual(response.status_code, 403)
+
         add_moderator_permission = Permission.objects.get_by_natural_key('change_forum','pybb','forum')
         self.user.user_permissions.add(add_moderator_permission)
 
@@ -1150,7 +1154,6 @@ class FeaturesTest(TestCase, SharedTestModule):
                 )
             )
 
-        # test the permission to acces the page
         response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': moderator.username}))
         self.assertEqual(response.status_code, 200)
 

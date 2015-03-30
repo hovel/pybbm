@@ -261,19 +261,35 @@ class PollForm(forms.Form):
 class ModeratorForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
+
+        """
+        Create the form to grant moderator privileges, checking if the request user has the 
+        permission to do so.
+
+        :param user: request user
+        """
+
         super(ModeratorForm, self).__init__(*args, **kwargs)
         categories = Category.objects.all()
         for category in categories:
             forums = [forum.pk for forum in category.forums.all() if perms.may_change_forum(user, forum)]
-            self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
-                label=category.name,
-                queryset=category.forums.filter(pk__in=forums),
-                widget=forms.CheckboxSelectMultiple(),
-                required=False
-            )
+            if forums:
+                self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
+                    label=category.name,
+                    queryset=category.forums.filter(pk__in=forums),
+                    widget=forms.CheckboxSelectMultiple(),
+                    required=False
+                )
         if not self.fields:
             raise PermissionDenied()
 
     def process(self, target_user):
+        """
+        Update the target user moderator privilesges
+
+        :param target_user: user to update
+        """
+
+
         forums = self.cleaned_data.values()
         target_user.forum_set = [forum for queryset in forums for forum in queryset]
