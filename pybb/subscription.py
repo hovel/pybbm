@@ -10,13 +10,7 @@ from django.contrib.sites.models import Site
 
 from pybb import defaults, util, compat
 
-if defaults.PYBB_USE_DJANGO_MAILER:
-    try:
-        from mailer import send_mass_mail
-    except ImportError:
-        from django.core.mail import send_mass_mail
-else:
-    from django.core.mail import send_mass_mail
+from pybb.compat import send_mass_html_mail
 
 
 def notify_topic_subscribers(post):
@@ -28,14 +22,20 @@ def notify_topic_subscribers(post):
         delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
         current_site = Site.objects.get_current()
         from_email = settings.DEFAULT_FROM_EMAIL
+        context = {
+            'post': post,
+            'post_url': 'http://%s%s' % (current_site, post.get_absolute_url()),
+            'topic_url': 'http://%s%s' % (current_site, post.topic.get_absolute_url()),
+            'delete_url_full': 'http://%s%s' % (current_site, delete_url),
 
-        subject = render_to_string('pybb/mail_templates/subscription_email_subject.html',
-                                   {'site': current_site,
-                                    'post': post})
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
+            #backward compat only. TODO Delete those vars in next major release
+            #and rename delete_url_full with delete_url for consistency
+            'site': current_site,
+            'delete_url': delete_url,
+        }
+        base_tpl = 'pybb/mail_templates/subscription_email_'
 
-        mails = tuple()
+        mails = []
         for user in topic.subscribers.exclude(pk=post.user.pk):
             try:
                 validate_email(user.email)
@@ -48,16 +48,19 @@ def notify_topic_subscribers(post):
 
             lang = util.get_pybb_profile(user).language or settings.LANGUAGE_CODE
             translation.activate(lang)
-
-            message = render_to_string('pybb/mail_templates/subscription_email_body.html',
-                                       {'site': current_site,
-                                        'post': post,
-                                        'delete_url': delete_url,
-                                        'user': user})
-            mails += ((subject, message, from_email, [user.email]),)
+            subject = render_to_string('%ssubject.html' % base_tpl, context)
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
+            context.update({
+                'user': user,
+                'subject': subject,
+            })
+            txt_message = render_to_string('%sbody.html' % base_tpl, context)
+            html_message = render_to_string('%sbody-html.html' % base_tpl, context)
+            mails.append((subject, txt_message, from_email, [user.email], html_message))
 
         # Send mails
-        send_mass_mail(mails, fail_silently=True)
+        send_mass_html_mail(mails, fail_silently=True)
 
         # Reactivate previous language
         translation.activate(old_lang)

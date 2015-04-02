@@ -1,0 +1,26 @@
+{% load i18n pybb_tags %}
+{% pybb_get_profile user=post.user as profile %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--
+Template basé sur le modèle proposé par alsacreations.com :
+http://www.alsacreations.com/tuto/lire/1533-un-e-mail-en-html-responsive-multi-clients.html
+-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{{ subject|default:'Email' }}</title>
+</head>
+<body style="margin:0px; padding:0px;">
+{% with link_end='</a>'|safe %}
+    <p>
+        {% blocktrans with username=profile.get_display_name %}User {{ username }} replied in topic to which you are subscribed.{% endblocktrans%}
+    </p>
+    <p>
+         {% blocktrans with topic_name=post.topic.name link_post_start='<a href="'|add:post_url|add:'">'|safe link_topic_start='<a href="'|add:topic_url|add:'">'|safe %}Follow {{ link_post_start }}this link{{ link_end }} to see the new post on the topic {{ link_topic_start }}{{ topic_name }}{{ link_end }}.{% endblocktrans%}
+    </p>
+
+    <hr />
+    {% blocktrans with link_start='<a href="'|add:delete_url_full|add:'">'|safe %}If you don't want to receive notifications on new posts in this topic visit following {{ link_start}} this link{{ link_end }}.{% endblocktrans%}
+{% endwith %}
+</body>
+</html>
