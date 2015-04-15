@@ -271,9 +271,11 @@ class ModeratorForm(forms.Form):
 
         super(ModeratorForm, self).__init__(*args, **kwargs)
         categories = Category.objects.all()
+        self.authorized_forums = []
         for category in categories:
             forums = [forum.pk for forum in category.forums.all() if perms.may_change_forum(user, forum)]
             if forums:
+                self.authorized_forums += forums
                 self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
                     label=category.name,
                     queryset=category.forums.filter(pk__in=forums),
@@ -285,11 +287,16 @@ class ModeratorForm(forms.Form):
 
     def process(self, target_user):
         """
-        Update the target user moderator privilesges
+        Updates the target user moderator privilesges
 
         :param target_user: user to update
         """
 
+        cleaned_forums = self.cleaned_data.values()
+        initial_forum_set = target_user.forum_set.all()
+        # concatenation of the lists into one
+        checked_forums = [forum for queryset in cleaned_forums for forum in queryset]
+        # keep all the forums, the request user does't have the permisssion to change
+        untouchable_forums = [forum for forum in initial_forum_set if forum.pk not in self.authorized_forums]
+        target_user.forum_set = checked_forums + untouchable_forums
 
-        forums = self.cleaned_data.values()
-        target_user.forum_set = [forum for queryset in forums for forum in queryset]
