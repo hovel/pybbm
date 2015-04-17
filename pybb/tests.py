@@ -1114,52 +1114,37 @@ class FeaturesTest(TestCase, SharedTestModule):
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
 
     def test_managing_forums(self):
+        _attach_perms_class('pybb.tests.CustomPermissionHandler')
         forum2 = Forum.objects.create(name='foo2', description='bar2', category=self.category)
         Forum.objects.create(name='foo3', description='bar3', category=self.category)
         moderator = User.objects.create_user('moderator', 'moderator@localhost', 'moderator')
-        Post.objects.create(topic=self.topic, user=moderator, body='test')
         self.login_client()
 
-        #test the visibility of the button
+        #test the visibility of the button and the access to the page
         response = self.client.get(reverse('pybb:user', kwargs={'username': moderator.username}))
         self.assertNotContains(
             response, '<a href="%s"' % reverse(
                     'pybb:edit_privileges', kwargs={'username': moderator.username}
                 )
             )
-        response = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
-        self.assertNotContains(
-            response, '<a href="%s"' % reverse(
-                    'pybb:edit_privileges', kwargs={'username': self.user.username}
-                )
-            )
-
-        # test the permission to acces the page
-        response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': self.user.username}))
+        response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': moderator.username}))
         self.assertEqual(response.status_code, 403)
-
-        add_moderator_permission = Permission.objects.get_by_natural_key('change_forum','pybb','forum')
-        self.user.user_permissions.add(add_moderator_permission)
-
+        add_change_forum_permission = Permission.objects.get_by_natural_key('change_forum','pybb','forum')
+        self.user.user_permissions.add(add_change_forum_permission)
+        self.user.is_staff = True
+        self.user.save()
         response = self.client.get(reverse('pybb:user', kwargs={'username': moderator.username}))
         self.assertContains(
             response, '<a href="%s"' % reverse(
                     'pybb:edit_privileges', kwargs={'username': moderator.username}
                 )
             )
-        response = self.client.get(reverse('pybb:user', kwargs={'username': self.user.username}))
-        self.assertContains(
-            response, '<a href="%s"' % reverse(
-                    'pybb:edit_privileges', kwargs={'username': self.user.username}
-                )
-            )
-
         response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': moderator.username}))
         self.assertEqual(response.status_code, 200)
 
         # test if there are as many chechkboxs as forums in the category
         inputs = dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % "privileges-edit")[0].inputs)
-        self.assertEqual(len(self.category.forums.all()),len(inputs['cat_%d' % self.category.pk]))
+        self.assertEqual(len(response.context['form'].authorized_forums),len(inputs['cat_%d' % self.category.pk]))
 
         # test to add user as moderator
         values = self.get_form_values(response, "privileges-edit")
@@ -1178,14 +1163,14 @@ class FeaturesTest(TestCase, SharedTestModule):
             )
         self.assertEqual(response.status_code, 200)
         self.assertEqual([self.forum, ], [forum for forum in moderator.forum_set.all()])
-
         values['cat_%d' % self.category.pk] = []
         response = self.client.post(
                 reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
             )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(0, moderator.forum_set.count())
-        self.user.user_permissions.remove(add_moderator_permission)
+        self.user.user_permissions.remove(add_change_forum_permission)
+        _detach_perms_class()
 
 
 class AnonymousTest(TestCase, SharedTestModule):
@@ -1660,6 +1645,8 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     def may_edit_topic_slug(self, user):
         return True
 
+    def may_change_forum(self, user, forum):
+        return not forum.pk % 3 == 0
 
 class MarkupParserTest(TestCase, SharedTestModule):
 

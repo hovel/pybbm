@@ -10,9 +10,8 @@ from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
 
-from pybb import compat, defaults, util
+from pybb import compat, defaults, util, permissions
 from pybb.models import Topic, Post, Attachment, PollAnswer, Category
-from pybb.permissions import perms
 
 
 User = compat.get_user_model()
@@ -272,8 +271,10 @@ class ModeratorForm(forms.Form):
         super(ModeratorForm, self).__init__(*args, **kwargs)
         categories = Category.objects.all()
         self.authorized_forums = []
+        if not permissions.perms.may_manage_moderators(user):
+            raise PermissionDenied()
         for category in categories:
-            forums = [forum.pk for forum in category.forums.all() if perms.may_change_forum(user, forum)]
+            forums = [forum.pk for forum in category.forums.all() if permissions.perms.may_change_forum(user, forum)]
             if forums:
                 self.authorized_forums += forums
                 self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
@@ -282,8 +283,6 @@ class ModeratorForm(forms.Form):
                     widget=forms.CheckboxSelectMultiple(),
                     required=False
                 )
-        if not self.fields:
-            raise PermissionDenied()
 
     def process(self, target_user):
         """
@@ -299,4 +298,3 @@ class ModeratorForm(forms.Form):
         # keep all the forums, the request user does't have the permisssion to change
         untouchable_forums = [forum for forum in initial_forum_set if forum.pk not in self.authorized_forums]
         target_user.forum_set = checked_forums + untouchable_forums
-
