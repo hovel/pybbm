@@ -3,23 +3,21 @@
 <div class="avatar">
     {% pybb_get_profile user=user as user_profile %}
     <a href="{{ user_profile.get_absolute_url }}">
-        {% if_has_tag thumbnail empty %}
-            {% thumbnail user_profile.avatar PYBB_AVATAR_DIMENSIONS as avatar %}
-                <img src="{{ avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" />
-            {% empty %}
-                <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" />
-            {% endthumbnail %}
-        {% else %}
-            {% if_has_tag thumbnail %}
-                {% thumbnail user_profile.avatar|default:PYBB_DEFAULT_AVATAR_URL PYBB_AVATAR_DIMENSIONS as avatar %}
-                <img src="{{ avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" />
+        {% if user_profile.avatar %}
+            {% if_has_tag thumbnail empty %}
+                {% thumbnail user_profile.avatar PYBB_AVATAR_DIMENSIONS as avatar %}
+                    <img src="{{ avatar.url }}" alt="{{ user_profile.get_display_name }} avatar"/>
+                {% endthumbnail %}
             {% else %}
-                {% if user_profile.avatar %}
-                    <img src="{{ user_profile.avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
+                {% if_has_tag thumbnail %}
+                    {% thumbnail user_profile.avatar|default:PYBB_DEFAULT_AVATAR_URL PYBB_AVATAR_DIMENSIONS as avatar %}
+                    <img src="{{ avatar.url }}" alt="{{ user_profile.get_display_name }} avatar"/>
                 {% else %}
-                    <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
-                {% endif %}
-            {% endif_has_tag %}
-        {% endif_has_tag %}
+                    <img src="{{ user_profile.avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}"/>
+                {% end_if_has_tag %}
+            {% end_if_has_tag %}
+        {% else %}
+            <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="default avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}"/>
+        {% endif %}
     </a>
 </div>
