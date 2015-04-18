@@ -1,7 +1,10 @@
-django>=1.6,<1.7
+django>=1.7,<1.8
 
-#exemple_bootstrap dependencies
-django-registration
+#required to use with django<1.7
+#south
+
+#example_bootstrap dependencies
+django-registration-redux
 
 #pybb strong dependencies
 django-annoying

@@ -10,6 +10,7 @@ PyBBM Changelog
 * Functionality to support disabling default pybbm subscriptions and notifications and
   new settings: :ref:`PYBB_DISABLE_SUBSCRIPTIONS` and :ref:`PYBB_DISABLE_NOTIFICATIONS`
 * Fixed easy_thumbnail compatibility in standard `pybb/avatar.html` template
+* Improved example projects
 
 0.16 -> 0.16.1
 --------------

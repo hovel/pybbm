@@ -1,11 +1,12 @@
 # Django settings for example_bootstrap project.
 from __future__ import unicode_literals
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
+import django
 import os
 
-PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
 
 DATABASES = {
     'default': {
@@ -17,14 +18,14 @@ DATABASES = {
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static_collected')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
+    os.path.join(BASE_DIR, 'static'),
 )
 
 LOGIN_REDIRECT_URL = '/profile/edit/'
@@ -53,7 +54,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'example_bootstrap.urls'
 
 TEMPLATE_DIRS = (
-    os.path.join(PROJECT_ROOT, 'templates'),
+    os.path.join(BASE_DIR, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -67,6 +68,9 @@ INSTALLED_APPS = (
     'pybb',
     'registration'
 )
+
+if django.VERSION < (1, 7):
+    INSTALLED_APPS += ('south',)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',

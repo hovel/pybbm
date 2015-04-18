@@ -1,12 +1,6 @@
-{% extends "theme_bootstrap/less_base.html" %}
+{% extends "theme_bootstrap/base.html" %}
 {% load static %}
 {% block head_title %}{% block title %}{% endblock %}{% endblock %}
-
-{% block style_base %}
-{{ block.super }}
-<link href="{% static "style.less" %}" rel="stylesheet/less" type="text/css">
-{% block extra_style %}{% endblock %}
-{% endblock %}
 
 {% block script_base %}
 {{ block.super }}
