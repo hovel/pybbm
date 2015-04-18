@@ -4,6 +4,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 import os
+import django
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
@@ -50,7 +51,6 @@ MIDDLEWARE_CLASSES = (
     'pybb.middleware.PybbMiddleware',
 )
 
-ROOT_URLCONF = 'example_bootstrap.urls'
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_ROOT, 'templates'),
@@ -67,6 +67,9 @@ INSTALLED_APPS = (
     'pybb',
     'registration'
 )
+
+if django.VERSION < (1, 7):
+    INSTALLED_APPS += ('south',)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
@@ -100,4 +103,5 @@ LOGGING = {
     }
 }
 
+ROOT_URLCONF = 'urls'
 PYBB_ATTACHMENT_ENABLE = False
