@@ -1,5 +1,8 @@
 django>=1.7,<1.8
 
+#required to use with django<1.7
+#south
+
 #exemple_bootstrap dependencies
 django-registration-redux
 
