@@ -12,5 +12,5 @@ bbcode
 Pillow>=2.7,<2.8
 
 #for test purpose only
-lxml
-markdown
+#lxml
+#markdown
