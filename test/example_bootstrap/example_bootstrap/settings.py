@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import django
 import os
+import django
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -17,6 +18,8 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
+
+ROOT_URLCONF = 'example_bootstrap.urls'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -51,7 +54,6 @@ MIDDLEWARE_CLASSES = (
     'pybb.middleware.PybbMiddleware',
 )
 
-ROOT_URLCONF = 'example_bootstrap.urls'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),

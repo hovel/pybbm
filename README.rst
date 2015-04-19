@@ -1,7 +1,8 @@
 PyBBM - Django forum solution
 =============================
 
-.. image:: https://travis-ci.org/hovel/pybbm.png?branch=master
+.. image:: https://travis-ci.org/skolsuper/pybbm.png?branch=master
+    :target: https://travis-ci.org/skolsuper/pybbm
 
 PyBBM is a full-featured django forum solution with these features:
 
