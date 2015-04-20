@@ -18,6 +18,8 @@ DATABASES = {
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 
+ROOT_URLCONF = 'example_bootstrap.urls'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
