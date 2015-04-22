@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import time
 import datetime
 import os
+import unittest
 
 from django.contrib.auth.models import Permission
 from django.conf import settings
@@ -175,21 +176,21 @@ class FeaturesTest(TestCase, SharedTestModule):
         #do we need to correct this ?
         #self.assertEqual(topic.forum.topics.count(), 1)
         self.assertEqual(topic.post_count, 0)
-        
+
         #Now, TopicReadTracker is not created because the topic detail view raise a 404
         #If its creation is not finished. So we create it manually to add a test, just in case
         #we have an other way where TopicReadTracker could be set for a not complete topic.
         TopicReadTracker.objects.create(user=user_ann, topic=topic, time_stamp=topic.created)
-        
+
         #before correction, raised TypeError: can't compare datetime.datetime to NoneType
         pybb_topic_unread([topic,], user_ann)
-        
+
         #before correction, raised IndexError: list index out of range
         last_post = topic.last_post
-        
+
         #post creation now.
         Post(topic=topic, user=self.user, body='one').save()
-        
+
         self.assertEqual(client.get(topic.get_absolute_url()).status_code, 200)
         self.assertEqual(topic.forum.post_count, 2)
         self.assertEqual(topic.forum.topic_count, 2)
@@ -311,7 +312,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob, topic=topic_1).count(), 1)
 
-        # user_bob reads topic_2, he should get a forum read tracker, 
+        # user_bob reads topic_2, he should get a forum read tracker,
         #  there should be no topic read trackers for user_bob
         time.sleep(1)
         client_bob.get(topic_2.get_absolute_url())
@@ -402,7 +403,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=self.user, topic=topic_1).count(), 1)
 
-        # user reads topic_2, they should get a forum read tracker, 
+        # user reads topic_2, they should get a forum read tracker,
         #  there should be no topic read trackers for the user
         client.get(topic_2.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 0)
@@ -952,7 +953,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = client.get(self.topic.get_absolute_url())
         subscribe_links = html.fromstring(response.content).xpath('//a[@href="%s"]' % subscribe_url)
         self.assertEqual(len(subscribe_links), 0)
-        
+
         response = client.get(subscribe_url, follow=True)
         self.assertEqual(response.status_code, 403)
 
@@ -1005,7 +1006,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         # there should be no email in the outbox
         self.assertEqual(len(mail.outbox), 0)
-        
+
         defaults.PYBB_DISABLE_NOTIFICATIONS = orig_conf
 
     def test_topic_updated(self):
@@ -1555,9 +1556,9 @@ class FiltersTest(TestCase, SharedTestModule):
 
 
 class CustomPermissionHandler(permissions.DefaultPermissionHandler):
-    """ 
+    """
     a custom permission handler which changes the meaning of "hidden" forum:
-    "hidden" forum or category is visible for all logged on users, not only staff 
+    "hidden" forum or category is visible for all logged on users, not only staff
     """
 
     def filter_categories(self, user, qs):
@@ -1595,6 +1596,14 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
         return False
 
 
+def can_import_test_project():
+    try:
+        import test.test_project
+    except ImportError:
+        return False
+    return True
+
+@unittest.skipUnless(can_import_test_project(), 'Can\'t import test_project module')
 class MarkupParserTest(TestCase, SharedTestModule):
 
     def setUp(self):
@@ -1867,7 +1876,7 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         nostaff.is_staff = False
         nostaff.save()
 
-        # create topic, post in hidden category 
+        # create topic, post in hidden category
         self.category = Category(name='private', hidden=True)
         self.category.save()
         self.forum = Forum(name='priv1', category=self.category)
@@ -1957,7 +1966,7 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         # allowed user is allowed
         r = self.get_with_user(edit_post_url, 'staff', 'staff')
         self.assertEquals(r.status_code, 200)
-        
+
     def test_profile_autocreation_signal_on(self):
         user = User.objects.create_user('cronos', 'cronos@localhost', 'cronos')
         profile = getattr(user, defaults.PYBB_PROFILE_RELATED_NAME, None)
