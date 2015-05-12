@@ -1,7 +1,7 @@
-django>=1.6,<1.7
+django>=1.7,<1.8
 
 #exemple_bootstrap dependencies
-django-registration
+django-registration-redux
 
 #pybb strong dependencies
 django-annoying

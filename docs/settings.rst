@@ -463,3 +463,18 @@ if loaded pybb_tags. In template will be loaded methods which start with 'may' o
 and with three or two arguments (include 'self' argument)
 
 Default: 'pybb.permissions.DefaultPermissionHandler'
+
+
+Urls
+----
+
+.. _PYBB_NICE_URL:
+
+PYBB_NICE_URL
+.............
+
+Changes old/classics URLs to more semantic URLs using Category/Forum/Topic's slug.
+For example www.yourforum.com/forum/1 becomes www.yourforum.com/contents/category_slug/forum_slug.
+Old URLs will have a permanent redirections to new ones.
+
+Default: False

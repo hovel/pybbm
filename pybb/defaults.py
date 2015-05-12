@@ -45,6 +45,8 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
     ';)': 'wink.png'
 })
 
+PYBB_NICE_URL = getattr(settings, 'PYBB_NICE_URL', False)
+
 # TODO In a near future, this code will be deleted when callable settings will not supported anymore.
 callable_warning = ('%(setting_name)s should not be a callable anymore but a path to the parser classes.'
                     'ex : myproject.markup.CustomBBCodeParser. It will stop working in next pybbm release.')

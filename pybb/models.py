@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, DatabaseError
+from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import strip_tags
@@ -31,6 +32,7 @@ class Category(models.Model):
     position = models.IntegerField(_('Position'), blank=True, default=0)
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
                                  help_text=_('If checked, this category will be visible only for staff'))
+    slug = models.SlugField(_("Slug"), max_length=100, unique=True)
 
     class Meta(object):
         ordering = ['position']
@@ -44,6 +46,8 @@ class Category(models.Model):
         return self.forums.all().count()
 
     def get_absolute_url(self):
+        if defaults.PYBB_NICE_URL:
+            return reverse('pybb:category', kwargs={'slug': self.slug, })
         return reverse('pybb:category', kwargs={'pk': self.id})
 
     @property
@@ -70,11 +74,13 @@ class Forum(models.Model):
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(get_user_model_path(), through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=100)
 
     class Meta(object):
         ordering = ['position']
         verbose_name = _('Forum')
         verbose_name_plural = _('Forums')
+        unique_together = ('category', 'slug')
 
     def __str__(self):
         return self.name
@@ -95,6 +101,8 @@ class Forum(models.Model):
         self.save()
 
     def get_absolute_url(self):
+        if defaults.PYBB_NICE_URL:
+            return reverse('pybb:forum', kwargs={'slug': self.slug, 'category_slug': self.category.slug})
         return reverse('pybb:forum', kwargs={'pk': self.id})
 
     @property
@@ -147,11 +155,13 @@ class Topic(models.Model):
     on_moderation = models.BooleanField(_('On moderation'), default=False)
     poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
     poll_question = models.TextField(_('Poll question'), blank=True, null=True)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=100)
 
     class Meta(object):
         ordering = ['-created']
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
+        unique_together = ('forum', 'slug')
 
     def __str__(self):
         return self.name
@@ -171,6 +181,8 @@ class Topic(models.Model):
             return None
 
     def get_absolute_url(self):
+        if defaults.PYBB_NICE_URL:
+            return reverse('pybb:topic', kwargs={'slug': self.slug, 'forum_slug': self.forum.slug, 'category_slug': self.forum.category.slug})
         return reverse('pybb:topic', kwargs={'pk': self.id})
 
     def save(self, *args, **kwargs):
@@ -463,3 +475,26 @@ class PollAnswerUser(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.poll_answer.topic, self.user)
+
+
+def create_or_check_slug(instance, model, **extra_filters):
+    """
+    returns a unique slug
+
+    :param instance : target instance
+    :param model: needed as instance._meta.model is available since django 1.6
+    :param extra_filters: filters needed for Forum and Topic for their unique_together field
+    """
+    if not instance.slug:
+        instance.slug = slugify(instance.name)
+    slug = instance.slug
+    filters = {'slug__startswith': slug, }
+    if extra_filters:
+        filters.update(extra_filters)
+    count = 0
+    objs = model.objects.filter(**filters).exclude(pk=instance.pk)
+    slug_list = [obj.slug for obj in objs]
+    while slug in slug_list:
+        count += 1
+        slug = '%s-%d' % (instance.slug, count)
+    return slug
