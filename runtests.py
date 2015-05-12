@@ -68,10 +68,14 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
         'django.contrib.sessions',
         'django.contrib.sites',
         'test.test_project',
-        'pybb',
     ]
     if django.VERSION[:2] < (1, 7) and south_installed:
         INSTALLED_APPS.append('south')
+
+    if django.VERSION[:2] < (1, 7):
+        INSTALLED_APPS.append('pybb')
+    else:
+        INSTALLED_APPS.append('pybb.apps.PybbConfig')
 
     settings.configure(
         DATABASES=DATABASES,

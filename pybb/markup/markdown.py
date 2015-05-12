@@ -5,7 +5,6 @@ from markdown import Markdown
 from django.forms import Textarea
 from django.template import Context
 from django.template.loader import get_template
-from django.utils.html import urlize
 from pybb.markup.base import smile_it, BaseParser
 
 
@@ -37,7 +36,7 @@ class MarkdownParser(BaseParser):
         self._parser = Markdown(safe_mode='escape')
 
     def format(self, text):
-        return urlize(smile_it(self._parser.convert(text)))
+        return smile_it(self._parser.convert(text))
 
     def quote(self, text, username=''):
         return '>' + text.replace('\n', '\n>').replace('\r', '\n>') + '\n'

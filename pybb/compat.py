@@ -97,3 +97,10 @@ def is_installed(app_name):
     else:
         from django.apps import apps
         return apps.is_installed(app_name)
+
+
+def get_related_model_class(parent_model, field_name):
+    if django.VERSION[:2] < (1, 8):
+        return getattr(parent_model, field_name).related.model
+    else:
+        return parent_model._meta.get_field(field_name).related_model

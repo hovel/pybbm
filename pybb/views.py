@@ -295,14 +295,14 @@ class PostEditMixin(PybbFormsMixin):
 
         ctx = super(PostEditMixin, self).get_context_data(**kwargs)
 
-        if perms.may_attach_files(self.request.user) and (not 'aformset' in kwargs):
+        if perms.may_attach_files(self.request.user) and 'aformset' not in kwargs:
             ctx['aformset'] = self.get_attachment_formset_class()(
-                instance=self.object if getattr(self, 'object') else None
+                instance=getattr(self, 'object', None)
             )
 
-        if perms.may_create_poll(self.request.user) and ('pollformset' not in kwargs):
+        if perms.may_create_poll(self.request.user) and 'pollformset' not in kwargs:
             ctx['pollformset'] = self.get_poll_answer_formset_class()(
-                instance=self.object.topic if getattr(self, 'object') else None
+                instance=self.object.topic if getattr(self, 'object', None) else None
             )
 
         return ctx
@@ -311,7 +311,7 @@ class PostEditMixin(PybbFormsMixin):
         success = True
         save_attachments = False
         save_poll_answers = False
-        self.object = form.save(commit=False)
+        self.object, topic = form.save(commit=False)
 
         if perms.may_attach_files(self.request.user):
             aformset = self.get_attachment_formset_class()(
@@ -326,23 +326,24 @@ class PostEditMixin(PybbFormsMixin):
 
         if perms.may_create_poll(self.request.user):
             pollformset = self.get_poll_answer_formset_class()()
-            if getattr(self, 'forum', None) or self.object.topic.head == self.object:
-                if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
-                    pollformset = self.get_poll_answer_formset_class()(self.request.POST,
-                                                                       instance=self.object.topic)
+            if getattr(self, 'forum', None) or topic.head == self.object:
+                if topic.poll_type != Topic.POLL_TYPE_NONE:
+                    pollformset = self.get_poll_answer_formset_class()(
+                        self.request.POST, instance=topic
+                    )
                     if pollformset.is_valid():
                         save_poll_answers = True
                     else:
                         success = False
                 else:
-                    self.object.topic.poll_question = None
-                    self.object.topic.poll_answers.all().delete()
+                    topic.poll_question = None
+                    topic.poll_answers.all().delete()
         else:
             pollformset = None
 
         if success:
-            self.object.topic.save()
-            self.object.topic = self.object.topic
+            topic.save()
+            self.object.topic = topic
             self.object.save()
             if save_attachments:
                 aformset.save()
@@ -415,7 +416,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
     def get_success_url(self):
         if (not self.request.user.is_authenticated()) and defaults.PYBB_PREMODERATION:
             return reverse('pybb:index')
-        return super(AddPostView, self).get_success_url()
+        return self.object.get_absolute_url()
 
 
 class EditPostView(PostEditMixin, generic.UpdateView):
@@ -506,6 +507,8 @@ class UserTopics(PaginatorMixin, generic.ListView):
 
 class PostView(RedirectToLoginMixin, generic.RedirectView):
 
+    permanent = False
+
     def get_login_redirect_url(self):
         return reverse('pybb:post', args=(self.kwargs['pk'],))
 
@@ -519,6 +522,9 @@ class PostView(RedirectToLoginMixin, generic.RedirectView):
 
 
 class ModeratePost(generic.RedirectView):
+
+    permanent = False
+
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
         if not perms.may_moderate_topic(self.request.user, post.topic):
