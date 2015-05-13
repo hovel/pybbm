@@ -1604,15 +1604,15 @@ class MarkupParserTest(TestCase, SharedTestModule):
         self.ORIG_PYBB_QUOTE_ENGINES = util.PYBB_QUOTE_ENGINES
         util.PYBB_MARKUP_ENGINES = {
             'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
-            'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
-            'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
+            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'liberator': 'test_project.markup_parsers.LiberatorParser',  # completely new parser
             'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': defaults.markdown  # old-style callable parser,
         }
         util.PYBB_QUOTE_ENGINES = {
             'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
-            'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
-            'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
+            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'liberator': 'test_project.markup_parsers.LiberatorParser',  # completely new parser
             'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': lambda text, username="": '>' + text.replace('\n', '\n>').replace('\r', '\n>') + '\n'  # old-style callable parser
         }

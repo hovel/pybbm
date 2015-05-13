@@ -14,6 +14,8 @@ PyBBM Changelog
 * Removed applying `urlize` filter over html produced by markdown parser
   (it doesn't play nicely with html markup as noted in django's docs)
 * django 1.8 compatibility
+* common django layout for test project
+* use mysqlclient package for testing installation with mysql database backend on python 3
 
 0.16 -> 0.16.1
 --------------
