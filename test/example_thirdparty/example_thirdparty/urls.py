@@ -6,7 +6,7 @@ try:
 except ImportError:
     from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
-from test.example_thirdparty.forms import SignupFormWithCaptcha
+from example_thirdparty.forms import SignupFormWithCaptcha
 
 admin.autodiscover()
 

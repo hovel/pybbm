@@ -1,20 +1,17 @@
 {% load pybb_tags %}
-{% friendly_load thumbnail %}
 <div class="avatar">
     {% pybb_get_profile user=user as user_profile %}
     <a href="{{ user_profile.get_absolute_url }}">
-        {% if_has_tag thumbnail %}
-            {% thumbnail user_profile.avatar PYBB_AVATAR_DIMENSIONS as avatar %}
-                <img src="{{ avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" />
-            {% empty %}
-                <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" />
-            {% endthumbnail %}
-        {% else %}
-            {% if user_profile.avatar %}
-                <img src="{{ user_profile.avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
+        {% if user_profile.avatar %}
+            {% if 'sorl.thumbnail'|check_app_installed %}
+                {% include 'pybb/_sorl_thumbnail_avatar.html' %}
+            {% elif 'easy_thumbnails'|check_app_installed %}
+                {% include 'pybb/_easy_thumbnail_avatar.html' %}
             {% else %}
-                <img src="{{PYBB_DEFAULT_AVATAR_URL}}" alt="default avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}" />
+                <img src="{{ user_profile.avatar.url }}" alt="{{ user_profile.get_display_name }} avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}"/>
             {% endif %}
-        {% endif_has_tag %}
+        {% else %}
+            <img src="{{ PYBB_DEFAULT_AVATAR_URL }}" alt="default avatar" width="{{ PYBB_AVATAR_WIDTH }}" height="{{ PYBB_AVATAR_HEIGHT }}"/>
+        {% endif %}
     </a>
 </div>

@@ -88,3 +88,12 @@ def get_paginator_class():
         pure_pagination = False
 
     return Paginator, pure_pagination
+
+
+def is_installed(app_name):
+    if django.VERSION[:2] < (1, 7):
+        from django.db.models import get_apps
+        return app_name in get_apps()
+    else:
+        from django.apps import apps
+        return apps.is_installed(app_name)

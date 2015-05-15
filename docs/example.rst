@@ -20,8 +20,8 @@ Each example directory contains requirements.txt file, you can run::
 
 to install all dependencies.
 
-Also `example_bootstrap/fixtures` directory contains `demo_data.json` fiel with some example data.
-You can run::
+Also `example_bootstrap/fixtures` directory contains `demo_data.json` file with some example data.
+So, you can run::
 
     python manage.py loaddata <path to example_bootstrap>/fixtures/demo_data.json
 

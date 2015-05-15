@@ -8,9 +8,6 @@ import warnings
 
 from django import template
 from django.core.cache import cache
-from django.template.base import get_library, InvalidTemplateLibrary, TemplateSyntaxError, TOKEN_BLOCK
-from django.template.defaulttags import LoadNode, CommentNode, IfNode
-from django.template.smartif import Literal
 from django.utils.safestring import mark_safe
 from django.utils.encoding import smart_text
 from django.utils.html import escape
@@ -27,7 +24,7 @@ except ImportError:
 
 from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser, Topic, Post
 from pybb.permissions import perms
-from pybb import defaults, util
+from pybb import defaults, util, compat
 
 
 register = template.Library()
@@ -264,95 +261,10 @@ def load_perms_filters():
                 register.filter('%s%s' % ('pybb_', method[0]), partial_no_param(method[0], perms))
 load_perms_filters()
 
-# next two tags copied from https://bitbucket.org/jaap3/django-friendly-tag-loader
 
-@register.tag
-def friendly_load(parser, token):
-    """
-    Tries to load a custom template tag set. Non existing tag libraries
-    are ignored.
-
-    This means that, if used in conjuction with ``if_has_tag``, you can try to
-    load the comments template tag library to enable comments even if the
-    comments framework is not installed.
-
-    For example::
-
-        {% load friendly_loader %}
-        {% friendly_load comments webdesign %}
-
-        {% if_has_tag render_comment_list %}
-            {% render_comment_list for obj %}
-        {% else %}
-            {% if_has_tag lorem %}
-                {% lorem %}
-            {% endif_has_tag %}
-        {% endif_has_tag %}
-    """
-    bits = token.contents.split()
-    for taglib in bits[1:]:
-        try:
-            lib = get_library(taglib)
-            parser.add_library(lib)
-        except InvalidTemplateLibrary:
-            pass
-    return LoadNode()
-
-
-@register.tag
-def if_has_tag(parser, token):
-    """
-    The logic for both ``{% if_has_tag %}`` and ``{% if not_has_tag %}``.
-
-    Checks if all the given tags exist (or not exist if ``negate`` is ``True``)
-    and then only parses the branch that will not error due to non-existing
-    tags.
-
-    This means that the following is essentially the same as a
-    ``{% comment %}`` tag::
-
-      {% if_has_tag non_existing_tag %}
-          {% non_existing_tag %}
-      {% endif_has_tag %}
-
-    Another example is checking a built-in tag. This will alway render the
-    current year and never FAIL::
-
-      {% if_has_tag now %}
-          {% now \"Y\" %}
-      {% else %}
-          FAIL
-      {% endif_has_tag %}
-    """
-    bits = list(token.split_contents())
-    if len(bits) < 2:
-        raise TemplateSyntaxError("%r takes at least one arguments" % bits[0])
-    end_tag = 'end%s' % bits[0]
-    has_tag = all([tag in parser.tags for tag in bits[1:]])
-    nodelist_true = nodelist_false = CommentNode()
-    if has_tag:
-        nodelist_true = parser.parse(('else', end_tag))
-        token = parser.next_token()
-        if token.contents == 'else':
-            parser.skip_past(end_tag)
-    else:
-        while parser.tokens:
-            token = parser.next_token()
-            if token.token_type == TOKEN_BLOCK and token.contents == end_tag:
-                try:
-                    return IfNode([(Literal(has_tag), nodelist_true),
-                                   (None, nodelist_false)])
-                except TypeError:  # < 1.4
-                    return IfNode(Literal(has_tag), nodelist_true, nodelist_false)
-            elif token.token_type == TOKEN_BLOCK and token.contents == 'else':
-                break
-        nodelist_false = parser.parse((end_tag,))
-        token = parser.next_token()
-    try:
-        return IfNode([(Literal(has_tag), nodelist_true),
-                       (None, nodelist_false)])
-    except TypeError:  # < 1.4
-        return IfNode(Literal(has_tag), nodelist_true, nodelist_false)
+@register.filter
+def check_app_installed(app_name):
+    return compat.is_installed(app_name)
 
 
 @register.filter

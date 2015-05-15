@@ -1,15 +1,18 @@
-South>=0.7.5
-Markdown>=2.1
-postmarkup>=1.2.0
+django>=1.7,<1.8
+
+# required for django < 1.7
+#south
+Markdown
+postmarkup
 
 # TODO: remove dependencies
-django-annoying>=0.7.6
-django-pure-pagination>=0.2.1
-sorl-thumbnail>=11.12
-pytils>=0.2.3
+django-annoying
+django-pure-pagination
+sorl-thumbnail
+pytils
 
 # Theme, templates and authentication
 django-simple-captcha
-pinax-theme-bootstrap==4.0
+pinax-theme-bootstrap
 django-bootstrap-form
 django-user-accounts
