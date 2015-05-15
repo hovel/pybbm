@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import time
 import datetime
 import os
-from urlparse import urlparse
 from django.contrib.auth.models import Permission
 from django.conf import settings
 from django.core import mail
@@ -18,6 +17,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.six.moves.urllib.parse import urlparse
 from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
     pybb_get_latest_topics, pybb_get_latest_posts
