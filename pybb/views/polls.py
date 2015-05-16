@@ -13,7 +13,7 @@ from pybb.permissions import perms
 from pybb.models import Topic, PollAnswerUser
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 
-from .mixins import PybbFormsMixin
+from pybb.views.mixins import PybbFormsMixin
 
 
 class TopicPollVoteView(PybbFormsMixin, generic.UpdateView):

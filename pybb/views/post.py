@@ -18,7 +18,7 @@ from pybb import compat, defaults, util
 from pybb.permissions import perms
 from pybb.models import Post, Forum, Topic
 
-from .mixins import RedirectToLoginMixin, PostEditMixin
+from pybb.views.mixins import RedirectToLoginMixin, PostEditMixin
 
 User = compat.get_user_model()
 username_field = compat.get_username_field()

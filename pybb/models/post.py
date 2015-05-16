@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from pybb.compat import get_user_model_path
 
-from .renderable import RenderableItem
+from pybb.models.renderable import RenderableItem
 
 
 @python_2_unicode_compatible

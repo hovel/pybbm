@@ -14,7 +14,7 @@ from pybb.forms import EditProfileForm
 from pybb.permissions import perms
 from pybb.models import Topic, Post
 
-from .mixins import PaginatorMixin
+from pybb.views.mixins import PaginatorMixin
 
 User = compat.get_user_model()
 username_field = compat.get_username_field()

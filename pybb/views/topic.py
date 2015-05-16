@@ -17,7 +17,7 @@ from pybb.permissions import perms
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 from pybb.models import Topic, TopicReadTracker, ForumReadTracker
 
-from .mixins import RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin
+from pybb.views.mixins import RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin
 
 username_field = compat.get_username_field()
 

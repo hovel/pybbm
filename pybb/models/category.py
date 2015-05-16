@@ -6,8 +6,8 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from .topic import Topic
-from .post import Post
+from pybb.models.topic import Topic
+from pybb.models.post import Post
 
 
 @python_2_unicode_compatible

@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from pybb.compat import get_user_model_path
 
-from .post import Post
+from pybb.models.post import Post
 
 @python_2_unicode_compatible
 class Forum(models.Model):

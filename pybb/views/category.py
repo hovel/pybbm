@@ -9,7 +9,7 @@ from django.views import generic
 from pybb.permissions import perms
 from pybb.models import Category
 
-from .mixins import RedirectToLoginMixin
+from pybb.views.mixins import RedirectToLoginMixin
 
 
 class CategoryView(RedirectToLoginMixin, generic.DetailView):

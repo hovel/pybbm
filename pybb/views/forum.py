@@ -11,7 +11,7 @@ from pybb import defaults
 from pybb.permissions import perms
 from pybb.models import Forum
 
-from .mixins import RedirectToLoginMixin, PaginatorMixin
+from pybb.views.mixins import RedirectToLoginMixin, PaginatorMixin
 
 
 class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):

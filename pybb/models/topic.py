@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from pybb.compat import get_user_model_path
 
-from .poll_answer import PollAnswerUser
+from pybb.models.poll_answer import PollAnswerUser
 
 @python_2_unicode_compatible
 class Topic(models.Model):

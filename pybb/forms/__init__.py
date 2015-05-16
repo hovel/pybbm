@@ -1,9 +1,9 @@
-from .attachment import AttachmentForm, AttachmentFormSet
-from .misc import UserSearchForm
-from .polls import (PollForm, PollAnswerForm, BasePollAnswerFormset,
+from pybb.forms.attachment import AttachmentForm, AttachmentFormSet
+from pybb.forms.misc import UserSearchForm
+from pybb.forms.polls import (PollForm, PollAnswerForm, BasePollAnswerFormset,
                     PollAnswerFormSet)
-from .post import PostForm, AdminPostForm
+from pybb.forms.post import PostForm, AdminPostForm
 try:
-    from .profile import EditProfileForm
+    from pybb.forms.profile import EditProfileForm
 except ImportError:
     pass

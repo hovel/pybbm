@@ -1,9 +1,9 @@
-from .attachment import Attachment
-from .category import Category
-from .forum import Forum
-from .poll_answer import PollAnswer, PollAnswerUser
-from .post import Post
-from .profile import PybbProfile, Profile
-from .read_trackers import ForumReadTracker, TopicReadTracker
-from .renderable import RenderableItem
-from .topic import Topic
+from pybb.models.attachment import Attachment
+from pybb.models.category import Category
+from pybb.models.forum import Forum
+from pybb.models.poll_answer import PollAnswer, PollAnswerUser
+from pybb.models.post import Post
+from pybb.models.profile import PybbProfile, Profile
+from pybb.models.read_trackers import ForumReadTracker, TopicReadTracker
+from pybb.models.renderable import RenderableItem
+from pybb.models.topic import Topic
