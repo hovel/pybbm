@@ -9,7 +9,7 @@ django-registration-redux
 #pybb strong dependencies
 django-annoying
 bbcode
-Pillow>=2.7,<2.8
+Pillow
 
 #for test purpose only
 #lxml

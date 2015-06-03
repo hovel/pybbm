@@ -9,8 +9,13 @@ PyBBM Changelog
 * Using active markup engine when quoting posts via javascript
 * Functionality to support disabling default pybbm subscriptions and notifications and
   new settings: :ref:`PYBB_DISABLE_SUBSCRIPTIONS` and :ref:`PYBB_DISABLE_NOTIFICATIONS`
-* Fixed easy_thumbnail compatibility in standard `pybb/avatar.html` template
+* Fixed sorl.thumbnail/easy_thumbnail compatibility in standard `pybb/avatar.html` template
 * Improved example projects
+* Removed applying `urlize` filter over html produced by markdown parser
+  (it doesn't play nicely with html markup as noted in django's docs)
+* django 1.8 compatibility
+* common django layout for test project
+* use mysqlclient package for testing installation with mysql database backend on python 3
 
 0.16 -> 0.16.1
 --------------

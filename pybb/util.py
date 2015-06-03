@@ -8,6 +8,7 @@ import uuid
 from django.utils.importlib import import_module
 from django.utils.six import string_types
 from django.utils.translation import ugettext as _
+from pybb import compat
 
 from pybb.compat import get_username_field, get_user_model
 from pybb.defaults import (
@@ -148,7 +149,7 @@ def get_pybb_profile_model():
     from pybb import defaults
 
     if defaults.PYBB_PROFILE_RELATED_NAME:
-        return getattr(get_user_model(), defaults.PYBB_PROFILE_RELATED_NAME).related.model
+        return compat.get_related_model_class(get_user_model(), defaults.PYBB_PROFILE_RELATED_NAME)
     else:
         return get_user_model()
 

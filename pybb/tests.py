@@ -1604,15 +1604,15 @@ class MarkupParserTest(TestCase, SharedTestModule):
         self.ORIG_PYBB_QUOTE_ENGINES = util.PYBB_QUOTE_ENGINES
         util.PYBB_MARKUP_ENGINES = {
             'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
-            'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
-            'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
+            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'liberator': 'test_project.markup_parsers.LiberatorParser',  # completely new parser
             'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': defaults.markdown  # old-style callable parser,
         }
         util.PYBB_QUOTE_ENGINES = {
             'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
-            'bbcode_custom': 'test.test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
-            'liberator': 'test.test_project.markup_parsers.LiberatorParser',  # completely new parser
+            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'liberator': 'test_project.markup_parsers.LiberatorParser',  # completely new parser
             'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': lambda text, username="": '>' + text.replace('\n', '\n>').replace('\r', '\n>') + '\n'  # old-style callable parser
         }
@@ -1821,9 +1821,9 @@ class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     def test_post_permission(self):
         for p in Post.objects.all():
             r = self.get_with_user(p.get_absolute_url())
-            self.assertEqual(r.status_code, 302 if p.topic.forum.hidden or p.topic.forum.category.hidden else 301)
+            self.assertEqual(r.status_code, 302)
             r = self.get_with_user(p.get_absolute_url(), 'zeus', 'zeus')
-            self.assertEqual(r.status_code, 301)
+            self.assertEqual(r.status_code, 302)
 
     def test_poll_add(self):
         add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
@@ -1919,7 +1919,7 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.assertEquals(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.post.get_absolute_url(), 'staff', 'staff')
-        self.assertEquals(r.status_code, 301)
+        self.assertEquals(r.status_code, 302)
 
     @override_settings(PYBB_ENABLE_ANONYMOUS_POST=False)
     def test_redirect_topic_add(self):
