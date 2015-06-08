@@ -3,14 +3,13 @@ from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, DatabaseError
-from django.template.defaultfilters import slugify
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now as tznow
 
-from pybb.compat import get_user_model_path, get_username_field, get_atomic_func
+from pybb.compat import get_user_model_path, get_username_field, get_atomic_func, slugify
 from pybb import defaults
 from pybb.profiles import PybbProfile
 from pybb.util import unescape, FilePathGenerator, _get_markup_formatter
@@ -32,7 +31,7 @@ class Category(models.Model):
     position = models.IntegerField(_('Position'), blank=True, default=0)
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
                                  help_text=_('If checked, this category will be visible only for staff'))
-    slug = models.SlugField(_("Slug"), max_length=100, unique=True)
+    slug = models.SlugField(_("Slug"), max_length=255, unique=True)
 
     class Meta(object):
         ordering = ['position']
@@ -74,7 +73,7 @@ class Forum(models.Model):
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
     readed_by = models.ManyToManyField(get_user_model_path(), through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=100)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
 
     class Meta(object):
         ordering = ['position']
@@ -155,7 +154,7 @@ class Topic(models.Model):
     on_moderation = models.BooleanField(_('On moderation'), default=False)
     poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
     poll_question = models.TextField(_('Poll question'), blank=True, null=True)
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=100)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
 
     class Meta(object):
         ordering = ['-created']
@@ -485,16 +484,15 @@ def create_or_check_slug(instance, model, **extra_filters):
     :param model: needed as instance._meta.model is available since django 1.6
     :param extra_filters: filters needed for Forum and Topic for their unique_together field
     """
-    if not instance.slug:
-        instance.slug = slugify(instance.name)
-    slug = instance.slug
-    filters = {'slug__startswith': slug, }
+    initial_slug = instance.slug or slugify(instance.name)
+    filters = {'slug__startswith': initial_slug[:253], }
     if extra_filters:
         filters.update(extra_filters)
     count = 0
     objs = model.objects.filter(**filters).exclude(pk=instance.pk)
     slug_list = [obj.slug for obj in objs]
+    slug = initial_slug
     while slug in slug_list:
         count += 1
-        slug = '%s-%d' % (instance.slug, count)
+        slug = '%s-%d' % (initial_slug[:253], count)
     return slug

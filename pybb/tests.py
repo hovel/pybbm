@@ -11,13 +11,11 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.http import HttpResponsePermanentRedirect
-from django.template.defaultfilters import slugify
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import timezone
-from django.utils.six.moves.urllib.parse import urlparse
 from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
     pybb_get_latest_topics, pybb_get_latest_posts
@@ -177,21 +175,21 @@ class FeaturesTest(TestCase, SharedTestModule):
         #do we need to correct this ?
         #self.assertEqual(topic.forum.topics.count(), 1)
         self.assertEqual(topic.post_count, 0)
-        
+
         #Now, TopicReadTracker is not created because the topic detail view raise a 404
         #If its creation is not finished. So we create it manually to add a test, just in case
         #we have an other way where TopicReadTracker could be set for a not complete topic.
         TopicReadTracker.objects.create(user=user_ann, topic=topic, time_stamp=topic.created)
-        
+
         #before correction, raised TypeError: can't compare datetime.datetime to NoneType
         pybb_topic_unread([topic,], user_ann)
-        
+
         #before correction, raised IndexError: list index out of range
         last_post = topic.last_post
-        
+
         #post creation now.
         Post(topic=topic, user=self.user, body='one').save()
-        
+
         self.assertEqual(client.get(topic.get_absolute_url()).status_code, 200)
         self.assertEqual(topic.forum.post_count, 2)
         self.assertEqual(topic.forum.topic_count, 2)
@@ -313,7 +311,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob, topic=topic_1).count(), 1)
 
-        # user_bob reads topic_2, he should get a forum read tracker, 
+        # user_bob reads topic_2, he should get a forum read tracker,
         #  there should be no topic read trackers for user_bob
         time.sleep(1)
         client_bob.get(topic_2.get_absolute_url())
@@ -404,7 +402,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=self.user, topic=topic_1).count(), 1)
 
-        # user reads topic_2, they should get a forum read tracker, 
+        # user reads topic_2, they should get a forum read tracker,
         #  there should be no topic read trackers for the user
         client.get(topic_2.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 0)
@@ -2011,10 +2009,14 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         self.ORIGINAL_PYBB_NICE_URL = defaults.PYBB_NICE_URL
         defaults.PYBB_NICE_URL = True
 
+    def test_unicode_slugify(self):
+        self.assertEqual(compat.slugify('北京 (China), Москва (Russia), é_è (a sad smiley !)'),
+                         'bei-jing-china-moskva-russia-e_e-a-sad-smiley')
+
     def test_automatique_slug(self):
-        self.assertEqual(slugify(self.category.name), self.category.slug)
-        self.assertEqual(slugify(self.forum.name), self.forum.slug)
-        self.assertEqual(slugify(self.topic.name), self.topic.slug)
+        self.assertEqual(compat.slugify(self.category.name), self.category.slug)
+        self.assertEqual(compat.slugify(self.forum.name), self.forum.slug)
+        self.assertEqual(compat.slugify(self.topic.name), self.topic.slug)
 
     def test_no_duplicate_slug(self):
         category_name = self.category.name
@@ -2025,43 +2027,53 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         category = Category.objects.create(name=category_name)
         forum = Forum.objects.create(name=forum_name, description='bar', category=self.category)
         topic = Topic.objects.create(name=topic_name, forum=self.forum, user=self.user)
+
         slug_nb = len(Category.objects.filter(slug__startswith=category_name)) - 1
-        self.assertEqual('%s-%d' % (slugify(category_name), slug_nb), category.slug)
+        self.assertEqual('%s-%d' % (compat.slugify(category_name), slug_nb), category.slug)
         slug_nb = len(Forum.objects.filter(slug__startswith=forum_name)) - 1
-        self.assertEqual('%s-%d' % (slugify(forum_name), slug_nb), forum.slug)
+        self.assertEqual('%s-%d' % (compat.slugify(forum_name), slug_nb), forum.slug)
         slug_nb = len(Topic.objects.filter(slug__startswith=topic_name)) - 1
-        self.assertEqual('%s-%d' % (slugify(topic_name), slug_nb), topic.slug)
+        self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
 
         # objects created with a duplicate slug but a different name
-        category = Category.objects.create(name='test_slug_category', slug=slugify(category_name))
+        category = Category.objects.create(name='test_slug_category', slug=compat.slugify(category_name))
         forum = Forum.objects.create(name='test_slug_forum', description='bar',
-                                     category=self.category, slug=slugify(forum_name))
+                                     category=self.category, slug=compat.slugify(forum_name))
         topic = Topic.objects.create(name='test_topic_slug', forum=self.forum,
-                                     user=self.user, slug=slugify(topic_name))
+                                     user=self.user, slug=compat.slugify(topic_name))
         slug_nb = len(Category.objects.filter(slug__startswith=category_name)) - 1
-        self.assertEqual('%s-%d' % (slugify(category_name), slug_nb), category.slug)
+        self.assertEqual('%s-%d' % (compat.slugify(category_name), slug_nb), category.slug)
         slug_nb = len(Forum.objects.filter(slug__startswith=forum_name)) - 1
-        self.assertEqual('%s-%d' % (slugify(forum_name), slug_nb), forum.slug)
+        self.assertEqual('%s-%d' % (compat.slugify(forum_name), slug_nb), forum.slug)
         slug_nb = len(Topic.objects.filter(slug__startswith=self.topic.name)) - 1
-        self.assertEqual('%s-%d' % (slugify(topic_name), slug_nb), topic.slug)
+        self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
+
+    def test_long_duplicate_slug(self):
+        long_name = 'abcde' * 51  # 255 symbols
+        topic1 = Topic.objects.create(name=long_name, forum=self.forum, user=self.user)
+        self.assertEqual(topic1.slug, long_name)
+        topic2 = Topic.objects.create(name=long_name, forum=self.forum, user=self.user)
+        self.assertEqual(topic2.slug, '%s-1' % long_name[:253])
+        topic3 = Topic.objects.create(name=long_name, forum=self.forum, user=self.user)
+        self.assertEqual(topic3.slug, '%s-2' % long_name[:253])
 
     def test_absolute_url(self):
         response = self.client.get(self.category.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['category'], self.category)
-        self.assertEqual('/contents/%s/' % (self.category.slug), self.category.get_absolute_url())
+        self.assertEqual('/c/%s/' % (self.category.slug), self.category.get_absolute_url())
         response = self.client.get(self.forum.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['forum'], self.forum)
         self.assertEqual(
-            '/contents/%s/%s/' % (self.category.slug, self.forum.slug),
+            '/c/%s/%s/' % (self.category.slug, self.forum.slug),
             self.forum.get_absolute_url()
             )
         response = self.client.get(self.topic.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['topic'], self.topic)
         self.assertEqual(
-            '/contents/%s/%s/%s/' % (self.category.slug, self.forum.slug, self.topic.slug),
+            '/c/%s/%s/%s/' % (self.category.slug, self.forum.slug, self.topic.slug),
             self.topic.get_absolute_url()
             )
 
@@ -2073,7 +2085,7 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         values = self.get_form_values(response)
         values.update({'name': self.topic.name, 'body': '[b]Test slug body[/b]', 'poll_type': 0})
         response = self.client.post(add_topic_url, data=values, follow=True)
-        slug_nb = len(Topic.objects.filter(slug__startswith=slugify(self.topic.name))) - 1
+        slug_nb = len(Topic.objects.filter(slug__startswith=compat.slugify(self.topic.name))) - 1
         self.assertIsNotNone = Topic.objects.get(slug='%s-%d' % (self.topic.name, slug_nb))
 
         _attach_perms_class('pybb.tests.CustomPermissionHandler')
@@ -2088,18 +2100,22 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         _detach_perms_class()
 
     def test_old_url_redirection(self):
-        response = self.client.get(reverse("pybb:category", kwargs={"pk": self.category.pk}))
-        self.assertEqual(response.status_code, 301)
-        self.assertTrue(isinstance(response, HttpResponsePermanentRedirect))
-        self.assertEquals(self.category.get_absolute_url(), urlparse(response.get('location')).path)
-        response = self.client.get(reverse("pybb:forum", kwargs={"pk": self.forum.pk}))
-        self.assertEqual(response.status_code, 301)
-        self.assertTrue(isinstance(response, HttpResponsePermanentRedirect))
-        self.assertEquals(self.forum.get_absolute_url(), urlparse(response.get('location')).path)
-        response = self.client.get(reverse("pybb:topic", kwargs={"pk": self.topic.pk}))
-        self.assertEqual(response.status_code, 301)
-        self.assertTrue(isinstance(response, HttpResponsePermanentRedirect))
-        self.assertEquals(self.topic.get_absolute_url(), urlparse(response.get('location')).path)
+
+        original_perm_redirect = defaults.PYBB_NICE_URL_PERMANENT_REDIRECT
+
+        for redirect_status in [301, 302]:
+            defaults.PYBB_NICE_URL_PERMANENT_REDIRECT = redirect_status == 301
+
+            response = self.client.get(reverse("pybb:category", kwargs={"pk": self.category.pk}))
+            self.assertRedirects(response, self.category.get_absolute_url(), status_code=redirect_status)
+
+            response = self.client.get(reverse("pybb:forum", kwargs={"pk": self.forum.pk}))
+            self.assertRedirects(response, self.forum.get_absolute_url(), status_code=redirect_status)
+
+            response = self.client.get(reverse("pybb:topic", kwargs={"pk": self.topic.pk}))
+            self.assertRedirects(response, self.topic.get_absolute_url(), status_code=redirect_status)
+
+        defaults.PYBB_NICE_URL_PERMANENT_REDIRECT = original_perm_redirect
 
     def tearDown(self):
         defaults.PYBB_NICE_URL = self.ORIGINAL_PYBB_NICE_URL

@@ -79,7 +79,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '100'})
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'})
         },
         'pybb.forum': {
             'Meta': {'ordering': "['position']", 'unique_together': "(('category', 'slug'),)", 'object_name': 'Forum'},
@@ -94,7 +94,7 @@ class Migration(SchemaMigration):
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_forums'", 'symmetrical': 'False', 'through': "orm['pybb.ForumReadTracker']", 'to': "orm['auth.User']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '100'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
             'topic_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
@@ -156,7 +156,7 @@ class Migration(SchemaMigration):
             'poll_type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_topics'", 'symmetrical': 'False', 'through': "orm['pybb.TopicReadTracker']", 'to': "orm['auth.User']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '100'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
             'sticky': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'subscriptions'", 'blank': 'True', 'to': "orm['auth.User']"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),

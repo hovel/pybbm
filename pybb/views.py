@@ -103,7 +103,7 @@ class CategoryView(RedirectToLoginMixin, generic.DetailView):
 
     def get(self, *args, **kwargs):
         if defaults.PYBB_NICE_URL and (('id' in kwargs) or ('pk' in kwargs)):
-            return redirect(super(CategoryView, self).get_object(), permanent=True)
+            return redirect(super(CategoryView, self).get_object(), permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
         return super(CategoryView, self).get(*args, **kwargs)
 
 
@@ -145,7 +145,7 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
 
     def get(self, *args, **kwargs):
         if defaults.PYBB_NICE_URL and 'pk' in kwargs:
-            return redirect(self.forum, permanent=True)
+            return redirect(self.forum, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
         return super(ForumView, self).get(*args, **kwargs)
 
 
@@ -315,7 +315,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
 
     def get(self, *args, **kwargs):
         if defaults.PYBB_NICE_URL and 'pk' in kwargs:
-            return redirect(self.topic, permanent=True)
+            return redirect(self.topic, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
         return super(TopicView, self).get(*args, **kwargs)
 
 

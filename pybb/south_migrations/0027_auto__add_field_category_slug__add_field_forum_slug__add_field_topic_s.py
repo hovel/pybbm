@@ -10,17 +10,17 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'Category.slug'
         db.add_column('pybb_category', 'slug',
-                      self.gf('django.db.models.fields.SlugField')(default='', max_length=100, blank=True),
+                      self.gf('django.db.models.fields.SlugField')(default='', max_length=255, blank=True),
                       keep_default=False)
 
         # Adding field 'Forum.slug'
         db.add_column('pybb_forum', 'slug',
-                      self.gf('django.db.models.fields.SlugField')(default='', max_length=100, blank=True),
+                      self.gf('django.db.models.fields.SlugField')(default='', max_length=255, blank=True),
                       keep_default=False)
 
         # Adding field 'Topic.slug'
         db.add_column('pybb_topic', 'slug',
-                      self.gf('django.db.models.fields.SlugField')(default='', max_length=100, blank=True),
+                      self.gf('django.db.models.fields.SlugField')(default='', max_length=255, blank=True),
                       keep_default=False)
 
 
@@ -85,7 +85,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '100', 'blank': 'True'})
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'blank': 'True'})
         },
         'pybb.forum': {
             'Meta': {'ordering': "['position']", 'object_name': 'Forum'},
@@ -100,7 +100,7 @@ class Migration(SchemaMigration):
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_forums'", 'symmetrical': 'False', 'through': "orm['pybb.ForumReadTracker']", 'to': "orm['auth.User']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '100', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'blank': 'True'}),
             'topic_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
@@ -162,7 +162,7 @@ class Migration(SchemaMigration):
             'poll_type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_topics'", 'symmetrical': 'False', 'through': "orm['pybb.TopicReadTracker']", 'to': "orm['auth.User']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '100', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'blank': 'True'}),
             'sticky': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'subscriptions'", 'blank': 'True', 'to': "orm['auth.User']"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),

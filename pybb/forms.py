@@ -94,7 +94,7 @@ class PostForm(forms.ModelForm):
             del self.fields['poll_type']
             del self.fields['poll_question']
             del self.fields['slug']
-        elif not self.may_create_poll or not self.may_edit_topic_slug:
+        else:
             if not self.may_create_poll:
                 del self.fields['poll_type']
                 del self.fields['poll_question']

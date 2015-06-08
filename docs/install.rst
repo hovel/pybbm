@@ -7,9 +7,8 @@ Mandatory dependencies
 PyBBM requires the following packages:
 
 * django
-* markdown
-* bbcode
 * django-annoying
+* unidecode (for slugifying instances for nicer urls)
 
 
 By installing PyBBM with ``pip`` or ``easy_install``, all the above dependencies will be installed automatically::

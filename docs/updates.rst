@@ -16,6 +16,8 @@ PyBBM Changelog
 * django 1.8 compatibility
 * common django layout for test project
 * use mysqlclient package for testing installation with mysql database backend on python 3
+* optional enabling "nice urls" for entire forum,
+  that looks like '<forum prefix>/c/<category slug>/<forum slug>/<topic slug>/'
 
 0.16 -> 0.16.1
 --------------

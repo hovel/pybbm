@@ -474,7 +474,18 @@ PYBB_NICE_URL
 .............
 
 Changes old/classics URLs to more semantic URLs using Category/Forum/Topic's slug.
-For example www.yourforum.com/forum/1 becomes www.yourforum.com/contents/category_slug/forum_slug.
+For example www.yourforum.com/forum/1 becomes www.yourforum.com/c/category_slug/forum_slug.
 Old URLs will have a permanent redirections to new ones.
 
 Default: False
+
+.. _PYBB_NICE_URL_PERMANENT_REDIRECT:
+
+PYBB_NICE_URL_PERMANENT_REDIRECT
+................................
+
+When PYBB is set to use PYBB_NICE_URL, this setting changes the HTTP response code used
+to redirect old style URL to new one. True (default) use 301 (permantent) redirect. If set to False,
+it uses 302 (temporary) redirect. `False` value is usefull for testing period to not loose SEO related
+to old URLs, then, once testing period is over, setting this to True will ensure that your old URLs will
+be updated to the new ones next time the Search Engine will check it.

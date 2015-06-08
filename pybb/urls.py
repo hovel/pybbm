@@ -76,9 +76,9 @@ urlpatterns += patterns('pybb.views',
 
 if PYBB_NICE_URL:
     urlpatterns += patterns('pybb.views',
-                            url(_(r'^contents/(?P<slug>[\w-]+)/$'), CategoryView.as_view(), name='category'),
-                            url(_(r'^contents/(?P<category_slug>[\w-]+)/(?P<slug>[\w-]+)/$'), ForumView.as_view(),
+                            url(_(r'^c/(?P<slug>[\w-]+)/$'), CategoryView.as_view(), name='category'),
+                            url(_(r'^c/(?P<category_slug>[\w-]+)/(?P<slug>[\w-]+)/$'), ForumView.as_view(),
                                 name='forum'),
-                            url(_(r'^contents/(?P<category_slug>[\w-]+)/(?P<forum_slug>[\w-]+)/(?P<slug>[\w-]+)/$'),
+                            url(_(r'^c/(?P<category_slug>[\w-]+)/(?P<forum_slug>[\w-]+)/(?P<slug>[\w-]+)/$'),
                                 TopicView.as_view(), name='topic'),
                             )
