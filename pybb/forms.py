@@ -138,7 +138,7 @@ class PostForm(forms.ModelForm):
             post.updated = tznow()
             if commit:
                 post.save()
-            return post
+            return post, post.topic
 
         allow_post = True
         if defaults.PYBB_PREMODERATION:
@@ -154,16 +154,16 @@ class PostForm(forms.ModelForm):
             )
             if not allow_post:
                 topic.on_moderation = True
-            if commit:
-                topic.save()
         else:
             topic = self.topic
-        post = Post(topic=topic, user=self.user, user_ip=self.ip, body=self.cleaned_data['body'])
+        post = Post(user=self.user, user_ip=self.ip, body=self.cleaned_data['body'])
         if not allow_post:
             post.on_moderation = True
         if commit:
+            topic.save()
+            post.topic = topic
             post.save()
-        return post
+        return post, topic
 
 
 class AdminPostForm(PostForm):

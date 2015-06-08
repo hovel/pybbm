@@ -1,4 +1,5 @@
 django>=1.7,<1.8
+pillow
 
 # required for django < 1.7
 #south
