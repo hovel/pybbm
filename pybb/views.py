@@ -5,10 +5,11 @@ import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
+from django.forms.util import ErrorList
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -382,16 +383,23 @@ class PostEditMixin(PybbFormsMixin):
             pollformset = None
 
         if success:
-            topic.save()
-            self.object.topic = topic
-            self.object.save()
-            if save_attachments:
-                aformset.save()
-            if save_poll_answers:
-                pollformset.save()
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+            try:
+                topic.save()
+            except ValidationError as e:
+                success = False
+                errors = form._errors.setdefault('name', ErrorList())
+                errors += e.error_list
+            else:
+                self.object.topic = topic
+                self.object.save()
+                if save_attachments:
+                    aformset.save()
+                if save_poll_answers:
+                    pollformset.save()
+                return HttpResponseRedirect(self.get_success_url())
+        return self.render_to_response(self.get_context_data(form=form, 
+                                                             aformset=aformset, 
+                                                             pollformset=pollformset))
 
 
 class AddPostView(PostEditMixin, generic.CreateView):

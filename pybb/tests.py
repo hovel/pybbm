@@ -2048,6 +2048,15 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         slug_nb = len(Topic.objects.filter(slug__startswith=self.topic.name)) - 1
         self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
 
+    def test_fail_on_too_many_duplicate_slug(self):
+        try:
+            for i in iter(range(100)):
+                topic = Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
+        except ValidationError as e:
+            self.fails('Should be able to create "dolly", "dolly-1", ..., "dolly-99".\n')
+        with self.assertRaises(ValidationError):
+            topic = Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
+
     def test_long_duplicate_slug(self):
         long_name = 'abcde' * 51  # 255 symbols
         topic1 = Topic.objects.create(name=long_name, forum=self.forum, user=self.user)

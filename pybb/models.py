@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
@@ -485,14 +486,26 @@ def create_or_check_slug(instance, model, **extra_filters):
     :param extra_filters: filters needed for Forum and Topic for their unique_together field
     """
     initial_slug = instance.slug or slugify(instance.name)
-    filters = {'slug__startswith': initial_slug[:253], }
-    if extra_filters:
-        filters.update(extra_filters)
-    count = 0
-    objs = model.objects.filter(**filters).exclude(pk=instance.pk)
-    slug_list = [obj.slug for obj in objs]
-    slug = initial_slug
-    while slug in slug_list:
+    count = -1
+    last_count_len = 0
+    slug_len = len(initial_slug)
+    slug_is_not_unique = True
+    while slug_is_not_unique:
         count += 1
-        slug = '%s-%d' % (initial_slug[:253], count)
+        count_len = len(str(count))
+        if last_count_len != count_len:
+            last_count_len = count_len
+            if count_len == 3:
+                msg = _('After 100 attemps, there is not any unique slug value for "%(slug)s"')
+                raise ValidationError(msg % {'slug': initial_slug})
+            filters = {'slug__startswith': initial_slug[:(254-count_len)], }
+            if extra_filters:
+                filters.update(extra_filters)
+            objs = model.objects.filter(**filters).exclude(pk=instance.pk)
+            slug_list = [obj.slug for obj in objs]
+        if count == 0:
+            slug = initial_slug
+        else:
+            slug = '%s-%d' % (initial_slug[:(254-count_len)], count)
+        slug_is_not_unique = slug in slug_list
     return slug
