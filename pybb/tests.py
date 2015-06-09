@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import time
 import datetime
 import os
-
 from django.contrib.auth.models import Permission
 from django.conf import settings
 from django.core import mail
@@ -12,6 +11,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -128,7 +128,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         for i in range(0, defaults.PYBB_FORUM_PAGE_SIZE + 3):
             topic = Topic(name='topic_%s_' % i, forum=self.forum, user=self.user)
             topic.save()
-        url = reverse('pybb:forum', args=[self.forum.id])
+        url = self.forum.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(len(response.context['topic_list']), defaults.PYBB_FORUM_PAGE_SIZE)
         self.assertTrue(response.context['is_paginated'])
@@ -175,21 +175,21 @@ class FeaturesTest(TestCase, SharedTestModule):
         #do we need to correct this ?
         #self.assertEqual(topic.forum.topics.count(), 1)
         self.assertEqual(topic.post_count, 0)
-        
+
         #Now, TopicReadTracker is not created because the topic detail view raise a 404
         #If its creation is not finished. So we create it manually to add a test, just in case
         #we have an other way where TopicReadTracker could be set for a not complete topic.
         TopicReadTracker.objects.create(user=user_ann, topic=topic, time_stamp=topic.created)
-        
+
         #before correction, raised TypeError: can't compare datetime.datetime to NoneType
         pybb_topic_unread([topic,], user_ann)
-        
+
         #before correction, raised IndexError: list index out of range
         last_post = topic.last_post
-        
+
         #post creation now.
         Post(topic=topic, user=self.user, body='one').save()
-        
+
         self.assertEqual(client.get(topic.get_absolute_url()).status_code, 200)
         self.assertEqual(topic.forum.post_count, 2)
         self.assertEqual(topic.forum.topic_count, 2)
@@ -311,7 +311,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob, topic=topic_1).count(), 1)
 
-        # user_bob reads topic_2, he should get a forum read tracker, 
+        # user_bob reads topic_2, he should get a forum read tracker,
         #  there should be no topic read trackers for user_bob
         time.sleep(1)
         client_bob.get(topic_2.get_absolute_url())
@@ -402,7 +402,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(TopicReadTracker.objects.filter(user=self.user).count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=self.user, topic=topic_1).count(), 1)
 
-        # user reads topic_2, they should get a forum read tracker, 
+        # user reads topic_2, they should get a forum read tracker,
         #  there should be no topic read trackers for the user
         client.get(topic_2.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 0)
@@ -1594,6 +1594,9 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     def may_create_poll(self, user):
         return False
 
+    def may_edit_topic_slug(self, user):
+        return True
+
 
 class MarkupParserTest(TestCase, SharedTestModule):
 
@@ -1990,3 +1993,145 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.assertFalse(User.objects.filter(pk=user_pk).exists())
         self.assertFalse(Profile.objects.filter(pk=profile_pk).exists())
         self.assertFalse(Post.objects.filter(pk=post_pk).exists())
+
+
+class NiceUrlsTest(TestCase, SharedTestModule):
+    def __init__(self, *args, **kwargs):
+        super(NiceUrlsTest, self).__init__(*args, **kwargs)
+        self.ORIGINAL_PYBB_NICE_URL = defaults.PYBB_NICE_URL
+        defaults.PYBB_NICE_URL = True
+        self.urls = settings.ROOT_URLCONF
+
+    def setUp(self):
+        self.create_user()
+        self.login_client()
+        self.create_initial()
+        self.ORIGINAL_PYBB_NICE_URL = defaults.PYBB_NICE_URL
+        defaults.PYBB_NICE_URL = True
+
+    def test_unicode_slugify(self):
+        self.assertEqual(compat.slugify('北京 (China), Москва (Russia), é_è (a sad smiley !)'),
+                         'bei-jing-china-moskva-russia-e_e-a-sad-smiley')
+
+    def test_automatique_slug(self):
+        self.assertEqual(compat.slugify(self.category.name), self.category.slug)
+        self.assertEqual(compat.slugify(self.forum.name), self.forum.slug)
+        self.assertEqual(compat.slugify(self.topic.name), self.topic.slug)
+
+    def test_no_duplicate_slug(self):
+        category_name = self.category.name
+        forum_name = self.forum.name
+        topic_name = self.topic.name
+
+        # objects created without slug but the same name
+        category = Category.objects.create(name=category_name)
+        forum = Forum.objects.create(name=forum_name, description='bar', category=self.category)
+        topic = Topic.objects.create(name=topic_name, forum=self.forum, user=self.user)
+
+        slug_nb = len(Category.objects.filter(slug__startswith=category_name)) - 1
+        self.assertEqual('%s-%d' % (compat.slugify(category_name), slug_nb), category.slug)
+        slug_nb = len(Forum.objects.filter(slug__startswith=forum_name)) - 1
+        self.assertEqual('%s-%d' % (compat.slugify(forum_name), slug_nb), forum.slug)
+        slug_nb = len(Topic.objects.filter(slug__startswith=topic_name)) - 1
+        self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
+
+        # objects created with a duplicate slug but a different name
+        category = Category.objects.create(name='test_slug_category', slug=compat.slugify(category_name))
+        forum = Forum.objects.create(name='test_slug_forum', description='bar',
+                                     category=self.category, slug=compat.slugify(forum_name))
+        topic = Topic.objects.create(name='test_topic_slug', forum=self.forum,
+                                     user=self.user, slug=compat.slugify(topic_name))
+        slug_nb = len(Category.objects.filter(slug__startswith=category_name)) - 1
+        self.assertEqual('%s-%d' % (compat.slugify(category_name), slug_nb), category.slug)
+        slug_nb = len(Forum.objects.filter(slug__startswith=forum_name)) - 1
+        self.assertEqual('%s-%d' % (compat.slugify(forum_name), slug_nb), forum.slug)
+        slug_nb = len(Topic.objects.filter(slug__startswith=self.topic.name)) - 1
+        self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
+
+    def test_fail_on_too_many_duplicate_slug(self):
+
+        original_duplicate_limit = defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT
+
+        defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT = 200
+
+        try:
+            for _ in iter(range(200)):
+                Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
+        except ValidationError as e:
+            self.fail('Should be able to create "dolly", "dolly-1", ..., "dolly-199".\n')
+        with self.assertRaises(ValidationError):
+            Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
+
+        defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT = original_duplicate_limit
+
+    def test_long_duplicate_slug(self):
+        long_name = 'abcde' * 51  # 255 symbols
+        topic1 = Topic.objects.create(name=long_name, forum=self.forum, user=self.user)
+        self.assertEqual(topic1.slug, long_name)
+        topic2 = Topic.objects.create(name=long_name, forum=self.forum, user=self.user)
+        self.assertEqual(topic2.slug, '%s-1' % long_name[:253])
+        topic3 = Topic.objects.create(name=long_name, forum=self.forum, user=self.user)
+        self.assertEqual(topic3.slug, '%s-2' % long_name[:253])
+
+    def test_absolute_url(self):
+        response = self.client.get(self.category.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['category'], self.category)
+        self.assertEqual('/c/%s/' % (self.category.slug), self.category.get_absolute_url())
+        response = self.client.get(self.forum.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['forum'], self.forum)
+        self.assertEqual(
+            '/c/%s/%s/' % (self.category.slug, self.forum.slug),
+            self.forum.get_absolute_url()
+            )
+        response = self.client.get(self.topic.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['topic'], self.topic)
+        self.assertEqual(
+            '/c/%s/%s/%s/' % (self.category.slug, self.forum.slug, self.topic.slug),
+            self.topic.get_absolute_url()
+            )
+
+    def test_add_topic(self):
+        add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.pk})
+        response = self.client.get(add_topic_url)
+        inputs = dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % "post-form")[0].inputs)
+        self.assertNotIn('slug', inputs)
+        values = self.get_form_values(response)
+        values.update({'name': self.topic.name, 'body': '[b]Test slug body[/b]', 'poll_type': 0})
+        response = self.client.post(add_topic_url, data=values, follow=True)
+        slug_nb = len(Topic.objects.filter(slug__startswith=compat.slugify(self.topic.name))) - 1
+        self.assertIsNotNone = Topic.objects.get(slug='%s-%d' % (self.topic.name, slug_nb))
+
+        _attach_perms_class('pybb.tests.CustomPermissionHandler')
+        response = self.client.get(add_topic_url)
+        inputs = dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % "post-form")[0].inputs)
+        self.assertIn('slug', inputs)
+        values = self.get_form_values(response)
+        values.update({'name': self.topic.name, 'body': '[b]Test slug body[/b]',
+                       'poll_type': 0, 'slug': 'test_slug'})
+        response = self.client.post(add_topic_url, data=values, follow=True)
+        self.assertIsNotNone = Topic.objects.get(slug='test_slug')
+        _detach_perms_class()
+
+    def test_old_url_redirection(self):
+
+        original_perm_redirect = defaults.PYBB_NICE_URL_PERMANENT_REDIRECT
+
+        for redirect_status in [301, 302]:
+            defaults.PYBB_NICE_URL_PERMANENT_REDIRECT = redirect_status == 301
+
+            response = self.client.get(reverse("pybb:category", kwargs={"pk": self.category.pk}))
+            self.assertRedirects(response, self.category.get_absolute_url(), status_code=redirect_status)
+
+            response = self.client.get(reverse("pybb:forum", kwargs={"pk": self.forum.pk}))
+            self.assertRedirects(response, self.forum.get_absolute_url(), status_code=redirect_status)
+
+            response = self.client.get(reverse("pybb:topic", kwargs={"pk": self.topic.pk}))
+            self.assertRedirects(response, self.topic.get_absolute_url(), status_code=redirect_status)
+
+        defaults.PYBB_NICE_URL_PERMANENT_REDIRECT = original_perm_redirect
+
+    def tearDown(self):
+        defaults.PYBB_NICE_URL = self.ORIGINAL_PYBB_NICE_URL

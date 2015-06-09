@@ -8,6 +8,8 @@ try:
 except ImportError:
     south_installed = False
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 DEBUG = False
 
 DATABASES = {
@@ -51,10 +53,6 @@ if django.VERSION[:2] < (1, 7):
 else:
     INSTALLED_APPS.append('pybb.apps.PybbConfig')
 
-DATABASES = DATABASES
-
-INSTALLED_APPS = INSTALLED_APPS
-
 SECRET_KEY = 'some secret'
 
 TEMPLATE_CONTEXT_PROCESSORS = [
@@ -84,7 +82,9 @@ SITE_ID = 1
 
 STATIC_URL = '/static/'
 
-TEMPLATE_DIRS = (os.path.join(os.path.dirname(os.path.abspath(__file__)), '../templates'), )
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates'),
+)
 
 if django.VERSION[:2] > (1, 4):
     AUTH_USER_MODEL = 'test_app.CustomUser'

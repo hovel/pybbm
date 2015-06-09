@@ -13,6 +13,7 @@ setup(
     package_data={'': ['pybb/templates', 'pybb/static']},
     install_requires=[
         'django-annoying',
+        'unidecode',
     ],
     test_suite='runtests.runtests',
     license="BSD",
