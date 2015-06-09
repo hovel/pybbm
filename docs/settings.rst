@@ -489,3 +489,15 @@ to redirect old style URL to new one. True (default) use 301 (permantent) redire
 it uses 302 (temporary) redirect. `False` value is usefull for testing period to not loose SEO related
 to old URLs, then, once testing period is over, setting this to True will ensure that your old URLs will
 be updated to the new ones next time the Search Engine will check it.
+
+Default: True
+
+.. _PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT:
+
+PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT
+..................................
+
+Limit for checking duplicate slugs.
+After reaching this limit while trying to find unique slug ValidationError will be raised.
+
+Default: 100

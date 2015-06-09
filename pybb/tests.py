@@ -2049,13 +2049,20 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
 
     def test_fail_on_too_many_duplicate_slug(self):
+
+        original_duplicate_limit = defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT
+
+        defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT = 200
+
         try:
-            for i in iter(range(100)):
-                topic = Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
+            for _ in iter(range(200)):
+                Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
         except ValidationError as e:
-            self.fails('Should be able to create "dolly", "dolly-1", ..., "dolly-99".\n')
+            self.fail('Should be able to create "dolly", "dolly-1", ..., "dolly-199".\n')
         with self.assertRaises(ValidationError):
-            topic = Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
+            Topic.objects.create(name='dolly', forum=self.forum, user=self.user)
+
+        defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT = original_duplicate_limit
 
     def test_long_duplicate_slug(self):
         long_name = 'abcde' * 51  # 255 symbols
