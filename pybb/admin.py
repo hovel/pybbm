@@ -17,6 +17,7 @@ class ForumInlineAdmin(admin.TabularInline):
 
 
 class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
     list_display = ['name', 'position', 'hidden', 'forum_count']
     list_per_page = 20
     ordering = ['position']
@@ -27,6 +28,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ForumAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
     list_display = ['name', 'category', 'hidden', 'position', 'topic_count', ]
     list_per_page = 20
     raw_id_fields = ['moderators']
@@ -40,7 +42,7 @@ class ForumAdmin(admin.ModelAdmin):
          ),
         (_('Additional options'), {
                 'classes': ('collapse',),
-                'fields': ('updated', 'description', 'headline', 'post_count', 'moderators')
+                'fields': ('updated', 'description', 'headline', 'post_count', 'moderators', 'slug')
                 }
             ),
         )
@@ -53,6 +55,7 @@ class PollAnswerAdmin(admin.TabularInline):
 
 
 class TopicAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
     list_display = ['name', 'forum', 'created', 'head', 'post_count', 'poll_type',]
     list_per_page = 20
     raw_id_fields = ['user', 'subscribers']
@@ -66,7 +69,7 @@ class TopicAdmin(admin.ModelAdmin):
          ),
         (_('Additional options'), {
                 'classes': ('collapse',),
-                'fields': (('views', 'post_count'), ('sticky', 'closed'), 'subscribers')
+                'fields': (('views', 'post_count'), ('sticky', 'closed'), 'subscribers', 'slug')
                 }
          ),
         )

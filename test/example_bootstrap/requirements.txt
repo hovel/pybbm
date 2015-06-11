@@ -10,6 +10,7 @@ django-registration-redux
 django-annoying
 bbcode
 Pillow
+unidecode
 
 #for test purpose only
 #lxml

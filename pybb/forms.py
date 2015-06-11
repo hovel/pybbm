@@ -59,6 +59,7 @@ class PostForm(forms.ModelForm):
         label=ugettext_lazy('Poll question'),
         required=False,
         widget=forms.Textarea(attrs={'class': 'no-markitup'}))
+    slug = forms.CharField(label=ugettext_lazy('Topic slug'), required=False)
 
     class Meta(object):
         model = Post
@@ -76,6 +77,7 @@ class PostForm(forms.ModelForm):
         self.topic = kwargs.pop('topic', None)
         self.forum = kwargs.pop('forum', None)
         self.may_create_poll = kwargs.pop('may_create_poll', True)
+        self.may_edit_topic_slug = kwargs.pop('may_edit_topic_slug', False)
         if not (self.topic or self.forum or ('instance' in kwargs)):
             raise ValueError('You should provide topic, forum or instance')
             # Handle topic subject, poll type and question if editing topic head
@@ -91,9 +93,13 @@ class PostForm(forms.ModelForm):
             del self.fields['name']
             del self.fields['poll_type']
             del self.fields['poll_question']
-        elif not self.may_create_poll:
-            del self.fields['poll_type']
-            del self.fields['poll_question']
+            del self.fields['slug']
+        else:
+            if not self.may_create_poll:
+                del self.fields['poll_type']
+                del self.fields['poll_question']
+            if not self.may_edit_topic_slug:
+                del self.fields['slug']
 
         self.available_smiles = defaults.PYBB_SMILES
         self.smiles_prefix = defaults.PYBB_SMILES_PREFIX
@@ -144,6 +150,7 @@ class PostForm(forms.ModelForm):
                 name=self.cleaned_data['name'],
                 poll_type=self.cleaned_data.get('poll_type', Topic.POLL_TYPE_NONE),
                 poll_question=self.cleaned_data.get('poll_question', None),
+                slug=self.cleaned_data.get('slug', None),
             )
             if not allow_post:
                 topic.on_moderation = True
