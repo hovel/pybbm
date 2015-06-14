@@ -1,9 +1,10 @@
+{% extends PYBB_TEMPLATE_MAIL_TXT|default:"pybb/mail_templates/base.html" %}
 {% load i18n pybb_tags %}
-{% pybb_get_profile user=post.user as profile %}
-
-{% blocktrans with username=profile.get_display_name %}User {{ username }} replied in topic to which you are subscribed.{% endblocktrans%}
+{% block content %}{% pybb_get_profile user=post.user as profile %}{% autoescape off %}{% blocktrans with username=profile.get_display_name %}User {{ username }} replied in topic to which you are subscribed.{% endblocktrans%}
 {% trans "Link to post:" %} {{ post_url }}
 {% trans "Link to topic:" %} {{ topic_url }}
 
 -----
 {% trans "If you don't want to receive notifications on new messages in this topic visit following link:" %} {{ delete_url_full }}
+{% endautoescape %}
+{% endblock %}

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-09 10:07-0500\n"
-"PO-Revision-Date: 2015-06-09 17:24+0100\n"
-"Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
+"POT-Creation-Date: 2015-06-14 20:00+0200\n"
+"PO-Revision-Date: 2015-06-14 20:04+0100\n"
+"Last-Translator: Dylann Cordel <cordel.d@free.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -86,7 +86,6 @@ msgid "Poll question"
 msgstr "Question de sondage"
 
 #: forms.py:62
-#| msgid "Topics"
 msgid "Topic slug"
 msgstr "Slug du sujet"
 
@@ -99,7 +98,6 @@ msgstr "Vous devez spécifier une question lorsque vous ajoutez un sondage"
 #: models.py:256
 #: models.py:329
 #: models.py:468
-#: templates/pybb/mail_templates/subscription_email_body.html:4
 msgid "User"
 msgstr "Utilisateur"
 
@@ -236,7 +234,7 @@ msgstr "Sujet"
 
 #: models.py:163
 #: templates/pybb/forum_list.html:11
-#: templates/pybb/user_topics.html:9
+#: templates/pybb/user_topics.html:8
 msgid "Topics"
 msgstr "Sujets"
 
@@ -262,7 +260,7 @@ msgstr "Message"
 #: templates/pybb/topic.html:28
 #: templates/pybb/topic.html.py:48
 #: templates/pybb/topic_list.html:10
-#: templates/pybb/user_posts.html:9
+#: templates/pybb/user_posts.html:8
 msgid "Posts"
 msgstr "Messages"
 
@@ -545,9 +543,25 @@ msgstr "Marquer tous les forums comme lus"
 msgid "Mark all topics as read"
 msgstr "Marquer tous les sujets comme lus"
 
+#: templates/pybb/mail_templates/subscription_email_body-html.html:16
 #: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "replied in topic to which you are subscribed."
-msgstr "a répondu dans un sujet auquel vous êtes abonné."
+#, python-format
+#| msgid "replied in topic to which you are subscribed."
+msgid "User %(username)s replied in topic to which you are subscribed."
+msgstr "L'utilisateur %(username)s a répondu dans un sujet auquel vous êtes abonné."
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:19
+#, python-format
+msgid "Follow %(link_post_start)sthis link%(link_end)s to see the new post on the topic %(link_topic_start)s%(topic_name)s%(link_end)s."
+msgstr "Suivez %(link_post_start)sce lien%(link_end)s pour voir le nouveau message du sujet %(link_topic_start)s%(topic_name)s%(link_end)s."
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:23
+#, python-format
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
+msgid "If you don't want to receive notifications on new posts in this topic visit following %(link_start)s this link%(link_end)s."
+msgstr "Si vous ne souhaitez pas recevoir de notifications pour les nouveaux messages de ce sujet, visitez %(link_start)sce lien%(link_end)s."
 
 #: templates/pybb/mail_templates/subscription_email_body.html:5
 msgid "Link to post:"
@@ -558,8 +572,11 @@ msgid "Link to topic:"
 msgstr "Lien vers le sujet :"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:9
-msgid "If you don't want to recive notifications on new messages in this topic visit following link:"
-msgstr "Si vous ne souhaitez pas recevoir de notifications pour les nouveaux messages de ce sujet, visitez le lien :"
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
+msgid "If you don't want to receive notifications on new messages in this topic visit following link:"
+msgstr "Si vous ne souhaitez pas recevoir de notifications pour les nouveaux messages de ce sujet, visitez le lien suivant :"
 
 #: templates/pybb/mail_templates/subscription_email_subject.html:2
 msgid "New answer in topic that you subscribed."
@@ -588,32 +605,26 @@ msgid "Second Level Heading"
 msgstr "Titre de second niveau"
 
 #: templates/pybb/markup/markdown_widget.html:20
-#| msgid "Headline"
 msgid "Heading 3"
 msgstr "Titre 3"
 
 #: templates/pybb/markup/markdown_widget.html:21
-#| msgid "Headline"
 msgid "Heading 4"
 msgstr "Titre 4"
 
 #: templates/pybb/markup/markdown_widget.html:22
-#| msgid "Headline"
 msgid "Heading 5"
 msgstr "Titre 5"
 
 #: templates/pybb/markup/markdown_widget.html:23
-#| msgid "Headline"
 msgid "Heading 6"
 msgstr "Titre 6"
 
 #: templates/pybb/markup/markdown_widget.html:28
-#| msgid "Bulleted list"
 msgid "Bulleted List"
 msgstr "Liste à puces"
 
 #: templates/pybb/markup/markdown_widget.html:29
-#| msgid "Numeric list"
 msgid "Numeric List"
 msgstr "Liste numérotée"
 
@@ -654,7 +665,7 @@ msgid "Rank"
 msgstr "Classement"
 
 #: templates/pybb/post_template.html:42
-#: templates/pybb/user.html:47
+#: templates/pybb/user.html:49
 msgid "Edit"
 msgstr "Modifier"
 
@@ -727,41 +738,41 @@ msgstr "Aller au premier message non lu"
 msgid "pages"
 msgstr "pages"
 
-#: templates/pybb/user.html:16
+#: templates/pybb/user.html:18
 msgid "Statistics"
 msgstr "Statistiques"
 
-#: templates/pybb/user.html:19
+#: templates/pybb/user.html:21
 msgid "Number of topics"
 msgstr "Nombre de sujets"
 
-#: templates/pybb/user.html:25
+#: templates/pybb/user.html:27
 msgid "Number of posts"
 msgstr "Nombre de messages"
 
-#: templates/pybb/user.html:29
+#: templates/pybb/user.html:31
 msgid "Date of registration"
 msgstr "Date d'enregistrement"
 
-#: templates/pybb/user.html:37
+#: templates/pybb/user.html:39
 msgid "Block"
 msgstr "Bloquer"
 
-#: templates/pybb/user.html:38
+#: templates/pybb/user.html:40
 msgid "Block and delete all messages"
 msgstr "Bloquer et supprimer tous les messages"
 
-#: templates/pybb/user.html:42
+#: templates/pybb/user.html:44
 msgid "Unblock"
 msgstr "Débloquer"
 
-#: templates/pybb/user_posts.html:12
-#: templates/pybb/user_posts.html.py:16
+#: templates/pybb/user_posts.html:13
+#: templates/pybb/user_posts.html.py:18
 msgid "All posts created by"
 msgstr "Tous les sujets créés par"
 
-#: templates/pybb/user_topics.html:12
-#: templates/pybb/user_topics.html.py:16
+#: templates/pybb/user_topics.html:13
+#: templates/pybb/user_topics.html.py:18
 msgid "All topics created by"
 msgstr "Tous les sujets créés par"
 
@@ -805,7 +816,6 @@ msgid "Can't get profile for anonymous user"
 msgstr "Impossible d'obtenir le profil d'un utilisateur anonyme"
 
 #: views.py:144
-#| msgid "Forum categories are not created"
 msgid "Forum does not exist"
 msgstr "Le forum n'existe pas"
 
