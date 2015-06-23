@@ -1144,25 +1144,33 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         # test if there are as many chechkboxs as forums in the category
         inputs = dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % "privileges-edit")[0].inputs)
-        self.assertEqual(len(response.context['form'].authorized_forums),len(inputs['cat_%d' % self.category.pk]))
+        self.assertEqual(
+            len(response.context['form'].authorized_forums),
+            len(inputs['cat_%d' % self.category.pk])
+            )
 
         # test to add user as moderator
+        # get csrf token
         values = self.get_form_values(response, "privileges-edit")
-        values['cat_%d' % self.category.pk] = [self.forum.pk, forum2.pk]
+        # dynamic contruction of the list corresponding to custom may_change_forum
+        available_forums = [forum for forum in self.category.forums.all() if not forum.pk % 3 == 0]
+        values['cat_%d' % self.category.pk] = [forum.pk for forum in available_forums]
         response = self.client.post(
-            reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True)
+            reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
+            )
         self.assertEqual(response.status_code, 200)
-        correct_list = sorted([self.forum, forum2], key=lambda forum: forum.pk)
+
+        correct_list = sorted(available_forums, key=lambda forum: forum.pk)
         moderator_list = sorted([forum for forum in moderator.forum_set.all()], key=lambda forum: forum.pk)
         self.assertEqual(correct_list, moderator_list)
 
         # test to remove user as moderator
-        values['cat_%d' % self.category.pk] = [self.forum.pk, ]
+        values['cat_%d' % self.category.pk] = [available_forums[0].pk, ]
         response = self.client.post(
                 reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
             )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([self.forum, ], [forum for forum in moderator.forum_set.all()])
+        self.assertEqual([available_forums[0], ], [forum for forum in moderator.forum_set.all()])
         values['cat_%d' % self.category.pk] = []
         response = self.client.post(
                 reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True

@@ -262,7 +262,7 @@ class ModeratorForm(forms.Form):
     def __init__(self, user, *args, **kwargs):
 
         """
-        Create the form to grant moderator privileges, checking if the request user has the 
+        Creates the form to grant moderator privileges, checking if the request user has the
         permission to do so.
 
         :param user: request user

@@ -1,5 +1,6 @@
 # -*- coding: utf-8
 from __future__ import unicode_literals
+from copy import deepcopy
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
@@ -48,14 +49,17 @@ class ForumAdmin(admin.ModelAdmin):
             ),
         )
 
-    def get_form(self, request, obj=None, **kwargs):
+    def get_fieldsets(self, request, obj=None):
         """
         adds moderators field to Additionnal options fieldset only if
         the request user has permission to manage moderators
         """
+
+        fieldsets = super(ForumAdmin, self).get_fieldsets(request, obj)
         if permissions.perms.may_manage_moderators(request.user):
-            self.fieldsets[1][1]['fields'] += ('moderators',)
-        return super(ForumAdmin, self).get_form(request, obj, **kwargs)
+            fieldsets = deepcopy(fieldsets)
+            fieldsets[-1][1]['fields'] += ('moderators',)
+        return fieldsets
 
 
 class PollAnswerAdmin(admin.TabularInline):

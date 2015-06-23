@@ -196,6 +196,6 @@ class DefaultPermissionHandler(object):
 
     def may_manage_moderators(self, user):
         """ return True if `user` may manage moderators"""
-        return user.is_staff
+        return user.is_superuser or user.is_staff
 
 perms = util.resolve_class(defaults.PYBB_PERMISSION_HANDLER)
