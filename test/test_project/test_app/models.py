@@ -39,10 +39,12 @@ if django.VERSION[:2] >= (1, 5):
 
 
 class CustomProfile(PybbProfile):
-    user = models.OneToOneField(get_user_model_path(),
+    user = models.OneToOneField(
+        get_user_model_path(),
         verbose_name='linked account',
         related_name='pybb_customprofile',
-        blank=False, null=False,)
+        blank=False, null=False,
+    )
 
     class Meta(object):
         verbose_name = 'Profile'

@@ -8,9 +8,11 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now as tznow
 from django.utils.translation import ugettext_lazy as _
 
+from pybb import defaults
 from pybb.compat import get_user_model_path
 
 from pybb.models.poll_answer import PollAnswerUser
+
 
 @python_2_unicode_compatible
 class Topic(models.Model):
@@ -24,7 +26,7 @@ class Topic(models.Model):
         (POLL_TYPE_MULTIPLE, _('Multiple answers')),
     )
 
-    forum = models.ForeignKey('Forum', related_name='topics', verbose_name=_('Forum'))
+    forum = models.ForeignKey('pybb.Forum', related_name='topics', verbose_name=_('Forum'))
     name = models.CharField(_('Subject'), max_length=255)
     created = models.DateTimeField(_('Created'), null=True)
     updated = models.DateTimeField(_('Updated'), null=True)
@@ -39,12 +41,13 @@ class Topic(models.Model):
     on_moderation = models.BooleanField(_('On moderation'), default=False)
     poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
     poll_question = models.TextField(_('Poll question'), blank=True, null=True)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
 
     class Meta(object):
         ordering = ['-created']
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
-        app_label = 'pybb'
+        unique_together = ('forum', 'slug')
 
     def __str__(self):
         return self.name
@@ -64,6 +67,8 @@ class Topic(models.Model):
             return None
 
     def get_absolute_url(self):
+        if defaults.PYBB_NICE_URL:
+            return reverse('pybb:topic', kwargs={'slug': self.slug, 'forum_slug': self.forum.slug, 'category_slug': self.forum.category.slug})
         return reverse('pybb:topic', kwargs={'pk': self.id})
 
     def save(self, *args, **kwargs):

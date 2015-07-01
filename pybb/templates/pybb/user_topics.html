@@ -3,13 +3,15 @@
 {% load url from future %}
 {% load pybb_tags i18n %}
 
-{% pybb_get_profile target_user as target_profile %}
-
 {% block breadcrumb %}
+    {% pybb_get_profile target_user as target_profile %}
     {% include "pybb/breadcrumb.html" with object=target_profile extra_crumb=_('Topics') %}
 {% endblock %}
 
-{% block title %}{% trans "All topics created by" %} {{ target_profile.get_display_name }}{% endblock %}
+{% block title %}
+    {% pybb_get_profile target_user as target_profile %}
+    {% trans "All topics created by" %} {{ target_profile.get_display_name }}
+{% endblock %}
 
 {% block content %}
     {% pybb_get_profile target_user as target_profile %}

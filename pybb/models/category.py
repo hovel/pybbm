@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from pybb import defaults
 from pybb.models.topic import Topic
 from pybb.models.post import Post
 
@@ -16,12 +17,12 @@ class Category(models.Model):
     position = models.IntegerField(_('Position'), blank=True, default=0)
     hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
                                  help_text=_('If checked, this category will be visible only for staff'))
+    slug = models.SlugField(_("Slug"), max_length=255, unique=True)
 
     class Meta(object):
         ordering = ['position']
         verbose_name = _('Category')
         verbose_name_plural = _('Categories')
-        app_label = 'pybb'
 
     def __str__(self):
         return self.name
@@ -30,6 +31,8 @@ class Category(models.Model):
         return self.forums.all().count()
 
     def get_absolute_url(self):
+        if defaults.PYBB_NICE_URL:
+            return reverse('pybb:category', kwargs={'slug': self.slug, })
         return reverse('pybb:category', kwargs={'pk': self.id})
 
     @property

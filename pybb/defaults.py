@@ -45,6 +45,10 @@ PYBB_SMILES = getattr(settings, 'PYBB_SMILES', {
     ';)': 'wink.png'
 })
 
+PYBB_NICE_URL = getattr(settings, 'PYBB_NICE_URL', False)
+PYBB_NICE_URL_PERMANENT_REDIRECT = getattr(settings, 'PYBB_NICE_URL_PERMANENT_REDIRECT', True)
+PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT = getattr(settings, 'PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT', 100)
+
 # TODO In a near future, this code will be deleted when callable settings will not supported anymore.
 callable_warning = ('%(setting_name)s should not be a callable anymore but a path to the parser classes.'
                     'ex : myproject.markup.CustomBBCodeParser. It will stop working in next pybbm release.')

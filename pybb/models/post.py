@@ -10,11 +10,12 @@ from django.utils.translation import ugettext_lazy as _
 from pybb.compat import get_user_model_path
 
 from pybb.models.renderable import RenderableItem
+from pybb.models.topic import Topic
 
 
 @python_2_unicode_compatible
 class Post(RenderableItem):
-    topic = models.ForeignKey('Topic', related_name='posts', verbose_name=_('Topic'))
+    topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(get_user_model_path(), related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True, db_index=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
@@ -25,7 +26,6 @@ class Post(RenderableItem):
         ordering = ['created']
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
-        app_label = 'pybb'
 
     def summary(self):
         limit = 50

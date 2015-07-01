@@ -4,11 +4,13 @@
 
 {% load pybb_tags i18n %}
 
-{% pybb_get_profile target_user as target_profile %}
-
-{% block title %}{{ target_profile.get_display_name }}{% endblock %}
+{% block title %}
+    {% pybb_get_profile target_user as target_profile %}
+    {{ target_profile.get_display_name }}
+{% endblock %}
 
 {% block content %}
+    {% pybb_get_profile target_user as target_profile %}
     <h1>{{ target_profile.get_display_name }}</h1>
     <div class="userinfo">
         {% include 'pybb/avatar.html' with user=target_user %}

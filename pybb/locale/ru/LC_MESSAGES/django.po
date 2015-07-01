@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-21 19:54+0400\n"
+"POT-Creation-Date: 2015-06-09 16:27+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Pavel Zhukov <gelios@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,19 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin.py:41 admin.py:67 admin.py:95 admin.py:117
+#: admin.py:43 admin.py:70 admin.py:98 admin.py:120
 msgid "Additional options"
 msgstr "Дополнительные свойства"
 
-#: admin.py:100 models.py:226
+#: admin.py:103 models.py:241
 msgid "Message"
 msgstr "Сообщение"
 
-#: admin.py:131
+#: admin.py:134
 msgid "View post"
 msgstr "Просмотр сообщения"
 
-#: admin.py:136
+#: admin.py:139
 msgid "Edit post"
 msgstr "Редактирование сообщения"
 
@@ -57,220 +57,235 @@ msgstr "Вы не можете добавить более чем %s ответ�
 msgid "Add two or more answers for this poll"
 msgstr "Добавьте по крайней мере 2 варианта ответа на опрос"
 
-#: forms.py:56 models.py:133
+#: forms.py:56 models.py:144
 msgid "Subject"
 msgstr "Заголовок"
 
-#: forms.py:57 models.py:145
+#: forms.py:57 models.py:156
 msgid "Poll type"
 msgstr "Тип опроса"
 
-#: forms.py:59 models.py:146
+#: forms.py:59 models.py:157
 msgid "Poll question"
 msgstr "Тема опроса"
 
-#: forms.py:112
+#: forms.py:62
+msgid "Topic slug"
+msgstr "Метка темы"
+
+#: forms.py:121
 msgid "Polls question is required when adding a poll"
 msgstr "Необходимо указать вопрос при добавлении опроса"
 
-#: forms.py:164 models.py:136 models.py:241 models.py:314 models.py:453
+#: forms.py:174 models.py:147 models.py:256 models.py:329 models.py:468
 #: templates/pybb/mail_templates/subscription_email_body.html:4
 msgid "User"
 msgstr "Пользователь"
 
-#: forms.py:200
+#: forms.py:210
 #, python-format
 msgid "Avatar is too large, max size: %s bytes"
 msgstr "Аватар слишком большой, максимальный размер: %s байт"
 
-#: models.py:30 models.py:63
+#: models.py:31 models.py:67
 msgid "Name"
 msgstr "Имя"
 
-#: models.py:31 models.py:64
+#: models.py:32 models.py:68
 msgid "Position"
 msgstr "Позиция"
 
-#: models.py:32 models.py:70 templates/pybb/category.html:5
+#: models.py:33 models.py:74 templates/pybb/category.html:5
 #: templates/pybb/forum_list.html:26
 msgid "Hidden"
 msgstr "Скрыто"
 
-#: models.py:33
+#: models.py:34
 msgid "If checked, this category will be visible only for staff"
 msgstr ""
 "Если отмечено, данная категория будет отображаться только для персонала"
 
-#: models.py:37 models.py:60
+#: models.py:35 models.py:77 models.py:158
+msgid "Slug"
+msgstr "Метка"
+
+#: models.py:39 models.py:64
 msgid "Category"
 msgstr "Категория"
 
-#: models.py:38
+#: models.py:40
 msgid "Categories"
 msgstr "Категории"
 
-#: models.py:61
+#: models.py:65
 msgid "Parent forum"
 msgstr "Родительский форум"
 
-#: models.py:65
+#: models.py:69
 msgid "Description"
 msgstr "Описание"
 
-#: models.py:66
+#: models.py:70
 msgid "Moderators"
 msgstr "Модераторы"
 
-#: models.py:67 models.py:135 models.py:243
+#: models.py:71 models.py:146 models.py:258
 msgid "Updated"
 msgstr "Дата обновления"
 
-#: models.py:68 models.py:142 profiles.py:40
+#: models.py:72 models.py:153 profiles.py:40
 msgid "Post count"
 msgstr "Количество сообщений"
 
-#: models.py:69
+#: models.py:73
 msgid "Topic count"
 msgstr "Количество тем"
 
-#: models.py:72
+#: models.py:76
 msgid "Headline"
 msgstr "Шапка"
 
-#: models.py:76 models.py:132 templates/pybb/forum_list.html:8
+#: models.py:81 models.py:143 templates/pybb/forum_list.html:8
 msgid "Forum"
 msgstr "Форум"
 
-#: models.py:77
+#: models.py:82
 msgid "Forums"
 msgstr "Форумы"
 
-#: models.py:127
+#: models.py:138
 msgid "None"
 msgstr "Никакие"
 
-#: models.py:128
+#: models.py:139
 msgid "Single answer"
 msgstr "Выбор одного варианта"
 
-#: models.py:129
+#: models.py:140
 msgid "Multiple answers"
 msgstr "Выбор нескольких вариантов"
 
-#: models.py:134 models.py:242
+#: models.py:145 models.py:257
 msgid "Created"
 msgstr "Дата создания"
 
-#: models.py:137
+#: models.py:148
 msgid "Views count"
 msgstr "Количество просмотров"
 
-#: models.py:138 templates/pybb/topic_list.html:27
+#: models.py:149 templates/pybb/topic_list.html:27
 msgid "Sticky"
 msgstr "Закреплено"
 
-#: models.py:139 templates/pybb/topic_list.html:28
+#: models.py:150 templates/pybb/topic_list.html:28
 msgid "Closed"
 msgstr "Закрыто"
 
-#: models.py:141 templates/pybb/topic.html:89
+#: models.py:152 templates/pybb/topic.html:94
 msgid "Subscribers"
 msgstr "Подписчики"
 
-#: models.py:144 models.py:245
+#: models.py:155 models.py:260
 msgid "On moderation"
 msgstr "На модерации"
 
-#: models.py:150 models.py:240 models.py:429 templates/pybb/topic_list.html:7
+#: models.py:162 models.py:255 models.py:444 templates/pybb/topic_list.html:7
 msgid "Topic"
 msgstr "Тема"
 
-#: models.py:151 templates/pybb/forum_list.html:11
+#: models.py:163 templates/pybb/forum_list.html:11
 #: templates/pybb/user_topics.html:9
 msgid "Topics"
 msgstr "Темы"
 
-#: models.py:227
+#: models.py:242
 msgid "HTML version"
 msgstr "HTML версия"
 
-#: models.py:228
+#: models.py:243
 msgid "Text version"
 msgstr "Текстовая версия"
 
-#: models.py:244
+#: models.py:259
 msgid "User IP"
 msgstr "IP автора"
 
-#: models.py:249 models.py:332
+#: models.py:264 models.py:347
 msgid "Post"
 msgstr "Сообщение"
 
-#: models.py:250 templates/pybb/forum_list.html:14
-#: templates/pybb/topic.html:24 templates/pybb/topic.html.py:44
+#: models.py:265 templates/pybb/forum_list.html:14
+#: templates/pybb/topic.html:28 templates/pybb/topic.html.py:48
 #: templates/pybb/topic_list.html:10 templates/pybb/user_posts.html:9
 msgid "Posts"
 msgstr "Сообщения"
 
-#: models.py:317
+#: models.py:332
 msgid "Profile"
 msgstr "Профиль"
 
-#: models.py:318
+#: models.py:333
 msgid "Profiles"
 msgstr "Профили"
 
-#: models.py:329
+#: models.py:344
 msgid "Attachment"
 msgstr "Вложение"
 
-#: models.py:330
+#: models.py:345
 msgid "Attachments"
 msgstr "Вложения"
 
-#: models.py:333
+#: models.py:348
 msgid "Size"
 msgstr "Размер"
 
-#: models.py:334
+#: models.py:349
 msgid "File"
 msgstr "Файл"
 
-#: models.py:384
+#: models.py:399
 msgid "Topic read tracker"
 msgstr "Трекер прочитанных сообщений"
 
-#: models.py:385
+#: models.py:400
 msgid "Topic read trackers"
 msgstr "Трекеры прочитанных сообщений"
 
-#: models.py:422
+#: models.py:437
 msgid "Forum read tracker"
 msgstr "Отметка прочитанного форума"
 
-#: models.py:423
+#: models.py:438
 msgid "Forum read trackers"
 msgstr "Отметки прочитанных форумов"
 
-#: models.py:430
+#: models.py:445
 msgid "Text"
 msgstr "Текст"
 
-#: models.py:433 models.py:452
+#: models.py:448 models.py:467
 msgid "Poll answer"
 msgstr "Ответ на опрос"
 
-#: models.py:434
+#: models.py:449
 msgid "Polls answers"
 msgstr "Ответы на опросы"
 
-#: models.py:457
+#: models.py:472
 msgid "Poll answer user"
 msgstr "Ответ пользователя на опрос"
 
-#: models.py:458
+#: models.py:473
 msgid "Polls answers users"
 msgstr "Ответы пользователей на опросы"
+
+#: models.py:496
+#, python-format
+msgid ""
+"After %(limit)s attemps, there is not any unique slug value for \"%(slug)s\""
+msgstr ""
+"После %(limit)s попыток не удалось найти уникальную метку для \"%(slug)s\""
 
 #: profiles.py:33
 msgid "Signature"
@@ -305,7 +320,7 @@ msgid "Automatically subscribe to topics that you answer"
 msgstr "Автоматически подписывать на темы, на которые вы ответили"
 
 #: templates/pybb/_button_new_topic.html:2 templates/pybb/add_post.html:5
-#: templates/pybb/add_post.html.py:28
+#: templates/pybb/add_post.html.py:32
 msgid "New topic"
 msgstr "Новая тема"
 
@@ -317,55 +332,74 @@ msgstr "Сохранить"
 msgid "Submit"
 msgstr "Отправить"
 
-#: templates/pybb/_markitup.html:15
+#: templates/pybb/_markitup.html:22
+#: templates/pybb/markup/bbcode_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:25
 msgid "Bold"
 msgstr "Жирный"
 
-#: templates/pybb/_markitup.html:16
+#: templates/pybb/_markitup.html:23
+#: templates/pybb/markup/bbcode_widget.html:18
+#: templates/pybb/markup/markdown_widget.html:26
 msgid "Italic"
 msgstr "Курсив"
 
-#: templates/pybb/_markitup.html:17
+#: templates/pybb/_markitup.html:24
+#: templates/pybb/markup/bbcode_widget.html:19
 msgid "Underline"
 msgstr "Подчёркнутый"
 
-#: templates/pybb/_markitup.html:18
+#: templates/pybb/_markitup.html:25
+#: templates/pybb/markup/bbcode_widget.html:20
 msgid "Stroke"
 msgstr "Зачёркнутый"
 
-#: templates/pybb/_markitup.html:20
+#: templates/pybb/_markitup.html:27
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
 msgid "Picture"
 msgstr "Изображение"
 
-#: templates/pybb/_markitup.html:21
+#: templates/pybb/_markitup.html:28
+#: templates/pybb/markup/bbcode_widget.html:23
+#: templates/pybb/markup/markdown_widget.html:34
 msgid "Link"
 msgstr "Ссылка"
 
-#: templates/pybb/_markitup.html:23
+#: templates/pybb/_markitup.html:30
+#: templates/pybb/markup/bbcode_widget.html:25
 msgid "Bulleted list"
 msgstr "Ненумерованный список"
 
-#: templates/pybb/_markitup.html:24
+#: templates/pybb/_markitup.html:31
+#: templates/pybb/markup/bbcode_widget.html:26
 msgid "Numeric list"
 msgstr "Нумерованный список"
 
-#: templates/pybb/_markitup.html:25
+#: templates/pybb/_markitup.html:32
+#: templates/pybb/markup/bbcode_widget.html:27
 msgid "List item"
 msgstr "Элемент списка"
 
-#: templates/pybb/_markitup.html:27
+#: templates/pybb/_markitup.html:34
+#: templates/pybb/markup/bbcode_widget.html:29
+#: templates/pybb/markup/markdown_widget.html:36
 msgid "Quotes"
 msgstr "Цитировать"
 
-#: templates/pybb/_markitup.html:28
+#: templates/pybb/_markitup.html:35
+#: templates/pybb/markup/bbcode_widget.html:30
 msgid "Code"
 msgstr "Код"
 
-#: templates/pybb/_markitup.html:30
+#: templates/pybb/_markitup.html:37
+#: templates/pybb/markup/bbcode_widget.html:32
 msgid "Clean"
 msgstr "Очистить"
 
-#: templates/pybb/_markitup.html:31
+#: templates/pybb/_markitup.html:38
+#: templates/pybb/markup/bbcode_widget.html:33
+#: templates/pybb/markup/markdown_widget.html:39
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -385,7 +419,7 @@ msgstr "войдите"
 msgid "to create to post a reply"
 msgstr "что-бы оставить сообщение"
 
-#: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:28
+#: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:32
 msgid "New reply"
 msgstr "Новый ответ"
 
@@ -414,7 +448,7 @@ msgstr "Нет, верните меня назад"
 msgid "Yes, I am sure"
 msgstr "Да, я уверен"
 
-#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:13
+#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:17
 msgid "Editing the post"
 msgstr "Редактирование сообщения"
 
@@ -484,6 +518,56 @@ msgstr ""
 msgid "New answer in topic that you subscribed."
 msgstr "Новый ответ в теме, на которую вы подписаны"
 
+#: templates/pybb/markup/bbcode_widget.html:23
+#: templates/pybb/markup/markdown_widget.html:34
+msgid "Your text to link here..."
+msgstr "Текст ссылки..."
+
+#: templates/pybb/markup/markdown_widget.html:18
+msgid "First Level Heading"
+msgstr "Первый уровень заголовка"
+
+#: templates/pybb/markup/markdown_widget.html:18
+#: templates/pybb/markup/markdown_widget.html:19
+#: templates/pybb/markup/markdown_widget.html:20
+#: templates/pybb/markup/markdown_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:23
+msgid "Your title here..."
+msgstr "Заголовок..."
+
+#: templates/pybb/markup/markdown_widget.html:19
+msgid "Second Level Heading"
+msgstr "Второй уровень заголовка"
+
+#: templates/pybb/markup/markdown_widget.html:20
+msgid "Heading 3"
+msgstr "Заголовок 3"
+
+#: templates/pybb/markup/markdown_widget.html:21
+msgid "Heading 4"
+msgstr "Заголовок 4"
+
+#: templates/pybb/markup/markdown_widget.html:22
+msgid "Heading 5"
+msgstr "Заголовок 5"
+
+#: templates/pybb/markup/markdown_widget.html:23
+msgid "Heading 6"
+msgstr "Заголовок 6"
+
+#: templates/pybb/markup/markdown_widget.html:28
+msgid "Bulleted List"
+msgstr "Ненумерованный список"
+
+#: templates/pybb/markup/markdown_widget.html:29
+msgid "Numeric List"
+msgstr "Нумерованный список"
+
+#: templates/pybb/markup/markdown_widget.html:37
+msgid "Code Block / Code"
+msgstr "Программный код"
+
 #: templates/pybb/pagination.html:7
 msgid "previous page"
 msgstr "предыдущая страница"
@@ -532,7 +616,7 @@ msgstr "Удалить"
 msgid "Approve post"
 msgstr "Принять пост"
 
-#: templates/pybb/post_template.html:54 templates/pybb/topic.html:63
+#: templates/pybb/post_template.html:54 templates/pybb/topic.html:68
 msgid "Admin"
 msgstr "Админка"
 
@@ -548,27 +632,27 @@ msgstr "цитировать"
 msgid "quote selected"
 msgstr "цитировать выделенное"
 
-#: templates/pybb/topic.html:52
+#: templates/pybb/topic.html:57
 msgid "Unstick topic"
 msgstr "Снять закрепление"
 
-#: templates/pybb/topic.html:54
+#: templates/pybb/topic.html:59
 msgid "Stick topic"
 msgstr "Закрепить тему"
 
-#: templates/pybb/topic.html:58
+#: templates/pybb/topic.html:63
 msgid "Open topic"
 msgstr "Открыть тему"
 
-#: templates/pybb/topic.html:60
+#: templates/pybb/topic.html:65
 msgid "Close topic"
 msgstr "Закрыть тему"
 
-#: templates/pybb/topic.html:72
+#: templates/pybb/topic.html:76
 msgid "Unsubscribe"
 msgstr "Запретить уведомления"
 
-#: templates/pybb/topic.html:74
+#: templates/pybb/topic.html:78
 msgid "Subscribe"
 msgstr "Получать уведомления"
 
@@ -632,44 +716,52 @@ msgstr "Пользователи"
 msgid "Search"
 msgstr "Поиск"
 
-#: templatetags/pybb_tags.py:63
+#: templatetags/pybb_tags.py:60
 msgid "seconds ago,seconds ago,seconds ago"
 msgstr "секунду назад,секунды назад,секунд назад"
 
-#: templatetags/pybb_tags.py:66
+#: templatetags/pybb_tags.py:63
 msgid "seconds ago"
 msgstr "seconds ago"
 
-#: templatetags/pybb_tags.py:72
+#: templatetags/pybb_tags.py:69
 msgid "minutes ago,minutes ago,minutes ago"
 msgstr "минуту назад,минуты назад,минут назад"
 
-#: templatetags/pybb_tags.py:75
+#: templatetags/pybb_tags.py:72
 msgid "minutes ago"
 msgstr "minutes ago"
 
-#: templatetags/pybb_tags.py:85
+#: templatetags/pybb_tags.py:82
 #, python-format
 msgid "today, %s"
 msgstr "сегодня, %s"
 
-#: templatetags/pybb_tags.py:87
+#: templatetags/pybb_tags.py:84
 #, python-format
 msgid "yesterday, %s"
 msgstr "вчера, %s"
 
-#: util.py:43
+#: util.py:140
 msgid "Can't get profile for anonymous user"
 msgstr "Невозможно получить профиль для анонимного пользователя"
 
-#: views.py:687
+#: views.py:144
+msgid "Forum does not exist"
+msgstr "Форум не найден"
+
+#: views.py:314
+msgid "This topic does not exists"
+msgstr "Тема не найдена"
+
+#: views.py:772
 msgid "All forums marked as read"
 msgstr "Все форумы отмечены как прочтенные"
 
-#: views.py:720
+#: views.py:805
 msgid "User successfuly blocked"
 msgstr "Пользователь успешно заблокирован"
 
-#: views.py:733
+#: views.py:818
 msgid "User successfuly unblocked"
 msgstr "Пользователь успешно разблокирован"

@@ -1,4 +1,4 @@
-django>=1.7,<1.8
+django
 
 #required to use with django<1.7
 #south
@@ -9,7 +9,8 @@ django-registration-redux
 #pybb strong dependencies
 django-annoying
 bbcode
-Pillow>=2.7,<2.8
+Pillow
+unidecode
 
 #for test purpose only
 lxml

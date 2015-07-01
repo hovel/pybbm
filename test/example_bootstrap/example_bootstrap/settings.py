@@ -105,4 +105,5 @@ LOGGING = {
     }
 }
 
+PYBB_NICE_URL = True
 PYBB_ATTACHMENT_ENABLE = False

@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save, post_delete
-from pybb.models import Post
+from django.db.models.signals import post_save, post_delete, pre_save
+from pybb.models import Post, Category, Topic, Forum, create_or_check_slug
 from pybb.subscription import notify_topic_subscribers
 from pybb import util, defaults, compat
 from pybb.permissions import perms
@@ -55,7 +55,31 @@ def user_saved(instance, created, **kwargs):
         profile.save()
 
 
+def get_save_slug(extra_field=None):
+    '''
+    Returns a function to add or make an instance's slug unique
+
+    :param extra_field: field needed in case of a unique_together.
+    '''
+    if extra_field:
+        def save_slug(**kwargs):
+            extra_filters = {}
+            extra_filters[extra_field] = getattr(kwargs.get('instance'), extra_field)
+            kwargs['instance'].slug = create_or_check_slug(kwargs['instance'], kwargs['sender'], **extra_filters)
+    else:
+        def save_slug(**kwargs):
+            kwargs['instance'].slug = create_or_check_slug(kwargs['instance'], kwargs['sender'])
+    return save_slug
+
+pre_save_category_slug = get_save_slug()
+pre_save_forum_slug = get_save_slug('category')
+pre_save_topic_slug = get_save_slug('forum')
+
+
 def setup():
+    pre_save.connect(pre_save_category_slug, sender=Category)
+    pre_save.connect(pre_save_forum_slug, sender=Forum)
+    pre_save.connect(pre_save_topic_slug, sender=Topic)
     post_save.connect(post_saved, sender=Post)
     post_delete.connect(post_deleted, sender=Post)
     if defaults.PYBB_AUTO_USER_PERMISSIONS:

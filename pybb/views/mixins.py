@@ -3,7 +3,8 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.views import redirect_to_login
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.forms.util import ErrorList
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.utils.decorators import method_decorator
 
@@ -66,6 +67,7 @@ class PybbFormsMixin(object):
     def get_poll_answer_formset_class(self):
         return self.poll_answer_formset_class
 
+
 class PostEditMixin(PybbFormsMixin):
 
     @method_decorator(get_atomic_func())
@@ -82,14 +84,14 @@ class PostEditMixin(PybbFormsMixin):
 
         ctx = super(PostEditMixin, self).get_context_data(**kwargs)
 
-        if perms.may_attach_files(self.request.user) and (not 'aformset' in kwargs):
+        if perms.may_attach_files(self.request.user) and 'aformset' not in kwargs:
             ctx['aformset'] = self.get_attachment_formset_class()(
-                instance=self.object if getattr(self, 'object') else None
+                instance=getattr(self, 'object', None)
             )
 
-        if perms.may_create_poll(self.request.user) and ('pollformset' not in kwargs):
+        if perms.may_create_poll(self.request.user) and 'pollformset' not in kwargs:
             ctx['pollformset'] = self.get_poll_answer_formset_class()(
-                instance=self.object.topic if getattr(self, 'object') else None
+                instance=self.object.topic if getattr(self, 'object', None) else None
             )
 
         return ctx
@@ -98,7 +100,7 @@ class PostEditMixin(PybbFormsMixin):
         success = True
         save_attachments = False
         save_poll_answers = False
-        self.object = form.save(commit=False)
+        self.object, topic = form.save(commit=False)
 
         if perms.may_attach_files(self.request.user):
             aformset = self.get_attachment_formset_class()(
@@ -113,28 +115,36 @@ class PostEditMixin(PybbFormsMixin):
 
         if perms.may_create_poll(self.request.user):
             pollformset = self.get_poll_answer_formset_class()()
-            if getattr(self, 'forum', None) or self.object.topic.head == self.object:
-                if self.object.topic.poll_type != Topic.POLL_TYPE_NONE:
-                    pollformset = self.get_poll_answer_formset_class()(self.request.POST,
-                                                                       instance=self.object.topic)
+            if getattr(self, 'forum', None) or topic.head == self.object:
+                if topic.poll_type != Topic.POLL_TYPE_NONE:
+                    pollformset = self.get_poll_answer_formset_class()(
+                        self.request.POST, instance=topic
+                    )
                     if pollformset.is_valid():
                         save_poll_answers = True
                     else:
                         success = False
                 else:
-                    self.object.topic.poll_question = None
-                    self.object.topic.poll_answers.all().delete()
+                    topic.poll_question = None
+                    topic.poll_answers.all().delete()
         else:
             pollformset = None
 
         if success:
-            self.object.topic.save()
-            self.object.topic = self.object.topic
-            self.object.save()
-            if save_attachments:
-                aformset.save()
-            if save_poll_answers:
-                pollformset.save()
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.render_to_response(self.get_context_data(form=form, aformset=aformset, pollformset=pollformset))
+            try:
+                topic.save()
+            except ValidationError as e:
+                success = False
+                errors = form._errors.setdefault('name', ErrorList())
+                errors += e.error_list
+            else:
+                self.object.topic = topic
+                self.object.save()
+                if save_attachments:
+                    aformset.save()
+                if save_poll_answers:
+                    pollformset.save()
+                return HttpResponseRedirect(self.get_success_url())
+        return self.render_to_response(self.get_context_data(form=form,
+                                                             aformset=aformset,
+                                                             pollformset=pollformset))

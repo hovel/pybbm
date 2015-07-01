@@ -26,16 +26,24 @@ username_field = compat.get_username_field()
 
 class PostView(RedirectToLoginMixin, generic.RedirectView):
 
+    permanent = False
+
+    def dispatch(self, request, *args, **kwargs):
+        self.post = self.get_post(**kwargs)
+        return super(PostView, self).dispatch(request, *args, **kwargs)
+
     def get_login_redirect_url(self):
-        return reverse('pybb:post', args=(self.kwargs['pk'],))
+        return self.post.get_absolute_url()
 
     def get_redirect_url(self, **kwargs):
-        post = get_object_or_404(Post.objects.all(), pk=self.kwargs['pk'])
-        if not perms.may_view_post(self.request.user, post):
+        if not perms.may_view_post(self.request.user, self.post):
             raise PermissionDenied
-        count = post.topic.posts.filter(created__lt=post.created).count() + 1
+        count = self.post.topic.posts.filter(created__lt=self.post.created).count() + 1
         page = math.ceil(count / float(defaults.PYBB_TOPIC_PAGE_SIZE))
-        return '%s?page=%d#post-%d' % (reverse('pybb:topic', args=[post.topic.id]), page, post.id)
+        return '%s?page=%d#post-%d' % (self.post.topic.get_absolute_url(), page, self.post.id)
+
+    def get_post(self, **kwargs):
+        return get_object_or_404(Post, pk=kwargs['pk'])
 
 
 class AddPostView(PostEditMixin, generic.CreateView):
@@ -88,6 +96,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
         if perms.may_post_as_admin(self.user):
             form_kwargs['initial']['login'] = getattr(self.user, username_field)
         form_kwargs['may_create_poll'] = perms.may_create_poll(self.user)
+        form_kwargs['may_edit_topic_slug'] = perms.may_edit_topic_slug(self.user)
         return form_kwargs
 
     def get_context_data(self, **kwargs):
@@ -99,7 +108,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
     def get_success_url(self):
         if (not self.request.user.is_authenticated()) and defaults.PYBB_PREMODERATION:
             return reverse('pybb:index')
-        return super(AddPostView, self).get_success_url()
+        return self.object.get_absolute_url()
 
 
 class EditPostView(PostEditMixin, generic.UpdateView):
@@ -127,6 +136,9 @@ class EditPostView(PostEditMixin, generic.UpdateView):
 
 
 class ModeratePost(generic.RedirectView):
+
+    permanent = False
+
     def get_redirect_url(self, **kwargs):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
         if not perms.may_moderate_topic(self.request.user, post.topic):

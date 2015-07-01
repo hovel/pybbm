@@ -88,7 +88,6 @@ class Profile(PybbProfile):
     class Meta(object):
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
-        app_label = 'pybb'
 
     def get_absolute_url(self):
         return reverse('pybb:user', kwargs={'username': getattr(self.user, get_username_field())})

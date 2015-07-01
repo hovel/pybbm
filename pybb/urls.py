@@ -6,6 +6,7 @@ try:
 except ImportError:
     from django.conf.urls.defaults import patterns, include, url
 
+from pybb.defaults import PYBB_NICE_URL
 from pybb.feeds import LastPosts, LastTopics
 from pybb.views import IndexView, CategoryView, ForumView, TopicView,\
     AddPostView, EditPostView, UserView, PostView, ProfileEditView,\
@@ -71,3 +72,12 @@ urlpatterns += patterns('pybb.views',
                         # Commands
                         url('^mark_all_as_read/$', 'mark_all_as_read', name='mark_all_as_read')
                         )
+
+if PYBB_NICE_URL:
+    urlpatterns += patterns('pybb.views',
+                            url(r'^c/(?P<slug>[\w-]+)/$', CategoryView.as_view(), name='category'),
+                            url(r'^c/(?P<category_slug>[\w-]+)/(?P<slug>[\w-]+)/$', ForumView.as_view(),
+                                name='forum'),
+                            url(r'^c/(?P<category_slug>[\w-]+)/(?P<forum_slug>[\w-]+)/(?P<slug>[\w-]+)/$',
+                                TopicView.as_view(), name='topic'),
+                            )

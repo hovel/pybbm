@@ -6,9 +6,10 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db.models import F, Q
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect, Http404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views import generic
 from django.views.decorators.csrf import csrf_protect
 
@@ -28,15 +29,11 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
     template_name = 'pybb/topic.html'
 
     def get_login_redirect_url(self):
-        return reverse('pybb:topic', args=(self.kwargs['pk'],))
+        return self.topic.get_absolute_url()
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
-        self.topic = get_object_or_404(
-            Topic.objects.select_related('forum'),
-            pk=kwargs['pk'],
-            post_count__gt=0
-        )
+        self.topic = self.get_topic(**kwargs)
 
         if request.GET.get('first-unread'):
             if request.user.is_authenticated():
@@ -72,7 +69,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
             cache.add(cache_key, 0)
             if cache.incr(cache_key) % defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER == 0:
                 Topic.objects.filter(id=self.topic.id).update(views=F('views') +
-                                                                    defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
+                                                                defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER)
                 cache.set(cache_key, 0)
         qs = self.topic.posts.all().select_related('user')
         if defaults.PYBB_PROFILE_RELATED_NAME:
@@ -138,6 +135,26 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
                 TopicReadTracker.objects.filter(user=user, topic__forum=topic.forum).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=user)
                 forum_mark.save()
+
+    def get_topic(self, **kwargs):
+        if 'pk' in kwargs:
+            topic = get_object_or_404(Topic, pk=kwargs['pk'], post_count__gt=0)
+        elif ('slug'and 'forum_slug'and 'category_slug') in kwargs:
+            topic = get_object_or_404(
+                Topic,
+                slug=kwargs['slug'],
+                forum__slug=kwargs['forum_slug'],
+                forum__category__slug=kwargs['category_slug'],
+                post_count__gt=0
+                )
+        else:
+            raise Http404(_('This topic does not exists'))
+        return topic
+
+    def get(self, *args, **kwargs):
+        if defaults.PYBB_NICE_URL and 'pk' in kwargs:
+            return redirect(self.topic, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
+        return super(TopicView, self).get(*args, **kwargs)
 
 
 class LatestTopicsView(PaginatorMixin, generic.ListView):

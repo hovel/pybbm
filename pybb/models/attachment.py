@@ -7,14 +7,14 @@ from django.utils.translation import ugettext_lazy as _
 from pybb import defaults
 from pybb.util import FilePathGenerator
 
+from pybb.models.post import Post
 
 class Attachment(models.Model):
     class Meta(object):
         verbose_name = _('Attachment')
         verbose_name_plural = _('Attachments')
-        app_label = 'pybb'
 
-    post = models.ForeignKey('Post', verbose_name=_('Post'), related_name='attachments')
+    post = models.ForeignKey(Post, verbose_name=_('Post'), related_name='attachments')
     size = models.IntegerField(_('Size'))
     file = models.FileField(_('File'),
                             upload_to=FilePathGenerator(to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))

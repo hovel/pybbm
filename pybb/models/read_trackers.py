@@ -2,10 +2,12 @@
 from __future__ import unicode_literals
 
 from django.db import models, transaction, DatabaseError
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from pybb.compat import get_user_model_path, get_atomic_func
+
+from pybb.models.forum import Forum
+from pybb.models.topic import Topic
 
 
 class TopicReadTrackerManager(models.Manager):
@@ -35,7 +37,7 @@ class TopicReadTracker(models.Model):
     Save per user topic read tracking
     """
     user = models.ForeignKey(get_user_model_path(), blank=False, null=False)
-    topic = models.ForeignKey('Topic', blank=True, null=True)
+    topic = models.ForeignKey(Topic, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
 
     objects = TopicReadTrackerManager()
@@ -44,7 +46,6 @@ class TopicReadTracker(models.Model):
         verbose_name = _('Topic read tracker')
         verbose_name_plural = _('Topic read trackers')
         unique_together = ('user', 'topic')
-        app_label = 'pybb'
 
 
 class ForumReadTrackerManager(models.Manager):
@@ -74,7 +75,7 @@ class ForumReadTracker(models.Model):
     Save per user forum read tracking
     """
     user = models.ForeignKey(get_user_model_path(), blank=False, null=False)
-    forum = models.ForeignKey('Forum', blank=True, null=True)
+    forum = models.ForeignKey(Forum, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
 
     objects = ForumReadTrackerManager()
@@ -83,4 +84,3 @@ class ForumReadTracker(models.Model):
         verbose_name = _('Forum read tracker')
         verbose_name_plural = _('Forum read trackers')
         unique_together = ('user', 'forum')
-        app_label = 'pybb'

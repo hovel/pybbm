@@ -179,5 +179,13 @@ class DefaultPermissionHandler(object):
         """
         return True
 
+    def may_edit_topic_slug(self, user):
+        """
+        returns True if `user` may choose topic's slug, False otherwise.
+        When True adds field slug in the Topic form.
+        By default always False
+        """
+        return False
+
 
 perms = util.resolve_class(defaults.PYBB_PERMISSION_HANDLER)

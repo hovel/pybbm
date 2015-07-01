@@ -107,7 +107,8 @@
     "fields": {
         "position": 0, 
         "hidden": false, 
-        "name": "Operating Systems"
+        "name": "Operating Systems", 
+        "slug": "operating-systems"
     }
 },
 {
@@ -116,7 +117,8 @@
     "fields": {
         "position": 0, 
         "hidden": false, 
-        "name": "Games"
+        "name": "Games", 
+        "slug": "games"
     }
 },
 {
@@ -201,6 +203,7 @@
         "category": 1, 
         "updated": null, 
         "name": "BSD", 
+        "slug": "bsd", 
         "parent": null, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -220,6 +223,7 @@
         "category": 1, 
         "updated": null, 
         "name": "GNU Linux", 
+        "slug": "gnu-linux", 
         "parent": null, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -239,6 +243,7 @@
         "category": 1, 
         "updated": null, 
         "name": "Debian", 
+        "slug": "debian", 
         "parent": 3, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -258,6 +263,7 @@
         "category": 1, 
         "updated": "2015-03-19T11:22:31.383", 
         "name": "Ubuntu and cie", 
+        "slug": "ubuntu-and-cie", 
         "parent": 3, 
         "post_count": 1, 
         "topic_count": 1, 
@@ -277,6 +283,7 @@
         "category": 1, 
         "updated": null, 
         "name": "Linux Mint", 
+        "slug": "linux-mint", 
         "parent": 3, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -296,6 +303,7 @@
         "category": 1, 
         "updated": null, 
         "name": "FreeBSD", 
+        "slug": "freebsd", 
         "parent": 2, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -315,6 +323,7 @@
         "category": 1, 
         "updated": null, 
         "name": "SunOS", 
+        "slug": "sunos", 
         "parent": 2, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -334,6 +343,7 @@
         "category": 1, 
         "updated": null, 
         "name": "NetBSD", 
+        "slug": "netbsd", 
         "parent": 2, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -353,6 +363,7 @@
         "category": 1, 
         "updated": null, 
         "name": "Windows", 
+        "slug": "windows", 
         "parent": null, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -372,6 +383,7 @@
         "category": 2, 
         "updated": null, 
         "name": "PC", 
+        "slug": "pc", 
         "parent": null, 
         "post_count": 0, 
         "topic_count": 0, 
@@ -389,6 +401,7 @@
         "category": 2, 
         "updated": "2015-03-19T11:50:31.407", 
         "name": "PS[1-9]\\d*", 
+        "slug": "ps1-9d", 
         "parent": null, 
         "post_count": 16, 
         "topic_count": 3, 
@@ -405,7 +418,8 @@
     "fields": {
         "updated": "2015-03-19T11:36:10.547", 
         "on_moderation": false, 
-        "name": "Why this forum as a weird name ?", 
+        "name": "Why this forum has a weird name ?", 
+        "slug": "why-this-forum-has-a-weird-name", 
         "forum": 12, 
         "views": 30, 
         "post_count": 14, 
@@ -431,6 +445,7 @@
         "updated": "2015-03-19T11:21:16.067", 
         "on_moderation": false, 
         "name": "TESV : Skyrim", 
+        "slug": "tesv-skyrim", 
         "forum": 12, 
         "views": 1, 
         "post_count": 1, 
@@ -452,6 +467,7 @@
         "updated": "2015-03-19T11:22:31.383", 
         "on_moderation": false, 
         "name": "Troll powa !", 
+        "slug": "troll-powa", 
         "forum": 5, 
         "views": 1, 
         "post_count": 1, 
@@ -473,6 +489,7 @@
         "updated": "2015-03-19T11:50:31.407", 
         "on_moderation": false, 
         "name": "Test accounts", 
+        "slug": "test-accounts", 
         "forum": 12, 
         "views": 2, 
         "post_count": 1, 
