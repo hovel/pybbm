@@ -1,8 +1,8 @@
 PyBBM Changelog
 ===============
 
-0.16.1 -> dev
--------------
+0.16.1 -> 0.17
+--------------
 * Topic and post creation wrapped in transaction
 * All topic/post/poll related forms can be overrided when custom view inherites pybbm view
 * Demo data for example projects
