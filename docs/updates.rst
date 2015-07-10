@@ -1,6 +1,12 @@
 PyBBM Changelog
 ===============
 
+0.17 -> 0.17.1
+--------------
+* Fast fix for migrations for Posgres database.
+  If you already get and applied migrations from 0.17 version (for example on MySQL DB) you can skip new
+  migrations with `manage.py migrate pybb --fake`
+
 0.16.1 -> 0.17
 --------------
 * Topic and post creation wrapped in transaction
