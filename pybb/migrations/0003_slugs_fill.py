@@ -41,45 +41,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='category',
-            name='slug',
-            field=models.SlugField(max_length=255, verbose_name='Slug', blank=True),
-        ),
-        migrations.AddField(
-            model_name='forum',
-            name='slug',
-            field=models.SlugField(max_length=255, verbose_name='Slug', blank=True),
-        ),
-        migrations.AddField(
-            model_name='topic',
-            name='slug',
-            field=models.SlugField(max_length=255, verbose_name='Slug', blank=True),
-        ),
-
         migrations.RunPython(fill_slugs, clear_slugs),
-
-        migrations.AlterField(
-            model_name='category',
-            name='slug',
-            field=models.SlugField(unique=True, max_length=255, verbose_name='Slug'),
-        ),
-        migrations.AlterField(
-            model_name='forum',
-            name='slug',
-            field=models.SlugField(max_length=255, verbose_name='Slug'),
-        ),
-        migrations.AlterField(
-            model_name='topic',
-            name='slug',
-            field=models.SlugField(max_length=255, verbose_name='Slug'),
-        ),
-        migrations.AlterUniqueTogether(
-            name='forum',
-            unique_together=set([('category', 'slug')]),
-        ),
-        migrations.AlterUniqueTogether(
-            name='topic',
-            unique_together=set([('forum', 'slug')]),
-        ),
     ]
