@@ -37,7 +37,7 @@ def clear_slugs(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pybb', '0002_initial'),
+        ('pybb', '0002_slugs_optional'),
     ]
 
     operations = [

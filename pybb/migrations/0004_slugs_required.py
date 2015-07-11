@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pybb', '0003_initial'),
+        ('pybb', '0003_slugs_fill'),
     ]
 
     operations = [
