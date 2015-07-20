@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 from pybb.compat import get_user_model_path, get_username_field
-from pybb.profiles import PybbProfile
+from pybb.models.profile import PybbProfile
 
 if django.VERSION[:2] >= (1, 5):
     from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
