@@ -557,8 +557,8 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         topic_1 = Topic.objects.get(id=topic_1.id)
         topic_2 = Topic.objects.get(id=topic_2.id)
-        self.assertEqual(topic_1.updated, post.updated or post.created)
-        self.assertEqual(forum_1.updated, post.updated or post.created)
+        self.assertAlmostEqual(topic_1.updated, post.updated or post.created, delta=datetime.timedelta(milliseconds=50))
+        self.assertAlmostEqual(forum_1.updated, post.updated or post.created, delta=datetime.timedelta(milliseconds=50))
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [True, False])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, False])
 
@@ -569,8 +569,8 @@ class FeaturesTest(TestCase, SharedTestModule):
         topic_2 = Topic.objects.get(id=topic_2.id)
         forum_1 = Forum.objects.get(id=forum_1.id)
         forum_2 = Forum.objects.get(id=forum_2.id)
-        self.assertEqual(topic_2.updated, post.updated or post.created)
-        self.assertEqual(forum_2.updated, post.updated or post.created)
+        self.assertAlmostEqual(topic_2.updated, post.updated or post.created, delta=datetime.timedelta(milliseconds=50))
+        self.assertAlmostEqual(forum_2.updated, post.updated or post.created, delta=datetime.timedelta(milliseconds=50))
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, True])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [False, True])
 
@@ -581,7 +581,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         topic_2 = Topic.objects.get(id=topic_2.id)
         forum_1 = Forum.objects.get(id=forum_1.id)
         forum_2 = Forum.objects.get(id=forum_2.id)
-        self.assertEqual(forum_1.updated, post.updated or post.created)
+        self.assertAlmostEqual(forum_1.updated, post.updated or post.created, delta=datetime.timedelta(milliseconds=50))
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, True])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, False])
 
@@ -615,18 +615,16 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertRedirects(response, '%s?page=%d#post-%d' % (topic_1.get_absolute_url(), 1, post_1_3.id))
 
     def test_latest_topics(self):
-        topic_1 = self.topic
-        topic_1.updated = timezone.now()
-        topic_1.save()
-        topic_2 = Topic.objects.create(name='topic_2', forum=self.forum, user=self.user)
-        topic_2.updated = timezone.now() + datetime.timedelta(days=-1)
-        topic_2.save()
 
         category_2 = Category.objects.create(name='cat2')
         forum_2 = Forum.objects.create(name='forum_2', category=category_2)
         topic_3 = Topic.objects.create(name='topic_3', forum=forum_2, user=self.user)
-        topic_3.updated = timezone.now() + datetime.timedelta(days=-2)
-        topic_3.save()
+
+        topic_2 = Topic.objects.create(name='topic_2', forum=self.forum, user=self.user)
+
+        topic_1 = self.topic
+        topic_1.updated = timezone.now()
+        topic_1.save()
 
         self.login_client()
         response = self.client.get(reverse('pybb:topic_latest'))
@@ -1030,19 +1028,19 @@ class FeaturesTest(TestCase, SharedTestModule):
         post_1 = Post.objects.create(topic=topic_1, user=self.user, body='test')
         post_1 = Post.objects.get(id=post_1.id)
 
-        self.assertEqual(topic_1.updated, post_1.created)
-        self.assertEqual(forum_1.updated, post_1.created)
+        self.assertAlmostEqual(topic_1.updated, post_1.created, delta=datetime.timedelta(milliseconds=50))
+        self.assertAlmostEqual(forum_1.updated, post_1.created, delta=datetime.timedelta(milliseconds=50))
 
         topic_2 = Topic.objects.create(name='another topic', forum=forum_1, user=self.user)
         post_2 = Post.objects.create(topic=topic_2, user=self.user, body='another test')
         post_2 = Post.objects.get(id=post_2.id)
 
-        self.assertEqual(topic_2.updated, post_2.created)
-        self.assertEqual(forum_1.updated, post_2.created)
+        self.assertAlmostEqual(topic_2.updated, post_2.created, delta=datetime.timedelta(milliseconds=50))
+        self.assertAlmostEqual(forum_1.updated, post_2.created, delta=datetime.timedelta(milliseconds=50))
 
         topic_2.delete()
         forum_1 = Forum.objects.get(id=forum_1.id)
-        self.assertEqual(forum_1.updated, post_1.created)
+        self.assertAlmostEqual(forum_1.updated, post_1.created, delta=datetime.timedelta(milliseconds=50))
         self.assertEqual(forum_1.topic_count, 1)
         self.assertEqual(forum_1.post_count, 1)
 

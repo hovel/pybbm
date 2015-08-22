@@ -186,11 +186,12 @@ class Topic(models.Model):
         return reverse('pybb:topic', kwargs={'pk': self.id})
 
     def save(self, *args, **kwargs):
+        if self.id is None:
+            self.updated = tznow()
 
         forum_changed = False
         old_topic = None
         if self.id is not None:
-            self.updated = tznow()
             old_topic = Topic.objects.get(id=self.id)
             if self.forum != old_topic.forum:
                 forum_changed = True
@@ -212,6 +213,8 @@ class Topic(models.Model):
             del self.last_post
         if self.last_post:
             self.updated = self.last_post.updated or self.last_post.created
+        else:
+            self.updated = self.created
         self.save()
 
     def get_parents(self):
