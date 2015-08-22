@@ -575,6 +575,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, True])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, False])
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_open_first_unread_post(self):
         forum_1 = self.forum
         topic_1 = Topic.objects.create(name='topic_1', forum=forum_1, user=self.user)
