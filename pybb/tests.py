@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -275,6 +275,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % f.get_absolute_url()))
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_read_tracking_multi_user(self):
         topic_1 = self.topic
         topic_2 = Topic(name='topic_2', forum=self.forum, user=self.user)
@@ -520,6 +521,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([f.unread for f in pybb_forum_unread([forum_parent, forum_child1, forum_child2], user_ann)],
                              [False, False, False])
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_read_tracker_when_topics_forum_changed(self):
         forum_1 = Forum.objects.create(name='f1', description='bar', category=self.category)
         forum_2 = Forum.objects.create(name='f2', description='bar', category=self.category)
@@ -995,8 +997,9 @@ class FeaturesTest(TestCase, SharedTestModule):
         
         defaults.PYBB_DISABLE_NOTIFICATIONS = orig_conf
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_topic_updated(self):
-        topic = Topic(name='etopic', forum=self.forum, user=self.user)
+        topic = Topic(name='new topic', forum=self.forum, user=self.user)
         topic.save()
         post = Post(topic=topic, user=self.user, body='bbcode [b]test[/b]')
         post.save()
