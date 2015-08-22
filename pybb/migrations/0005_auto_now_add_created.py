@@ -16,6 +16,9 @@ def forwards_func(apps, schema_editor):
         created=datetime.datetime.min
     )
 
+def noop(apps, schema_editor):
+    pass
+
 
 class Migration(migrations.Migration):
 
@@ -26,7 +29,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             forwards_func,
-            migrations.RunPython.noop
+            noop
         ),
         migrations.AlterField(
             model_name='post',
