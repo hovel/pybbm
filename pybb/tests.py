@@ -1,7 +1,6 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import time
 import datetime
 import os
 from django.contrib.auth.models import Permission
@@ -12,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -217,7 +216,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         Forum.objects.get(id=self.forum.id)
 
     def test_forum_updated(self):
-        time.sleep(1)
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
         post = Post(topic=topic, user=self.user, body='one')
@@ -277,6 +275,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         tree = html.fromstring(client.get(reverse('pybb:index')).content)
         self.assertFalse(tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % f.get_absolute_url()))
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_read_tracking_multi_user(self):
         topic_1 = self.topic
         topic_2 = Topic(name='topic_2', forum=self.forum, user=self.user)
@@ -297,7 +296,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 0)
 
         # user_ann reads topic_1, she should get one topic read tracker, there should be no forum read trackers
-        time.sleep(1)
         client_ann.get(topic_1.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 1)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_ann).count(), 1)
@@ -305,7 +303,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(ForumReadTracker.objects.all().count(), 0)
 
         # user_bob reads topic_1, he should get one topic read tracker, there should be no forum read trackers
-        time.sleep(1)
         client_bob.get(topic_1.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 2)
         self.assertEqual(TopicReadTracker.objects.filter(user=user_bob).count(), 1)
@@ -313,7 +310,6 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         # user_bob reads topic_2, he should get a forum read tracker,
         #  there should be no topic read trackers for user_bob
-        time.sleep(1)
         client_bob.get(topic_2.get_absolute_url())
         self.assertEqual(TopicReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
@@ -323,7 +319,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_bob)], [False, False])
 
         # user_ann creates topic_3, they should get a new topic read tracker in the db
-        time.sleep(1)
         add_topic_url = reverse('pybb:add_topic', kwargs={'forum_id': self.forum.id})
         response = client_ann.get(add_topic_url)
         values = self.get_form_values(response)
@@ -338,7 +333,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(topic_3.name, 'topic_3')
 
         # user_ann posts to topic_1, a topic they've already read, no new trackers should be created
-        time.sleep(1)
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': topic_1.id})
         response = client_ann.get(add_post_url)
         values = self.get_form_values(response)
@@ -357,7 +351,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         #   'topic_3' appears unread for user_bob
         #
         previous_time = ForumReadTracker.objects.all()[0].time_stamp
-        time.sleep(1)
         client_bob.get(topic_1.get_absolute_url())
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertEqual(ForumReadTracker.objects.all()[0].time_stamp, previous_time)
@@ -369,7 +362,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         # user_bob's existing forum read tracker updates and his topic read tracker disappears
         #
         previous_time = ForumReadTracker.objects.all()[0].time_stamp
-        time.sleep(1)
         client_bob.get(topic_3.get_absolute_url())
         self.assertEqual(ForumReadTracker.objects.all().count(), 1)
         self.assertGreater(ForumReadTracker.objects.all()[0].time_stamp, previous_time)
@@ -529,6 +521,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([f.unread for f in pybb_forum_unread([forum_parent, forum_child1, forum_child2], user_ann)],
                              [False, False, False])
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_read_tracker_when_topics_forum_changed(self):
         forum_1 = Forum.objects.create(name='f1', description='bar', category=self.category)
         forum_2 = Forum.objects.create(name='f2', description='bar', category=self.category)
@@ -551,7 +544,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, False])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [False, False])
 
-        time.sleep(1)
         post = Post.objects.create(topic=topic_1, user=self.user, body='three')
         post = Post.objects.get(id=post.id)  # get post with timestamp from DB
 
@@ -562,7 +554,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [True, False])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, False])
 
-        time.sleep(1)
         post.topic = topic_2
         post.save()
         topic_1 = Topic.objects.get(id=topic_1.id)
@@ -574,7 +565,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, True])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [False, True])
 
-        time.sleep(1)
         topic_2.forum = forum_1
         topic_2.save()
         topic_1 = Topic.objects.get(id=topic_1.id)
@@ -585,6 +575,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertListEqual([t.unread for t in pybb_topic_unread([topic_1, topic_2], user_ann)], [False, True])
         self.assertListEqual([t.unread for t in pybb_forum_unread([forum_1, forum_2], user_ann)], [True, False])
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_open_first_unread_post(self):
         forum_1 = self.forum
         topic_1 = Topic.objects.create(name='topic_1', forum=forum_1, user=self.user)
@@ -607,7 +598,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = client_ann.get(topic_2.get_absolute_url(), data={'first-unread': 1}, follow=True)
         self.assertRedirects(response, '%s?page=%d#post-%d' % (topic_2.get_absolute_url(), 1, post_2_1.id))
 
-        time.sleep(1)
         post_1_3 = Post.objects.create(topic=topic_1, user=self.user, body='1_3')
         post_1_4 = Post.objects.create(topic=topic_1, user=self.user, body='1_4')
 
@@ -1006,16 +996,15 @@ class FeaturesTest(TestCase, SharedTestModule):
         
         defaults.PYBB_DISABLE_NOTIFICATIONS = orig_conf
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_topic_updated(self):
-        topic = Topic(name='etopic', forum=self.forum, user=self.user)
+        topic = Topic(name='new topic', forum=self.forum, user=self.user)
         topic.save()
-        time.sleep(1)
         post = Post(topic=topic, user=self.user, body='bbcode [b]test[/b]')
         post.save()
         client = Client()
         response = client.get(self.forum.get_absolute_url())
         self.assertEqual(response.context['topic_list'][0], topic)
-        time.sleep(1)
         post = Post(topic=self.topic, user=self.user, body='bbcode [b]test[/b]')
         post.save()
         client = Client()
