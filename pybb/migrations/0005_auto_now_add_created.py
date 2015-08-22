@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             forwards_func,
+            migrations.RunPython.noop
         ),
         migrations.AlterField(
             model_name='post',
