@@ -613,7 +613,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         topic_2 = Topic.objects.create(name='topic_2', forum=self.forum, user=self.user)
 
         topic_1 = self.topic
-        topic_1.updated = timezone.now()
+        topic_1.updated = timezone.now() + datetime.timedelta(seconds=1)
         topic_1.save()
 
         self.login_client()
