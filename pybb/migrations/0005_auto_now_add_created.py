@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.db import models, migrations
+from django.utils.timezone import make_aware
 import datetime
 
 
@@ -9,11 +11,14 @@ def forwards_func(apps, schema_editor):
     Topic = apps.get_model("pybb", "Topic")
     Post = apps.get_model("pybb", "Post")
     db_alias = schema_editor.connection.alias
+    min_datetime = datetime.datetime.min
+    if settings.USE_TZ:
+        min_datetime = make_aware(min_datetime)
     Topic.objects.using(db_alias).filter(created=None).update(
-        created=datetime.datetime.min
+        created=min_datetime
     )
     Post.objects.using(db_alias).filter(created=None).update(
-        created=datetime.datetime.min
+        created=min_datetime
     )
 
 def noop(apps, schema_editor):
