@@ -451,7 +451,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
             response = super(AddPostView, self).post(request, *args, **kwargs)
         except:
             six.reraise(*sys.exc_info())
-        if not defaults.PYBB_DISABLE_NOTIFICATIONS:
+        if self.object and self.topic and not defaults.PYBB_DISABLE_NOTIFICATIONS:
             notify_topic_subscribers(self.object, request)
 
             if util.get_pybb_profile(self.object.user).autosubscribe and \
@@ -508,7 +508,6 @@ class EditPostView(PostEditMixin, generic.UpdateView):
                 perms.may_subscribe_topic(self.object.user, self.object.topic):
                 self.object.topic.subscribers.add(self.object.user)
         return response
-
 
     def get_form_kwargs(self):
         form_kwargs = super(EditPostView, self).get_form_kwargs()

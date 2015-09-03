@@ -6,6 +6,14 @@ from django.utils.encoding import force_text
 from unidecode import unidecode
 
 
+def get_current_site(request):
+    try:
+        from django.contrib.sites.shortcuts import get_current_site
+    except ImportError:
+        from django.contrib.sites.models import get_current_site
+    return get_current_site(request)
+
+
 def get_image_field_class():
     try:
         from sorl.thumbnail import ImageField
