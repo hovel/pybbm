@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.template.loader import render_to_string
 from django.utils import translation
-from django.contrib.sites.shortcuts import get_current_site
 
 from pybb import defaults, util, compat
 
@@ -28,7 +27,7 @@ def notify_topic_subscribers(post, request):
 
         # Define constants for templates rendering
         delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
-        current_site = get_current_site(request)
+        current_site = compat.get_current_site(request)
         from_email = settings.DEFAULT_FROM_EMAIL
 
         subject = render_to_string('pybb/mail_templates/subscription_email_subject.html',
