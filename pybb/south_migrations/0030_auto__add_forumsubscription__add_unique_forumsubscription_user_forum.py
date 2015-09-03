@@ -80,10 +80,11 @@ class Migration(SchemaMigration):
             'hidden': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
-            'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
+            'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255'})
         },
         'pybb.forum': {
-            'Meta': {'ordering': "['position']", 'object_name': 'Forum'},
+            'Meta': {'ordering': "['position']", 'unique_together': "(('category', 'slug'),)", 'object_name': 'Forum'},
             'category': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'forums'", 'to': "orm['pybb.Category']"}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'headline': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
@@ -95,6 +96,7 @@ class Migration(SchemaMigration):
             'position': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_forums'", 'symmetrical': 'False', 'through': "orm['pybb.ForumReadTracker']", 'to': "orm['auth.User']"}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
             'topic_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
@@ -143,16 +145,16 @@ class Migration(SchemaMigration):
             'autosubscribe': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'avatar': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'language': ('django.db.models.fields.CharField', [], {'default': "'en'", 'max_length': '10', 'blank': 'True'}),
+            'language': ('django.db.models.fields.CharField', [], {'default': "'en-us'", 'max_length': '10', 'blank': 'True'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'show_signatures': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'signature': ('django.db.models.fields.TextField', [], {'max_length': '1024', 'blank': 'True'}),
             'signature_html': ('django.db.models.fields.TextField', [], {'max_length': '1054', 'blank': 'True'}),
-            'time_zone': ('django.db.models.fields.FloatField', [], {'default': '1.0'}),
+            'time_zone': ('django.db.models.fields.FloatField', [], {'default': '3.0'}),
             'user': ('annoying.fields.AutoOneToOneField', [], {'related_name': "'pybb_profile'", 'unique': 'True', 'to': "orm['auth.User']"})
         },
         'pybb.topic': {
-            'Meta': {'ordering': "['-created']", 'object_name': 'Topic'},
+            'Meta': {'ordering': "['-created']", 'unique_together': "(('forum', 'slug'),)", 'object_name': 'Topic'},
             'closed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'forum': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'topics'", 'to': "orm['pybb.Forum']"}),
@@ -163,6 +165,7 @@ class Migration(SchemaMigration):
             'poll_type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'post_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'readed_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'readed_topics'", 'symmetrical': 'False', 'through': "orm['pybb.TopicReadTracker']", 'to': "orm['auth.User']"}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255'}),
             'sticky': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'subscribers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'subscriptions'", 'blank': 'True', 'to': "orm['auth.User']"}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),

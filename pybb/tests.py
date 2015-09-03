@@ -1007,7 +1007,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         parser = html.HTMLParser(encoding='utf8')
 
         #Check we have the "Subscribe" link
-        response = client.get(reverse('pybb:forum', args=[self.forum.id]))
+        response = client.get(self.forum.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content, parser=parser)
         self.assertTrue(['Subscribe'], tree.xpath('//a[@href="%s"]/text()' % url))
