@@ -2,7 +2,9 @@
 
 from __future__ import unicode_literals
 import math
+import sys
 
+from django.utils import six
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -24,6 +26,7 @@ from pybb.compat import get_atomic_func
 from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
+from pybb.subscription import notify_topic_subscribers
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 
 
@@ -443,6 +446,19 @@ class AddPostView(PostEditMixin, generic.CreateView):
                     return HttpResponse(self.quote)
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super(AddPostView, self).post(request, *args, **kwargs)
+        except:
+            six.reraise(*sys.exc_info())
+        if not defaults.PYBB_DISABLE_NOTIFICATIONS:
+            notify_topic_subscribers(self.object, request)
+
+            if util.get_pybb_profile(self.object.user).autosubscribe and \
+                perms.may_subscribe_topic(self.object.user, self.object.topic):
+                self.object.topic.subscribers.add(self.object.user)
+        return response
+
     def get_form_kwargs(self):
         ip = self.request.META.get('REMOTE_ADDR', '')
         form_kwargs = super(AddPostView, self).get_form_kwargs()
@@ -479,6 +495,20 @@ class EditPostView(PostEditMixin, generic.UpdateView):
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         return super(EditPostView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super(EditPostView, self).post(request, *args, **kwargs)
+        except:
+            six.reraise(*sys.exc_info())
+        if not defaults.PYBB_DISABLE_NOTIFICATIONS:
+            notify_topic_subscribers(self.object, request)
+
+            if util.get_pybb_profile(self.object.user).autosubscribe and \
+                perms.may_subscribe_topic(self.object.user, self.object.topic):
+                self.object.topic.subscribers.add(self.object.user)
+        return response
+
 
     def get_form_kwargs(self):
         form_kwargs = super(EditPostView, self).get_form_kwargs()
