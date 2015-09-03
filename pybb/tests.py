@@ -1062,8 +1062,9 @@ class FeaturesTest(TestCase, SharedTestModule):
         post.save()
 
         #Now, user3 should be subscribed to this new topic
-        usernames = list(topic.subscribers.all().values_list('username', flat=True))
-        self.assertEqual(usernames, [self.user.username, 'user3', ])
+        usernames = topic.subscribers.all().order_by('username')
+        usernames = list(usernames.values_list('username', flat=True))
+        self.assertEqual(usernames, ['user3', self.user.username])
         self.assertEqual(2, len(mail.outbox))
         self.assertEqual([user3.email, ], mail.outbox[1].to)
         self.assertEqual('New answer in topic that you subscribed.', mail.outbox[1].subject)
