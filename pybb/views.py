@@ -329,6 +329,9 @@ class PostEditMixin(PybbFormsMixin):
     def post(self, request, *args, **kwargs):
         return super(PostEditMixin, self).post(request, *args, **kwargs)
 
+    def notify_topic_subscribers(self):
+        notify_topic_subscribers(self.object, self.request)
+
     def get_form_class(self):
         if perms.may_post_as_admin(self.request.user):
             return self.get_admin_post_form_class()
@@ -454,7 +457,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
         except:
             six.reraise(*sys.exc_info())
         if self.object and self.topic and not defaults.PYBB_DISABLE_NOTIFICATIONS:
-            notify_topic_subscribers(self.object, request)
+            self.notify_topic_subscribers()
 
             if util.get_pybb_profile(self.object.user).autosubscribe and \
                 perms.may_subscribe_topic(self.object.user, self.object.topic):
@@ -505,10 +508,6 @@ class EditPostView(PostEditMixin, generic.UpdateView):
             six.reraise(*sys.exc_info())
         if not defaults.PYBB_DISABLE_NOTIFICATIONS:
             notify_topic_subscribers(self.object, request)
-
-            if util.get_pybb_profile(self.object.user).autosubscribe and \
-                perms.may_subscribe_topic(self.object.user, self.object.topic):
-                self.object.topic.subscribers.add(self.object.user)
         return response
 
     def get_form_kwargs(self):
