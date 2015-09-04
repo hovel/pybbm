@@ -507,7 +507,7 @@ class EditPostView(PostEditMixin, generic.UpdateView):
         except:
             six.reraise(*sys.exc_info())
         if not defaults.PYBB_DISABLE_NOTIFICATIONS:
-            notify_topic_subscribers(self.object, request)
+            self.notify_topic_subscribers()
         return response
 
     def get_form_kwargs(self):
