@@ -356,29 +356,29 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         return ctx
 
     def mark_read(self):
-        user = self.request.user
-        topic = self.topic
         try:
-            forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=user)
+            forum_mark = ForumReadTracker.objects.get(forum=self.topic.forum, user=self.request.user)
         except ForumReadTracker.DoesNotExist:
             forum_mark = None
-        if (forum_mark is None) or (forum_mark.time_stamp < topic.updated):
+        if (forum_mark is None) or (forum_mark.time_stamp <= self.topic.updated):
             # Mark topic as readed
-            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=topic, user=user)
-            if not new:
-                topic_mark.save()
+            topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=self.topic, user=self.request.user)
+            if not new and topic_mark.time_stamp > self.topic.updated:
+                # Bail early if we already read this thread.
+                return
 
             # Check, if there are any unread topics in forum
             readed_trackers = TopicReadTracker.objects.filter(
-                user=user, topic__forum=topic.forum, time_stamp__gte=F('topic__updated'))
-            unread = topic.forum.topics.exclude(topicreadtracker__in=readed_trackers)
+                user=self.request.user, topic__forum=self.topic.forum, time_stamp__gte=F('topic__updated'))
+            unread = self.topic.forum.topics.exclude(topicreadtracker__in=readed_trackers)
             if forum_mark is not None:
                 unread = unread.filter(updated__gte=forum_mark.time_stamp)
 
             if not unread.exists():
                 # Clear all topic marks for this forum, mark forum as readed
-                TopicReadTracker.objects.filter(user=user, topic__forum=topic.forum).delete()
-                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=user)
+                TopicReadTracker.objects.filter(user=self.request.user, topic__forum=self.topic.forum).delete()
+                forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(
+                    forum=self.topic.forum, user=self.request.user)
                 forum_mark.save()
 
     def get_topic(self, **kwargs):
