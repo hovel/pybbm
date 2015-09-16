@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.db.models import F, Q
+from django.db.models import F
 from django.forms.utils import ErrorList
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
@@ -263,6 +263,14 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
     template_object_name = 'post_list'
     template_name = 'pybb/topic.html'
 
+    def get(self, request, *args, **kwargs):
+        if defaults.PYBB_NICE_URL and 'pk' in kwargs:
+            return redirect(self.topic, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
+        response = super(TopicView, self).get(request, *args, **kwargs)
+        if self.request.user.is_authenticated():
+            self.mark_read()
+        return response
+
     def get_login_redirect_url(self):
         return self.topic.get_absolute_url()
 
@@ -326,7 +334,6 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
                     topic=self.topic)
             else:
                 ctx['form'] = self.get_post_form_class()(topic=self.topic)
-            self.mark_read(self.request.user, self.topic)
         elif defaults.PYBB_ENABLE_ANONYMOUS_POST:
             ctx['form'] = self.get_post_form_class()(topic=self.topic)
         else:
@@ -348,7 +355,9 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
 
         return ctx
 
-    def mark_read(self, user, topic):
+    def mark_read(self):
+        user = self.request.user
+        topic = self.topic
         try:
             forum_mark = ForumReadTracker.objects.get(forum=topic.forum, user=user)
         except ForumReadTracker.DoesNotExist:
@@ -360,14 +369,13 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
                 topic_mark.save()
 
             # Check, if there are any unread topics in forum
-            readed = topic.forum.topics.filter((Q(topicreadtracker__user=user,
-                                                  topicreadtracker__time_stamp__gte=F('updated'))) |
-                                                Q(forum__forumreadtracker__user=user,
-                                                  forum__forumreadtracker__time_stamp__gte=F('updated')))\
-                                       .only('id').order_by()
+            readed_trackers = TopicReadTracker.objects.filter(
+                user=user, topic__forum=topic.forum, time_stamp__gte=F('topic__updated'))
+            unread = topic.forum.topics.exclude(topicreadtracker__in=readed_trackers)
+            if forum_mark is not None:
+                unread = unread.filter(updated__gte=forum_mark.time_stamp)
 
-            not_readed = topic.forum.topics.exclude(id__in=readed)
-            if not not_readed.exists():
+            if not unread.exists():
                 # Clear all topic marks for this forum, mark forum as readed
                 TopicReadTracker.objects.filter(user=user, topic__forum=topic.forum).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(forum=topic.forum, user=user)
@@ -387,11 +395,6 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         else:
             raise Http404(_('This topic does not exists'))
         return topic
-
-    def get(self, *args, **kwargs):
-        if defaults.PYBB_NICE_URL and 'pk' in kwargs:
-            return redirect(self.topic, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
-        return super(TopicView, self).get(*args, **kwargs)
 
 
 class PostEditMixin(PybbFormsMixin):
