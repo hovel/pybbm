@@ -68,8 +68,17 @@ PYBB_DISABLE_NOTIFICATIONS
 ..........................
 
 Users which have subscribed to a topic won't receive notifications but still be able to subscribe
-to topics. See ``PYBB_DISABLE_NOTIFICATIONS`` to disable topic subscription too.
+to topics. See ``PYBB_DISABLE_SUBSCRIPTIONS`` to disable topic subscription too.
 This is usefull if you want to to use your own notification system.
+
+Default: False
+
+.. _PYBB_NOTIFY_ON_EDIT:
+
+PYBB_NOTIFY_ON_EDIT
+..........................
+
+Describes whether to send notifications to topic subscribers when a post in the topic is edited.
 
 Default: False
 
