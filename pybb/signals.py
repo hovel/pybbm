@@ -10,7 +10,7 @@ from pybb import util, defaults, compat
 from pybb.models import Post, Category, Topic, Forum, create_or_check_slug
 from pybb.subscription import notify_topic_subscribers
 
-post_updated = Signal(providing_args=['post', 'request'])
+topic_updated = Signal(providing_args=['post', 'request'])
 
 
 def post_saved(instance, **kwargs):
@@ -80,6 +80,6 @@ def setup():
     post_save.connect(post_saved, sender=Post)
     post_delete.connect(post_deleted, sender=Post)
     if not defaults.PYBB_DISABLE_NOTIFICATIONS:
-        post_updated.connect(notify_topic_subscribers, sender=Post)
+        topic_updated.connect(notify_topic_subscribers, sender=Post)
     if defaults.PYBB_AUTO_USER_PERMISSIONS:
         post_save.connect(user_saved, sender=compat.get_user_model())

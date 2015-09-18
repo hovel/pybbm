@@ -25,7 +25,7 @@ from pybb.compat import get_atomic_func
 from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm
 from pybb.models import Category, Forum, Topic, Post, TopicReadTracker, ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
-from pybb.signals import post_updated
+from pybb.signals import topic_updated
 from pybb.templatetags.pybb_tags import pybb_topic_poll_not_voted
 
 
@@ -451,7 +451,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
         response = super(AddPostView, self).post(request, *args, **kwargs)
 
         if self.object and self.topic:
-            post_updated.send(Post, post=self.object, request=self.request)
+            topic_updated.send(Post, post=self.object, request=self.request)
             if not defaults.PYBB_DISABLE_SUBSCRIPTIONS and util.get_pybb_profile(self.object.user).autosubscribe and \
                     perms.may_subscribe_topic(self.object.user, self.object.topic):
                 self.object.topic.subscribers.add(self.object.user)
@@ -497,7 +497,7 @@ class EditPostView(PostEditMixin, generic.UpdateView):
     def post(self, request, *args, **kwargs):
         response = super(EditPostView, self).post(request, *args, **kwargs)
         if defaults.PYBB_NOTIFY_ON_EDIT:
-            post_updated.send(Post, post=self.object, request=self.request)
+            topic_updated.send(Post, post=self.object, request=self.request)
         return response
 
     def get_form_kwargs(self):
