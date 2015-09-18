@@ -20,7 +20,9 @@ else:
     from django.core.mail import send_mass_mail
 
 
-def notify_topic_subscribers(post, request):
+def notify_topic_subscribers(post, request, *args, **kwargs):
+    if defaults.PYBB_DISABLE_NOTIFICATIONS:
+        return
     topic = post.topic
     if post != topic.head:
         old_lang = translation.get_language()
