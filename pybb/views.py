@@ -360,8 +360,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
             forum_mark = ForumReadTracker.objects.get(forum=self.topic.forum, user=self.request.user)
         except ForumReadTracker.DoesNotExist:
             forum_mark = None
-        if (forum_mark is None) or (forum_mark.time_stamp <= self.topic.updated):
-            # Mark topic as readed
+        if (forum_mark is None) or (forum_mark.time_stamp < self.topic.updated):
             topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=self.topic, user=self.request.user)
             if not new and topic_mark.time_stamp > self.topic.updated:
                 # Bail early if we already read this thread.
@@ -375,7 +374,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
                 unread = unread.filter(updated__gte=forum_mark.time_stamp)
 
             if not unread.exists():
-                # Clear all topic marks for this forum, mark forum as readed
+                # Clear all topic marks for this forum, mark forum as read
                 TopicReadTracker.objects.filter(user=self.request.user, topic__forum=self.topic.forum).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(
                     forum=self.topic.forum, user=self.request.user)
