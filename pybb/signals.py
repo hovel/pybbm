@@ -19,9 +19,9 @@ def post_saved(instance, **kwargs):
         profile = util.get_pybb_profile(instance.user)
         profile.post_count = instance.user.posts.count()
         profile.save()
-    if not defaults.PYBB_DISABLE_SUBSCRIPTIONS and util.get_pybb_profile(instance.user).autosubscribe and \
-            perms.may_subscribe_topic(instance.user, instance.topic):
-        instance.topic.subscribers.add(instance.user)
+        if not defaults.PYBB_DISABLE_SUBSCRIPTIONS and util.get_pybb_profile(instance.user).autosubscribe and \
+                perms.may_subscribe_topic(instance.user, instance.topic):
+            instance.topic.subscribers.add(instance.user)
 
 
 def post_deleted(instance, **kwargs):
