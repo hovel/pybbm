@@ -8,6 +8,7 @@ from django.db.models.signals import post_save, post_delete, pre_save
 
 from pybb import util, defaults, compat
 from pybb.models import Post, Category, Topic, Forum, create_or_check_slug
+from pybb.permissions import perms
 from pybb.subscription import notify_topic_subscribers
 
 topic_updated = Signal(providing_args=['post', 'request'])
@@ -18,6 +19,9 @@ def post_saved(instance, **kwargs):
         profile = util.get_pybb_profile(instance.user)
         profile.post_count = instance.user.posts.count()
         profile.save()
+    if not defaults.PYBB_DISABLE_SUBSCRIPTIONS and util.get_pybb_profile(instance.user).autosubscribe and \
+            perms.may_subscribe_topic(instance.user, instance.topic):
+        instance.topic.subscribers.add(instance.user)
 
 
 def post_deleted(instance, **kwargs):
