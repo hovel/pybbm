@@ -393,7 +393,12 @@ class PostEditMixin(PybbFormsMixin):
                 errors += e.error_list
             else:
                 self.object.topic = topic
+
+                created = self.object.id is None
                 self.object.save()
+
+                if created or defaults.PYBB_NOTIFY_ON_EDIT:
+                    topic_updated.send(Post, post=self.object, current_site=compat.get_current_site(self.request))
                 if save_attachments:
                     aformset.save()
                 if save_poll_answers:
@@ -447,16 +452,6 @@ class AddPostView(PostEditMixin, generic.CreateView):
                     return HttpResponse(self.quote)
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        response = super(AddPostView, self).post(request, *args, **kwargs)
-
-        if self.object and self.topic:
-            topic_updated.send(Post, post=self.object, request=self.request)
-            if not defaults.PYBB_DISABLE_SUBSCRIPTIONS and util.get_pybb_profile(self.object.user).autosubscribe and \
-                    perms.may_subscribe_topic(self.object.user, self.object.topic):
-                self.object.topic.subscribers.add(self.object.user)
-        return response
-
     def get_form_kwargs(self):
         ip = self.request.META.get('REMOTE_ADDR', '')
         form_kwargs = super(AddPostView, self).get_form_kwargs()
@@ -493,12 +488,6 @@ class EditPostView(PostEditMixin, generic.UpdateView):
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
         return super(EditPostView, self).dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        response = super(EditPostView, self).post(request, *args, **kwargs)
-        if defaults.PYBB_NOTIFY_ON_EDIT:
-            topic_updated.send(Post, post=self.object, request=self.request)
-        return response
 
     def get_form_kwargs(self):
         form_kwargs = super(EditPostView, self).get_form_kwargs()

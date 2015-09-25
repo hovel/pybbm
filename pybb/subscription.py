@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -20,7 +21,7 @@ else:
     from django.core.mail import send_mass_mail
 
 
-def notify_topic_subscribers(post, request, *args, **kwargs):
+def notify_topic_subscribers(post, current_site, *args, **kwargs):
     if defaults.PYBB_DISABLE_NOTIFICATIONS:
         return
     topic = post.topic
@@ -29,7 +30,6 @@ def notify_topic_subscribers(post, request, *args, **kwargs):
 
         # Define constants for templates rendering
         delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
-        current_site = compat.get_current_site(request)
         from_email = settings.DEFAULT_FROM_EMAIL
 
         subject = render_to_string('pybb/mail_templates/subscription_email_subject.html',
