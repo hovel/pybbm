@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'test_app',
 ]
 if django.VERSION[:2] < (1, 7) and south_installed:
@@ -60,7 +61,6 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
-    'django.core.context_processors.static',
     'django.core.context_processors.request',
     'pybb.context_processors.processor',
     'django.core.context_processors.tz'
