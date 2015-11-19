@@ -744,6 +744,8 @@ def topic_cancel_poll_vote(request, pk):
 def delete_subscription(request, topic_id):
     topic = get_object_or_404(perms.filter_topics(request.user, Topic.objects.all()), pk=topic_id)
     topic.subscribers.remove(request.user)
+    msg = _('Subscription removed. You will not receive emails from this topic unless you subscribe or post again.')
+    messages.success(request, msg, fail_silently=True)
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
@@ -753,6 +755,8 @@ def add_subscription(request, topic_id):
     if not perms.may_subscribe_topic(request.user, topic):
         raise PermissionDenied
     topic.subscribers.add(request.user)
+    msg = _('Subscription added. You will receive email notifications for replies to this topic.')
+    messages.success(request, msg, fail_silently=True)
     return HttpResponseRedirect(topic.get_absolute_url())
 
 
