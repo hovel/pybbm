@@ -697,6 +697,15 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 302)
         self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 302)
 
+        user = User.objects.create_user('someguy', 'email@abc.xyz', 'password')
+        client.login(username='someguy', password='password')
+
+        response = client.get(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}))
+        self.assertEqual(response.status_code, 200, response)
+
+        response = client.get(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}), data={'quote_id': post_hidden.id})
+        self.assertEqual(response.status_code, 403, response)
+
         client.login(username='zeus', password='zeus')
         self.assertFalse(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
         self.assertNotContains(client.get(reverse('pybb:index')), forum_hidden.get_absolute_url())
@@ -705,6 +714,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 403)
         self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 403)
         self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 403)
+
         self.user.is_staff = True
         self.user.save()
         self.assertTrue(category.id in [c.id for c in client.get(reverse('pybb:index')).context['categories']])
@@ -714,6 +724,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(client.get(topic_in_hidden.get_absolute_url()).status_code, 200)
         self.assertEqual(client.get(forum_hidden.get_absolute_url()).status_code, 200)
         self.assertEqual(client.get(topic_hidden.get_absolute_url()).status_code, 200)
+
 
     def test_inactive(self):
         self.login_client()
