@@ -148,7 +148,7 @@ class DefaultPermissionHandler(object):
             return True
         if post.on_moderation:
             return post.user == user or user in post.topic.forum.moderators.all()
-        return post.user == user or not post.topic.forum.hidden
+        return post.user == user or not (post.topic.forum.hidden or post.topic.forum.category.hidden)
 
     def may_edit_post(self, user, post):
         """ return True if `user` may edit `post` """
