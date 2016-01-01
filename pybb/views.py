@@ -625,8 +625,6 @@ class DeletePostView(generic.DeleteView):
             raise PermissionDenied
         self.topic = post.topic
         self.forum = post.topic.forum
-        if not perms.may_moderate_topic(self.request.user, self.topic):
-            raise PermissionDenied
         return post
 
     def delete(self, request, *args, **kwargs):
