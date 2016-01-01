@@ -156,7 +156,7 @@ class DefaultPermissionHandler(object):
 
     def may_delete_post(self, user, post):
         """ return True if `user` may delete `post` """
-        return self.may_moderate_topic(user, post.topic)
+        return self.may_moderate_topic(user, post.topic) or post.user == user
 
     #
     # permission checks on users
