@@ -546,7 +546,7 @@ class UserTopics(PaginatorMixin, generic.ListView):
     def get_queryset(self):
         qs = super(UserTopics, self).get_queryset()
         qs = qs.filter(user=self.user)
-        qs = perms.filter_topics(self.user, qs)
+        qs = perms.filter_topics(self.request.user, qs)
         qs = qs.order_by('-updated', '-created', '-id')
         return qs
 
