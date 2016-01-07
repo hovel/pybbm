@@ -446,7 +446,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
         return super(AddPostView, self).dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        ip = self.request.META.get('REMOTE_ADDR', '')
+        ip = util.get_ip(self.request)
         form_kwargs = super(AddPostView, self).get_form_kwargs()
         form_kwargs.update(dict(topic=self.topic, forum=self.forum, user=self.user,
                            ip=ip, initial={}))
