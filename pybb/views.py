@@ -436,6 +436,8 @@ class AddPostView(PostEditMixin, generic.CreateView):
                     raise Http404
                 else:
                     post = get_object_or_404(Post, pk=quote_id)
+                    if not perms.may_view_post(request.user, post):
+                        raise PermissionDenied
                     profile = util.get_pybb_profile(post.user)
                     self.quote = util._get_markup_quoter(defaults.PYBB_MARKUP)(post.body, profile.get_display_name())
 
@@ -544,7 +546,7 @@ class UserTopics(PaginatorMixin, generic.ListView):
     def get_queryset(self):
         qs = super(UserTopics, self).get_queryset()
         qs = qs.filter(user=self.user)
-        qs = perms.filter_topics(self.user, qs)
+        qs = perms.filter_topics(self.request.user, qs)
         qs = qs.order_by('-updated', '-created', '-id')
         return qs
 
