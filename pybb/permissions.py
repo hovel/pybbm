@@ -115,7 +115,7 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may post as admin """
         return user.is_staff
 
-    def may_subscribe_topic(self, user, forum):
+    def may_subscribe_topic(self, user, topic):
         """ return True if `user` is allowed to subscribe to a `topic` """
         return not defaults.PYBB_DISABLE_SUBSCRIPTIONS
 
