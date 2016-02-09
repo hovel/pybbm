@@ -256,7 +256,7 @@ class Post(RenderableItem):
     user = models.ForeignKey(get_user_model_path(), related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True, db_index=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
-    user_ip = models.IPAddressField(_('User IP'), blank=True, default='0.0.0.0')
+    user_ip = models.GenericIPAddressField(_('User IP'), blank=True, default='0.0.0.0')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
 
     class Meta(object):
