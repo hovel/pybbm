@@ -8,12 +8,6 @@ env:
   - DJANGO="Django>=1.4,<1.5" DB=sqlite
   - DJANGO="Django>=1.4,<1.5" DB=postgres
   - DJANGO="Django>=1.4,<1.5" DB=mysql
-  - DJANGO="Django>=1.5,<1.6" DB=sqlite
-  - DJANGO="Django>=1.5,<1.6" DB=postgres
-  - DJANGO="Django>=1.5,<1.6" DB=mysql
-  - DJANGO="Django>=1.6,<1.7" DB=sqlite
-  - DJANGO="Django>=1.6,<1.7" DB=postgres
-  - DJANGO="Django>=1.6,<1.7" DB=mysql
   - DJANGO="Django>=1.7,<1.8" DB=sqlite
   - DJANGO="Django>=1.7,<1.8" DB=postgres
   - DJANGO="Django>=1.7,<1.8" DB=mysql
@@ -42,10 +36,6 @@ matrix:
       env: DJANGO="Django>=1.4,<1.5" DB=mysql
 
     - python: "3.2"
-      env: DJANGO="Django>=1.5,<1.6" DB=mysql
-    - python: "3.2"
-      env: DJANGO="Django>=1.6,<1.7" DB=mysql
-    - python: "3.2"
       env: DJANGO="Django>=1.7,<1.8" DB=mysql
     - python: "3.2"
       env: DJANGO="Django>=1.8,<1.9" DB=mysql
@@ -60,4 +50,3 @@ install:
   - CFLAGS="-O0" pip install -qU -r test/test_project/requirements_test.txt
 script:
   - python setup.py test
-
