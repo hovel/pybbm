@@ -4,11 +4,6 @@ import sys
 import os
 from optparse import OptionParser
 from django.conf import settings
-try:
-    import south
-    south_installed = True
-except ImportError:
-    south_installed = False
 
 project_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test/test_project')
 sys.path.insert(0, project_dir)
@@ -24,9 +19,6 @@ except ImportError:
 def runtests(*test_args, **kwargs):
     if django.VERSION[:2] >= (1, 7):
         django.setup()
-    if 'south' in settings.INSTALLED_APPS and south_installed:
-        from south.management.commands import patch_for_test_db_setup
-        patch_for_test_db_setup()
 
     if not test_args:
         test_args = ['pybb']

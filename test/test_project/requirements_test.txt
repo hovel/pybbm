@@ -1,5 +1,4 @@
 lxml
 Pillow
-south
 bbcode
 markdown
