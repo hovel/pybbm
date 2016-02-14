@@ -417,7 +417,7 @@ msgstr "войдите"
 
 #: templates/pybb/_need_to_login_message.html:3
 msgid "to create to post a reply"
-msgstr "что-бы оставить сообщение"
+msgstr "чтобы оставить сообщение"
 
 #: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:32
 msgid "New reply"
