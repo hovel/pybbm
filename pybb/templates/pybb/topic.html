@@ -92,7 +92,7 @@
                 {% for subscriber in topic.subscribers.all %}
                     {% pybb_get_profile user=subscriber as subscriber_profile %}
                     <a href="{% url 'pybb:user' subscriber.get_username %}">
-                        {{ subscriber.get_display_name }}
+                        {{ subscriber_profile.get_display_name }}
                     </a>
                     {% if not forloop.last %},{% endif %}
                 {% endfor %}
