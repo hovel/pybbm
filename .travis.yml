@@ -1,55 +1,34 @@
 language: python
 python:
   - "2.7"
-  - "3.2"
   - "3.3"
   - "3.4"
+  - "3.5"
 env:
-  - DJANGO="Django>=1.4,<1.5" DB=sqlite
-  - DJANGO="Django>=1.4,<1.5" DB=postgres
-  - DJANGO="Django>=1.4,<1.5" DB=mysql
-  - DJANGO="Django>=1.5,<1.6" DB=sqlite
-  - DJANGO="Django>=1.5,<1.6" DB=postgres
-  - DJANGO="Django>=1.5,<1.6" DB=mysql
-  - DJANGO="Django>=1.6,<1.7" DB=sqlite
-  - DJANGO="Django>=1.6,<1.7" DB=postgres
-  - DJANGO="Django>=1.6,<1.7" DB=mysql
   - DJANGO="Django>=1.7,<1.8" DB=sqlite
   - DJANGO="Django>=1.7,<1.8" DB=postgres
   - DJANGO="Django>=1.7,<1.8" DB=mysql
   - DJANGO="Django>=1.8,<1.9" DB=sqlite
   - DJANGO="Django>=1.8,<1.9" DB=postgres
   - DJANGO="Django>=1.8,<1.9" DB=mysql
+  - DJANGO="Django>=1.9,<1.10" DB=sqlite
+  - DJANGO="Django>=1.9,<1.10" DB=postgres
+  - DJANGO="Django>=1.9,<1.10" DB=mysql
 matrix:
   exclude:
-    - python: "3.2"
-      env: DJANGO="Django>=1.4,<1.5" DB=sqlite
-    - python: "3.2"
-      env: DJANGO="Django>=1.4,<1.5" DB=postgres
-    - python: "3.2"
-      env: DJANGO="Django>=1.4,<1.5" DB=mysql
     - python: "3.3"
-      env: DJANGO="Django>=1.4,<1.5" DB=sqlite
+      env: DJANGO="Django>=1.9,<1.10" DB=sqlite
     - python: "3.3"
-      env: DJANGO="Django>=1.4,<1.5" DB=postgres
+      env: DJANGO="Django>=1.9,<1.10" DB=postgres
     - python: "3.3"
-      env: DJANGO="Django>=1.4,<1.5" DB=mysql
-    - python: "3.4"
-      env: DJANGO="Django>=1.4,<1.5" DB=sqlite
-    - python: "3.4"
-      env: DJANGO="Django>=1.4,<1.5" DB=postgres
-    - python: "3.4"
-      env: DJANGO="Django>=1.4,<1.5" DB=mysql
+      env: DJANGO="Django>=1.9,<1.10" DB=mysql
 
-    - python: "3.2"
-      env: DJANGO="Django>=1.5,<1.6" DB=mysql
-    - python: "3.2"
-      env: DJANGO="Django>=1.6,<1.7" DB=mysql
-    - python: "3.2"
+    - python: "3.5"
+      env: DJANGO="Django>=1.7,<1.8" DB=sqlite
+    - python: "3.5"
+      env: DJANGO="Django>=1.7,<1.8" DB=postgres
+    - python: "3.5"
       env: DJANGO="Django>=1.7,<1.8" DB=mysql
-    - python: "3.2"
-      env: DJANGO="Django>=1.8,<1.9" DB=mysql
-
 before_script:
   - mysql -e 'create database pybbm;'
   - psql -c 'create database pybbm;' -U postgres
@@ -60,4 +39,3 @@ install:
   - CFLAGS="-O0" pip install -qU -r test/test_project/requirements_test.txt
 script:
   - python setup.py test
-

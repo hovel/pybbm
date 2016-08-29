@@ -1,5 +1,4 @@
-{% load url from future %}
-{% load i18n pybb_tags %}
+{% load i18n pybb_tags staticfiles %}
 <form class="post-form" action="
     {% if forum %}
         {% url 'pybb:add_topic' forum.pk %}
@@ -18,9 +17,11 @@
     {% if form.login %} {% include "pybb/form_field.html" with field=form.login %}  {% endif %}
     {% if form.body %} {% include "pybb/form_field.html" with field=form.body %}  {% endif %}
     <div id='emoticons'>
-      {% for smile, url in form.available_smiles.items %}
-        <a href='#' title='{{ smile|safe }}'><img src='{{ STATIC_URL }}{{ form.smiles_prefix }}{{ url }}'></a>
-      {% endfor %}
+    {% for smile, url in form.available_smiles.items %}
+        {% with form.smiles_prefix|add:url as static_smiley %}
+            <a href='#' title='{{ smile|safe }}'><img src='{% static static_smiley %}'></a>
+        {% endwith %}
+    {% endfor %}
     </div>
 
     {% if request.user|pybb_may_create_poll and form.poll_type %}

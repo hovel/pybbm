@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.db.models import F, Q
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest,\
     HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -546,7 +546,7 @@ class UserTopics(PaginatorMixin, generic.ListView):
     def get_queryset(self):
         qs = super(UserTopics, self).get_queryset()
         qs = qs.filter(user=self.user)
-        qs = perms.filter_topics(self.user, qs)
+        qs = perms.filter_topics(self.request.user, qs)
         qs = qs.order_by('-updated', '-created', '-id')
         return qs
 

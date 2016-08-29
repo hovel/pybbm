@@ -1,8 +1,6 @@
 {% extends 'pybb/base.html' %}
 
-{% load url from future %}
-
-{% load pybb_tags i18n %}
+{% load pybb_tags i18n staticfiles %}
 
 {% block title %}{{ topic }}{% endblock %}
 
@@ -13,7 +11,7 @@
 {% block extra_script %}
     {{ block.super }}
     {{ form.media.js }}
-    <script type="text/javascript" src="{{ STATIC_URL }}pybb/js/jquery.formset.min.js"></script>
+    <script type="text/javascript" src="{% static 'pybb/js/jquery.formset.min.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumb %}
@@ -94,7 +92,7 @@
                 {% for subscriber in topic.subscribers.all %}
                     {% pybb_get_profile user=subscriber as subscriber_profile %}
                     <a href="{% url 'pybb:user' subscriber.get_username %}">
-                        {{ subscriber.get_display_name }}
+                        {{ subscriber_profile.get_display_name }}
                     </a>
                     {% if not forloop.last %},{% endif %}
                 {% endfor %}
