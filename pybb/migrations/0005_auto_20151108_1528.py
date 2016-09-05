@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import pybb.util
+from pybb.compat import get_image_field_class
 
 
 class Migration(migrations.Migration):
@@ -21,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='profile',
             name='avatar',
-            field=models.ImageField(blank=True, null=True, upload_to=pybb.util.FilePathGenerator(to='pybb/avatar'), verbose_name='Avatar'),
+            field=get_image_field_class()(blank=True, null=True, upload_to=pybb.util.FilePathGenerator(to='pybb/avatar'), verbose_name='Avatar'),
         ),
         migrations.AlterField(
             model_name='profile',

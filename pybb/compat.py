@@ -8,6 +8,11 @@ from unidecode import unidecode
 
 def get_image_field_class():
     try:
+        from PIL import Image
+    except ImportError:
+        from django.db.models import FileField
+        return FileField
+    try:
         from sorl.thumbnail import ImageField
     except ImportError:
         from django.db.models import ImageField
@@ -15,6 +20,10 @@ def get_image_field_class():
 
 
 def get_image_field_full_name():
+    try:
+        from PIL import Image
+    except ImportError:
+        return 'django.db.models.fields.files.FileField'
     try:
         from sorl.thumbnail import ImageField
         name = 'sorl.thumbnail.fields.ImageField'
