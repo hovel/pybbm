@@ -68,7 +68,7 @@ class DefaultPermissionHandler(object):
         if not user.is_staff and (topic.forum.hidden or topic.forum.category.hidden):
             return False  # only staff may see hidden forum / category
         if topic.on_moderation:
-            return user.is_authenticated() and (user == topic.user or user in topic.forum.moderators)
+            return user.is_authenticated() and (user == topic.user or user in topic.forum.moderators.all())
         return True
 
     def may_moderate_topic(self, user, topic):
