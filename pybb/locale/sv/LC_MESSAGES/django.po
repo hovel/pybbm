@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-02 21:54+0200\n"
-"PO-Revision-Date: 2016-09-12 12:47+0200\n"
+"POT-Creation-Date: 2016-09-13 10:54+0200\n"
+"PO-Revision-Date: 2016-09-13 10:56+0200\n"
 "Last-Translator: Göran Uddeborg <goeran@uddeborg.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -283,7 +283,8 @@ msgstr "Användares omröstningssvar"
 #, python-format
 msgid ""
 "After %(limit)s attemps, there is not any unique slug value for \"%(slug)s\""
-msgstr "Efter %(limit)s försök finns det inget unikt typradsvärde för ”%(slug)s”"
+msgstr ""
+"Efter %(limit)s försök finns det inget unikt typradsvärde för ”%(slug)s”"
 
 #: profiles.py:33
 msgid "Signature"
@@ -495,7 +496,9 @@ msgstr "Länk till ämne:"
 msgid ""
 "If you don't want to recive notifications on new messages in this topic "
 "visit following link:"
-msgstr "Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då följande länk:"
+msgstr ""
+"Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då "
+"följande länk:"
 
 #: templates/pybb/mail_templates/subscription_email_subject.html:2
 msgid "New answer in topic that you subscribed."
@@ -700,20 +703,24 @@ msgid "Search"
 msgstr "Sök"
 
 #: templatetags/pybb_tags.py:60
-msgid "seconds ago,seconds ago,seconds ago"
-msgstr "sekunder sedan,sekunder sedan,sekunder sedan"
+#, python-format
+msgid "%d seconds ago,%d seconds ago,%d seconds ago"
+msgstr "för %d sekunder sedan,för %d sekunder sedan,för %d sekunder sedan"
 
 #: templatetags/pybb_tags.py:63
-msgid "seconds ago"
-msgstr "sekunder sedan"
+#, python-format
+msgid "%d seconds ago"
+msgstr "för %d sekunder sedan"
 
 #: templatetags/pybb_tags.py:69
-msgid "minutes ago,minutes ago,minutes ago"
-msgstr "minuter sedan,minuter sedan,minuter sedan"
+#, python-format
+msgid "%d minutes ago,%d minutes ago,%d minutes ago"
+msgstr "för %d minuter sedan,för %d minuter sedan,för %d minuter sedan"
 
 #: templatetags/pybb_tags.py:72
-msgid "minutes ago"
-msgstr "minuter sedan"
+#, python-format
+msgid "%d minutes ago"
+msgstr "för %d minuter sedan"
 
 #: templatetags/pybb_tags.py:82
 #, python-format

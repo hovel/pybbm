@@ -57,20 +57,20 @@ class PybbTimeNode(template.Node):
         if delta.days == 0:
             if delta.seconds < 60:
                 if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
-                    msg = _('seconds ago,seconds ago,seconds ago')
+                    msg = _('%d seconds ago,%d seconds ago,%d seconds ago')
                     msg = pytils.numeral.choose_plural(delta.seconds, msg)
                 else:
-                    msg = _('seconds ago')
-                return '%d %s' % (delta.seconds, msg)
+                    msg = _('%d seconds ago')
+                return msg % delta.seconds
 
             elif delta.seconds < 3600:
                 minutes = int(delta.seconds / 60)
                 if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
-                    msg = _('minutes ago,minutes ago,minutes ago')
+                    msg = _('%d minutes ago,%d minutes ago,%d minutes ago')
                     msg = pytils.numeral.choose_plural(minutes, msg)
                 else:
-                    msg = _('minutes ago')
-                return '%d %s' % (minutes, msg)
+                    msg = _('%d minutes ago')
+                return msg % minutes
         if context['user'].is_authenticated():
             if time.daylight:
                 tz1 = time.altzone
