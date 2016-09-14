@@ -15,6 +15,8 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.translation.trans_real import get_supported_language_variant
+
 from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
     pybb_get_latest_topics, pybb_get_latest_posts
@@ -104,8 +106,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(len(response.context['object'].forums_accessed), 1)
 
     def test_profile_language_default(self):
-        user = User.objects.create_user(username='user2', password='user2', email='user2@example.com')
-        self.assertEqual(util.get_pybb_profile(user).language, settings.LANGUAGE_CODE)
+        user = User.objects.create_user(username='user2', password='user2',
+                                        email='user2@example.com')
+        self.assertEqual(util.get_pybb_profile(user).language,
+                         get_supported_language_variant(settings.LANGUAGE_CODE))
 
     def test_profile_edit(self):
         # Self profile edit

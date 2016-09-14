@@ -1,11 +1,12 @@
 # coding=utf-8
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import models
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
-from pybb import defaults, util
-from pybb.compat import get_image_field_class, get_username_field
+from django.utils.translation.trans_real import get_supported_language_variant
 
+from pybb import defaults, util
+from pybb.compat import get_image_field_class
 
 TZ_CHOICES = [(float(x[0]), x[1]) for x in (
     (-12, '-12'), (-11, '-11'), (-10, '-10'), (-9.5, '-09.5'), (-9, '-09'),
@@ -35,7 +36,7 @@ class PybbProfile(models.Model):
                                       max_length=defaults.PYBB_SIGNATURE_MAX_LENGTH + 30)
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True, choices=settings.LANGUAGES,
-                                default=settings.LANGUAGE_CODE)
+                                default=get_supported_language_variant(settings.LANGUAGE_CODE, strict=True))
     show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     avatar = get_image_field_class()(_('Avatar'), blank=True, null=True,
@@ -62,4 +63,4 @@ class PybbProfile(models.Model):
             if not defaults.PYBB_PROFILE_RELATED_NAME:  # we now in user custom model itself
                 return self.get_username()
         except Exception:
-            return unicode(self)
+            return force_text(self)

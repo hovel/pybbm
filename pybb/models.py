@@ -17,14 +17,6 @@ from pybb.util import unescape, FilePathGenerator, _get_markup_formatter
 
 from annoying.fields import AutoOneToOneField
 
-try:
-    from south.modelsinspector import add_introspection_rules
-
-    add_introspection_rules([], ["^annoying\.fields\.JSONField"])
-    add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
-except ImportError:
-    pass
-
 
 @python_2_unicode_compatible
 class Category(models.Model):
@@ -67,7 +59,7 @@ class Forum(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
     description = models.TextField(_('Description'), blank=True)
-    moderators = models.ManyToManyField(get_user_model_path(), blank=True, null=True, verbose_name=_('Moderators'))
+    moderators = models.ManyToManyField(get_user_model_path(), blank=True, verbose_name=_('Moderators'))
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)

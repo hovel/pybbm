@@ -20,9 +20,6 @@ Optional dependencies
 
 The following dependencies are optional. You can install them with ``pip install``:
 
-* We strongly recommend to use ``south`` (with django<1.7) and django migrations since 1.7 version
-  to smoothly migrate database schema in your projects.
-
 * For better perfomance and easy images thumbnailing you can use any thumbnail django application.
   PyBBM by default uses ``sorl.thumbnail`` if it is installed and included in your ``INSTALLED_APPS`` setting.
   It is used for defining the `avatar` field in the `PybbProfile` model and for resizing the avatar
@@ -103,8 +100,8 @@ from OneToOne field related to User from custom site profile model.
 
 For more information see :doc:`how to use custom user model with pybbm</customuser>`
 
-Sync/Migrate database
----------------------
+Migrate database
+----------------
 
 Since django 1.7 release you have several combinations of installed packages that affect database migrations:
 
@@ -113,37 +110,6 @@ Since django 1.7 release you have several combinations of installed packages tha
   Pybbm fully supports django 1.7 migrations, so just run::
 
     python manage.py migrate pybb
-
-* **django < 1.7, south >= 1.0**
-  South since version 1.0 changed default migration directory to `south_migrations`.
-  This give reusable apps ability to support django native migrations and south migrations in parallel.
-  Migration commands that you need::
-
-    python manage.py syncdb --all
-    python manage.py migrate pybb --fake
-
-* **django < 1.7, south < 1.0**
-  Override `SOUTH_MIGRATION_MODULES` setting as::
-
-    SOUTH_MIGRATION_MODULES = {
-        'pybb': 'pybb.south_migrations',
-    }
-
-  then run commands to migrate from above
-
-* **django <1.7, south not installed**
-  just type::
-
-    python manage.py syncdb
-
-  to get actual database state for your pybbm release
-
-WARNING
-'''''''
-
-* If you have south enabled and use profile class under south control (like 'pybb.Profile'),
-the profile for superuser will not be created after syncdb/migrate. It will be created during
-first login of this user to the site by `pybb.middleware.PybbMiddleware`.
 
 * We recommend to use database engine that supports transaction management (all django backends except sqlite).
   Otherwise you have small chance to face some inconsistency in DB after failed post/topic creation.
