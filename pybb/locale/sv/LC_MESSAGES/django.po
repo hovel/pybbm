@@ -7,14 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-13 10:54+0200\n"
-"PO-Revision-Date: 2016-09-13 10:56+0200\n"
+"POT-Creation-Date: 2016-09-14 20:28+0200\n"
+"PO-Revision-Date: 2016-09-14 20:31+0200\n"
 "Last-Translator: Göran Uddeborg <goeran@uddeborg.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin.py:43 admin.py:70 admin.py:98 admin.py:120
 msgid "Additional options"
@@ -702,32 +703,26 @@ msgstr "Användare"
 msgid "Search"
 msgstr "Sök"
 
-#: templatetags/pybb_tags.py:60
+#: templatetags/pybb_tags.py:53
 #, python-format
-msgid "%d seconds ago,%d seconds ago,%d seconds ago"
-msgstr "för %d sekunder sedan,för %d sekunder sedan,för %d sekunder sedan"
+msgid "%d second ago"
+msgid_plural "%d seconds ago"
+msgstr[0] "för %d sekund sedan"
+msgstr[1] "för %d sekunder sedan"
 
-#: templatetags/pybb_tags.py:63
+#: templatetags/pybb_tags.py:57
 #, python-format
-msgid "%d seconds ago"
-msgstr "för %d sekunder sedan"
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "för %d minut sedan"
+msgstr[1] "för %d minuter sedan"
 
-#: templatetags/pybb_tags.py:69
-#, python-format
-msgid "%d minutes ago,%d minutes ago,%d minutes ago"
-msgstr "för %d minuter sedan,för %d minuter sedan,för %d minuter sedan"
-
-#: templatetags/pybb_tags.py:72
-#, python-format
-msgid "%d minutes ago"
-msgstr "för %d minuter sedan"
-
-#: templatetags/pybb_tags.py:82
+#: templatetags/pybb_tags.py:67
 #, python-format
 msgid "today, %s"
 msgstr "idag, %s"
 
-#: templatetags/pybb_tags.py:84
+#: templatetags/pybb_tags.py:69
 #, python-format
 msgid "yesterday, %s"
 msgstr "igår, %s"
