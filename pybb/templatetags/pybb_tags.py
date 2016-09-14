@@ -11,16 +11,10 @@ from django.core.cache import cache
 from django.utils.safestring import mark_safe
 from django.utils.encoding import smart_text
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ungettext
 from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
-
-try:
-    import pytils
-    pytils_enabled = True
-except ImportError:
-    pytils_enabled = False
 
 from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser, Topic, Post
 from pybb.permissions import perms
@@ -56,20 +50,11 @@ class PybbTimeNode(template.Node):
 
         if delta.days == 0:
             if delta.seconds < 60:
-                if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
-                    msg = _('%d seconds ago,%d seconds ago,%d seconds ago')
-                    msg = pytils.numeral.choose_plural(delta.seconds, msg)
-                else:
-                    msg = _('%d seconds ago')
+                msg = ungettext('%d second ago', '%d seconds ago', delta.seconds)
                 return msg % delta.seconds
-
             elif delta.seconds < 3600:
                 minutes = int(delta.seconds / 60)
-                if pytils_enabled and context.get('LANGUAGE_CODE', '').startswith('ru'):
-                    msg = _('%d minutes ago,%d minutes ago,%d minutes ago')
-                    msg = pytils.numeral.choose_plural(minutes, msg)
-                else:
-                    msg = _('%d minutes ago')
+                msg = ungettext('%d minute ago', '%d minutes ago', minutes)
                 return msg % minutes
         if context['user'].is_authenticated():
             if time.daylight:
