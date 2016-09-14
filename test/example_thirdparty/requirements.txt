@@ -10,7 +10,6 @@ postmarkup
 django-annoying
 django-pure-pagination
 sorl-thumbnail
-pytils
 unidecode
 
 # Theme, templates and authentication

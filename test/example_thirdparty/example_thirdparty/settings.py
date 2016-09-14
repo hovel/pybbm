@@ -75,7 +75,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'pybb.apps.PybbConfig',
-    'pytils',
     'sorl.thumbnail',
     'pure_pagination',
     'account',
