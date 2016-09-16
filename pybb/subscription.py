@@ -31,6 +31,9 @@ def notify_topic_subscribers(post):
 
         mails = tuple()
         for user in topic.subscribers.exclude(pk=post.user.pk):
+            if not getattr(util.get_pybb_profile(user), 'receive_emails', True):
+                continue
+
             try:
                 validate_email(user.email)
             except:

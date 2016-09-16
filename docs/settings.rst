@@ -69,7 +69,9 @@ PYBB_DISABLE_NOTIFICATIONS
 
 Users which have subscribed to a topic won't receive notifications but still be able to subscribe
 to topics. See ``PYBB_DISABLE_NOTIFICATIONS`` to disable topic subscription too.
-This is usefull if you want to to use your own notification system.
+This is usefull if you want to to use your own notification system. Additionally, if your custom
+user model has a ``receive_emails`` field, it will be used to determine whether to send notification
+emails to each user.
 
 Default: False
 
