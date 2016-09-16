@@ -540,7 +540,7 @@ class UserTopics(PaginatorMixin, generic.ListView):
 
     def dispatch(self, request, *args, **kwargs):
         username = kwargs.pop('username')
-        self.user = get_object_or_404(User, username=username)
+        self.user = get_object_or_404(**{'klass': User, username_field: username})
         return super(UserTopics, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
