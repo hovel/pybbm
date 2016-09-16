@@ -29,12 +29,6 @@ def notify_topic_subscribers(post):
         current_site = Site.objects.get_current()
         from_email = settings.DEFAULT_FROM_EMAIL
 
-        subject = render_to_string('pybb/mail_templates/subscription_email_subject.html',
-                                   {'site': current_site,
-                                    'post': post})
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-
         mails = tuple()
         for user in topic.subscribers.exclude(pk=post.user.pk):
             try:
@@ -48,6 +42,12 @@ def notify_topic_subscribers(post):
 
             lang = util.get_pybb_profile(user).language or settings.LANGUAGE_CODE
             translation.activate(lang)
+
+            subject = render_to_string('pybb/mail_templates/subscription_email_subject.html',
+                                       {'site': current_site,
+                                        'post': post})
+            # Email subject *must not* contain newlines
+            subject = ''.join(subject.splitlines())
 
             message = render_to_string('pybb/mail_templates/subscription_email_body.html',
                                        {'site': current_site,
