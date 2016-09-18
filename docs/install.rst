@@ -80,11 +80,11 @@ Enable PyBBM urlconf
 
 Put ``include('pybb.urls', namespace='pybb'))`` into main project ``urls.py`` file::
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         ....
         (r'^forum/', include('pybb.urls', namespace='pybb')),
         ....
-    )
+    ]
 
 Enable your site profile
 ------------------------

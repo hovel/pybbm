@@ -10,7 +10,7 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'testdb.sqlite',
+        'NAME': os.path.join(BASE_DIR, 'testdb.sqlite'),
     }
 }
 

@@ -278,9 +278,9 @@ For more information see :doc:`markup`
 PYBB_QUOTE_ENGINES (deprecated)
 ...............................
 
-**Deprecation note: Every markup class must inherit from  `pybb.markup.base.BaseParser`**
+**Deprecation note: Every markup class must inherit from** `pybb.markup.base.BaseParser`
 
-**For more information see :doc:`markup`**
+**For more information see** :doc:`markup`
 
 Should be the same dict with paths to markup engine classes as `PYBB_MARKUP_ENGINES_PATH` setting
 
@@ -300,7 +300,7 @@ Cleaners are user-aware, so you can disable them for some types of users.
 
 Each function in list should accept `auth.User` instance as first argument and `string` instance as second, returned value will be sended to next function on list or saved and rendered as post body.
 
-for example this is enabled by default `rstrip_str` cleaner::
+For example this is enabled by default `rstrip_str` cleaner::
 
     def rstrip_str(user, str):
         if user.is_staff:
