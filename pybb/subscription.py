@@ -25,7 +25,7 @@ def notify_forum_subscribers(topic):
     qs = ForumSubscription.objects.exclude(user=topic.user).filter(forum=topic.forum)
     notifications = qs.filter(type=ForumSubscription.TYPE_NOTIFY)
     if notifications.count():
-        users = (n.user for n in notifications.select_related('user'))
+        users = [n.user for n in notifications.select_related('user')]
         context = {
             'manage_url': reverse('pybb:forum_subscription', kwargs={'pk': forum.id}),
             'topic': topic,
@@ -49,13 +49,14 @@ def notify_topic_subscribers(post):
         send_notification(users, 'subscription_email', context)
 
 
-def send_notification(users, template, context={}):
+def send_notification(users, template, context=None):
+    context = context or {}
     if not 'site' in context:
         context['site'] = Site.objects.get_current()
     old_lang = translation.get_language()
     from_email = settings.DEFAULT_FROM_EMAIL
 
-    mails = tuple()
+    mails = []
     for user in users:
         if not getattr(util.get_pybb_profile(user), 'receive_emails', True):
             continue
@@ -79,7 +80,7 @@ def send_notification(users, template, context={}):
         subject = ''.join(subject.splitlines())
 
         message = render_to_string('pybb/mail_templates/%s_body.html' % template, context)
-        mails += ((subject, message, from_email, [user.email]),)
+        mails.append((subject, message, from_email, [user.email]))
 
     # Send mails
     send_mass_mail(mails, fail_silently=True)

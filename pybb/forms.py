@@ -264,25 +264,26 @@ class ForumSubscriptionForm(forms.Form):
         self.user = user
         self.forum = forum
         self.instance = instance
+
+        type_choices = list(ForumSubscription.TYPE_CHOICES)
+        if instance :
+            type_choices.append(
+                ('unsubscribe', _('be unsubscribe from this forum')))
+            type_initial = instance.type
+        else:
+            type_initial = ForumSubscription.TYPE_NOTIFY
+        self.fields['type'] = forms.ChoiceField(
+            label=_('You want to'), choices=type_choices, initial=type_initial,
+            widget=forms.RadioSelect())
+
         topic_choices = (
             ('new', _('only new topics')),
             ('all', _('all topics of the forum')),
         )
-        type_choices = list(ForumSubscription.TYPE_CHOICES)
-        if instance :
-            type_choices.append((
-                'unsubscribe', 
-                _('be unsubscribe from this forum')
-            ))
-
-        initial = ForumSubscription.TYPE_NOTIFY if not instance else instance.type
-        self.fields['type'] = forms.ChoiceField(
-            label=_('You want to'), choices=type_choices, initial=initial,
-            widget=forms.RadioSelect())
         self.fields['topics'] = forms.ChoiceField(
-            label=_('Concerned topics'), choices=topic_choices, initial=topic_choices[0][0],
-            widget=forms.RadioSelect())
-    
+            label=_('Concerned topics'), choices=topic_choices,
+            initial=topic_choices[0][0], widget=forms.RadioSelect())
+
     def process(self):
         """
         saves or deletes the ForumSubscription's instance

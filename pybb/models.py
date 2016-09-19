@@ -150,22 +150,22 @@ class ForumSubscription(models.Model):
         unique_together = ('user', 'forum',)
 
     def __str__(self):
-        return '%(user)s\'s subscription to "%(forum)s"' % {'user': self.user, 
+        return '%(user)s\'s subscription to "%(forum)s"' % {'user': self.user,
                                                             'forum': self.forum}
 
-    def save(self, all_topics=False):
+    def save(self, all_topics=False, **kwargs):
         if all_topics and self.type == self.TYPE_SUBSCRIBE:
             old = None if not self.pk else ForumSubscription.objects.get(pk=self.pk)
             if not old or old.type != self.type :
                 topics = Topic.objects.filter(forum=self.forum).exclude(subscribers=self.user)
                 self.user.subscriptions.add(*topics)
-        super(ForumSubscription, self).save()
+        super(ForumSubscription, self).save(**kwargs)
 
-    def delete(self, all_topics=False):
+    def delete(self, all_topics=False, **kwargs):
         if all_topics:
             topics = Topic.objects.filter(forum=self.forum, subscribers=self.user)
             self.user.subscriptions.remove(*topics)
-        super(ForumSubscription, self).delete()
+        super(ForumSubscription, self).delete(**kwargs)
 
 @python_2_unicode_compatible
 class Topic(models.Model):

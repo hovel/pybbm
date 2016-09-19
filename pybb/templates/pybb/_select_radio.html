@@ -1,0 +1,23 @@
+<div class="form-group">
+    <label class="control-label" for="{{ field.auto_id }}">{{ field.field.label }}</label>
+    <div class="">
+        {% for choice in field %}
+            <div class="radio">
+                <label>
+                    {{ choice.tag }}
+                    {{ choice.choice_label }}
+                </label>
+            </div>
+        {% endfor %}
+
+        {% for error in field.errors %}
+            <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+        {% endfor %}
+
+        {% if field.help_text %}
+            <p class="help-block">
+                {{ field.help_text|safe }}
+            </p>
+        {% endif %}
+    </div>
+</div>

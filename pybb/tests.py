@@ -10,7 +10,6 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -1021,27 +1020,27 @@ class FeaturesTest(TestCase, SharedTestModule):
         client.login(username='user2', password='user2')
         parser = html.HTMLParser(encoding='utf8')
 
-        #Check we have the "Subscribe" link
+        # Check we have the "Subscribe" link
         response = client.get(self.forum.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content, parser=parser)
         self.assertTrue(['Subscribe'], tree.xpath('//a[@href="%s"]/text()' % url))
 
-        #check anonymous can't subscribe :
+        # check anonymous can't subscribe :
         anonymous_client = Client()
         response = anonymous_client.get(url)
         self.assertEqual(response.status_code, 302)
 
-        #click on this link with a logged account
+        # click on this link with a logged account
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content, parser=parser)
 
-        #Check we have 4 radio inputs
+        # Check we have 4 radio inputs
         radio_ids = tree.xpath('//input[@type="radio"]/@id')
         self.assertEqual(['id_type_0', 'id_type_1', 'id_topics_0', 'id_topics_1'], radio_ids)
 
-        #submit the form to be notified for new topics
+        # submit the form to be notified for new topics
         values = self.get_form_values(response, form='forum_subscription')
         values.update({'type': ForumSubscription.TYPE_NOTIFY, 'topics': 'new', })
         response = client.post(url, values, follow=True)
@@ -1060,13 +1059,13 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('subscription' in response.context_data)
         self.assertTrue(response.context_data['subscription'].forum, self.forum)
-        #Check there is still only zeus who subscribe to topic
+        # Check there is still only zeus who subscribe to topic
         usernames = list(self.topic.subscribers.all().values_list('username', flat=True))
         self.assertEqual(usernames, [self.user.username, ])
 
         topic = Topic(name='newtopic', forum=self.forum, user=self.user)
         topic.save()
-        #user2 should have a mail
+        # user2 should have a mail
         self.assertEqual(1, len(mail.outbox))
         self.assertEqual([user2.email, ], mail.outbox[0].to)
         self.assertEqual('New topic in forum that you subscribed.', mail.outbox[0].subject)
@@ -1076,7 +1075,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         post = Post(topic=topic, user=self.user, body='body')
         post.save()
 
-        #Now, user3 should be subscribed to this new topic
+        # Now, user3 should be subscribed to this new topic
         usernames = topic.subscribers.all().order_by('username')
         usernames = list(usernames.values_list('username', flat=True))
         self.assertEqual(usernames, ['user3', self.user.username])
@@ -1084,15 +1083,15 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual([user3.email, ], mail.outbox[1].to)
         self.assertEqual('New answer in topic that you subscribed.', mail.outbox[1].subject)
 
-        #Now, we unsubscribe user3 to be auto subscribed
+        # Now, we unsubscribe user3 to be auto subscribed
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content, parser=parser)
 
-        #Check we have 5 radio inputs
+        # Check we have 5 radio inputs
         radio_ids = tree.xpath('//input[@type="radio"]/@id')
         expected_inputs = [
-            'id_type_0', 'id_type_1', 'id_type_2', 
+            'id_type_0', 'id_type_1', 'id_type_2',
             'id_topics_0', 'id_topics_1'
         ]
         self.assertEqual(expected_inputs, radio_ids)
@@ -1104,14 +1103,14 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('subscription' in response.context_data)
         self.assertIsNone(response.context_data['subscription'])
-        #user3 should not be subscribed anymore to any forum
+        # user3 should not be subscribed anymore to any forum
         with self.assertRaises(ForumSubscription.DoesNotExist):
             ForumSubscription.objects.get(user=user3)
-        #but should still be still subscribed to the topic
-        usernames = list(topic.subscribers.all().values_list('username', flat=True))
+        # but should still be still subscribed to the topic
+        usernames = list(topic.subscribers.all().order_by('id').values_list('username', flat=True))
         self.assertEqual(usernames, [self.user.username, 'user3', ])
 
-        #Update user2's subscription to be autosubscribed to all posts
+        # Update user2's subscription to be autosubscribed to all posts
         client = Client()
         client.login(username='user2', password='user2')
         response = client.get(url)
@@ -1123,12 +1122,12 @@ class FeaturesTest(TestCase, SharedTestModule):
         values['topics'] = 'all'
         response = client.post(url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        #user2 shoud now be subscribed to all self.forum's topics
+        # user2 shoud now be subscribed to all self.forum's topics
         subscribed_topics = list(user2.subscriptions.all().order_by('name').values_list('name', flat=True))
         expected_topics = list(self.forum.topics.all().order_by('name').values_list('name', flat=True))
-        self.assertEqual(subscribed_topics,expected_topics)
+        self.assertEqual(subscribed_topics, expected_topics)
 
-        #unsubscribe user2 to all topics
+        # unsubscribe user2 to all topics
         response = client.get(url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content, parser=parser)
@@ -1138,7 +1137,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         values['topics'] = 'all'
         response = client.post(url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        #user2 shoud now be subscribed to zero topic
+        # user2 shoud now be subscribed to zero topic
         topics = list(user2.subscriptions.all().values_list('name', flat=True))
         self.assertEqual(topics, [])
 

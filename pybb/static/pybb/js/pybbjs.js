@@ -71,20 +71,20 @@ jQuery(function ($) {
             }
         });
     }
-    
-    var pybb_concerned_topics = $('#pybb_concerned_topics');
-    if(pybb_concerned_topics.length){
-        $('#pybb_subscription_type INPUT[type="radio"]').change(function(e){
-            if(this.checked && (this.value == "2" || this.value == "unsubscribe")){
-                $('#pybb_concerned_topics').show();
-            }else{
-                $('#pybb_concerned_topics').hide();
+
+    var $pybbConcernedTopics = $('#pybb_concerned_topics');
+    if ($pybbConcernedTopics.length) {
+        $('#pybb_subscription_type input[type="radio"]').change(function (e) {
+            if (this.checked && (this.value == "2" || this.value == "unsubscribe")) {
+                $pybbConcernedTopics.show();
+            } else {
+                $pybbConcernedTopics.hide();
             }
         });
-        $('#pybb_concerned_topics').hide();
-        $('#id_type_2, #id_type_delete').each(function(i){
-            if(this.checked){
-                $('#pybb_concerned_topics').show();
+        $pybbConcernedTopics.hide();
+        $('input[name="type"][value="2"], input[name="type"][value="unsubscribe"]').each(function (i) {
+            if (this.checked) {
+                $pybbConcernedTopics.show();
             }
         });
     }

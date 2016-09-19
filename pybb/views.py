@@ -172,8 +172,8 @@ class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
     def get_success_url(self):
         return self.forum.get_absolute_url()
 
-    def get_form_kwargs(self, **kwargs):
-        kw = super(ForumSubscriptionView, self).get_form_kwargs(**kwargs)
+    def get_form_kwargs(self):
+        kw = super(ForumSubscriptionView, self).get_form_kwargs()
         self.get_objects()
         kw['instance'] = self.forum_subscription
         kw['user'] = self.request.user
