@@ -11,7 +11,8 @@ from pybb.views import IndexView, CategoryView, ForumView, TopicView, \
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView, \
     OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView, \
     UserTopics, UserPosts, topic_cancel_poll_vote, block_user, unblock_user, \
-    delete_subscription, add_subscription, post_ajax_preview, mark_all_as_read
+    delete_subscription, add_subscription, post_ajax_preview, \
+    mark_all_as_read, ForumSubscriptionView
 
 urlpatterns = [
     # Syndication feeds
@@ -75,6 +76,8 @@ urlpatterns += [
         delete_subscription, name='delete_subscription'),
     url('^subscription/topic/(\d+)/add/$',
         add_subscription, name='add_subscription'),
+    url('^subscription/forum/(?P<pk>\d+)/$',
+        ForumSubscriptionView.as_view(), name='forum_subscription'),
 
     # API
     url('^api/post_ajax_preview/$', post_ajax_preview,

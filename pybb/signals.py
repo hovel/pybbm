@@ -4,10 +4,14 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_save, post_delete, pre_save
 from pybb.models import Post, Category, Topic, Forum, create_or_check_slug
-from pybb.subscription import notify_topic_subscribers
+from pybb.subscription import notify_topic_subscribers, notify_forum_subscribers
 from pybb import util, defaults, compat
 from pybb.permissions import perms
 
+
+def topic_saved(instance, **kwargs):
+    if kwargs['created']:
+        notify_forum_subscribers(instance)
 
 def post_saved(instance, **kwargs):
     if not defaults.PYBB_DISABLE_NOTIFICATIONS:
@@ -80,6 +84,7 @@ def setup():
     pre_save.connect(pre_save_category_slug, sender=Category)
     pre_save.connect(pre_save_forum_slug, sender=Forum)
     pre_save.connect(pre_save_topic_slug, sender=Topic)
+    post_save.connect(topic_saved, sender=Topic)
     post_save.connect(post_saved, sender=Post)
     post_delete.connect(post_deleted, sender=Post)
     if defaults.PYBB_AUTO_USER_PERMISSIONS:
