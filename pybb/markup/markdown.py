@@ -35,7 +35,9 @@ class MarkdownParser(BaseParser):
     def __init__(self):
         self._parser = Markdown(safe_mode='escape')
 
-    def format(self, text):
+    def format(self, text, instance=None):
+        if instance and instance.pk:
+            text = self.format_attachments(text, attachments=instance.attachments.all())
         return smile_it(self._parser.convert(text))
 
     def quote(self, text, username=''):

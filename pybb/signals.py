@@ -14,6 +14,13 @@ def topic_saved(instance, **kwargs):
         notify_forum_subscribers(instance)
 
 def post_saved(instance, **kwargs):
+
+    if getattr(instance, '_post_saved_done', False):
+        #Do not spam users when post is saved more than once in a same request.
+        #For eg, when we parse attachments.
+        return
+
+    instance._post_saved_done = True
     if not defaults.PYBB_DISABLE_NOTIFICATIONS:
         notify_topic_subscribers(instance)
 

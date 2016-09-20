@@ -282,7 +282,7 @@ class RenderableItem(models.Model):
     body_text = models.TextField(_('Text version'))
 
     def render(self):
-        self.body_html = _get_markup_formatter()(self.body)
+        self.body_html = _get_markup_formatter()(self.body, instance=self)
         # Remove tags which was generated with the markup processor
         text = strip_tags(self.body_html)
         # Unescape entities which was generated with the markup processor

@@ -1517,6 +1517,8 @@ class AttachmentTest(TestCase, SharedTestModule):
             response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Post.objects.filter(body='test attachment').exists())
+        post = Post.objects.filter(body='test attachment')[0]
+        self.assertEqual(post.attachments.count(), 1)
 
     def test_attachment_two(self):
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
@@ -1530,6 +1532,40 @@ class AttachmentTest(TestCase, SharedTestModule):
             del values['attachments-TOTAL_FORMS']
             with self.assertRaises(ValidationError):
                 self.client.post(add_post_url, values, follow=True)
+
+    def test_attachment_usage(self):
+        add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
+        self.login_client()
+        response = self.client.get(add_post_url)
+        body = (
+            'test attachment: '
+            '[img][file-1][/img]'
+            '[img][file-2][/img]'
+            '[img][file-1][/img]'
+            '[file-3]'
+            '[file-a]'
+        )
+        with open(self.file_name, 'rb') as fp, open(self.file_name, 'rb') as fp2:
+            values = self.get_form_values(response)
+            values['body'] = body
+            values['attachments-0-file'] = fp
+            values['attachments-1-file'] = fp2
+            values['attachments-TOTAL_FORMS'] = 2
+            response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        post = response.context['post']
+        imgs = html.fromstring(post.body_html).xpath('//img')
+        self.assertEqual(len(imgs), 3)
+        self.assertTrue('[file-3]' in post.body_html)
+        self.assertTrue('[file-a]' in post.body_html)
+
+        src1 = imgs[0].attrib.get('src')
+        src2 = imgs[1].attrib.get('src')
+        src3 = imgs[2].attrib.get('src')
+        attachments = [a for a in post.attachments.order_by('pk')]
+        self.assertEqual(src1, attachments[0].file.url)
+        self.assertEqual(src2, attachments[1].file.url)
+        self.assertEqual(src1, src3)
 
     def tearDown(self):
         defaults.PYBB_ATTACHMENT_ENABLE = self.PYBB_ATTACHMENT_ENABLE

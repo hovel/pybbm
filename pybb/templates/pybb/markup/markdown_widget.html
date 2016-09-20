@@ -39,6 +39,12 @@ if(!window.pybb.get_markitup_settings){
         ];
         return mySettings ;
     };
+    window.pybb.insert_image = function(url){
+        $.markItUp({replaceWith: '![]('+url+')'});
+    }
+    window.pybb.insert_link = function(url, name){
+        $.markItUp({replaceWith: '['+name+']('+url+')'});
+    }
 }
 
 if (!window.pybb.markup) {
