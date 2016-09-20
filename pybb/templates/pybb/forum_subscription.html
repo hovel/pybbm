@@ -16,13 +16,13 @@
             {% csrf_token %}
             {% include "pybb/form_errors.html" %}
             {% with form.type as field %}
-                <div id="pybb_subscription_type" class="{% if field.is_required %}required{% endif %} {% if field.errors %}error{% endif %}">
+                <div id="pybb_subscription_type">
                     {% include 'pybb/_select_radio.html' with field=field %}
                 </div>
             {% endwith %}
 
             {% with form.topics as field %}
-                <div id="pybb_concerned_topics" class="{% if field.is_required %}required{% endif %} {% if field.errors %}error{% endif %}">
+                <div id="pybb_concerned_topics">
                     {% include 'pybb/_select_radio.html' with field=field %}
                 </div>
             {% endwith %}
