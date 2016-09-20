@@ -31,6 +31,9 @@
         <div class="clear"></div>
     </div>
     <div class='controls'>
+        {% if request.user|pybb_may_manage_moderators %}
+            <a href="{% url 'pybb:edit_privileges' target_user.get_username %}" class="btn">{% trans 'Moderator' %}</a>
+        {% endif %}
         {% if perms.pybb.block_users %}
             {% if target_user.is_active %}
                 <form action="{% url 'pybb:block_user' target_user.get_username %}" method="post">{% csrf_token %}

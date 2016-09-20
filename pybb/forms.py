@@ -5,14 +5,15 @@ import re
 import inspect
 
 from django import forms
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
 from django.utils.translation import ugettext as _
 
-from pybb import compat, defaults, util
-from pybb.models import Topic, Post, Attachment, PollAnswer, ForumSubscription
+from pybb import compat, defaults, util, permissions
+from pybb.models import Topic, Post, Attachment, PollAnswer, \
+    ForumSubscription, Category
 
 
 User = compat.get_user_model()
@@ -301,3 +302,46 @@ class ForumSubscriptionForm(forms.Form):
             self.instance.type = int(self.cleaned_data.get('type'))
             self.instance.save(all_topics=all_topics)
             return 'subscribe-all' if all_topics else 'subscribe'
+
+
+class ModeratorForm(forms.Form):
+
+    def __init__(self, user, *args, **kwargs):
+
+        """
+        Creates the form to grant moderator privileges, checking if the request user has the
+        permission to do so.
+
+        :param user: request user
+        """
+
+        super(ModeratorForm, self).__init__(*args, **kwargs)
+        categories = Category.objects.all()
+        self.authorized_forums = []
+        if not permissions.perms.may_manage_moderators(user):
+            raise PermissionDenied()
+        for category in categories:
+            forums = [forum.pk for forum in category.forums.all() if permissions.perms.may_change_forum(user, forum)]
+            if forums:
+                self.authorized_forums += forums
+                self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
+                    label=category.name,
+                    queryset=category.forums.filter(pk__in=forums),
+                    widget=forms.CheckboxSelectMultiple(),
+                    required=False
+                )
+
+    def process(self, target_user):
+        """
+        Updates the target user moderator privilesges
+
+        :param target_user: user to update
+        """
+
+        cleaned_forums = self.cleaned_data.values()
+        initial_forum_set = target_user.forum_set.all()
+        # concatenation of the lists into one
+        checked_forums = [forum for queryset in cleaned_forums for forum in queryset]
+        # keep all the forums, the request user does't have the permisssion to change
+        untouchable_forums = [forum for forum in initial_forum_set if forum.pk not in self.authorized_forums]
+        target_user.forum_set = checked_forums + untouchable_forums

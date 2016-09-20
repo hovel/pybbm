@@ -1,0 +1,21 @@
+{% extends 'pybb/base.html' %}
+
+{% load url from future %}
+
+{% load i18n pybb_tags %}
+
+{% block title %}{% trans "Grant moderator privileges" %}{% endblock title %}
+
+{% block content %}
+    <h1>{% trans "Grant moderator privileges" %}</h1>
+        <form method="post" action="" class="privileges-edit">
+            {% csrf_token %}
+            <fieldset>
+                {% for field in form %}
+                    <h3>{{ field.label }} : </h3>
+                    {{ field }}
+                {% endfor %}
+            </fieldset>
+            <p>{% include "pybb/_button_save.html" %}</p>
+        </form>
+{% endblock content %}

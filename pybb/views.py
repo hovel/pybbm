@@ -21,8 +21,8 @@ from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 from pybb import compat, defaults, util
 from pybb.compat import get_atomic_func
-from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, PollAnswerFormSet, PollForm,\
-    ForumSubscriptionForm
+from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, \
+    PollAnswerFormSet, PollForm, ForumSubscriptionForm, ModeratorForm
 from pybb.models import Category, Forum, ForumSubscription, Topic, Post, TopicReadTracker, \
     ForumReadTracker, PollAnswerUser
 from pybb.permissions import perms
@@ -129,7 +129,7 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         if self.request.user.is_authenticated():
             try:
                 ctx['subscription'] = ForumSubscription.objects.get(
-                    user=self.request.user, 
+                    user=self.request.user,
                     forum=self.forum
                 )
             except ForumSubscription.DoesNotExist:
@@ -216,7 +216,7 @@ class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
         self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
         try:
             self.forum_subscription = ForumSubscription.objects.get(
-                user=self.request.user, 
+                user=self.request.user,
                 forum=self.forum
             )
         except ForumSubscription.DoesNotExist:
@@ -469,8 +469,8 @@ class PostEditMixin(PybbFormsMixin):
                 if save_poll_answers:
                     pollformset.save()
                 return HttpResponseRedirect(self.get_success_url())
-        return self.render_to_response(self.get_context_data(form=form, 
-                                                             aformset=aformset, 
+        return self.render_to_response(self.get_context_data(form=form,
+                                                             aformset=aformset,
                                                              pollformset=pollformset))
 
 
@@ -896,3 +896,40 @@ def unblock_user(request, username):
     msg = _('User successfuly unblocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')
+
+
+class UserEditPrivilegesView(generic.edit.FormMixin, generic.edit.ProcessFormView, generic.DetailView):
+
+    template_name = 'pybb/edit_privileges.html'
+    form_class = ModeratorForm
+    model = User
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_success_url(self):
+        return reverse('pybb:edit_privileges', kwargs={'username': self.object.username})
+
+    def get_initial(self):
+        initial = super(UserEditPrivilegesView, self).get_initial()
+        categories = Category.objects.all()
+        for category in categories:
+            initial['cat_%d' % category.pk] = category.forums.filter(moderators=self.object.pk)
+        return initial
+
+    def get_form_kwargs(self):
+        form_kwargs = super(UserEditPrivilegesView, self).get_form_kwargs()
+        form_kwargs['user'] = self.request.user
+        return form_kwargs
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UserEditPrivilegesView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(UserEditPrivilegesView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.process(self.object)
+        messages.success(self.request, _("Privileges updated"))
+        return super(UserEditPrivilegesView, self).form_valid(form)
