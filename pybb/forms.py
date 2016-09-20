@@ -168,35 +168,6 @@ class PostForm(forms.ModelForm):
         return post, topic
 
 
-class AdminPostForm(PostForm):
-    """
-    Superusers can post messages from any user and from any time
-    If no user with specified name - new user will be created
-    """
-    login = forms.CharField(label=ugettext_lazy('User'))
-
-    def __init__(self, *args, **kwargs):
-        if args:
-            kwargs.update(dict(zip(inspect.getargspec(forms.ModelForm.__init__)[0][1:], args)))
-        if 'instance' in kwargs and kwargs['instance']:
-            kwargs.setdefault('initial', {}).update({'login': getattr(kwargs['instance'].user, username_field)})
-        super(AdminPostForm, self).__init__(**kwargs)
-
-    def save(self, *args, **kwargs):
-        try:
-            self.user = User.objects.filter(**{username_field: self.cleaned_data['login']}).get()
-        except User.DoesNotExist:
-            if username_field != 'email':
-                create_data = {username_field: self.cleaned_data['login'],
-                               'email': '%s@example.com' % self.cleaned_data['login'],
-                               'is_staff': False}
-            else:
-                create_data = {'email': '%s@example.com' % self.cleaned_data['login'],
-                               'is_staff': False}
-            self.user = User.objects.create(**create_data)
-        return super(AdminPostForm, self).save(*args, **kwargs)
-
-
 try:
     class EditProfileForm(forms.ModelForm):
         class Meta(object):
