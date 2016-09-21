@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
+from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.utils import translation
 from django.contrib.sites.models import Site
@@ -11,13 +12,7 @@ from django.contrib.sites.models import Site
 from pybb import defaults, util, compat
 from pybb.models import ForumSubscription
 
-if defaults.PYBB_USE_DJANGO_MAILER:
-    try:
-        from mailer import send_mass_mail
-    except ImportError:
-        from django.core.mail import send_mass_mail
-else:
-    from django.core.mail import send_mass_mail
+from pybb.compat import send_mass_html_mail
 
 
 def notify_forum_subscribers(topic):
@@ -42,9 +37,18 @@ def notify_topic_subscribers(post):
     users = topic.subscribers.exclude(pk=post.user.pk)
     if users.count():
         # Define constants for templates rendering
+        delete_url = reverse('pybb:delete_subscription', args=[post.topic.id])
+        current_site = Site.objects.get_current()
         context = {
-            'delete_url': reverse('pybb:delete_subscription', args=[post.topic.id]),
             'post': post,
+            'post_url': 'http://%s%s' % (current_site, post.get_absolute_url()),
+            'topic_url': 'http://%s%s' % (current_site, post.topic.get_absolute_url()),
+            'delete_url_full': 'http://%s%s' % (current_site, delete_url),
+
+            # backward compat only. TODO Delete those vars in next major release
+            # and rename delete_url_full with delete_url for consistency
+            'site': current_site,
+            'delete_url': delete_url,
         }
         send_notification(users, 'subscription_email', context)
 
@@ -78,12 +82,18 @@ def send_notification(users, template, context=None):
         subject = render_to_string('pybb/mail_templates/%s_subject.html' % template, context)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
+        context['subject'] = subject
 
-        message = render_to_string('pybb/mail_templates/%s_body.html' % template, context)
-        mails.append((subject, message, from_email, [user.email]))
+        txt_message = render_to_string('pybb/mail_templates/%s_body.html' % template, context)
+        try:
+            html_message = render_to_string('pybb/mail_templates/%s_body-html.html' % template, context)
+        except TemplateDoesNotExist as e:
+            mails.append((subject, txt_message, from_email, [user.email]))
+        else:
+            mails.append((subject, txt_message, from_email, [user.email], html_message))
 
     # Send mails
-    send_mass_mail(mails, fail_silently=True)
+    send_mass_html_mail(mails, fail_silently=True)
 
     # Reactivate previous language
     translation.activate(old_lang)

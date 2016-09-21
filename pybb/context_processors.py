@@ -10,6 +10,8 @@ def processor(request):
     context = {}
     for i in (
         'PYBB_TEMPLATE',
+        'PYBB_TEMPLATE_MAIL_HTML',
+        'PYBB_TEMPLATE_MAIL_TXT',
         'PYBB_DEFAULT_AVATAR_URL',
         'PYBB_MARKUP',
         'PYBB_DEFAULT_TITLE',

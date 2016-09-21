@@ -228,6 +228,24 @@ Builtin templates will inherit this template
 
 Default: 'base.html
 
+.. _PYBB_TEMPLATE_MAIL_TXT:
+
+PYBB_TEMPLATE_MAIL_TXT
+.............
+
+Builtin `txt` emails templates will inherit this template
+
+Default: 'pybb/mail_templates/base.html
+
+.. _PYBB_TEMPLATE_MAIL_HTML:
+
+PYBB_TEMPLATE_MAIL_HTML
+.............
+
+Builtin `html` emails templates will inherit this template
+
+Default: 'pybb/mail_templates/base-html.html
+
 
 Markup engines
 --------------

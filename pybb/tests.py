@@ -979,6 +979,83 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         defaults.PYBB_DISABLE_SUBSCRIPTIONS = orig_conf
 
+    def _test_notification_emails_init(self):
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@someserver.com')
+        profile2 = util.get_pybb_profile(user2)
+        profile2.language = 'en'
+        profile2.save()
+        user3 = User.objects.create_user(username='user3', password='user3', email='user3@someserver.com')
+        profile3 = util.get_pybb_profile(user3)
+        profile3.language = 'fr'
+        profile3.save()
+        self.topic.subscribers.add(user2)
+        self.topic.subscribers.add(user3)
+
+        # create a new reply (with another user)
+        self.client.login(username='zeus', password='zeus')
+        add_post_url = reverse('pybb:add_post', args=[self.topic.id])
+        response = self.client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test notification HTML'
+        response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_post = Post.objects.order_by('-id')[0]
+
+        return user2, user3, new_post
+
+    def test_notification_emails_alternative(self):
+        user2, user3, new_post = self._test_notification_emails_init()
+        # there should be two emails in the outbox (user2 and user3)
+        self.assertEqual(len(mail.outbox), 2)
+        email = mail.outbox[0]
+        self.assertEqual(email.to[0], user2.email)
+
+        # HTML alternative must be available
+        self.assertEqual(len(email.alternatives), 1)
+        self.assertEqual(email.alternatives[0][1], 'text/html')
+
+    def test_notification_emails_content(self):
+        user2, user3, new_post = self._test_notification_emails_init()
+        # there should be two emails in the outbox (user2 and user3)
+        self.assertEqual(len(mail.outbox), 2)
+        email = mail.outbox[0]
+        html_body = email.alternatives[0][0]
+        text_body = email.body
+
+        # emails (txt and HTML) must contains links to post AND to topic AND to unsubscribe.
+        delete_url = reverse('pybb:delete_subscription', args=[self.topic.id])
+        post_url = new_post.get_absolute_url()
+        topic_url = new_post.topic.get_absolute_url()
+        links = html.fromstring(html_body).xpath('//a')
+        found = {'post_url': False, 'topic_url': False, 'delete_url': False,}
+        for link in links:
+            if delete_url in link.attrib['href']:
+                found['delete_url'] = True
+            elif post_url in link.attrib['href']:
+                found['post_url'] = True
+            elif topic_url in link.attrib['href']:
+                found['topic_url'] = True
+        self.assertTrue(found['delete_url'])
+        self.assertTrue(found['post_url'])
+        self.assertTrue(found['topic_url'])
+        self.assertIn(post_url, text_body)
+        self.assertIn(topic_url, text_body)
+        self.assertIn(delete_url, text_body)
+
+
+    def test_notification_emails_translation(self):
+        user2, user3, new_post = self._test_notification_emails_init()
+        # there should be two emails in the outbox (user2 and user3)
+        self.assertEqual(len(mail.outbox), 2)
+        if mail.outbox[0].to[0] == user2.email:
+            email_en, email_fr = mail.outbox[0], mail.outbox[1]
+        else:
+            email_fr, email_en = mail.outbox[0], mail.outbox[1]
+
+        subject_en = "New answer in topic that you subscribed."
+        self.assertEqual(email_en.subject, subject_en)
+        self.assertNotEqual(email_fr.subject, subject_en)
+
     def test_notifications_disabled(self):
         orig_conf = defaults.PYBB_DISABLE_NOTIFICATIONS
         defaults.PYBB_DISABLE_NOTIFICATIONS = True
