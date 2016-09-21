@@ -138,6 +138,8 @@ PYBB_PERMISSION_HANDLER = getattr(settings, 'PYBB_PERMISSION_HANDLER', 'pybb.per
 
 PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb_profile')
 
+PYBB_ENABLE_ADMIN_POST_FORM = getattr(settings, 'PYBB_ENABLE_ADMIN_POST_FORM', True)
+
 # Backward compatibility : define old functions which was defined here if some devs did used it
 # TODO in a near future : delete those functions
 

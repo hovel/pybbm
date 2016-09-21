@@ -319,7 +319,8 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if self.request.user.is_authenticated():
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
-            if perms.may_post_as_admin(self.request.user):
+            if defaults.PYBB_ENABLE_ADMIN_POST_FORM and \
+                    perms.may_post_as_admin(self.request.user):
                 ctx['form'] = self.get_admin_post_form_class()(
                     initial={'login': getattr(self.request.user, username_field)},
                     topic=self.topic)
@@ -400,7 +401,8 @@ class PostEditMixin(PybbFormsMixin):
         return super(PostEditMixin, self).post(request, *args, **kwargs)
 
     def get_form_class(self):
-        if perms.may_post_as_admin(self.request.user):
+        if defaults.PYBB_ENABLE_ADMIN_POST_FORM and \
+                perms.may_post_as_admin(self.request.user):
             return self.get_admin_post_form_class()
         else:
             return self.get_post_form_class()
@@ -528,7 +530,8 @@ class AddPostView(PostEditMixin, generic.CreateView):
                            ip=ip, initial={}))
         if getattr(self, 'quote', None):
             form_kwargs['initial']['body'] = self.quote
-        if perms.may_post_as_admin(self.user):
+        if defaults.PYBB_ENABLE_ADMIN_POST_FORM and \
+                perms.may_post_as_admin(self.user):
             form_kwargs['initial']['login'] = getattr(self.user, username_field)
         form_kwargs['may_create_poll'] = perms.may_create_poll(self.user)
         form_kwargs['may_edit_topic_slug'] = perms.may_edit_topic_slug(self.user)

@@ -837,17 +837,38 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertIsNotNone(Post.objects.get(id=self.post.id).updated)
 
         # Check admin form
+        orig_conf = defaults.PYBB_ENABLE_ADMIN_POST_FORM
+
         self.user.is_staff = True
         self.user.save()
+
+        defaults.PYBB_ENABLE_ADMIN_POST_FORM = False
         response = self.client.get(edit_post_url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content)
         values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
+        self.assertNotIn('login', values)
         values['body'] = 'test edit'
         values['login'] = 'new_login'
         response = self.client.post(edit_post_url, data=values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'test edit')
+        self.assertNotContains(response, 'new_login')
+
+        defaults.PYBB_ENABLE_ADMIN_POST_FORM = True
+        response = self.client.get(edit_post_url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
+        self.assertIn('login', values)
+        values['body'] = 'test edit 2'
+        values['login'] = 'new_login 2'
+        response = self.client.post(edit_post_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'test edit 2')
+        self.assertContains(response, 'new_login 2')
+
+        defaults.PYBB_ENABLE_ADMIN_POST_FORM = orig_conf
 
     def test_admin_post_add(self):
         self.user.is_staff = True

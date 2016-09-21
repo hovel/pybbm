@@ -511,3 +511,12 @@ Limit for checking duplicate slugs.
 After reaching this limit while trying to find unique slug ValidationError will be raised.
 
 Default: 100
+
+.. PYBB_ENABLE_ADMIN_POST_FORM:
+
+PYBB_ENABLE_ADMIN_POST_FORM
+...........................
+
+Enable admin post form that allowed staff to post with any username automagically creating it if it did not exist.
+
+Default: True
