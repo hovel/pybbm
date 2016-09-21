@@ -836,29 +836,6 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertContains(response, 'test edit')
         self.assertIsNotNone(Post.objects.get(id=self.post.id).updated)
 
-        # Check admin form
-        self.user.is_staff = True
-        self.user.save()
-        response = self.client.get(edit_post_url)
-        self.assertEqual(response.status_code, 200)
-        tree = html.fromstring(response.content)
-        values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
-        values['body'] = 'test edit'
-        values['login'] = 'new_login'
-        response = self.client.post(edit_post_url, data=values, follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'test edit')
-
-    def test_admin_post_add(self):
-        self.user.is_staff = True
-        self.user.save()
-        self.login_client()
-        response = self.client.post(reverse('pybb:add_post', kwargs={'topic_id': self.topic.id}),
-                                    data={'quote_id': self.post.id, 'body': 'test admin post', 'user': 'zeus'},
-                                    follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'test admin post')
-
     def test_stick(self):
         self.user.is_superuser = True
         self.user.save()
