@@ -152,11 +152,15 @@ class DefaultPermissionHandler(object):
 
     def may_edit_post(self, user, post):
         """ return True if `user` may edit `post` """
-        return user.is_superuser or post.user == user or self.may_moderate_topic(user, post.topic)
+        return user.is_superuser or \
+               post.user == user or \
+               self.may_moderate_topic(user, post.topic)
 
     def may_delete_post(self, user, post):
         """ return True if `user` may delete `post` """
-        return self.may_moderate_topic(user, post.topic)
+        return user.is_superuser or \
+               (defaults.PYBB_ALLOW_DELETE_OWN_POST and post.user == user) or \
+               self.may_moderate_topic(user, post.topic)
 
     #
     # permission checks on users

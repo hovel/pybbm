@@ -140,6 +140,8 @@ PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb
 
 PYBB_ENABLE_ADMIN_POST_FORM = getattr(settings, 'PYBB_ENABLE_ADMIN_POST_FORM', True)
 
+PYBB_ALLOW_DELETE_OWN_POST = getattr(settings, 'PYBB_ALLOW_DELETE_OWN_POST', True)
+
 # Backward compatibility : define old functions which was defined here if some devs did used it
 # TODO in a near future : delete those functions
 

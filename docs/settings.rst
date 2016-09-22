@@ -520,3 +520,12 @@ PYBB_ENABLE_ADMIN_POST_FORM
 Enable admin post form that allowed staff to post with any username automagically creating it if it did not exist.
 
 Default: True
+
+.. PYBB_ALLOW_DELETE_OWN_POST:
+
+PYBB_ALLOW_DELETE_OWN_POST
+..........................
+
+Allow non-superusers to delete their own posts.
+
+Default: True
