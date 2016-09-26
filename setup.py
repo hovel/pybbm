@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pybbm',
-    version='0.18.1',
+    version='0.18.2',
     description='PyBB Modified. Django forum application',
     long_description=open('README.rst').read(),
     author='Pavel Zhukov',

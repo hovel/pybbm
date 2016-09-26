@@ -1,7 +1,22 @@
 PyBBM Changelog
 ===============
 
-0.17 -> 0.17.2
+0.17.3 -> 0.18.2
+----------------
+* PyBBM is now compatible with Django>=1.8,<1.11
+* Allow non-moderators to delete their own posts.
+* Add setting to enable or disable admin post form.
+* Add Swedish translation.
+* Use FileField instead of ImageField when pillow is not available to make pillow depencency optional.
+* Use staticfiles in all templates.
+* Improve permission checking.
+* Allow users to subscribe to a forum.
+* Add a form to grant users moderator privileges.
+* Add notification's emails HTML alternative.
+* Add the ability to the user to use their attachments inside their posts to render it as link, image etc.
+* Multiple fixes and improvements.
+
+0.17 -> 0.17.3
 --------------
 * Fast fix for migrations for Posgres database.
   If you already get and applied migrations from 0.17 version (for example on MySQL DB) you can skip new
