@@ -130,7 +130,7 @@ class ForumSubscription(models.Model):
         (TYPE_SUBSCRIBE, _('be auto-subscribed to topics')),
     )
 
-    user = models.ForeignKey(get_user_model_path(), 
+    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE,
         related_name='forum_subscriptions+', verbose_name=_('Subscriber'))
     forum = models.ForeignKey(Forum, 
         related_name='subscriptions+', verbose_name=_('Forum'))
