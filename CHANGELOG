@@ -1,3 +1,142 @@
+0.18.3
+    * Fix 0005 and 0006 migrations (changes will not affect db, so it's ok if this migrations were already executed)
+0.18.2
+    * Minor fixes.
+0.18.1
+    * Minor fixes.
+0.18
+    * PyBBM is now compatible with Django>=1.8,<1.11
+    * Allow non-moderators to delete their own posts.
+    * Add setting to enable or disable admin post form.
+    * Add Swedish translation.
+    * Use FileField instead of ImageField when pillow is not available to make pillow depencency optional.
+    * Use staticfiles in all templates.
+    * Improve permission checking.
+    * Allow users to subscribe to a forum.
+    * Add a form to grant users moderator privileges.
+    * Add notification's emails HTML alternative.
+    * Add the ability to the user to use their attachments inside their posts to render it as link, image etc.
+    * Multiple fixes and improvements.
+0.17.3
+    * Fast fix for migrations for Posgres database.
+      If you already get and applied migrations from 0.17 version (for example on MySQL DB) you can skip new
+      migrations with `manage.py migrate pybb --fake`
+0.17
+    * Topic and post creation wrapped in transaction
+    * All topic/post/poll related forms can be overrided when custom view inherites pybbm view
+    * Demo data for example projects
+    * Using active markup engine when quoting posts via javascript
+    * Functionality to support disabling default pybbm subscriptions and notifications and
+      new settings: `PYBB_DISABLE_SUBSCRIPTIONS` and `PYBB_DISABLE_NOTIFICATIONS`
+    * Fixed sorl.thumbnail/easy_thumbnail compatibility in standard `pybb/avatar.html` template
+    * Improved example projects
+    * Removed applying `urlize` filter over html produced by markdown parser
+      (it doesn't play nicely with html markup as noted in django's docs)
+    * django 1.8 compatibility
+    * common django layout for test project
+    * use mysqlclient package for testing installation with mysql database backend on python 3
+    * optional enabling "nice urls" for entire forum,
+      that looks like '<forum prefix>/c/<category slug>/<forum slug>/<topic slug>/'
+0.16.1
+    * Fast fixes
+0.16
+    * Django 1.7 compatibility.
+    * Fixed creating custom profile model of any class defined in settings with right related name to user model.
+      *Migration note*: If you have workaround for creating profile in your code, you should remove it for
+      preventing possible dubplicate unique key error on user creating.
+    * New get_display_name method for profile model used to unification displaying username through forum
+    * New markup processing. See `markup`
+0.15.6
+    * Make all migrations compatible with custom user model. Break dependency on sorl.thumbnail in migrations
+    * Compatibility functions moved to compat.py module
+    * Email notifications optimization
+    * Example_bootstrap projects now based on bootstrap 3
+    * Fixes and improvements
+0.15.5
+    * Fixed bug when user can vote (or cancel vote) when topic was closed.
+    * Added `may_vote_in_topic` method to permission handler.
+    * Fixed blocking user view
+0.15.4
+    * Hot fixes to bbcode transform
+0.15.3
+    * bbcode engine simplified
+0.15.2
+    * Pybbm specific forms moved to views' attributes, added new functions to views to get such forms dynamically.
+      This makes overriding pybbm forms much easier
+    * Moving from unmaintained postmarkup package to bbcode project as default bbcode render engine
+      Changed output html for [code] tag. It will be <code></code> tags instead of <div class="code"></div>.
+      So you should duplicate styles applied to div.code for code html tag.
+    * Japanese translation
+0.15.1
+    * Hot fixes for Python 3 support
+    * Fixes for Chinese translation
+0.15
+    * Python 3 support
+    * Chinese translation
+0.14.9
+    * Two new methods added to permission handler: `may_attach_files` and `may_create_poll`. First method used for
+      restrict attaching files to post by user. By default it depends on `PYBB_ATTACHMENT_ENABLE` setting.
+      Second may be used to restrict some users to create/edit polls. By default it always return `True`.
+      For disabling polls on your forum, just write custom permission handler and return from this method `False`
+0.14.8
+    * Improved javascript functionality: quote selected text, qoute full original message via ajax,
+      insert nickname in post body. For enabling this functionality you should satisfy `some requirements</javascript>`
+      in your templates
+    * Support for nested forums
+    * `PybbProfile` abstract model moved to `pybb.profiles` module to avoid circular imports when checking models.
+0.14.7
+    * Django 1.6 compatibility
+    * unblock user functionality added
+0.14.6
+    * Cache anonymous views count for topic and save it in database only when some count reached (100 by default).
+      This value can be changed by setting `PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
+      `pybbm_calc_topic_views` that calc actual views count for topic
+    * Fix for migration that may fails on clean mysql installation
+    * Fixed perfomance issue with feed views
+    * Using custom permissions handler in feed views
+0.14.5
+    * Minor fixes
+0.14.4
+    * Fix for migration that may fails on clean mysql installation (not fixed really, filxed after 0.14.5)
+    * Make example_thirdparty project bootstrap3 compatible
+0.14.3
+    * Show only available topics (by permission handler) in ForumView
+0.14.2
+    * Fixed MultipleObjectReturned when topic has more than one moderator
+0.14.1
+    * Fixed circular import issue
+0.14
+    * Restored views for rendering user's posts and topics and link to that views from profile info page
+    * Broken hard dependency from EditProfileView and EditProfileForm classes in forum
+    * Ability for users to cancel their poll vote
+    * Block user view accepts only POST requests
+    * If `block_and_delete_messages` passed to request.POST for block user view,
+      then all user's messages will be deleted
+0.13.1
+    * Hotfix for rendering avatars
+0.13
+    * You can add first-unread get parameter to the topic url to provide link to first unread post from topic
+    * Removed django-mailer, pytils, sorl-thumbnail, south, django-pure-pagination from hard dependencies
+    * Support Custom User model introduced in django 1.5. Do not forget to define `PYBB_PROFILE_RELATED_NAME`
+      in settings, if you don't use predefined `pybb.PybbProfile` model See `how to use custom user model
+      with pybbm</customuser>`
+    * Dropped support for django 1.3
+    * Experimental support for python 3
+    * Removed django-mailer from hard dependencies, you have to manually install it for using it's functionality
+0.12.5
+    * More flexible forms/forms fields rendering in templates
+      Strongly recommended to check rendering of pybbm forms on your site (edit profile, poll/topic create/edit)
+    * Additional template for markitup preview
+      You can override `pybb/_markitup_preview.html` to provide your styling for <code>, <pre> and other markitup tags
+    * Improved permissions handling see `PYBB_PERMISSION_HANDLER` setting in `settings</settings>`
+    * Fixed bugs and improved performance
+0.12.4
+    * `PYBB_USE_DJANGO_MAILER` setting
+0.12.3
+    * German translation
+0.12
+    * Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using polls subsystem
+    * Polish translation
 0.11.0
     * Polls (by Geyser)
 0.10.0

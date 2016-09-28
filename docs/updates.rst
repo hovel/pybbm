@@ -1,8 +1,20 @@
 PyBBM Changelog
 ===============
 
-0.17.3 -> 0.18.2
+0.18.2 -> 0.18.3
 ----------------
+* Fix 0005 and 0006 migrations (changes will not affect db, so it's ok if this migrations were already executed)
+
+0.18.1 -> 0.18.2
+----------------
+* Minor fixes.
+
+0.18 -> 0.18.1
+--------------
+* Minor fixes.
+
+0.17.3 -> 0.18
+--------------
 * PyBBM is now compatible with Django>=1.8,<1.11
 * Allow non-moderators to delete their own posts.
 * Add setting to enable or disable admin post form.
