@@ -6,13 +6,11 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
-
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'testdb.sqlite',
+        'NAME': os.path.join(BASE_DIR, 'testdb.sqlite'),
     }
 }
 
@@ -42,10 +40,28 @@ STATICFILES_FINDERS = (
 
 SECRET_KEY = '0t!z!jzl#o%4=#!it5!4pgge_!9_$2v*l-(jdn++!_sxn)+$wl'
 
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                # 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'pybb.context_processors.processor',
+            ],
+        },
+    },
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -61,10 +77,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'example_thirdparty.urls'
 
 WSGI_APPLICATION = 'example_thirdparty.wsgi.application'
-
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'),
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -83,17 +95,6 @@ INSTALLED_APPS = (
     'captcha',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = [
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages',
-    'account.context_processors.account',
-    'pybb.context_processors.processor',
-]
 AUTH_PROFILE_MODULE = 'pybb.Profile'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

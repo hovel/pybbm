@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-14 05:00+0000\n"
+"POT-Creation-Date: 2016-09-25 03:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Pavel Zhukov <gelios@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,19 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin.py:43 admin.py:70 admin.py:98 admin.py:120
+#: admin.py:45 admin.py:84 admin.py:112 admin.py:134
 msgid "Additional options"
 msgstr "Дополнительные свойства"
 
-#: admin.py:103 models.py:241
+#: admin.py:117 models.py:280
 msgid "Message"
 msgstr "Сообщение"
 
-#: admin.py:134
+#: admin.py:148
 msgid "View post"
 msgstr "Просмотр сообщения"
 
-#: admin.py:139
+#: admin.py:153
 msgid "Edit post"
 msgstr "Редактирование сообщения"
 
@@ -44,283 +44,336 @@ msgstr "Последние сообщения на форуме"
 msgid "Latest topics on forum"
 msgstr "Последние темы на форуме"
 
-#: forms.py:28
+#: forms.py:30
 msgid "Attachment is too big"
 msgstr "Вложение слишком большое"
 
-#: forms.py:46
+#: forms.py:48
 #, python-format
 msgid "You cant add more than %s answers for poll"
 msgstr "Вы не можете добавить более чем %s ответов на опрос"
 
-#: forms.py:48
+#: forms.py:50
 msgid "Add two or more answers for this poll"
 msgstr "Добавьте по крайней мере 2 варианта ответа на опрос"
 
-#: forms.py:56 models.py:144
+#: forms.py:58 models.py:183
 msgid "Subject"
 msgstr "Заголовок"
 
-#: forms.py:57 models.py:156
+#: forms.py:59 models.py:195
 msgid "Poll type"
 msgstr "Тип опроса"
 
-#: forms.py:59 models.py:157
+#: forms.py:61 models.py:196
 msgid "Poll question"
 msgstr "Тема опроса"
 
-#: forms.py:62
+#: forms.py:64
 msgid "Topic slug"
 msgstr "Метка темы"
 
-#: forms.py:121
+#: forms.py:123
 msgid "Polls question is required when adding a poll"
 msgstr "Необходимо указать вопрос при добавлении опроса"
 
-#: forms.py:174 models.py:147 models.py:256 models.py:329 models.py:468
-#: templates/pybb/mail_templates/subscription_email_body.html:4
+#: forms.py:176 models.py:186 models.py:295 models.py:368 models.py:507
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:4
 msgid "User"
 msgstr "Пользователь"
 
-#: forms.py:210
+#: forms.py:212
 #, python-format
 msgid "Avatar is too large, max size: %s bytes"
 msgstr "Аватар слишком большой, максимальный размер: %s байт"
 
-#: models.py:31 models.py:67
+#: forms.py:272
+msgid "be unsubscribe from this forum"
+msgstr "отписаться от этого форума"
+
+#: forms.py:277
+msgid "You want to"
+msgstr "Вы хотите"
+
+#: forms.py:281
+msgid "only new topics"
+msgstr "только новые темы"
+
+#: forms.py:282
+msgid "all topics of the forum"
+msgstr "все темы форума"
+
+#: forms.py:285
+msgid "Concerned topics"
+msgstr "выбранные темы"
+
+#: models.py:23 models.py:59
 msgid "Name"
 msgstr "Имя"
 
-#: models.py:32 models.py:68
+#: models.py:24 models.py:60
 msgid "Position"
 msgstr "Позиция"
 
-#: models.py:33 models.py:74 templates/pybb/category.html:4
+#: models.py:25 models.py:66 templates/pybb/category.html:4
 #: templates/pybb/forum_list.html:26
 msgid "Hidden"
 msgstr "Скрыто"
 
-#: models.py:34
+#: models.py:26
 msgid "If checked, this category will be visible only for staff"
 msgstr ""
 "Если отмечено, данная категория будет отображаться только для персонала"
 
-#: models.py:35 models.py:77 models.py:158
+#: models.py:27 models.py:69 models.py:197
 msgid "Slug"
 msgstr "Метка"
 
-#: models.py:39 models.py:64
+#: models.py:31 models.py:56
 msgid "Category"
 msgstr "Категория"
 
-#: models.py:40
+#: models.py:32
 msgid "Categories"
 msgstr "Категории"
 
-#: models.py:65
+#: models.py:57
 msgid "Parent forum"
 msgstr "Родительский форум"
 
-#: models.py:69
+#: models.py:61
 msgid "Description"
 msgstr "Описание"
 
-#: models.py:70
+#: models.py:62
 msgid "Moderators"
 msgstr "Модераторы"
 
-#: models.py:71 models.py:146 models.py:258
+#: models.py:63 models.py:185 models.py:297
 msgid "Updated"
 msgstr "Дата обновления"
 
-#: models.py:72 models.py:153 profiles.py:40
+#: models.py:64 models.py:192 profiles.py:41
 msgid "Post count"
 msgstr "Количество сообщений"
 
-#: models.py:73
+#: models.py:65
 msgid "Topic count"
 msgstr "Количество тем"
 
-#: models.py:76
+#: models.py:68
 msgid "Headline"
 msgstr "Шапка"
 
-#: models.py:81 models.py:143 templates/pybb/forum_list.html:8
+#: models.py:73 models.py:136 models.py:182 templates/pybb/forum_list.html:8
 msgid "Forum"
 msgstr "Форум"
 
-#: models.py:82
+#: models.py:74
 msgid "Forums"
 msgstr "Форумы"
 
+#: models.py:129
+msgid "be notified only when a new topic is added"
+msgstr "получать уведомления только о новых темах"
+
+#: models.py:130
+msgid "be auto-subscribed to topics"
+msgstr "автоматически подписываться на темы"
+
+#: models.py:134
+msgid "Subscriber"
+msgstr "Подписчик"
+
 #: models.py:138
+msgid "Subscription type"
+msgstr "Тип подписки"
+
+#: models.py:148
+msgid "Subscription to forum"
+msgstr "Подписка на форум"
+
+#: models.py:149
+msgid "Subscriptions to forums"
+msgstr "Подписка на форумы"
+
+#: models.py:177
 msgid "None"
 msgstr "Никакие"
 
-#: models.py:139
+#: models.py:178
 msgid "Single answer"
 msgstr "Выбор одного варианта"
 
-#: models.py:140
+#: models.py:179
 msgid "Multiple answers"
 msgstr "Выбор нескольких вариантов"
 
-#: models.py:145 models.py:257
+#: models.py:184 models.py:296
 msgid "Created"
 msgstr "Дата создания"
 
-#: models.py:148
+#: models.py:187
 msgid "Views count"
 msgstr "Количество просмотров"
 
-#: models.py:149 templates/pybb/topic_list.html:27
+#: models.py:188 templates/pybb/topic_list.html:27
 msgid "Sticky"
 msgstr "Закреплено"
 
-#: models.py:150 templates/pybb/topic_list.html:28
+#: models.py:189 templates/pybb/topic_list.html:28
 msgid "Closed"
 msgstr "Закрыто"
 
-#: models.py:152 templates/pybb/topic.html:92
+#: models.py:191 templates/pybb/topic.html:92
 msgid "Subscribers"
 msgstr "Подписчики"
 
-#: models.py:155 models.py:260
+#: models.py:194 models.py:299
 msgid "On moderation"
 msgstr "На модерации"
 
-#: models.py:162 models.py:255 models.py:444 templates/pybb/topic_list.html:7
+#: models.py:201 models.py:294 models.py:483 templates/pybb/topic_list.html:7
 msgid "Topic"
 msgstr "Тема"
 
-#: models.py:163 templates/pybb/forum_list.html:11
+#: models.py:202 templates/pybb/forum_list.html:11
 #: templates/pybb/user_topics.html:7
 msgid "Topics"
 msgstr "Темы"
 
-#: models.py:242
+#: models.py:281
 msgid "HTML version"
 msgstr "HTML версия"
 
-#: models.py:243
+#: models.py:282
 msgid "Text version"
 msgstr "Текстовая версия"
 
-#: models.py:259
+#: models.py:298
 msgid "User IP"
 msgstr "IP автора"
 
-#: models.py:264 models.py:347
+#: models.py:303 models.py:386
 msgid "Post"
 msgstr "Сообщение"
 
-#: models.py:265 templates/pybb/forum_list.html:14 templates/pybb/topic.html:26
-#: templates/pybb/topic.html.py:46 templates/pybb/topic_list.html:10
+#: models.py:304 templates/pybb/forum_list.html:14 templates/pybb/topic.html:26
+#: templates/pybb/topic.html:46 templates/pybb/topic_list.html:10
 #: templates/pybb/user_posts.html:7
 msgid "Posts"
 msgstr "Сообщения"
 
-#: models.py:332
+#: models.py:371
 msgid "Profile"
 msgstr "Профиль"
 
-#: models.py:333
+#: models.py:372
 msgid "Profiles"
 msgstr "Профили"
 
-#: models.py:344
+#: models.py:383
 msgid "Attachment"
 msgstr "Вложение"
 
-#: models.py:345
+#: models.py:384
 msgid "Attachments"
 msgstr "Вложения"
 
-#: models.py:348
+#: models.py:387
 msgid "Size"
 msgstr "Размер"
 
-#: models.py:349
+#: models.py:388
 msgid "File"
 msgstr "Файл"
 
-#: models.py:399
+#: models.py:438
 msgid "Topic read tracker"
 msgstr "Трекер прочитанных сообщений"
 
-#: models.py:400
+#: models.py:439
 msgid "Topic read trackers"
 msgstr "Трекеры прочитанных сообщений"
 
-#: models.py:437
+#: models.py:476
 msgid "Forum read tracker"
 msgstr "Отметка прочитанного форума"
 
-#: models.py:438
+#: models.py:477
 msgid "Forum read trackers"
 msgstr "Отметки прочитанных форумов"
 
-#: models.py:445
+#: models.py:484
 msgid "Text"
 msgstr "Текст"
 
-#: models.py:448 models.py:467
+#: models.py:487 models.py:506
 msgid "Poll answer"
 msgstr "Ответ на опрос"
 
-#: models.py:449
+#: models.py:488
 msgid "Polls answers"
 msgstr "Ответы на опросы"
 
-#: models.py:472
+#: models.py:511
 msgid "Poll answer user"
 msgstr "Ответ пользователя на опрос"
 
-#: models.py:473
+#: models.py:512
 msgid "Polls answers users"
 msgstr "Ответы пользователей на опросы"
 
-#: models.py:496
+#: models.py:535
 #, python-format
 msgid ""
 "After %(limit)s attemps, there is not any unique slug value for \"%(slug)s\""
 msgstr ""
 "После %(limit)s попыток не удалось найти уникальную метку для \"%(slug)s\""
 
-#: profiles.py:33
+#: profiles.py:34
 msgid "Signature"
 msgstr "Подпись"
 
-#: profiles.py:34
+#: profiles.py:35
 msgid "Signature HTML Version"
 msgstr "HTML версия подписи"
 
-#: profiles.py:36
+#: profiles.py:37
 msgid "Time zone"
 msgstr "Временная зона"
 
-#: profiles.py:37
+#: profiles.py:38
 msgid "Language"
 msgstr "Язык"
 
-#: profiles.py:39
+#: profiles.py:40
 msgid "Show signatures"
 msgstr "Показывать подписи"
 
-#: profiles.py:41
+#: profiles.py:42
 msgid "Avatar"
 msgstr "Аватар"
 
-#: profiles.py:43
+#: profiles.py:44
 msgid "Automatically subscribe"
 msgstr "Автоматически подписывать"
 
-#: profiles.py:44
+#: profiles.py:45
 msgid "Automatically subscribe to topics that you answer"
 msgstr "Автоматически подписывать на темы, на которые вы ответили"
 
+#: templates/pybb/_button_forum_subscription.html:1
+msgid "Manage subscription"
+msgstr "Управление подпиской"
+
+#: templates/pybb/_button_forum_subscription.html:1
+#: templates/pybb/topic.html:76
+msgid "Subscribe"
+msgstr "Получать уведомления"
+
 #: templates/pybb/_button_new_topic.html:1 templates/pybb/add_post.html:5
-#: templates/pybb/add_post.html.py:32
+#: templates/pybb/add_post.html:32
 msgid "New topic"
 msgstr "Новая тема"
 
@@ -329,6 +382,7 @@ msgid "Save"
 msgstr "Сохранить"
 
 #: templates/pybb/_button_submit.html:1
+#: templates/pybb/forum_subscription.html:33
 msgid "Submit"
 msgstr "Отправить"
 
@@ -406,7 +460,7 @@ msgstr "войдите"
 msgid "to create to post a reply"
 msgstr "чтобы оставить сообщение"
 
-#: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:32
+#: templates/pybb/add_post.html:5 templates/pybb/add_post.html:32
 msgid "New reply"
 msgstr "Новый ответ"
 
@@ -414,10 +468,41 @@ msgstr "Новый ответ"
 msgid "Add attachments"
 msgstr "Добавить вложение"
 
-#: templates/pybb/attachments_formset.html:12
+#: templates/pybb/attachments_formset.html:14
+msgid ""
+"If you need to upload larger files, please use an external storage website."
+msgstr ""
+"Используйте стороннее хранилище для загрузки файлов большего размера."
+
+#: templates/pybb/attachments_formset.html:14
+#, python-format
+msgid "(max size : %(max_size)s)"
+msgstr "(максимальный размер : %(max_size)s)"
+
+#: templates/pybb/attachments_formset.html:17
 #: templates/pybb/edit_profile.html:25
 msgid "delete"
 msgstr "удалить"
+
+#: templates/pybb/attachments_formset.html:20
+msgid "Reference to your file"
+msgstr "Ссылка на файл"
+
+#: templates/pybb/attachments_formset.html:22
+msgid "link"
+msgstr "ссылка"
+
+#: templates/pybb/attachments_formset.html:22
+msgid "Insert a link to your file inside your post."
+msgstr "Вставить ссылку на файл в сообщение"
+
+#: templates/pybb/attachments_formset.html:23
+msgid "image"
+msgstr "изображение"
+
+#: templates/pybb/attachments_formset.html:23
+msgid "Insert your image inside your post."
+msgstr "Вставить изображение в сообщение"
 
 #: templates/pybb/breadcrumb.html:4
 msgid "Home"
@@ -435,11 +520,15 @@ msgstr "Нет, верните меня назад"
 msgid "Yes, I am sure"
 msgstr "Да, я уверен"
 
-#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:17
+#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html:17
 msgid "Editing the post"
 msgstr "Редактирование сообщения"
 
-#: templates/pybb/edit_profile.html:5 templates/pybb/edit_profile.html.py:8
+#: templates/pybb/edit_privileges.html:5 templates/pybb/edit_privileges.html:8
+msgid "Grant moderator privileges"
+msgstr "Выдать права модератора"
+
+#: templates/pybb/edit_profile.html:5 templates/pybb/edit_profile.html:8
 #: templates/pybb/edit_profile.html:13
 msgid "Profile editing"
 msgstr "Изменение профиля"
@@ -460,6 +549,15 @@ msgstr "Форумы не созданы"
 msgid "Add forum now"
 msgstr "Добавить форум сейчас"
 
+#: templates/pybb/forum_subscription.html:4
+#: templates/pybb/forum_subscription.html:14
+msgid "Subscription"
+msgstr "Подписка"
+
+#: templates/pybb/forum_subscription.html:32
+msgid "Cancel"
+msgstr "Отмена"
+
 #: templates/pybb/index.html:17
 msgid "Forum categories are not created"
 msgstr "Категории форума не созданы"
@@ -468,12 +566,12 @@ msgstr "Категории форума не созданы"
 msgid "Add a category now"
 msgstr "Добавить категорию сейчас"
 
-#: templates/pybb/index.html:23 templates/pybb/latest_topics.html:5
+#: templates/pybb/index.html:22 templates/pybb/latest_topics.html:5
 #: templates/pybb/latest_topics.html:8 templates/pybb/latest_topics.html:15
 msgid "Last updates in topics"
 msgstr "Последние обновления в темах"
 
-#: templates/pybb/index.html:26
+#: templates/pybb/index.html:23
 msgid "Mark all forums as read"
 msgstr "Отметить все форумы как прочтенные"
 
@@ -481,21 +579,62 @@ msgstr "Отметить все форумы как прочтенные"
 msgid "Mark all topics as read"
 msgstr "Отметить все темы как прочтенные"
 
-#: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "replied in topic to which you are subscribed."
-msgstr "ответил в теме, на которую вы подписаны"
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:4
+msgid "post a new topic in forum to which you are subscribed."
+msgstr "создал новую тему в форуме, на который вы подписаны"
 
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
 #: templates/pybb/mail_templates/subscription_email_body.html:5
-msgid "Link to post:"
-msgstr "Ссылка на сообщение"
-
-#: templates/pybb/mail_templates/subscription_email_body.html:6
 msgid "Link to topic:"
 msgstr "Ссылка на тему"
 
-#: templates/pybb/mail_templates/subscription_email_body.html:9
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+msgid "Link to forum:"
+msgstr "Ссылка на форум:"
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
 msgid ""
-"If you don't want to recive notifications on new messages in this topic "
+"If you don't want to receive notifications on new topics in this forum visit "
+"following link:"
+msgstr ""
+"Если вы не хотите получать уведомления о новых темах на этом форуме - "
+"перейдите по следующей ссылке:"
+
+#: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
+msgid "New topic in forum that you subscribed."
+msgstr "Новая тема в форуме, на который вы подписаны"
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:7
+#: templates/pybb/mail_templates/subscription_email_body.html:3
+#, python-format
+msgid "User %(username)s replied in topic to which you are subscribed."
+msgstr "Пользователь %(username)s ответил в теме, на которую вы подписаны"
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:10
+#, python-format
+msgid ""
+"Follow %(link_post_start)sthis link%(link_end)s to see the new post on the "
+"topic %(link_topic_start)s%(topic_name)s%(link_end)s."
+msgstr ""
+"Перейдите по %(link_post_start)sссылке%(link_end)s, чтобы увидеть новое "
+"сообщение в теме %(link_topic_start)s%(topic_name)s%(link_end)s."
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:14
+#, python-format
+msgid ""
+"If you don't want to receive notifications on new posts in this topic visit "
+"following %(link_start)s this link%(link_end)s."
+msgstr ""
+"Если вы не хотите получать уведомления о новых сообщениях в этой теме - "
+"перейдите по следующей %(link_start)sссылке%(link_end)s."
+
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+msgid "Link to post:"
+msgstr "Ссылка на сообщение"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:8
+msgid ""
+"If you don't want to receive notifications on new messages in this topic "
 "visit following link:"
 msgstr ""
 "Если вы не хотите получать уведомления о новых сообщениях в этой теме - "
@@ -587,7 +726,7 @@ msgstr "добавить ответ"
 msgid "Rank"
 msgstr "Ранг"
 
-#: templates/pybb/post_template.html:41 templates/pybb/user.html:47
+#: templates/pybb/post_template.html:41 templates/pybb/user.html:50
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -599,7 +738,7 @@ msgstr "Удалить сообщение?"
 msgid "Delete"
 msgstr "Удалить"
 
-#: templates/pybb/post_template.html:48
+#: templates/pybb/post_template.html:49
 msgid "Approve post"
 msgstr "Принять пост"
 
@@ -639,10 +778,6 @@ msgstr "Закрыть тему"
 msgid "Unsubscribe"
 msgstr "Запретить уведомления"
 
-#: templates/pybb/topic.html:76
-msgid "Subscribe"
-msgstr "Получать уведомления"
-
 #: templates/pybb/topic_list.html:13
 msgid "Views"
 msgstr "Просмотров"
@@ -675,27 +810,31 @@ msgstr "Количество сообщений"
 msgid "Date of registration"
 msgstr "Дата регистрации"
 
-#: templates/pybb/user.html:37
+#: templates/pybb/user.html:35
+msgid "Moderator"
+msgstr "Модератор"
+
+#: templates/pybb/user.html:40
 msgid "Block"
 msgstr "Заблокировать"
 
-#: templates/pybb/user.html:38
+#: templates/pybb/user.html:41
 msgid "Block and delete all messages"
 msgstr "Заблокировать и удалить сообщения"
 
-#: templates/pybb/user.html:42
+#: templates/pybb/user.html:45
 msgid "Unblock"
 msgstr "Разблокировать"
 
-#: templates/pybb/user_posts.html:12 templates/pybb/user_posts.html.py:17
+#: templates/pybb/user_posts.html:12 templates/pybb/user_posts.html:17
 msgid "All posts created by"
 msgstr "Сообщения, оставленные пользователем"
 
-#: templates/pybb/user_topics.html:12 templates/pybb/user_topics.html.py:17
+#: templates/pybb/user_topics.html:12 templates/pybb/user_topics.html:17
 msgid "All topics created by"
 msgstr "Темы, созданные пользователем"
 
-#: templates/pybb/users.html:8 templates/pybb/users.html.py:24
+#: templates/pybb/users.html:8 templates/pybb/users.html:24
 msgid "Users"
 msgstr "Пользователи"
 
@@ -733,22 +872,42 @@ msgstr "вчера, %s"
 msgid "Can't get profile for anonymous user"
 msgstr "Невозможно получить профиль для анонимного пользователя"
 
-#: views.py:144
+#: views.py:156
 msgid "Forum does not exist"
 msgstr "Форум не найден"
 
-#: views.py:314
+#: views.py:388
 msgid "This topic does not exists"
 msgstr "Тема не найдена"
 
-#: views.py:774
+#: views.py:826
+msgid ""
+"Subscription removed. You will not receive emails from this topic unless you "
+"subscribe or post again."
+msgstr ""
+"Подписка удалена. Вы не будете получать уведомления по этой теме, пока не "
+"подпишетесь снова."
+
+#: views.py:837
+msgid ""
+"Subscription added. You will receive email notifications for replies to this "
+"topic."
+msgstr ""
+"Подписка добавлена. Вы будете получать уведомления о новых ответах в этой "
+"теме."
+
+#: views.py:855
 msgid "All forums marked as read"
 msgstr "Все форумы отмечены как прочтенные"
 
-#: views.py:807
+#: views.py:888
 msgid "User successfuly blocked"
 msgstr "Пользователь успешно заблокирован"
 
-#: views.py:820
+#: views.py:901
 msgid "User successfuly unblocked"
 msgstr "Пользователь успешно разблокирован"
+
+#: views.py:939
+msgid "Privileges updated"
+msgstr "Привилегии обновлены"

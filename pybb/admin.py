@@ -1,9 +1,11 @@
 # -*- coding: utf-8
 from __future__ import unicode_literals
+from copy import deepcopy
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
+from pybb import permissions
 from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer
 
 from pybb import compat, util
@@ -42,10 +44,22 @@ class ForumAdmin(admin.ModelAdmin):
          ),
         (_('Additional options'), {
                 'classes': ('collapse',),
-                'fields': ('updated', 'description', 'headline', 'post_count', 'moderators', 'slug')
+                'fields': ('updated', 'description', 'headline', 'post_count', 'slug')
                 }
             ),
         )
+
+    def get_fieldsets(self, request, obj=None):
+        """
+        adds moderators field to Additionnal options fieldset only if
+        the request user has permission to manage moderators
+        """
+
+        fieldsets = super(ForumAdmin, self).get_fieldsets(request, obj)
+        if permissions.perms.may_manage_moderators(request.user):
+            fieldsets = deepcopy(fieldsets)
+            fieldsets[-1][1]['fields'] += ('moderators',)
+        return fieldsets
 
 
 class PollAnswerAdmin(admin.TabularInline):

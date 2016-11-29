@@ -1,12 +1,47 @@
 # coding=utf-8
 from __future__ import unicode_literals
-import django
 from django.conf import settings
 from django.utils.encoding import force_text
 from unidecode import unidecode
+from pybb import defaults
 
+if defaults.PYBB_USE_DJANGO_MAILER:
+    from mailer import send_html_mail, send_mail
+else:
+    from django.core.mail import send_mail, get_connection
+    from django.core.mail.message import EmailMultiAlternatives
+
+    def send_html_mail(subject, text_msg, html_msg, sender, recipient, 
+            fail_silently=False, auth_user=None, auth_password=None, connection=None):
+        """Sends an email with HTML alternative."""
+        connection = connection or get_connection(username=auth_user,
+                                    password=auth_password,
+                                    fail_silently=fail_silently)
+        msg = EmailMultiAlternatives(subject, text_msg, sender, recipient, connection=connection)
+        msg.attach_alternative(html_msg, "text/html")
+        msg.send()
+
+
+def send_mass_html_mail(emails, *args, **kwargs):
+    """
+    Sends emails with html alternative if email item has html content.
+    Email item is a tuple with an optionnal html message version :
+        (subject, text_msg, sender, recipient, [html_msg])
+    """
+    for email in emails:
+        subject, text_msg, sender, recipient = email[0:4]
+        html_msg = email[4] if len(email) > 4 else ''
+        if html_msg:
+            send_html_mail(subject, text_msg, html_msg, sender, recipient, *args, **kwargs)
+        else:
+            send_mail(subject, text_msg, sender, recipient, *args, **kwargs)
 
 def get_image_field_class():
+    try:
+        from PIL import Image
+    except ImportError:
+        from django.db.models import FileField
+        return FileField
     try:
         from sorl.thumbnail import ImageField
     except ImportError:
@@ -15,6 +50,10 @@ def get_image_field_class():
 
 
 def get_image_field_full_name():
+    try:
+        from PIL import Image
+    except ImportError:
+        return 'django.db.models.fields.files.FileField'
     try:
         from sorl.thumbnail import ImageField
         name = 'sorl.thumbnail.fields.ImageField'
@@ -25,54 +64,20 @@ def get_image_field_full_name():
 
 
 def get_user_model():
-    if django.VERSION[:2] >= (1, 5):
-        from django.contrib.auth import get_user_model
-        return get_user_model()
-    else:
-        from django.contrib.auth.models import User
-        User.get_username = lambda u: u.username  # emulate new 1.5 method
-        return User
+    from django.contrib.auth import get_user_model
+    return get_user_model()
 
 
 def get_user_model_path():
-    if django.VERSION[:2] >= (1, 5):
-        return getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
-    else:
-        return 'auth.User'
+    return getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
 
 def get_username_field():
-    if django.VERSION[:2] >= (1, 5):
-        return get_user_model().USERNAME_FIELD
-    else:
-        return 'username'
-
-
-def get_user_frozen_models(user_model):
-    from south.creator.freezer import freeze_apps
-    user_app, user_class = user_model.split('.')
-    if user_model != 'auth.User':
-        from south.migration.base import Migrations
-        from south.exceptions import NoMigrations
-        try:
-            user_migrations = Migrations(user_app)
-        except NoMigrations:
-            extra_model = freeze_apps(user_app)
-        else:
-            from pybb import defaults
-            migration_name = defaults.PYBB_INITIAL_CUSTOM_USER_MIGRATION or '0001_initial.py'
-            initial_user_migration = user_migrations.migration(migration_name)
-            extra_model = initial_user_migration.migration_class().models
-    else:
-        extra_model = freeze_apps(user_app)
-    return extra_model
+    return get_user_model().USERNAME_FIELD
 
 
 def get_atomic_func():
-    try:
-        from django.db.transaction import atomic as atomic_func
-    except ImportError:
-        from django.db.transaction import commit_on_success as atomic_func
+    from django.db.transaction import atomic as atomic_func
     return atomic_func
 
 
@@ -93,19 +98,12 @@ def get_paginator_class():
 
 
 def is_installed(app_name):
-    if django.VERSION[:2] < (1, 7):
-        from django.db.models import get_apps
-        return app_name in get_apps()
-    else:
-        from django.apps import apps
-        return apps.is_installed(app_name)
+    from django.apps import apps
+    return apps.is_installed(app_name)
 
 
 def get_related_model_class(parent_model, field_name):
-    if django.VERSION[:2] < (1, 8):
-        return getattr(parent_model, field_name).related.model
-    else:
-        return parent_model._meta.get_field(field_name).related_model
+    return parent_model._meta.get_field(field_name).related_model
 
 
 def slugify(text):
@@ -114,9 +112,6 @@ def slugify(text):
     :param text: any unicode text
     :return: slugified version of passed text
     """
-    if django.VERSION[:2] < (1, 5):
-        from django.template.defaultfilters import slugify as django_slugify
-    else:
-        from django.utils.text import slugify as django_slugify
+    from django.utils.text import slugify as django_slugify
 
     return django_slugify(force_text(unidecode(text)))

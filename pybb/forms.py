@@ -5,13 +5,15 @@ import re
 import inspect
 
 from django import forms
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.timezone import now as tznow
+from django.utils.translation import ugettext as _
 
-from pybb import compat, defaults, util
-from pybb.models import Topic, Post, Attachment, PollAnswer
+from pybb import compat, defaults, util, permissions
+from pybb.models import Topic, Post, Attachment, PollAnswer, \
+    ForumSubscription, Category
 
 
 User = compat.get_user_model()
@@ -255,3 +257,91 @@ class PollForm(forms.Form):
             return [answers]
         else:
             return answers
+
+
+class ForumSubscriptionForm(forms.Form):
+    def __init__(self, user, forum, instance=None, *args, **kwargs):
+        super(ForumSubscriptionForm, self).__init__(*args, **kwargs)
+        self.user = user
+        self.forum = forum
+        self.instance = instance
+
+        type_choices = list(ForumSubscription.TYPE_CHOICES)
+        if instance :
+            type_choices.append(
+                ('unsubscribe', _('be unsubscribe from this forum')))
+            type_initial = instance.type
+        else:
+            type_initial = ForumSubscription.TYPE_NOTIFY
+        self.fields['type'] = forms.ChoiceField(
+            label=_('You want to'), choices=type_choices, initial=type_initial,
+            widget=forms.RadioSelect())
+
+        topic_choices = (
+            ('new', _('only new topics')),
+            ('all', _('all topics of the forum')),
+        )
+        self.fields['topics'] = forms.ChoiceField(
+            label=_('Concerned topics'), choices=topic_choices,
+            initial=topic_choices[0][0], widget=forms.RadioSelect())
+
+    def process(self):
+        """
+        saves or deletes the ForumSubscription's instance
+        """
+        action = self.cleaned_data.get('type')
+        all_topics = self.cleaned_data.get('topics') == 'all'
+        if action == 'unsubscribe':
+            self.instance.delete(all_topics=all_topics)
+            return 'delete-all' if all_topics else 'delete'
+        else:
+            if not self.instance:
+                self.instance = ForumSubscription()
+                self.instance.user = self.user
+                self.instance.forum = self.forum
+            self.instance.type = int(self.cleaned_data.get('type'))
+            self.instance.save(all_topics=all_topics)
+            return 'subscribe-all' if all_topics else 'subscribe'
+
+
+class ModeratorForm(forms.Form):
+
+    def __init__(self, user, *args, **kwargs):
+
+        """
+        Creates the form to grant moderator privileges, checking if the request user has the
+        permission to do so.
+
+        :param user: request user
+        """
+
+        super(ModeratorForm, self).__init__(*args, **kwargs)
+        categories = Category.objects.all()
+        self.authorized_forums = []
+        if not permissions.perms.may_manage_moderators(user):
+            raise PermissionDenied()
+        for category in categories:
+            forums = [forum.pk for forum in category.forums.all() if permissions.perms.may_change_forum(user, forum)]
+            if forums:
+                self.authorized_forums += forums
+                self.fields['cat_%d' % category.pk] = forms.ModelMultipleChoiceField(
+                    label=category.name,
+                    queryset=category.forums.filter(pk__in=forums),
+                    widget=forms.CheckboxSelectMultiple(),
+                    required=False
+                )
+
+    def process(self, target_user):
+        """
+        Updates the target user moderator privilesges
+
+        :param target_user: user to update
+        """
+
+        cleaned_forums = self.cleaned_data.values()
+        initial_forum_set = target_user.forum_set.all()
+        # concatenation of the lists into one
+        checked_forums = [forum for queryset in cleaned_forums for forum in queryset]
+        # keep all the forums, the request user does't have the permisssion to change
+        untouchable_forums = [forum for forum in initial_forum_set if forum.pk not in self.authorized_forums]
+        target_user.forum_set = checked_forums + untouchable_forums

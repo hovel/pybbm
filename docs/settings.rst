@@ -69,7 +69,9 @@ PYBB_DISABLE_NOTIFICATIONS
 
 Users which have subscribed to a topic won't receive notifications but still be able to subscribe
 to topics. See ``PYBB_DISABLE_NOTIFICATIONS`` to disable topic subscription too.
-This is usefull if you want to to use your own notification system.
+This is usefull if you want to to use your own notification system. Additionally, if your custom
+user model has a ``receive_emails`` field, it will be used to determine whether to send notification
+emails to each user.
 
 Default: False
 
@@ -83,16 +85,6 @@ manage emails from your site in queue. But in this case you have to periodically
 send emails from queue. For more information see `app home page <https://github.com/pinax/django-mailer/>`_.
 
 Default: False
-
-.. _PYBB_INITIAL_CUSTOM_USER_MIGRATION:
-
-PYBB_INITIAL_CUSTOM_USER_MIGRATION
-..................................
-
-Name of initial south migration in app where placed custom user model.
-``None`` means that if app with custom user model has migrations, then '0001_initial.py' will be used by default.
-
-Default: None
 
 
 Emoticons
@@ -236,6 +228,24 @@ Builtin templates will inherit this template
 
 Default: 'base.html
 
+.. _PYBB_TEMPLATE_MAIL_TXT:
+
+PYBB_TEMPLATE_MAIL_TXT
+.............
+
+Builtin `txt` emails templates will inherit this template
+
+Default: 'pybb/mail_templates/base.html
+
+.. _PYBB_TEMPLATE_MAIL_HTML:
+
+PYBB_TEMPLATE_MAIL_HTML
+.............
+
+Builtin `html` emails templates will inherit this template
+
+Default: 'pybb/mail_templates/base-html.html
+
 
 Markup engines
 --------------
@@ -286,9 +296,9 @@ For more information see :doc:`markup`
 PYBB_QUOTE_ENGINES (deprecated)
 ...............................
 
-**Deprecation note: Every markup class must inherit from  `pybb.markup.base.BaseParser`**
+**Deprecation note: Every markup class must inherit from** `pybb.markup.base.BaseParser`
 
-**For more information see :doc:`markup`**
+**For more information see** :doc:`markup`
 
 Should be the same dict with paths to markup engine classes as `PYBB_MARKUP_ENGINES_PATH` setting
 
@@ -308,7 +318,7 @@ Cleaners are user-aware, so you can disable them for some types of users.
 
 Each function in list should accept `auth.User` instance as first argument and `string` instance as second, returned value will be sended to next function on list or saved and rendered as post body.
 
-for example this is enabled by default `rstrip_str` cleaner::
+For example this is enabled by default `rstrip_str` cleaner::
 
     def rstrip_str(user, str):
         if user.is_staff:
@@ -501,3 +511,21 @@ Limit for checking duplicate slugs.
 After reaching this limit while trying to find unique slug ValidationError will be raised.
 
 Default: 100
+
+.. PYBB_ENABLE_ADMIN_POST_FORM:
+
+PYBB_ENABLE_ADMIN_POST_FORM
+...........................
+
+Enable admin post form that allowed staff to post with any username automagically creating it if it did not exist.
+
+Default: True
+
+.. PYBB_ALLOW_DELETE_OWN_POST:
+
+PYBB_ALLOW_DELETE_OWN_POST
+..........................
+
+Allow non-superusers to delete their own posts.
+
+Default: True

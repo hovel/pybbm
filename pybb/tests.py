@@ -10,11 +10,12 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils import timezone
+from django.utils.translation.trans_real import get_supported_language_variant
+
 from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
     pybb_get_latest_topics, pybb_get_latest_posts
@@ -30,8 +31,8 @@ except ImportError:
     raise Exception('PyBB requires lxml for self testing')
 
 from pybb import defaults
-from pybb.models import Topic, TopicReadTracker, Forum, ForumReadTracker, Post, Category, PollAnswer
-
+from pybb.models import Category, Forum, Topic, Post, PollAnswer, TopicReadTracker, \
+    ForumReadTracker, ForumSubscription
 
 Profile = util.get_pybb_profile_model()
 
@@ -104,8 +105,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(len(response.context['object'].forums_accessed), 1)
 
     def test_profile_language_default(self):
-        user = User.objects.create_user(username='user2', password='user2', email='user2@example.com')
-        self.assertEqual(util.get_pybb_profile(user).language, settings.LANGUAGE_CODE)
+        user = User.objects.create_user(username='user2', password='user2',
+                                        email='user2@example.com')
+        self.assertEqual(util.get_pybb_profile(user).language,
+                         get_supported_language_variant(settings.LANGUAGE_CODE))
 
     def test_profile_edit(self):
         # Self profile edit
@@ -834,17 +837,38 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertIsNotNone(Post.objects.get(id=self.post.id).updated)
 
         # Check admin form
+        orig_conf = defaults.PYBB_ENABLE_ADMIN_POST_FORM
+
         self.user.is_staff = True
         self.user.save()
+
+        defaults.PYBB_ENABLE_ADMIN_POST_FORM = False
         response = self.client.get(edit_post_url)
         self.assertEqual(response.status_code, 200)
         tree = html.fromstring(response.content)
         values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
+        self.assertNotIn('login', values)
         values['body'] = 'test edit'
         values['login'] = 'new_login'
         response = self.client.post(edit_post_url, data=values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'test edit')
+        self.assertNotContains(response, 'new_login')
+
+        defaults.PYBB_ENABLE_ADMIN_POST_FORM = True
+        response = self.client.get(edit_post_url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        values = dict(tree.xpath('//form[@method="post"]')[0].form_values())
+        self.assertIn('login', values)
+        values['body'] = 'test edit 2'
+        values['login'] = 'new_login 2'
+        response = self.client.post(edit_post_url, data=values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'test edit 2')
+        self.assertContains(response, 'new_login 2')
+
+        defaults.PYBB_ENABLE_ADMIN_POST_FORM = orig_conf
 
     def test_admin_post_add(self):
         self.user.is_staff = True
@@ -976,6 +1000,83 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         defaults.PYBB_DISABLE_SUBSCRIPTIONS = orig_conf
 
+    def _test_notification_emails_init(self):
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@someserver.com')
+        profile2 = util.get_pybb_profile(user2)
+        profile2.language = 'en'
+        profile2.save()
+        user3 = User.objects.create_user(username='user3', password='user3', email='user3@someserver.com')
+        profile3 = util.get_pybb_profile(user3)
+        profile3.language = 'fr'
+        profile3.save()
+        self.topic.subscribers.add(user2)
+        self.topic.subscribers.add(user3)
+
+        # create a new reply (with another user)
+        self.client.login(username='zeus', password='zeus')
+        add_post_url = reverse('pybb:add_post', args=[self.topic.id])
+        response = self.client.get(add_post_url)
+        values = self.get_form_values(response)
+        values['body'] = 'test notification HTML'
+        response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        new_post = Post.objects.order_by('-id')[0]
+
+        return user2, user3, new_post
+
+    def test_notification_emails_alternative(self):
+        user2, user3, new_post = self._test_notification_emails_init()
+        # there should be two emails in the outbox (user2 and user3)
+        self.assertEqual(len(mail.outbox), 2)
+        email = mail.outbox[0]
+        self.assertEqual(email.to[0], user2.email)
+
+        # HTML alternative must be available
+        self.assertEqual(len(email.alternatives), 1)
+        self.assertEqual(email.alternatives[0][1], 'text/html')
+
+    def test_notification_emails_content(self):
+        user2, user3, new_post = self._test_notification_emails_init()
+        # there should be two emails in the outbox (user2 and user3)
+        self.assertEqual(len(mail.outbox), 2)
+        email = mail.outbox[0]
+        html_body = email.alternatives[0][0]
+        text_body = email.body
+
+        # emails (txt and HTML) must contains links to post AND to topic AND to unsubscribe.
+        delete_url = reverse('pybb:delete_subscription', args=[self.topic.id])
+        post_url = new_post.get_absolute_url()
+        topic_url = new_post.topic.get_absolute_url()
+        links = html.fromstring(html_body).xpath('//a')
+        found = {'post_url': False, 'topic_url': False, 'delete_url': False,}
+        for link in links:
+            if delete_url in link.attrib['href']:
+                found['delete_url'] = True
+            elif post_url in link.attrib['href']:
+                found['post_url'] = True
+            elif topic_url in link.attrib['href']:
+                found['topic_url'] = True
+        self.assertTrue(found['delete_url'])
+        self.assertTrue(found['post_url'])
+        self.assertTrue(found['topic_url'])
+        self.assertIn(post_url, text_body)
+        self.assertIn(topic_url, text_body)
+        self.assertIn(delete_url, text_body)
+
+
+    def test_notification_emails_translation(self):
+        user2, user3, new_post = self._test_notification_emails_init()
+        # there should be two emails in the outbox (user2 and user3)
+        self.assertEqual(len(mail.outbox), 2)
+        if mail.outbox[0].to[0] == user2.email:
+            email_en, email_fr = mail.outbox[0], mail.outbox[1]
+        else:
+            email_fr, email_en = mail.outbox[0], mail.outbox[1]
+
+        subject_en = "New answer in topic that you subscribed."
+        self.assertEqual(email_en.subject, subject_en)
+        self.assertNotEqual(email_fr.subject, subject_en)
+
     def test_notifications_disabled(self):
         orig_conf = defaults.PYBB_DISABLE_NOTIFICATIONS
         defaults.PYBB_DISABLE_NOTIFICATIONS = True
@@ -1008,6 +1109,135 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(len(mail.outbox), 0)
         
         defaults.PYBB_DISABLE_NOTIFICATIONS = orig_conf
+
+    def test_forum_subscription(self):
+        url = reverse('pybb:forum_subscription', kwargs={'pk': self.forum.id})
+        user2 = User.objects.create_user(username='user2', password='user2', email='user2@dns.com')
+        user3 = User.objects.create_user(username='user3', password='user3', email='user3@dns.com')
+        client = Client()
+        client.login(username='user2', password='user2')
+        parser = html.HTMLParser(encoding='utf8')
+
+        # Check we have the "Subscribe" link
+        response = client.get(self.forum.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertTrue(['Subscribe'], tree.xpath('//a[@href="%s"]/text()' % url))
+
+        # check anonymous can't subscribe :
+        anonymous_client = Client()
+        response = anonymous_client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        # click on this link with a logged account
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+
+        # Check we have 4 radio inputs
+        radio_ids = tree.xpath('//input[@type="radio"]/@id')
+        self.assertEqual(['id_type_0', 'id_type_1', 'id_topics_0', 'id_topics_1'], radio_ids)
+
+        # submit the form to be notified for new topics
+        values = self.get_form_values(response, form='forum_subscription')
+        values.update({'type': ForumSubscription.TYPE_NOTIFY, 'topics': 'new', })
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('subscription' in response.context_data)
+        self.assertEqual(response.context_data['subscription'].forum, self.forum)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertTrue(['Manage subscription'], tree.xpath('//a[@href="%s"]/text()' % url))
+
+        client = Client()
+        client.login(username='user3', password='user3')
+        response = client.get(url)
+        values = self.get_form_values(response, form='forum_subscription')
+        values.update({'type': ForumSubscription.TYPE_SUBSCRIBE, 'topics': 'new', })
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('subscription' in response.context_data)
+        self.assertTrue(response.context_data['subscription'].forum, self.forum)
+        # Check there is still only zeus who subscribe to topic
+        usernames = list(self.topic.subscribers.all().values_list('username', flat=True))
+        self.assertEqual(usernames, [self.user.username, ])
+
+        topic = Topic(name='newtopic', forum=self.forum, user=self.user)
+        topic.save()
+        # user2 should have a mail
+        self.assertEqual(1, len(mail.outbox))
+        self.assertEqual([user2.email, ], mail.outbox[0].to)
+        self.assertEqual('New topic in forum that you subscribed.', mail.outbox[0].subject)
+        self.assertTrue('User zeus post a new topic' in mail.outbox[0].body)
+        self.assertTrue(topic.get_absolute_url() in mail.outbox[0].body)
+        self.assertTrue(url in mail.outbox[0].body)
+        post = Post(topic=topic, user=self.user, body='body')
+        post.save()
+
+        # Now, user3 should be subscribed to this new topic
+        usernames = topic.subscribers.all().order_by('username')
+        usernames = list(usernames.values_list('username', flat=True))
+        self.assertEqual(usernames, ['user3', self.user.username])
+        self.assertEqual(2, len(mail.outbox))
+        self.assertEqual([user3.email, ], mail.outbox[1].to)
+        self.assertEqual('New answer in topic that you subscribed.', mail.outbox[1].subject)
+
+        # Now, we unsubscribe user3 to be auto subscribed
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+
+        # Check we have 5 radio inputs
+        radio_ids = tree.xpath('//input[@type="radio"]/@id')
+        expected_inputs = [
+            'id_type_0', 'id_type_1', 'id_type_2',
+            'id_topics_0', 'id_topics_1'
+        ]
+        self.assertEqual(expected_inputs, radio_ids)
+        self.assertEqual(tree.xpath('//input[@id="id_type_2"]/@value'), ['unsubscribe', ])
+        self.assertEqual(tree.xpath('//input[@id="id_type_1"]/@checked'), ['checked', ])
+        values = self.get_form_values(response, form='forum_subscription')
+        values['type'] = 'unsubscribe'
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('subscription' in response.context_data)
+        self.assertIsNone(response.context_data['subscription'])
+        # user3 should not be subscribed anymore to any forum
+        with self.assertRaises(ForumSubscription.DoesNotExist):
+            ForumSubscription.objects.get(user=user3)
+        # but should still be still subscribed to the topic
+        usernames = list(topic.subscribers.all().order_by('id').values_list('username', flat=True))
+        self.assertEqual(usernames, [self.user.username, 'user3', ])
+
+        # Update user2's subscription to be autosubscribed to all posts
+        client = Client()
+        client.login(username='user2', password='user2')
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertEqual(tree.xpath('//input[@id="id_type_0"]/@checked'), ['checked', ])
+        values = self.get_form_values(response, form='forum_subscription')
+        values['type'] = ForumSubscription.TYPE_SUBSCRIBE
+        values['topics'] = 'all'
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # user2 shoud now be subscribed to all self.forum's topics
+        subscribed_topics = list(user2.subscriptions.all().order_by('name').values_list('name', flat=True))
+        expected_topics = list(self.forum.topics.all().order_by('name').values_list('name', flat=True))
+        self.assertEqual(subscribed_topics, expected_topics)
+
+        # unsubscribe user2 to all topics
+        response = client.get(url)
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content, parser=parser)
+        self.assertEqual(tree.xpath('//input[@id="id_type_2"]/@value'), ['unsubscribe', ])
+        values = self.get_form_values(response, form='forum_subscription')
+        values['type'] = 'unsubscribe'
+        values['topics'] = 'all'
+        response = client.post(url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # user2 shoud now be subscribed to zero topic
+        topics = list(user2.subscriptions.all().values_list('name', flat=True))
+        self.assertEqual(topics, [])
 
     @skipUnlessDBFeature('supports_microsecond_precision')
     def test_topic_updated(self):
@@ -1123,6 +1353,73 @@ class FeaturesTest(TestCase, SharedTestModule):
     def tearDown(self):
         defaults.PYBB_ENABLE_ANONYMOUS_POST = self.ORIG_PYBB_ENABLE_ANONYMOUS_POST
         defaults.PYBB_PREMODERATION = self.ORIG_PYBB_PREMODERATION
+
+    def test_managing_forums(self):
+        _attach_perms_class('pybb.tests.CustomPermissionHandler')
+        forum2 = Forum.objects.create(name='foo2', description='bar2', category=self.category)
+        Forum.objects.create(name='foo3', description='bar3', category=self.category)
+        moderator = User.objects.create_user('moderator', 'moderator@localhost', 'moderator')
+        self.login_client()
+
+        #test the visibility of the button and the access to the page
+        response = self.client.get(reverse('pybb:user', kwargs={'username': moderator.username}))
+        self.assertNotContains(
+            response, '<a href="%s"' % reverse(
+                    'pybb:edit_privileges', kwargs={'username': moderator.username}
+                )
+            )
+        response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': moderator.username}))
+        self.assertEqual(response.status_code, 403)
+        add_change_forum_permission = Permission.objects.get_by_natural_key('change_forum','pybb','forum')
+        self.user.user_permissions.add(add_change_forum_permission)
+        self.user.is_staff = True
+        self.user.save()
+        response = self.client.get(reverse('pybb:user', kwargs={'username': moderator.username}))
+        self.assertContains(
+            response, '<a href="%s"' % reverse(
+                    'pybb:edit_privileges', kwargs={'username': moderator.username}
+                )
+            )
+        response = self.client.get(reverse('pybb:edit_privileges', kwargs={'username': moderator.username}))
+        self.assertEqual(response.status_code, 200)
+
+        # test if there are as many chechkboxs as forums in the category
+        inputs = dict(html.fromstring(response.content).xpath('//form[@class="%s"]' % "privileges-edit")[0].inputs)
+        self.assertEqual(
+            len(response.context['form'].authorized_forums),
+            len(inputs['cat_%d' % self.category.pk])
+            )
+
+        # test to add user as moderator
+        # get csrf token
+        values = self.get_form_values(response, "privileges-edit")
+        # dynamic contruction of the list corresponding to custom may_change_forum
+        available_forums = [forum for forum in self.category.forums.all() if not forum.pk % 3 == 0]
+        values['cat_%d' % self.category.pk] = [forum.pk for forum in available_forums]
+        response = self.client.post(
+            reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
+            )
+        self.assertEqual(response.status_code, 200)
+
+        correct_list = sorted(available_forums, key=lambda forum: forum.pk)
+        moderator_list = sorted([forum for forum in moderator.forum_set.all()], key=lambda forum: forum.pk)
+        self.assertEqual(correct_list, moderator_list)
+
+        # test to remove user as moderator
+        values['cat_%d' % self.category.pk] = [available_forums[0].pk, ]
+        response = self.client.post(
+                reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([available_forums[0], ], [forum for forum in moderator.forum_set.all()])
+        values['cat_%d' % self.category.pk] = []
+        response = self.client.post(
+                reverse('pybb:edit_privileges', kwargs={'username': moderator.username}), data=values, follow=True
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(0, moderator.forum_set.count())
+        self.user.user_permissions.remove(add_change_forum_permission)
+        _detach_perms_class()
 
 
 class AnonymousTest(TestCase, SharedTestModule):
@@ -1318,6 +1615,8 @@ class AttachmentTest(TestCase, SharedTestModule):
             response = self.client.post(add_post_url, values, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Post.objects.filter(body='test attachment').exists())
+        post = Post.objects.filter(body='test attachment')[0]
+        self.assertEqual(post.attachments.count(), 1)
 
     def test_attachment_two(self):
         add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
@@ -1331,6 +1630,40 @@ class AttachmentTest(TestCase, SharedTestModule):
             del values['attachments-TOTAL_FORMS']
             with self.assertRaises(ValidationError):
                 self.client.post(add_post_url, values, follow=True)
+
+    def test_attachment_usage(self):
+        add_post_url = reverse('pybb:add_post', kwargs={'topic_id': self.topic.id})
+        self.login_client()
+        response = self.client.get(add_post_url)
+        body = (
+            'test attachment: '
+            '[img][file-1][/img]'
+            '[img][file-2][/img]'
+            '[img][file-1][/img]'
+            '[file-3]'
+            '[file-a]'
+        )
+        with open(self.file_name, 'rb') as fp, open(self.file_name, 'rb') as fp2:
+            values = self.get_form_values(response)
+            values['body'] = body
+            values['attachments-0-file'] = fp
+            values['attachments-1-file'] = fp2
+            values['attachments-TOTAL_FORMS'] = 2
+            response = self.client.post(add_post_url, values, follow=True)
+        self.assertEqual(response.status_code, 200)
+        post = response.context['post']
+        imgs = html.fromstring(post.body_html).xpath('//img')
+        self.assertEqual(len(imgs), 3)
+        self.assertTrue('[file-3]' in post.body_html)
+        self.assertTrue('[file-a]' in post.body_html)
+
+        src1 = imgs[0].attrib.get('src')
+        src2 = imgs[1].attrib.get('src')
+        src3 = imgs[2].attrib.get('src')
+        attachments = [a for a in post.attachments.order_by('pk')]
+        self.assertEqual(src1, attachments[0].file.url)
+        self.assertEqual(src2, attachments[1].file.url)
+        self.assertEqual(src1, src3)
 
     def tearDown(self):
         defaults.PYBB_ATTACHMENT_ENABLE = self.PYBB_ATTACHMENT_ENABLE
@@ -1597,6 +1930,8 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     def may_edit_topic_slug(self, user):
         return True
 
+    def may_change_forum(self, user, forum):
+        return not forum.pk % 3 == 0
 
 class MarkupParserTest(TestCase, SharedTestModule):
 

@@ -1,0 +1,36 @@
+{% extends 'pybb/base.html' %}
+{% load pybb_tags i18n %}
+
+{% block title %}{{ forum.name }} - {% trans 'Subscription' %}{% endblock title %}
+
+{% block breadcrumb %}
+    {% with forum as object %}
+        {% include "pybb/breadcrumb.html" %}
+    {% endwith %}
+{% endblock %}
+
+{% block content %}
+    <div class="forum_subscription">
+        <h1>{{ forum.name }} - {% trans 'Subscription' %}</h1>
+        <form class="forum_subscription" action="" method="POST">
+            {% csrf_token %}
+            {% include "pybb/form_errors.html" %}
+            {% with form.type as field %}
+                <div id="pybb_subscription_type">
+                    {% include 'pybb/_select_radio.html' with field=field %}
+                </div>
+            {% endwith %}
+
+            {% with form.topics as field %}
+                <div id="pybb_concerned_topics">
+                    {% include 'pybb/_select_radio.html' with field=field %}
+                </div>
+            {% endwith %}
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field }}
+            {% endfor %}
+            <a class="btn btn-link" href="{{ forum.get_absolute_url }}">{% trans 'Cancel' %}</a>
+            <input type="submit" class="btn btn-primary" value="{% trans 'Submit' %}" />
+        </form>
+    </div>
+{% endblock content %}

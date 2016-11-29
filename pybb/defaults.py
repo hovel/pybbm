@@ -106,6 +106,12 @@ if not PYBB_MARKUP or PYBB_MARKUP not in PYBB_MARKUP_ENGINES:
                                    'PYBB_MARKUP_ENGINES_PATHS')
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
+PYBB_TEMPLATE_MAIL_TXT = getattr(settings, 
+                                 'PYBB_TEMPLATE_MAIL_TXT', 
+                                 'pybb/mail_templates/base.html')
+PYBB_TEMPLATE_MAIL_HTML = getattr(settings, 
+                                  'PYBB_TEMPLATE_MAIL_HTML', 
+                                  'pybb/mail_templates/base-html.html')
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
 PYBB_ENABLE_ANONYMOUS_POST = getattr(settings, 'PYBB_ENABLE_ANONYMOUS_POST', False)
 PYBB_ANONYMOUS_USERNAME = getattr(settings, 'PYBB_ANONYMOUS_USERNAME', 'Anonymous')
@@ -132,7 +138,9 @@ PYBB_PERMISSION_HANDLER = getattr(settings, 'PYBB_PERMISSION_HANDLER', 'pybb.per
 
 PYBB_PROFILE_RELATED_NAME = getattr(settings, 'PYBB_PROFILE_RELATED_NAME', 'pybb_profile')
 
-PYBB_INITIAL_CUSTOM_USER_MIGRATION = getattr(settings, 'PYBB_INITIAL_CUSTOM_USER_MIGRATION', None)
+PYBB_ENABLE_ADMIN_POST_FORM = getattr(settings, 'PYBB_ENABLE_ADMIN_POST_FORM', True)
+
+PYBB_ALLOW_DELETE_OWN_POST = getattr(settings, 'PYBB_ALLOW_DELETE_OWN_POST', True)
 
 # Backward compatibility : define old functions which was defined here if some devs did used it
 # TODO in a near future : delete those functions

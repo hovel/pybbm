@@ -18,7 +18,7 @@ PyBBM is a full-featured django forum solution with these features:
 All features is based on:
 
 * 95% tests covered code
-* Twitter bootstrap 2 default theme
+* Twitter bootstrap compatible default theme
 * Ready to use example project
 
 The main point in development of pybb is to build it so it could be
@@ -29,7 +29,7 @@ PyBBM includes ready to use `example/test project with instructions <http://read
 i18n support
 ============
 PYBB support English, Russian, Slovak, Ukrainian, Brazilian Portuguese, Polish, Hebrew, French, Chinese, Japanese,
-German, Spanish, Italian translations now. Feel free to contribute translation for another language or to correct existing.
+German, Spanish, Italian, Swedish translations now. Feel free to contribute translation for another language or to correct existing.
 You should enable django.middleware.locale.LocaleMiddleware to activate
 django locale autodetecting.
 

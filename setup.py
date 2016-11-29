@@ -1,16 +1,17 @@
 from setuptools import setup, find_packages
 
 setup(
-    version='0.17.3',
+    name='pybbm',
+    version='0.18.3',
     description='PyBB Modified. Django forum application',
     long_description=open('README.rst').read(),
     author='Pavel Zhukov',
     author_email='gelios@gmail.com',
-    name='pybbm',
     url='http://www.pybbm.org/',
     packages=find_packages(),
     include_package_data=True,
     package_data={'': ['pybb/templates', 'pybb/static']},
+    zip_safe=False,
     install_requires=[
         'django-annoying',
         'unidecode',
@@ -29,9 +30,8 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Message Boards',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

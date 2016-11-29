@@ -141,7 +141,7 @@
     "model": "pybb.profile", 
     "fields": {
         "show_signatures": true, 
-        "language": "en-us", 
+        "language": "en", 
         "signature_html": "", 
         "time_zone": 3.0, 
         "post_count": 10, 
@@ -156,7 +156,7 @@
     "model": "pybb.profile", 
     "fields": {
         "show_signatures": true, 
-        "language": "en-us", 
+        "language": "en", 
         "signature_html": "", 
         "time_zone": 3.0, 
         "post_count": 1, 
@@ -186,7 +186,7 @@
     "model": "pybb.profile", 
     "fields": {
         "show_signatures": true, 
-        "language": "en-us", 
+        "language": "en", 
         "signature_html": "", 
         "time_zone": 3.0, 
         "post_count": 1, 

@@ -3,22 +3,17 @@ import django
 import sys
 import os
 from optparse import OptionParser
-from django.conf import settings
 
 project_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test/test_project')
 sys.path.insert(0, project_dir)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test_project.settings')
 
-try:
-    from django.test.runner import DiscoverRunner as Runner
-except ImportError:
-    from django.test.simple import DjangoTestSuiteRunner as Runner
+from django.test.runner import DiscoverRunner as Runner
 
 
 def runtests(*test_args, **kwargs):
-    if django.VERSION[:2] >= (1, 7):
-        django.setup()
+    django.setup()
 
     if not test_args:
         test_args = ['pybb']

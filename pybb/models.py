@@ -17,14 +17,6 @@ from pybb.util import unescape, FilePathGenerator, _get_markup_formatter
 
 from annoying.fields import AutoOneToOneField
 
-try:
-    from south.modelsinspector import add_introspection_rules
-
-    add_introspection_rules([], ["^annoying\.fields\.JSONField"])
-    add_introspection_rules([], ["^annoying\.fields\.AutoOneToOneField"])
-except ImportError:
-    pass
-
 
 @python_2_unicode_compatible
 class Category(models.Model):
@@ -67,7 +59,7 @@ class Forum(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
     description = models.TextField(_('Description'), blank=True)
-    moderators = models.ManyToManyField(get_user_model_path(), blank=True, null=True, verbose_name=_('Moderators'))
+    moderators = models.ManyToManyField(get_user_model_path(), blank=True, verbose_name=_('Moderators'))
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
@@ -127,6 +119,53 @@ class Forum(models.Model):
             parent = parent.parent
         return parents
 
+
+@python_2_unicode_compatible
+class ForumSubscription(models.Model):
+
+    TYPE_NOTIFY = 1
+    TYPE_SUBSCRIBE = 2
+    TYPE_CHOICES = (
+        (TYPE_NOTIFY, _('be notified only when a new topic is added')),
+        (TYPE_SUBSCRIBE, _('be auto-subscribed to topics')),
+    )
+
+    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE,
+        related_name='forum_subscriptions+', verbose_name=_('Subscriber'))
+    forum = models.ForeignKey(Forum, 
+        related_name='subscriptions+', verbose_name=_('Forum'))
+    type = models.PositiveSmallIntegerField(
+        _('Subscription type'), choices=TYPE_CHOICES,
+        help_text=_((
+            'The auto-subscription works like you manually subscribed to watch each topic :\n'
+            'you will be notified when a topic will receive an answer. \n'
+            'If you choose to be notified only when a new topic is added. It means'
+            'you will be notified only once when the topic is created : '
+            'you won\'t be notified for the answers.'
+        )), )
+
+    class Meta(object):
+        verbose_name = _('Subscription to forum')
+        verbose_name_plural = _('Subscriptions to forums')
+        unique_together = ('user', 'forum',)
+
+    def __str__(self):
+        return '%(user)s\'s subscription to "%(forum)s"' % {'user': self.user,
+                                                            'forum': self.forum}
+
+    def save(self, all_topics=False, **kwargs):
+        if all_topics and self.type == self.TYPE_SUBSCRIBE:
+            old = None if not self.pk else ForumSubscription.objects.get(pk=self.pk)
+            if not old or old.type != self.type :
+                topics = Topic.objects.filter(forum=self.forum).exclude(subscribers=self.user)
+                self.user.subscriptions.add(*topics)
+        super(ForumSubscription, self).save(**kwargs)
+
+    def delete(self, all_topics=False, **kwargs):
+        if all_topics:
+            topics = Topic.objects.filter(forum=self.forum, subscribers=self.user)
+            self.user.subscriptions.remove(*topics)
+        super(ForumSubscription, self).delete(**kwargs)
 
 @python_2_unicode_compatible
 class Topic(models.Model):
@@ -243,7 +282,7 @@ class RenderableItem(models.Model):
     body_text = models.TextField(_('Text version'))
 
     def render(self):
-        self.body_html = _get_markup_formatter()(self.body)
+        self.body_html = _get_markup_formatter()(self.body, instance=self)
         # Remove tags which was generated with the markup processor
         text = strip_tags(self.body_html)
         # Unescape entities which was generated with the markup processor
