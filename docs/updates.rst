@@ -1,6 +1,10 @@
 PyBBM Changelog
 ===============
 
+0.18.3 -> 0.18.4
+----------------
+* Fix misspelling in Swedish translation
+
 0.18.2 -> 0.18.3
 ----------------
 * Fix 0005 and 0006 migrations (changes will not affect db, so it's ok if this migrations were already executed)
