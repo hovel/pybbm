@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-14 20:28+0200\n"
-"PO-Revision-Date: 2016-09-14 20:31+0200\n"
+"PO-Revision-Date: 2016-11-29 21:56+0100\n"
 "Last-Translator: Göran Uddeborg <goeran@uddeborg.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -483,7 +483,7 @@ msgstr "Markera alla ämnen som lästa"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:4
 msgid "replied in topic to which you are subscribed."
-msgstr "svarade i ett ämne som du prenuererar på."
+msgstr "svarade i ett ämne som du prenumererar på."
 
 #: templates/pybb/mail_templates/subscription_email_body.html:5
 msgid "Link to post:"
