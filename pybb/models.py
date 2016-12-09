@@ -181,7 +181,7 @@ class Topic(models.Model):
 
     forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
     name = models.CharField(_('Subject'), max_length=255)
-    created = models.DateTimeField(_('Created'), null=True)
+    created = models.DateTimeField(_('Created'), auto_now_add=True)
     updated = models.DateTimeField(_('Updated'), null=True)
     user = models.ForeignKey(get_user_model_path(), verbose_name=_('User'))
     views = models.IntegerField(_('Views count'), blank=True, default=0)
@@ -226,7 +226,7 @@ class Topic(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.created = self.updated = tznow()
+            self.updated = tznow()
 
         forum_changed = False
         old_topic = None
@@ -252,6 +252,8 @@ class Topic(models.Model):
             del self.last_post
         if self.last_post:
             self.updated = self.last_post.updated or self.last_post.created
+        else:
+            self.updated = self.created
         self.save()
 
     def get_parents(self):
@@ -293,7 +295,7 @@ class RenderableItem(models.Model):
 class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(get_user_model_path(), related_name='posts', verbose_name=_('User'))
-    created = models.DateTimeField(_('Created'), blank=True, db_index=True)
+    created = models.DateTimeField(_('Created'), blank=True, db_index=True, auto_now_add=True)
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     user_ip = models.GenericIPAddressField(_('User IP'), blank=True, null=True, default='0.0.0.0')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
@@ -312,9 +314,6 @@ class Post(RenderableItem):
         return self.summary()
 
     def save(self, *args, **kwargs):
-        created_at = tznow()
-        if self.created is None:
-            self.created = created_at
         self.render()
 
         new = self.pk is None
@@ -322,6 +321,7 @@ class Post(RenderableItem):
         topic_changed = False
         old_post = None
         if not new:
+            self.updated = tznow()
             old_post = Post.objects.get(pk=self.pk)
             if old_post.topic != self.topic:
                 topic_changed = True
