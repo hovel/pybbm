@@ -22,7 +22,7 @@ from annoying.fields import AutoOneToOneField
 class Category(models.Model):
     name = models.CharField(_('Name'), max_length=80)
     position = models.IntegerField(_('Position'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False,
+    hidden = models.BooleanField(_('Hidden'), default=False,
                                  help_text=_('If checked, this category will be visible only for staff'))
     slug = models.SlugField(_("Slug"), max_length=255, unique=True)
 
@@ -63,7 +63,7 @@ class Forum(models.Model):
     updated = models.DateTimeField(_('Updated'), blank=True, null=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), blank=False, null=False, default=False)
+    hidden = models.BooleanField(_('Hidden'), default=False)
     readed_by = models.ManyToManyField(get_user_model_path(), through='ForumReadTracker', related_name='readed_forums')
     headline = models.TextField(_('Headline'), blank=True, null=True)
     slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
@@ -185,8 +185,8 @@ class Topic(models.Model):
     updated = models.DateTimeField(_('Updated'), null=True)
     user = models.ForeignKey(get_user_model_path(), verbose_name=_('User'))
     views = models.IntegerField(_('Views count'), blank=True, default=0)
-    sticky = models.BooleanField(_('Sticky'), blank=True, default=False)
-    closed = models.BooleanField(_('Closed'), blank=True, default=False)
+    sticky = models.BooleanField(_('Sticky'), default=False)
+    closed = models.BooleanField(_('Closed'), default=False)
     subscribers = models.ManyToManyField(get_user_model_path(), related_name='subscriptions',
                                          verbose_name=_('Subscribers'), blank=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
