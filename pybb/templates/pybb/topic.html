@@ -23,20 +23,16 @@
 {% block content %}
     <div class="topic">
         <h1>{{ topic.name }}</h1>
-        {% with _('Posts') as label %}
-            {% include "pybb/pagination.html" %}
-        {% endwith %}
+        {% include "pybb/pagination.html" %}
 
         {% if topic.poll_type %}
             {% include 'pybb/poll.html' %}
         {% endif %}
 
         <div class="posts">
-            {% if first_post %}{% ifnotequal first_post post_list.0 %}
-                {% with first_post as post %}
-                    <li class="first_post">{% include "pybb/post_template.html" %}</li>
-                {% endwith %}
-            {% endifnotequal %}{% endif %}
+            {% if first_post and first_post != post_list.0 %}
+                <div class="first_post">{% include "pybb/post_template.html" with first_post=post %}</div>
+            {% endif %}
             {% for post in post_list %}
                 {% cycle 'odd' 'even' as rowcolors silent %}
                 {% include "pybb/post_template.html" %}
@@ -63,10 +59,10 @@
                             <a href="{% url 'pybb:close_topic' topic.id %}">{% trans "Close topic" %}</a> /
                         {% endif %}
                         {% if perms.pybb.change_topic and user.is_staff %}
-                            <a href="{% url 'admin:pybb_topic_change' topic.id %}">{% trans 'Admin' %}</a> /
+                            <a href="{% url 'admin:pybb_topic_change' topic.id %}">{% trans "Admin" %}</a> /
                         {% endif %}
                         {% comment %}
-                            <a href="{% url 'pybb:merge_topics' %}?topic={{ topic.id }}">{% trans 'Merge topics' %}</a> /
+                            <a href="{% url 'pybb:merge_topics' %}?topic={{ topic.id }}">{% trans "Merge topics" %}</a> /
                         {% endcomment %}
                     {% endif %}
                     {% if user.is_subscribed %}

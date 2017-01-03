@@ -22,23 +22,23 @@ $(function() {
     mySettings['previewPosition'] = 'before';
     mySettings['resizeHandle'] = true;
     mySettings['markupSet'] = [
-        {name:'{% trans 'Bold' %}', key:'B', openWith:'[b]', closeWith:'[/b]'},
-        {name:'{% trans 'Italic' %}', key:'I', openWith:'[i]', closeWith:'[/i]'},
-        {name:'{% trans 'Underline' %}', key:'U', openWith:'[u]', closeWith:'[/u]'},
-        {name:'{% trans 'Stroke' %}', key:'S', openWith:'[s]', closeWith:'[/s]'},
+        {name:'{% trans "Bold" as txt %}{{ txt|escapejs }}', key:'B', openWith:'[b]', closeWith:'[/b]'},
+        {name:'{% trans "Italic" as txt %}{{ txt|escapejs }}', key:'I', openWith:'[i]', closeWith:'[/i]'},
+        {name:'{% trans "Underline" as txt %}{{ txt|escapejs }}', key:'U', openWith:'[u]', closeWith:'[/u]'},
+        {name:'{% trans "Stroke" as txt %}{{ txt|escapejs }}', key:'S', openWith:'[s]', closeWith:'[/s]'},
         {separator:'---------------' },
-        {name:'{% trans 'Picture' %}', key:'P', replaceWith:'[img][![Url]!][/img]'},
-        {name:'{% trans 'Link' %}', key:'L', openWith:'[url=[![Url]!]]', closeWith:'[/url]', placeHolder:'Your text to link here...'},
+        {name:'{% trans "Picture" as txt %}{{ txt|escapejs }}', key:'P', replaceWith:'[img][![Url]!][/img]'},
+        {name:'{% trans "Link" as txt %}{{ txt|escapejs }}', key:'L', openWith:'[url=[![Url]!]]', closeWith:'[/url]', placeHolder:'Your text to link here...'},
         {separator:'---------------' },
-        {name:'{% trans 'Bulleted list' %}', openWith:'[list]\n', closeWith:'\n[/list]'},
-        {name:'{% trans 'Numeric list' %}', openWith:'[list=[![Starting number]!]]\n', closeWith:'\n[/list]'},
-        {name:'{% trans 'List item' %}', openWith:'[*] '},
+        {name:'{% trans "Bulleted list" as txt %}{{ txt|escapejs }}', openWith:'[list]\n', closeWith:'\n[/list]'},
+        {name:'{% trans "Numeric list" as txt %}{{ txt|escapejs }}', openWith:'[list=[![Starting number]!]]\n', closeWith:'\n[/list]'},
+        {name:'{% trans "List item" as txt %}{{ txt|escapejs }}', openWith:'[*] '},
         {separator:'---------------' },
-        {name:'{% trans 'Quotes' %}', openWith:'[quote]', closeWith:'[/quote]'},
-        {name:'{% trans 'Code' %}', openWith:'[code]', closeWith:'[/code]'},
+        {name:'{% trans "Quotes" as txt %}{{ txt|escapejs }}', openWith:'[quote]', closeWith:'[/quote]'},
+        {name:'{% trans "Code" as txt %}{{ txt|escapejs }}', openWith:'[code]', closeWith:'[/code]'},
         {separator:'---------------' },
-        {name:'{% trans 'Clean' %}', className:"clean", replaceWith:function(markitup) { return markitup.selection.replace(/\[(.*?)\]/g, "") } },
-        {name:'{% trans 'Preview' %}', className:"preview", call:'preview' }
+        {name:'{% trans "Clean" as txt %}{{ txt|escapejs }}', className:"clean", replaceWith:function(markitup) { return markitup.selection.replace(/\[(.*?)\]/g, "") } },
+        {name:'{% trans "Preview" as txt %}{{ txt|escapejs }}', className:"preview", call:'preview' }
     ];
     $('textarea:not([class="no-markitup"])').markItUp(mySettings);
 

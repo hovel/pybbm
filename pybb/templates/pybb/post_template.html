@@ -24,11 +24,11 @@
                 </a>
             </div>
             {% if post_user_profile.rank %}
-                <div class='rank'>
+                <div class="rank">
                     {% trans "Rank" %}: {{ post_user_profile.rank }}
                     {% if user.is_authenticated and user != post.user %}
-                        <a href='#' class='vote' rel='{{ post_user_profile.get_vote_up_url }}'>+</a>
-                        <a href='#' class='vote' rel='{{ post_user_profile.get_vote_down_url }}'>-</a>
+                        <a href="#" class="vote" rel="{{ post_user_profile.get_vote_up_url }}">+</a>
+                        <a href="#" class="vote" rel="{{ post_user_profile.get_vote_down_url }}">-</a>
                     {% endif %}
                 </div>
             {% endif %}
@@ -42,7 +42,7 @@
                 {% endif %}
                 {% if user|pybb_may_delete_post:post %}
                     <a onclick="pybb_delete_post('{% url 'pybb:delete_post' post.id %}',
-                            'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
+                            'post-{{ post.id }}', '{% trans 'Delete post?' as txt %}{{ txt|escapejs }}'); return false;"
                        href="{% url 'pybb:delete_post' post.id %}">{% trans "Delete" %}</a>
                 {% endif %}
                 {% if post.on_moderation and user.is_moderator %}
@@ -50,7 +50,7 @@
                 {% endif %}
 
                 {% if perms.pybb.change_post and user.is_staff %}
-                    <a href="{% url 'admin:pybb_post_change' post.id %}">{% trans 'Admin' %}</a>
+                    <a href="{% url 'admin:pybb_post_change' post.id %}">{% trans "Admin" %}</a>
                 {% endif %}
 
             </div>
@@ -82,7 +82,7 @@
                     <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}" class="quote-link">{% trans "quote" %}</a>
                     <a href="#" class="quote-selected-link">{% trans "quote selected" %}</a>
                 {% endif %}
-                <div class='attachments'>
+                <div class="attachments">
                     {% for attachment in post.attachments.all %}
                         <a href="{{ attachment.file.url }}"><img src="{% static 'pybb/img/attachment.png' %}"> {{ attachment.size_display }}</a>
                     {% endfor %}

@@ -1,7 +1,7 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_tags i18n %}
 
-{% block title %}{{ forum.name }} - {% trans 'Subscription' %}{% endblock title %}
+{% block title %}{% blocktrans with forum=forum.name context 'page title' %}{{ forum }} - Subscription{% endblocktrans %}{% endblock title %}
 
 {% block breadcrumb %}
     {% with forum as object %}
@@ -11,7 +11,7 @@
 
 {% block content %}
     <div class="forum_subscription">
-        <h1>{{ forum.name }} - {% trans 'Subscription' %}</h1>
+        <h1>{% blocktrans with forum=forum.name context 'content heading' %}{{ forum }} - Subscription{% endblocktrans %}</h1>
         <form class="forum_subscription" action="" method="POST">
             {% csrf_token %}
             {% include "pybb/form_errors.html" %}
@@ -29,8 +29,8 @@
             {% for hidden_field in form.hidden_fields %}
                 {{ hidden_field }}
             {% endfor %}
-            <a class="btn btn-link" href="{{ forum.get_absolute_url }}">{% trans 'Cancel' %}</a>
-            <input type="submit" class="btn btn-primary" value="{% trans 'Submit' %}" />
+            <a class="btn btn-link" href="{{ forum.get_absolute_url }}">{% trans "Cancel" %}</a>
+            <input type="submit" class="btn btn-primary" value="{% trans "Submit" %}" />
         </form>
     </div>
 {% endblock content %}

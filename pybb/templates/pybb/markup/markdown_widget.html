@@ -10,32 +10,32 @@ if(!window.pybb){
 if(!window.pybb.get_markitup_settings){
     window.pybb.get_markitup_settings = function() {
         var mySettings = new Array();
-        mySettings['previewParserPath'] = '{% url "pybb:post_ajax_preview" %}';
+        mySettings['previewParserPath'] = '{% url 'pybb:post_ajax_preview' %}';
         mySettings['previewPosition'] = 'before';
         mySettings['resizeHandle'] = true;
         mySettings['markupSet'] = [
-            {name:'{% trans "First Level Heading" %}', key:'1', placeHolder:'{% trans "Your title here..." %}', closeWith:function(markItUp) { return miu.markdownTitle(markItUp, '=') } },
-            {name:'{% trans "Second Level Heading" %}', key:'2', placeHolder:'{% trans "Your title here..." %}', closeWith:function(markItUp) { return miu.markdownTitle(markItUp, '-') } },
-            {name:'{% trans "Heading 3" %}', key:'3', openWith:'### ', placeHolder:'{% trans "Your title here..." %}' },
-            {name:'{% trans "Heading 4" %}', key:'4', openWith:'#### ', placeHolder:'{% trans "Your title here..." %}' },
-            {name:'{% trans "Heading 5" %}', key:'5', openWith:'##### ', placeHolder:'{% trans "Your title here..." %}' },
-            {name:'{% trans "Heading 6" %}', key:'6', openWith:'###### ', placeHolder:'{% trans "Your title here..." %}' },
+            {name:'{% trans "First Level Heading" as txt %}{{ txt|escapejs }}', key:'1', placeHolder:'{% trans "Your title here..." as txt %}{{ txt|escapejs }}', closeWith:function(markItUp) { return miu.markdownTitle(markItUp, '=') } },
+            {name:'{% trans "Second Level Heading" as txt %}{{ txt|escapejs }}', key:'2', placeHolder:'{% trans "Your title here..." as txt %}{{ txt|escapejs }}', closeWith:function(markItUp) { return miu.markdownTitle(markItUp, '-') } },
+            {name:'{% trans "Heading 3" as txt %}{{ txt|escapejs }}', key:'3', openWith:'### ', placeHolder:'{% trans "Your title here..." %}' },
+            {name:'{% trans "Heading 4" as txt %}{{ txt|escapejs }}', key:'4', openWith:'#### ', placeHolder:'{% trans "Your title here..." %}' },
+            {name:'{% trans "Heading 5" as txt %}{{ txt|escapejs }}', key:'5', openWith:'##### ', placeHolder:'{% trans "Your title here..." %}' },
+            {name:'{% trans "Heading 6" as txt %}{{ txt|escapejs }}', key:'6', openWith:'###### ', placeHolder:'{% trans "Your title here..." %}' },
             {separator:'---------------' },
-            {name:'{% trans "Bold" %}', key:'B', openWith:'**', closeWith:'**'},
-            {name:'{% trans "Italic" %}', key:'I', openWith:'_', closeWith:'_'},
+            {name:'{% trans "Bold" as txt %}{{ txt|escapejs }}', key:'B', openWith:'**', closeWith:'**'},
+            {name:'{% trans "Italic" as txt %}{{ txt|escapejs }}', key:'I', openWith:'_', closeWith:'_'},
             {separator:'---------------' },
-            {name:'{% trans "Bulleted List" %}', openWith:'- ' },
-            {name:'{% trans "Numeric List" %}', openWith:function(markItUp) {
+            {name:'{% trans "Bulleted List" as txt %}{{ txt|escapejs }}', openWith:'- ' },
+            {name:'{% trans "Numeric List" as txt %}{{ txt|escapejs }}', openWith:function(markItUp) {
                 return markItUp.line+'. ';
             }},
             {separator:'---------------' },
-            {name:'{% trans "Picture" %}', key:'P', replaceWith:'![[![Alternative text]!]]([![Url:!:http://]!] "[![Title]!]")'},
-            {name:'{% trans "Link" %}', key:'L', openWith:'[', closeWith:']([![Url:!:http://]!] "[![Title]!]")', placeHolder:'{% trans "Your text to link here..." %}' },
+            {name:'{% trans "Picture" as txt %}{{ txt|escapejs }}', key:'P', replaceWith:'![[![Alternative text]!]]([![Url:!:http://]!] "[![Title]!]")'},
+            {name:'{% trans "Link" as txt %}{{ txt|escapejs }}', key:'L', openWith:'[', closeWith:']([![Url:!:http://]!] "[![Title]!]")', placeHolder:'{% trans "Your text to link here..." %}' },
             {separator:'---------------'},
-            {name:'{% trans "Quotes" %}', openWith:'> '},
-            {name:'{% trans "Code Block / Code" %}', openWith:'(!(\t|!|`)!)', closeWith:'(!(`)!)'},
+            {name:'{% trans "Quotes" as txt %}{{ txt|escapejs }}', openWith:'> '},
+            {name:'{% trans "Code Block / Code" as txt %}{{ txt|escapejs }}', openWith:'(!(\t|!|`)!)', closeWith:'(!(`)!)'},
             {separator:'---------------'},
-            {name:'{% trans "Preview" %}', call:'preview', className:"preview"}
+            {name:'{% trans "Preview" as txt %}{{ txt|escapejs }}', call:'preview', className:"preview"}
         ];
         return mySettings ;
     };

@@ -26,8 +26,8 @@
         {% include "pybb/pagination.html" %}
 
         {% if user.is_authenticated %}
-            <div id='mark-all-as-read'>
-                <a href='{% url 'pybb:mark_all_as_read' %}'>
+            <div id="mark-all-as-read">
+                <a href="{% url 'pybb:mark_all_as_read' %}">
                     {% trans "Mark all topics as read" %}
                 </a>
             </div>
