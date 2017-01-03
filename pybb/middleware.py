@@ -8,9 +8,9 @@ from django.db.models import ObjectDoesNotExist
 from pybb import util
 
 
-if django.VERSION < (1, 10):
+if django.VERSION < (1, 10):  # pragma: no cover
     MiddlewareParentClass = object
-else:
+else:  # pragma: no cover
     from django.utils.deprecation import MiddlewareMixin
     MiddlewareParentClass = MiddlewareMixin
 

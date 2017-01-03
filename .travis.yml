@@ -19,7 +19,9 @@ before_script:
 install:
   - if [[ $DB == mysql ]]; then pip install -qU mysqlclient; fi
   - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
-  - pip install -qU $DJANGO
+  - pip install -qU $DJANGO coveralls
   - CFLAGS="-O0" pip install -qU -r test/test_project/requirements_test.txt
 script:
-  - python setup.py test
+  - coverage run setup.py test
+after_success:
+  - coveralls

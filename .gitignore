@@ -11,4 +11,6 @@ env/
 
 #After a tox test run, some folders are created. Ignore these
 .tox/
+.coverage
+htmlcov/
 pybb_upload/

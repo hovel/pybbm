@@ -1,0 +1,7 @@
+[run]
+source = pybb
+
+[report]
+exclude_lines =
+    pragma: no cover
+    raise ImproperlyConfigured
