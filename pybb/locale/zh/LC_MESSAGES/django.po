@@ -3,320 +3,396 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-16 23:13+0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Leo Zhu <zhuleiping@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2017-01-03 11:22+0100\n"
+"PO-Revision-Date: 2017-01-03 12:06+0100\n"
+"Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
+"Language-Team: \n"
 "Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 1.6.10\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: ../../..\n"
 
-#: admin.py:41 admin.py:67 admin.py:95 admin.py:117
+#: admin.py:45 admin.py:84 admin.py:112 admin.py:134
 msgid "Additional options"
 msgstr "额外选项"
 
-#: admin.py:100 models.py:241
+#: admin.py:117 models.py:280
 msgid "Message"
 msgstr "消息"
 
-#: admin.py:131
+#: admin.py:148
 msgid "View post"
 msgstr "查看帖子"
 
-#: admin.py:136
+#: admin.py:153
 msgid "Edit post"
 msgstr "编辑帖子"
 
-#: feeds.py:26 feeds.py:27 templates/pybb/base.html:12
+#: apps.py:9
+msgid "Pybbm forum solution"
+msgstr ""
+
+#: feeds.py:27 feeds.py:28 templates/pybb/base.html:10
 msgid "Latest posts on forum"
 msgstr "最新的帖子"
 
-#: feeds.py:40 feeds.py:41 templates/pybb/base.html:13
+#: feeds.py:41 feeds.py:42 templates/pybb/base.html:11
 msgid "Latest topics on forum"
 msgstr "最新的主题"
 
-#: forms.py:27
+#: forms.py:30
 msgid "Attachment is too big"
 msgstr "附件太大"
 
-#: forms.py:47
+#: forms.py:48
 #, python-format
 msgid "You cant add more than %s answers for poll"
 msgstr "选项个数不能多于%s个"
 
-#: forms.py:49
+#: forms.py:50
 msgid "Add two or more answers for this poll"
 msgstr "必须添加两个或以上的选项"
 
-#: forms.py:57 models.py:148
+#: forms.py:58 models.py:183
 msgid "Subject"
 msgstr "主题"
 
-#: forms.py:58 models.py:160
+#: forms.py:59 models.py:195
 msgid "Poll type"
 msgstr "投票类型"
 
-#: forms.py:60 models.py:161
+#: forms.py:61 models.py:196
 msgid "Poll question"
 msgstr "投票问题"
 
-#: forms.py:109
+#: forms.py:64
+#, fuzzy
+#| msgid "Topics"
+msgid "Topic slug"
+msgstr "主题"
+
+#: forms.py:123
 msgid "Polls question is required when adding a poll"
 msgstr "发起投票时必须设置问题"
 
-#: forms.py:159 models.py:151 models.py:255 models.py:327 models.py:458
-#: templates/pybb/mail_templates/subscription_email_body.html:3
+#: forms.py:176 models.py:186 models.py:295 models.py:368 models.py:507
 msgid "User"
 msgstr "用户"
 
-#: forms.py:195
+#: forms.py:212
 #, python-format
 msgid "Avatar is too large, max size: %s bytes"
 msgstr "头像过大，最大尺寸：%s字节"
 
-#: models.py:46 models.py:79
+#: forms.py:272
+msgid "be unsubscribe from this forum"
+msgstr ""
+
+#: forms.py:277
+msgid "You want to"
+msgstr ""
+
+#: forms.py:281
+#, fuzzy
+#| msgid "New topic"
+msgid "only new topics"
+msgstr "新主题"
+
+#: forms.py:282
+#, fuzzy
+#| msgid "Latest topics on forum"
+msgid "all topics of the forum"
+msgstr "最新的主题"
+
+#: forms.py:285
+#, fuzzy
+#| msgid "Close topic"
+msgid "Concerned topics"
+msgstr "关闭主题"
+
+#: models.py:23 models.py:59
 msgid "Name"
 msgstr "名字"
 
-#: models.py:47 models.py:80
+#: models.py:24 models.py:60
 msgid "Position"
 msgstr "位置"
 
-#: models.py:48 models.py:86 templates/pybb/category.html:5
+#: models.py:25 models.py:66 templates/pybb/category.html:4
 #: templates/pybb/forum_list.html:26
 msgid "Hidden"
 msgstr "隐藏"
 
-#: models.py:49
+#: models.py:26
 msgid "If checked, this category will be visible only for staff"
 msgstr "如果选中此选项，此目录仅被员工可见"
 
-#: models.py:54 models.py:76
+#: models.py:27 models.py:69 models.py:197
+msgid "Slug"
+msgstr ""
+
+#: models.py:31 models.py:56
 msgid "Category"
 msgstr "目录"
 
-#: models.py:55
+#: models.py:32
 msgid "Categories"
 msgstr "目录"
 
-#: models.py:77
+#: models.py:57
 msgid "Parent forum"
 msgstr "父讨论区"
 
-#: models.py:81
+#: models.py:61
 msgid "Description"
 msgstr "描述"
 
-#: models.py:82
+#: models.py:62
 msgid "Moderators"
 msgstr "板主"
 
-#: models.py:83 models.py:150 models.py:257
+#: models.py:63 models.py:185 models.py:297
 msgid "Updated"
 msgstr "最后更新"
 
-#: models.py:84 models.py:157 profiles.py:48
+#: models.py:64 models.py:192 profiles.py:41
 msgid "Post count"
 msgstr "贴子数"
 
-#: models.py:85
+#: models.py:65
 msgid "Topic count"
 msgstr "主题数"
 
-#: models.py:88
+#: models.py:68
 msgid "Headline"
 msgstr "标题"
 
-#: models.py:92 models.py:147 templates/pybb/forum_list.html:8
+#: models.py:73 models.py:136 models.py:182 templates/pybb/forum_list.html:8
 msgid "Forum"
 msgstr "论坛"
 
-#: models.py:93
+#: models.py:74
 msgid "Forums"
 msgstr "论坛"
 
-#: models.py:142
+#: models.py:129
+msgid "be notified only when a new topic is added"
+msgstr ""
+
+#: models.py:130
+msgid "be auto-subscribed to topics"
+msgstr ""
+
+#: models.py:134
+#, fuzzy
+#| msgid "Subscribers"
+msgid "Subscriber"
+msgstr "订阅者"
+
+#: models.py:138
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscription type"
+msgstr "订阅的主题"
+
+#: models.py:148
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscription to forum"
+msgstr "订阅的主题"
+
+#: models.py:149
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscriptions to forums"
+msgstr "订阅的主题"
+
+#: models.py:177
 msgid "None"
 msgstr "无"
 
-#: models.py:143
+#: models.py:178
 msgid "Single answer"
 msgstr "单选"
 
-#: models.py:144
+#: models.py:179
 msgid "Multiple answers"
 msgstr "多选"
 
-#: models.py:149 models.py:256
+#: models.py:184 models.py:296
 msgid "Created"
 msgstr "创建时间"
 
-#: models.py:152
+#: models.py:187
 msgid "Views count"
 msgstr "浏览次数"
 
-#: models.py:153 templates/pybb/topic_list.html:27
+#: models.py:188 templates/pybb/topic_list.html:27
 msgid "Sticky"
 msgstr "置顶"
 
-#: models.py:154 templates/pybb/topic_list.html:28
+#: models.py:189 templates/pybb/topic_list.html:28
 msgid "Closed"
 msgstr "已关闭"
 
-#: models.py:155 templates/pybb/topic.html:93
+#: models.py:191
 msgid "Subscribers"
 msgstr "订阅者"
 
-#: models.py:159 models.py:259
+#: models.py:194 models.py:299
 msgid "On moderation"
 msgstr "审核中"
 
-#: models.py:165 models.py:254 models.py:435 templates/pybb/topic_list.html:7
+#: models.py:201 models.py:294 models.py:483 templates/pybb/topic_list.html:7
 msgid "Topic"
 msgstr "主题"
 
-#: models.py:166 templates/pybb/forum_list.html:11
-#: templates/pybb/user_topics.html:8
+#: models.py:202 templates/pybb/forum_list.html:11
+#: templates/pybb/user_topics.html:7
 msgid "Topics"
 msgstr "主题"
 
-#: models.py:242
+#: models.py:281
 msgid "HTML version"
 msgstr "HTML版本"
 
-#: models.py:243
+#: models.py:282
 msgid "Text version"
 msgstr "文本版本"
 
-#: models.py:258
+#: models.py:298
 msgid "User IP"
 msgstr "用户IP"
 
-#: models.py:263 models.py:343
+#: models.py:303 models.py:386
 msgid "Post"
 msgstr "帖子"
 
-#: models.py:264 templates/pybb/forum_list.html:14
-#: templates/pybb/topic.html:24 templates/pybb/topic.html.py:44
-#: templates/pybb/topic_list.html:10 templates/pybb/user_posts.html:8
+#: models.py:304 templates/pybb/forum_list.html:14
+#: templates/pybb/topic.html:42 templates/pybb/topic_list.html:10
+#: templates/pybb/user_posts.html:7
 msgid "Posts"
 msgstr "帖子"
 
-#: models.py:330
+#: models.py:371
 msgid "Profile"
 msgstr "个人资料"
 
-#: models.py:331
+#: models.py:372
 msgid "Profiles"
 msgstr "个人资料"
 
-#: models.py:340
+#: models.py:383
 msgid "Attachment"
 msgstr "附件"
 
-#: models.py:341
+#: models.py:384
 msgid "Attachments"
 msgstr "附件"
 
-#: models.py:344
+#: models.py:387
 msgid "Size"
 msgstr "大小"
 
-#: models.py:345
+#: models.py:388
 msgid "File"
 msgstr "文件"
 
-#: models.py:393
+#: models.py:438
 msgid "Topic read tracker"
 msgstr "主题阅读跟踪"
 
-#: models.py:394
+#: models.py:439
 msgid "Topic read trackers"
 msgstr "主题阅读跟踪"
 
-#: models.py:429
+#: models.py:476
 msgid "Forum read tracker"
 msgstr "讨论区阅读跟踪"
 
-#: models.py:430
+#: models.py:477
 msgid "Forum read trackers"
 msgstr "讨论区阅读跟踪"
 
-#: models.py:436
+#: models.py:484
 msgid "Text"
 msgstr "文本"
 
-#: models.py:439 models.py:457
+#: models.py:487 models.py:506
 msgid "Poll answer"
 msgstr "投票回答"
 
-#: models.py:440
+#: models.py:488
 msgid "Polls answers"
 msgstr "投票回答"
 
-#: models.py:462
+#: models.py:511
 msgid "Poll answer user"
 msgstr "投票回答用户"
 
-#: models.py:463
+#: models.py:512
 msgid "Polls answers users"
 msgstr "投票回答用户"
 
-#: profiles.py:37
+#: models.py:535
+#, python-format
+msgid ""
+"After %(limit)s attemps, there is not any unique slug value for \"%(slug)s\""
+msgstr ""
+
+#: profiles.py:34
 msgid "Signature"
 msgstr "签名"
 
-#: profiles.py:39
+#: profiles.py:35
 msgid "Signature HTML Version"
 msgstr "HTML版签名"
 
-#: profiles.py:41
+#: profiles.py:37
 msgid "Time zone"
 msgstr "时区"
 
-#: profiles.py:43
+#: profiles.py:38
 msgid "Language"
 msgstr "语言"
 
-#: profiles.py:46
+#: profiles.py:40
 msgid "Show signatures"
 msgstr "显示签名"
 
-#: profiles.py:49
+#: profiles.py:42
 msgid "Avatar"
 msgstr "个人头像"
 
-#: profiles.py:51
+#: profiles.py:44
 msgid "Automatically subscribe"
 msgstr "自动订阅"
 
-#: profiles.py:52
+#: profiles.py:45
 msgid "Automatically subscribe to topics that you answer"
 msgstr "自动订阅您回复的主题"
 
-#: util.py:60
-msgid "Can't get profile for anonymous user"
-msgstr "匿名用户没有个人资料"
+#: templates/pybb/_button_forum_subscription.html:1
+#, fuzzy
+#| msgid "Description"
+msgid "Manage subscription"
+msgstr "描述"
 
-#: views.py:662
-msgid "All forums marked as read"
-msgstr "所有讨论区都已标记为已读"
+#: templates/pybb/_button_forum_subscription.html:1
+#: templates/pybb/topic.html:72
+msgid "Subscribe"
+msgstr "订阅"
 
-#: views.py:682
-msgid "User successfuly blocked"
-msgstr "成功屏蔽了用户"
-
-#: views.py:695
-msgid "User successfuly unblocked"
-msgstr "成功对用户取消屏蔽"
-
-#: templates/pybb/_button_new_topic.html:2 templates/pybb/add_post.html:24
+#: templates/pybb/_button_new_topic.html:1 templates/pybb/add_post.html:5
+#: templates/pybb/add_post.html.py:32
 msgid "New topic"
 msgstr "新主题"
 
@@ -325,91 +401,141 @@ msgid "Save"
 msgstr "保存"
 
 #: templates/pybb/_button_submit.html:1
+#: templates/pybb/forum_subscription.html:33
 msgid "Submit"
 msgstr "提交"
 
-#: templates/pybb/_markitup.html:15
+#: templates/pybb/_markitup.html:25
+#: templates/pybb/markup/bbcode_widget.html:16
+#: templates/pybb/markup/markdown_widget.html:24
 msgid "Bold"
 msgstr "粗体"
 
-#: templates/pybb/_markitup.html:16
+#: templates/pybb/_markitup.html:26
+#: templates/pybb/markup/bbcode_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:25
 msgid "Italic"
 msgstr "斜体"
 
-#: templates/pybb/_markitup.html:17
+#: templates/pybb/_markitup.html:27
+#: templates/pybb/markup/bbcode_widget.html:18
 msgid "Underline"
 msgstr "下划线"
 
-#: templates/pybb/_markitup.html:18
+#: templates/pybb/_markitup.html:28
+#: templates/pybb/markup/bbcode_widget.html:19
 msgid "Stroke"
 msgstr "描边"
 
-#: templates/pybb/_markitup.html:20
+#: templates/pybb/_markitup.html:30
+#: templates/pybb/markup/bbcode_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:32
 msgid "Picture"
 msgstr "图片"
 
-#: templates/pybb/_markitup.html:21
+#: templates/pybb/_markitup.html:31
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
 msgid "Link"
 msgstr "链接"
 
-#: templates/pybb/_markitup.html:23
+#: templates/pybb/_markitup.html:33
+#: templates/pybb/markup/bbcode_widget.html:24
 msgid "Bulleted list"
 msgstr "符号列表"
 
-#: templates/pybb/_markitup.html:24
+#: templates/pybb/_markitup.html:34
+#: templates/pybb/markup/bbcode_widget.html:25
 msgid "Numeric list"
 msgstr "数字列表"
 
-#: templates/pybb/_markitup.html:25
+#: templates/pybb/_markitup.html:35
+#: templates/pybb/markup/bbcode_widget.html:26
 msgid "List item"
 msgstr "列表项"
 
-#: templates/pybb/_markitup.html:27
+#: templates/pybb/_markitup.html:37
+#: templates/pybb/markup/bbcode_widget.html:28
+#: templates/pybb/markup/markdown_widget.html:35
 msgid "Quotes"
 msgstr "引用"
 
-#: templates/pybb/_markitup.html:28
+#: templates/pybb/_markitup.html:38
+#: templates/pybb/markup/bbcode_widget.html:29
 msgid "Code"
 msgstr "代码"
 
-#: templates/pybb/_markitup.html:30
+#: templates/pybb/_markitup.html:40
+#: templates/pybb/markup/bbcode_widget.html:31
 msgid "Clean"
 msgstr "清除"
 
-#: templates/pybb/_markitup.html:31
+#: templates/pybb/_markitup.html:41
+#: templates/pybb/markup/bbcode_widget.html:32
+#: templates/pybb/markup/markdown_widget.html:38
 msgid "Preview"
 msgstr "预览"
 
-#: templates/pybb/_need_to_login_message.html:3
+#: templates/pybb/_need_to_login_message.html:2
 msgid "Register"
 msgstr "注册"
 
-#: templates/pybb/_need_to_login_message.html:3
+#: templates/pybb/_need_to_login_message.html:2
 msgid "or"
 msgstr "或"
 
-#: templates/pybb/_need_to_login_message.html:3
+#: templates/pybb/_need_to_login_message.html:2
 msgid "login"
 msgstr "登录"
 
-#: templates/pybb/_need_to_login_message.html:3
+#: templates/pybb/_need_to_login_message.html:2
 msgid "to create to post a reply"
 msgstr "来创建回复"
 
-#: templates/pybb/add_post.html:24
+#: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:32
 msgid "New reply"
 msgstr "回复主题"
 
-#: templates/pybb/attachments_formset.html:4
+#: templates/pybb/attachments_formset.html:6
 msgid "Add attachments"
 msgstr "添加附件"
 
-#: templates/pybb/attachments_formset.html:10
-#: templates/pybb/edit_profile.html:27
+#: templates/pybb/attachments_formset.html:14
+msgid ""
+"If you need to upload larger files, please use an external storage website."
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:14
+#, python-format
+msgid "(max size: %(max_size)s)"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:17
+#: templates/pybb/edit_profile.html:25
 msgid "delete"
 msgstr "删除"
 
-#: templates/pybb/breadcrumb.html:5
+#: templates/pybb/attachments_formset.html:20
+msgid "Reference to your file"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:22
+msgid "link"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:22
+msgid "Insert a link to your file inside your post."
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:23
+msgid "image"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:23
+msgid "Insert your image inside your post."
+msgstr ""
+
+#: templates/pybb/breadcrumb.html:4
 msgid "Home"
 msgstr "主页"
 
@@ -425,16 +551,20 @@ msgstr "不，返回"
 msgid "Yes, I am sure"
 msgstr "是，我确定"
 
-#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:13
+#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:17
 msgid "Editing the post"
 msgstr "编辑帖子"
 
-#: templates/pybb/edit_profile.html:7 templates/pybb/edit_profile.html:10
-#: templates/pybb/edit_profile.html:15
+#: templates/pybb/edit_privileges.html:5 templates/pybb/edit_privileges.html:8
+msgid "Grant moderator privileges"
+msgstr ""
+
+#: templates/pybb/edit_profile.html:5 templates/pybb/edit_profile.html.py:8
+#: templates/pybb/edit_profile.html:13
 msgid "Profile editing"
 msgstr "个人资料编辑中"
 
-#: templates/pybb/edit_profile.html:20
+#: templates/pybb/edit_profile.html:18
 msgid "Subscriptions on topics"
 msgstr "订阅的主题"
 
@@ -450,26 +580,181 @@ msgstr "没有讨论区"
 msgid "Add forum now"
 msgstr "创建讨论区"
 
-#: templates/pybb/index.html:19
+#: templates/pybb/forum_subscription.html:4
+#, python-format
+msgctxt "page title"
+msgid "%(forum)s - Subscription"
+msgstr ""
+
+#: templates/pybb/forum_subscription.html:14
+#, python-format
+msgctxt "content heading"
+msgid "%(forum)s - Subscription"
+msgstr ""
+
+#: templates/pybb/forum_subscription.html:32
+msgid "Cancel"
+msgstr ""
+
+#: templates/pybb/index.html:17
 msgid "Forum categories are not created"
 msgstr "没有创建讨论区目录"
 
-#: templates/pybb/index.html:20
+#: templates/pybb/index.html:18
 msgid "Add a category now"
 msgstr "增加新目录"
 
-#: templates/pybb/index.html:25 templates/pybb/latest_topics.html:7
-#: templates/pybb/latest_topics.html:10 templates/pybb/latest_topics.html:17
+#: templates/pybb/index.html:22 templates/pybb/latest_topics.html:5
+#: templates/pybb/latest_topics.html:8 templates/pybb/latest_topics.html:15
 msgid "Last updates in topics"
 msgstr "最近更新的主题"
 
-#: templates/pybb/index.html:28
+#: templates/pybb/index.html:23
 msgid "Mark all forums as read"
 msgstr "标记所有讨论区已读"
 
-#: templates/pybb/latest_topics.html:33
+#: templates/pybb/latest_topics.html:31
 msgid "Mark all topics as read"
 msgstr "标记所有主题为已读"
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:4
+#, fuzzy, python-format
+#| msgid "replied in topic to which you are subscribed."
+msgid ""
+"User %(username)s post a new topic in forum to which you are subscribed "
+"(%(forum_name)s)."
+msgstr "你订阅的主题的回复"
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+msgid "Link to topic:"
+msgstr "主题链接"
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#, fuzzy
+#| msgid "Link to post:"
+msgid "Link to forum:"
+msgstr "帖子链接"
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#, fuzzy
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
+msgid ""
+"If you don't want to receive notifications on new topics in this forum visit "
+"following link:"
+msgstr "如果您不想再次收到此主题的通知，请点击如下链接："
+
+#: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
+#, fuzzy
+#| msgid "New answer in topic that you subscribed."
+msgid "New topic in forum that you subscribed."
+msgstr "您订阅的主题有新的内容"
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:7
+#: templates/pybb/mail_templates/subscription_email_body.html:3
+#, fuzzy, python-format
+#| msgid "replied in topic to which you are subscribed."
+msgid "User %(username)s replied in topic to which you are subscribed."
+msgstr "你订阅的主题的回复"
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:10
+#, python-format
+msgid ""
+"Follow %(link_post_start)sthis link%(link_end)s to see the new post on the "
+"topic %(link_topic_start)s%(topic_name)s%(link_end)s."
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:14
+#, fuzzy, python-format
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
+msgid ""
+"If you don't want to receive notifications on new posts in this topic visit "
+"following %(link_start)s this link%(link_end)s."
+msgstr "如果您不想再次收到此主题的通知，请点击如下链接："
+
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+msgid "Link to post:"
+msgstr "帖子链接"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:8
+#, fuzzy
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
+msgid ""
+"If you don't want to receive notifications on new messages in this topic "
+"visit following link:"
+msgstr "如果您不想再次收到此主题的通知，请点击如下链接："
+
+#: templates/pybb/mail_templates/subscription_email_subject.html:2
+msgid "New answer in topic that you subscribed."
+msgstr "您订阅的主题有新的内容"
+
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
+msgid "Your text to link here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:17
+msgid "First Level Heading"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:18
+#: templates/pybb/markup/markdown_widget.html:19
+#: templates/pybb/markup/markdown_widget.html:20
+#: templates/pybb/markup/markdown_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:22
+msgid "Your title here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:18
+msgid "Second Level Heading"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:19
+#, fuzzy
+#| msgid "Headline"
+msgid "Heading 3"
+msgstr "标题"
+
+#: templates/pybb/markup/markdown_widget.html:20
+#, fuzzy
+#| msgid "Headline"
+msgid "Heading 4"
+msgstr "标题"
+
+#: templates/pybb/markup/markdown_widget.html:21
+#, fuzzy
+#| msgid "Headline"
+msgid "Heading 5"
+msgstr "标题"
+
+#: templates/pybb/markup/markdown_widget.html:22
+#, fuzzy
+#| msgid "Headline"
+msgid "Heading 6"
+msgstr "标题"
+
+#: templates/pybb/markup/markdown_widget.html:27
+#, fuzzy
+#| msgid "Bulleted list"
+msgid "Bulleted List"
+msgstr "符号列表"
+
+#: templates/pybb/markup/markdown_widget.html:28
+#, fuzzy
+#| msgid "Numeric list"
+msgid "Numeric List"
+msgstr "数字列表"
+
+#: templates/pybb/markup/markdown_widget.html:36
+msgid "Code Block / Code"
+msgstr ""
 
 #: templates/pybb/pagination.html:7
 msgid "previous page"
@@ -479,7 +764,7 @@ msgstr "上一页"
 msgid "next page"
 msgstr "下一页"
 
-#: templates/pybb/poll.html:5
+#: templates/pybb/poll.html:4
 msgid "Poll"
 msgstr "投票"
 
@@ -499,65 +784,66 @@ msgstr "删除选项"
 msgid "add answer"
 msgstr "增加选项"
 
-#: templates/pybb/post_template.html:25
-msgid "Rank"
-msgstr "等级"
+#: templates/pybb/post_template.html:28
+#, python-format
+msgid "Rank: %(rank)s"
+msgstr ""
 
-#: templates/pybb/post_template.html:38 templates/pybb/user.html:46
+#: templates/pybb/post_template.html:41 templates/pybb/user.html:51
 msgid "Edit"
 msgstr "编辑"
 
-#: templates/pybb/post_template.html:42
+#: templates/pybb/post_template.html:45
 msgid "Delete post?"
 msgstr "删除帖子？"
 
-#: templates/pybb/post_template.html:43
+#: templates/pybb/post_template.html:46
 msgid "Delete"
 msgstr "删除"
 
-#: templates/pybb/post_template.html:45
+#: templates/pybb/post_template.html:49
 msgid "Approve post"
 msgstr "通过帖子"
 
-#: templates/pybb/post_template.html:50 templates/pybb/topic.html:63
+#: templates/pybb/post_template.html:53 templates/pybb/topic.html:62
 msgid "Admin"
 msgstr "管理"
 
-#: templates/pybb/post_template.html:66
+#: templates/pybb/post_template.html:69
 msgid "Edited"
 msgstr "已编辑"
 
-#: templates/pybb/post_template.html:79
+#: templates/pybb/post_template.html:83
 msgid "quote"
 msgstr "引用"
 
-#: templates/pybb/post_template.html:80
+#: templates/pybb/post_template.html:84
 msgid "quote selected"
 msgstr "选中的引用"
 
-#: templates/pybb/topic.html:52
+#: templates/pybb/topic.html:51
 msgid "Unstick topic"
 msgstr "取消置顶"
 
-#: templates/pybb/topic.html:54
+#: templates/pybb/topic.html:53
 msgid "Stick topic"
 msgstr "置顶"
 
-#: templates/pybb/topic.html:58
+#: templates/pybb/topic.html:57
 msgid "Open topic"
 msgstr "打开主题"
 
-#: templates/pybb/topic.html:60
+#: templates/pybb/topic.html:59
 msgid "Close topic"
 msgstr "关闭主题"
 
-#: templates/pybb/topic.html:72
+#: templates/pybb/topic.html:70
 msgid "Unsubscribe"
 msgstr "取消订阅"
 
-#: templates/pybb/topic.html:74
-msgid "Subscribe"
-msgstr "订阅"
+#: templates/pybb/topic.html:88
+msgid "Subscribers:"
+msgstr "订阅者："
 
 #: templates/pybb/topic_list.html:13
 msgid "Views"
@@ -572,42 +858,51 @@ msgid "Go to first unread post"
 msgstr "跳转到第一个未读帖子"
 
 #: templates/pybb/topic_list.html:32
-msgid "pages"
-msgstr "页"
+msgid "pages:"
+msgstr "页："
 
-#: templates/pybb/user.html:15
+#: templates/pybb/user.html:16
 msgid "Statistics"
 msgstr "统计"
 
-#: templates/pybb/user.html:18
-msgid "Number of topics"
-msgstr "主题数"
+#: templates/pybb/user.html:19
+#, python-format
+msgid "Number of topics: %(count)s"
+msgstr "主题数：%(count)s"
 
 #: templates/pybb/user.html:24
-msgid "Number of posts"
-msgstr "帖子数量"
+#, python-format
+msgid "Number of posts: %(count)s"
+msgstr "帖子数量：%(count)s"
 
-#: templates/pybb/user.html:28
-msgid "Date of registration"
-msgstr "注册日期"
+#: templates/pybb/user.html:29
+#, python-format
+msgid "Date of registration: %(date_joined)s "
+msgstr "注册日期：%(date_joined)s "
 
 #: templates/pybb/user.html:36
+#, fuzzy
+#| msgid "Moderators"
+msgid "Moderator"
+msgstr "板主"
+
+#: templates/pybb/user.html:41
 msgid "Block"
 msgstr "屏蔽"
 
-#: templates/pybb/user.html:37
+#: templates/pybb/user.html:42
 msgid "Block and delete all messages"
 msgstr "屏蔽并删除所有消息"
 
-#: templates/pybb/user.html:41
+#: templates/pybb/user.html:46
 msgid "Unblock"
 msgstr "取消屏蔽"
 
-#: templates/pybb/user_posts.html:13
+#: templates/pybb/user_posts.html:12 templates/pybb/user_posts.html.py:17
 msgid "All posts created by"
 msgstr "创建的帖子"
 
-#: templates/pybb/user_topics.html:11 templates/pybb/user_topics.html.py:15
+#: templates/pybb/user_topics.html:12 templates/pybb/user_topics.html.py:17
 msgid "All topics created by"
 msgstr "创建的主题"
 
@@ -619,50 +914,73 @@ msgstr "用户"
 msgid "Search"
 msgstr "搜索"
 
-#: templates/pybb/mail_templates/subscription_email_body.html:3
-msgid "replied in topic to which you are subscribed."
-msgstr "你订阅的主题的回复"
+#: templatetags/pybb_tags.py:61
+#, fuzzy, python-format
+#| msgid "seconds ago"
+msgid "%d second ago"
+msgid_plural "%d seconds ago"
+msgstr[0] "秒前"
+msgstr[1] "秒前"
 
-#: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "Link to post:"
-msgstr "帖子链接"
-
-#: templates/pybb/mail_templates/subscription_email_body.html:5
-msgid "Link to topic:"
-msgstr "主题链接"
-
-#: templates/pybb/mail_templates/subscription_email_body.html:8
-msgid ""
-"If you don't want to recive notifications on new messages in this topic "
-"visit following link:"
-msgstr "如果您不想再次收到此主题的通知，请点击如下链接："
-
-#: templates/pybb/mail_templates/subscription_email_subject.html:2
-msgid "New answer in topic that you subscribed."
-msgstr "您订阅的主题有新的内容"
-
-#: templatetags/pybb_tags.py:63
-msgid "seconds ago,seconds ago,seconds ago"
-msgstr ""
-
-#: templatetags/pybb_tags.py:66
-msgid "seconds ago"
-msgstr "秒前"
-
-#: templatetags/pybb_tags.py:72
-msgid "minutes ago,minutes ago,minutes ago"
-msgstr ""
+#: templatetags/pybb_tags.py:65
+#, fuzzy, python-format
+#| msgid "minutes ago"
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "分钟前"
+msgstr[1] "分钟前"
 
 #: templatetags/pybb_tags.py:75
-msgid "minutes ago"
-msgstr "分钟前"
-
-#: templatetags/pybb_tags.py:85
 #, python-format
 msgid "today, %s"
 msgstr "今天，%s"
 
-#: templatetags/pybb_tags.py:87
+#: templatetags/pybb_tags.py:77
 #, python-format
 msgid "yesterday, %s"
 msgstr "昨天，%s"
+
+#: util.py:140
+msgid "Can't get profile for anonymous user"
+msgstr "匿名用户没有个人资料"
+
+#: views.py:156
+#, fuzzy
+#| msgid "Forum categories are not created"
+msgid "Forum does not exist"
+msgstr "没有创建讨论区目录"
+
+#: views.py:388
+msgid "This topic does not exists"
+msgstr ""
+
+#: views.py:826
+msgid ""
+"Subscription removed. You will not receive emails from this topic unless you "
+"subscribe or post again."
+msgstr ""
+
+#: views.py:837
+msgid ""
+"Subscription added. You will receive email notifications for replies to this "
+"topic."
+msgstr ""
+
+#: views.py:855
+msgid "All forums marked as read"
+msgstr "所有讨论区都已标记为已读"
+
+#: views.py:888
+msgid "User successfuly blocked"
+msgstr "成功屏蔽了用户"
+
+#: views.py:901
+msgid "User successfuly unblocked"
+msgstr "成功对用户取消屏蔽"
+
+#: views.py:939
+msgid "Privileges updated"
+msgstr ""
+
+#~ msgid "Rank"
+#~ msgstr "等级"
