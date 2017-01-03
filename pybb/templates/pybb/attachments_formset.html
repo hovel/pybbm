@@ -11,7 +11,7 @@
                         <td>
                             {{ form.id }}{{ form.file }}
                             {% if attachment_max_size %}
-                                <span title="{% trans "If you need to upload larger files, please use an external storage website." %}" class="help">{% blocktrans with max_size=attachment_max_size|filesizeformat%}(max size : {{ max_size }}){% endblocktrans %}</span>
+                                <span title="{% trans "If you need to upload larger files, please use an external storage website." %}" class="help">{% blocktrans with max_size=attachment_max_size|filesizeformat%}(max size: {{ max_size }}){% endblocktrans %}</span>
                             {% endif %}
                         </td>
                         <td>{% if form.instance.pk %}{{ form.DELETE }} {% trans "delete" %}{% endif %}</td>

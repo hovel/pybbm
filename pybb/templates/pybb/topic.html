@@ -84,7 +84,7 @@
 
         {% if user.is_staff %}
             <div class="subscriber-list">
-                {% trans "Subscribers" %}:
+                {% trans "Subscribers:" %}
                 {% for subscriber in topic.subscribers.all %}
                     {% pybb_get_profile user=subscriber as subscriber_profile %}
                     <a href="{% url 'pybb:user' subscriber.get_username %}">

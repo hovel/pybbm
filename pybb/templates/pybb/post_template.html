@@ -25,7 +25,7 @@
             </div>
             {% if post_user_profile.rank %}
                 <div class="rank">
-                    {% trans "Rank" %}: {{ post_user_profile.rank }}
+                    {% blocktrans with rank=post_user_profile.rank %}Rank: {{ rank }}{% endblocktrans %}
                     {% if user.is_authenticated and user != post.user %}
                         <a href="#" class="vote" rel="{{ post_user_profile.get_vote_up_url }}">+</a>
                         <a href="#" class="vote" rel="{{ post_user_profile.get_vote_down_url }}">-</a>
@@ -73,7 +73,7 @@
                     {% if post.attachment_cache %}
                     {% for attach in post.attachment_cache %}
                     <br/>
-                    {% trans "Attachment" %}: <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
+                    {% trans "Attachment:" %} <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
                     {% endfor %}
                     {% endif %}
             {% endcomment %}

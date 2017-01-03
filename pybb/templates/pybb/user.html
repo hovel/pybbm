@@ -16,17 +16,18 @@
             <div class="label">{% trans "Statistics" %}</div>
             <div>
                 <a href="{% url 'pybb:user_topics' target_user.get_username %}">
-                    {% trans "Number of topics" %}:
-                    {{ topic_count }}
+                    {% blocktrans with count=topic_count %}Number of topics: {{ count }}{% endblocktrans %}
                 </a>
             </div>
             <div>
                 <a href="{% url 'pybb:user_posts' target_user.get_username %}">
-                    {% trans "Number of posts" %}:
-                    {{ target_profile.post_count }}
+                    {% blocktrans with count=target_profile.post_count %}Number of posts: {{ count }}{% endblocktrans %}
                 </a>
             </div>
-            <div>{% trans "Date of registration" %}: {% pybb_time target_user.date_joined %}</div>
+            <div>
+                {% pybb_get_time target_user.date_joined as date_joined %}
+                {% blocktrans %}Date of registration: {{ date_joined }} {% endblocktrans %}
+            </div>
         </div>
         <div class="clear"></div>
     </div>
