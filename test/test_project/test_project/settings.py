@@ -18,13 +18,13 @@ if test_db == 'mysql':
     DATABASES['default'].update({
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pybbm',
-        'USER': 'root',
+        # 'USER': 'root',
         'TEST_COLLATION': 'utf8_general_ci',
     })
 elif test_db == 'postgres':
     DATABASES['default'].update({
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'postgres',
+        # 'USER': 'postgres',
         'NAME': 'pybbm',
         'OPTIONS': {}
     })

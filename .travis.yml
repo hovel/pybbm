@@ -14,8 +14,8 @@ env:
   - DJANGO="Django>=1.10,<1.11" DB=postgres
   - DJANGO="Django>=1.10,<1.11" DB=mysql
 before_script:
-  - mysql -e 'create database pybbm;'
-  - psql -c 'create database pybbm;' -U postgres
+  - if [[ $DB == mysql ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000 ; create database pybbm;'; fi
+  - if [[ $DB == postgres ]]; then psql -c 'create database pybbm;' -U postgres; fi
 install:
   - if [[ $DB == mysql ]]; then pip install -qU mysqlclient; fi
   - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
