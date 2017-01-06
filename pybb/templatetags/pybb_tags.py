@@ -84,7 +84,7 @@ def pybb_link(object, anchor=''):
 
 
 @register.filter
-def pybb_topic_moderated_by(topic, user):  # pragama: no cover
+def pybb_topic_moderated_by(topic, user):  # pragma: no cover
     """
     Check if user is moderator of topic's forum.
     """
@@ -94,7 +94,7 @@ def pybb_topic_moderated_by(topic, user):  # pragama: no cover
     return perms.may_moderate_topic(user, topic)
 
 @register.filter
-def pybb_editable_by(post, user):  # pragama: no cover
+def pybb_editable_by(post, user):  # pragma: no cover
     """
     Check if the post could be edited by the user.
     """

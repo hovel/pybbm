@@ -13,7 +13,6 @@ setup(
     package_data={'': ['pybb/templates', 'pybb/static']},
     zip_safe=False,
     install_requires=[
-        'Django>=1.8',
         'django-annoying',
         'unidecode',
     ],
