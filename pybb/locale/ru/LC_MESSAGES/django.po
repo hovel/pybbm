@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 11:22+0100\n"
-"PO-Revision-Date: 2017-01-03 11:58+0100\n"
+"POT-Creation-Date: 2017-01-11 14:06+0100\n"
+"PO-Revision-Date: 2017-01-11 14:16+0100\n"
 "Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -229,7 +229,7 @@ msgstr "Закреплено"
 msgid "Closed"
 msgstr "Закрыто"
 
-#: models.py:191
+#: models.py:191 templates/pybb/topic.html:88
 msgid "Subscribers"
 msgstr "Подписчики"
 
@@ -504,6 +504,20 @@ msgstr "удалить"
 msgid "Reference to your file"
 msgstr "Ссылка на файл"
 
+#: templates/pybb/attachments_formset.html:20
+msgid "Ref"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#: templates/pybb/topic.html:88 templates/pybb/topic_list.html:32
+msgid ":"
+msgstr ""
+
 #: templates/pybb/attachments_formset.html:22
 msgid "link"
 msgstr "ссылка"
@@ -613,20 +627,20 @@ msgstr ""
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:5
 #: templates/pybb/mail_templates/subscription_email_body.html:5
-msgid "Link to topic:"
+msgid "Link to topic"
 msgstr "Ссылка на тему"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:6
-msgid "Link to forum:"
-msgstr "Ссылка на форум:"
+msgid "Link to forum"
+msgstr "Ссылка на форум"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:9
 msgid ""
 "If you don't want to receive notifications on new topics in this forum visit "
-"following link:"
+"following link"
 msgstr ""
 "Если вы не хотите получать уведомления о новых темах на этом форуме - "
-"перейдите по следующей ссылке:"
+"перейдите по следующей ссылке"
 
 #: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
 msgid "New topic in forum that you subscribed."
@@ -651,22 +665,23 @@ msgstr ""
 #, python-format
 msgid ""
 "If you don't want to receive notifications on new posts in this topic visit "
-"following %(link_start)s this link%(link_end)s."
+"%(link_start)sthis link%(link_end)s."
 msgstr ""
 "Если вы не хотите получать уведомления о новых сообщениях в этой теме - "
 "перейдите по следующей %(link_start)sссылке%(link_end)s."
 
 #: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "Link to post:"
+msgid "Link to post"
 msgstr "Ссылка на сообщение"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:8
+#, python-format
 msgid ""
 "If you don't want to receive notifications on new messages in this topic "
-"visit following link:"
+"visit following link: %(delete_url_full)s"
 msgstr ""
 "Если вы не хотите получать уведомления о новых сообщениях в этой теме - "
-"перейдите по следующей ссылке:"
+"перейдите по следующей ссылке: %(delete_url_full)s"
 
 #: templates/pybb/mail_templates/subscription_email_subject.html:2
 msgid "New answer in topic that you subscribed."
@@ -807,10 +822,6 @@ msgstr "Закрыть тему"
 msgid "Unsubscribe"
 msgstr "Запретить уведомления"
 
-#: templates/pybb/topic.html:88
-msgid "Subscribers:"
-msgstr "Подписчики:"
-
 #: templates/pybb/topic_list.html:13
 msgid "Views"
 msgstr "Просмотров"
@@ -824,8 +835,8 @@ msgid "Go to first unread post"
 msgstr "Перейти к первому непрочитанному сообщению"
 
 #: templates/pybb/topic_list.html:32
-msgid "pages:"
-msgstr "страницы:"
+msgid "pages"
+msgstr "страницы"
 
 #: templates/pybb/user.html:16
 msgid "Statistics"
@@ -947,6 +958,9 @@ msgstr "Пользователь успешно разблокирован"
 #: views.py:939
 msgid "Privileges updated"
 msgstr "Привилегии обновлены"
+
+#~ msgid "Subscribers:"
+#~ msgstr "Подписчики:"
 
 #~ msgid "Rank"
 #~ msgstr "Ранг"

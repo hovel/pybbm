@@ -2,10 +2,10 @@
 
 {% load i18n pybb_tags %}
 
-{% block title %}{% trans "Grant moderator privileges" %}{% endblock title %}
+{% block title %}{% trans 'Grant moderator privileges' %}{% endblock title %}
 
 {% block content %}
-    <h1>{% trans "Grant moderator privileges" %}</h1>
+    <h1>{% trans 'Grant moderator privileges' %}</h1>
         <form method="post" action="" class="privileges-edit">
             {% csrf_token %}
             <fieldset>

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 11:22+0100\n"
-"PO-Revision-Date: 2017-01-03 11:29+0100\n"
+"POT-Creation-Date: 2017-01-11 14:06+0100\n"
+"PO-Revision-Date: 2017-01-11 14:11+0100\n"
 "Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -244,7 +244,7 @@ msgstr "Sticky"
 msgid "Closed"
 msgstr "Geschlossen"
 
-#: models.py:191
+#: models.py:191 templates/pybb/topic.html:88
 msgid "Subscribers"
 msgstr "Abonnenten"
 
@@ -524,6 +524,20 @@ msgstr "löschen"
 msgid "Reference to your file"
 msgstr ""
 
+#: templates/pybb/attachments_formset.html:20
+msgid "Ref"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#: templates/pybb/topic.html:88 templates/pybb/topic_list.html:32
+msgid ":"
+msgstr ""
+
 #: templates/pybb/attachments_formset.html:22
 msgid "link"
 msgstr "Link"
@@ -635,11 +649,15 @@ msgstr ""
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:5
 #: templates/pybb/mail_templates/subscription_email_body.html:5
-msgid "Link to topic:"
+#, fuzzy
+#| msgid "Link to topic:"
+msgid "Link to topic"
 msgstr "Link zum Thema"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:6
-msgid "Link to forum:"
+#, fuzzy
+#| msgid "Link to forum:"
+msgid "Link to forum"
 msgstr "Link zum Forum:"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:9
@@ -649,7 +667,7 @@ msgstr "Link zum Forum:"
 #| "visit following link:"
 msgid ""
 "If you don't want to receive notifications on new topics in this forum visit "
-"following link:"
+"following link"
 msgstr ""
 "Wenn Sie keine E-Mails zu diesem Thema mehr erhalten möchten,klicken Sie den "
 "folgenden Link"
@@ -681,23 +699,25 @@ msgstr ""
 #| "visit following link:"
 msgid ""
 "If you don't want to receive notifications on new posts in this topic visit "
-"following %(link_start)s this link%(link_end)s."
+"%(link_start)sthis link%(link_end)s."
 msgstr ""
 "Wenn Sie keine E-Mails zu diesem Thema mehr erhalten möchten,klicken Sie den "
 "folgenden Link"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "Link to post:"
+#, fuzzy
+#| msgid "Link to post:"
+msgid "Link to post"
 msgstr "Link zum Beitrag"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:8
-#, fuzzy
+#, fuzzy, python-format
 #| msgid ""
 #| "If you don't want to recive notifications on new messages in this topic "
 #| "visit following link:"
 msgid ""
 "If you don't want to receive notifications on new messages in this topic "
-"visit following link:"
+"visit following link: %(delete_url_full)s"
 msgstr ""
 "Wenn Sie keine E-Mails zu diesem Thema mehr erhalten möchten,klicken Sie den "
 "folgenden Link"
@@ -841,10 +861,6 @@ msgstr "Thema schließen"
 msgid "Unsubscribe"
 msgstr "Abbestellen"
 
-#: templates/pybb/topic.html:88
-msgid "Subscribers:"
-msgstr "Abonnenten:"
-
 #: templates/pybb/topic_list.html:13
 msgid "Views"
 msgstr "Ansichten"
@@ -858,8 +874,8 @@ msgid "Go to first unread post"
 msgstr ""
 
 #: templates/pybb/topic_list.html:32
-msgid "pages:"
-msgstr "Seiten:"
+msgid "pages"
+msgstr "Seiten"
 
 #: templates/pybb/user.html:16
 msgid "Statistics"
@@ -985,6 +1001,9 @@ msgstr "Benutzer wurde erfolgreich gesperrt"
 #: views.py:939
 msgid "Privileges updated"
 msgstr ""
+
+#~ msgid "Subscribers:"
+#~ msgstr "Abonnenten:"
 
 #~ msgid "Change the password"
 #~ msgstr "Passwort ändern"

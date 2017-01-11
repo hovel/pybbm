@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 11:22+0100\n"
-"PO-Revision-Date: 2017-01-03 12:02+0100\n"
+"POT-Creation-Date: 2017-01-11 14:06+0100\n"
+"PO-Revision-Date: 2017-01-11 14:17+0100\n"
 "Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -240,7 +240,7 @@ msgstr "Fäst"
 msgid "Closed"
 msgstr "Stängd"
 
-#: models.py:191
+#: models.py:191 templates/pybb/topic.html:88
 msgid "Subscribers"
 msgstr "Prenumeranter"
 
@@ -517,6 +517,20 @@ msgstr "radera"
 msgid "Reference to your file"
 msgstr ""
 
+#: templates/pybb/attachments_formset.html:20
+msgid "Ref"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#: templates/pybb/topic.html:88 templates/pybb/topic_list.html:32
+msgid ":"
+msgstr ""
+
 #: templates/pybb/attachments_formset.html:22
 msgid "link"
 msgstr ""
@@ -625,26 +639,20 @@ msgstr "svarade i ett ämne som du prenumererar på."
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:5
 #: templates/pybb/mail_templates/subscription_email_body.html:5
-msgid "Link to topic:"
-msgstr "Länk till ämne:"
+msgid "Link to topic"
+msgstr "Länk till ämne"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:6
-#, fuzzy
-#| msgid "Link to post:"
-msgid "Link to forum:"
-msgstr "Länk till inlägg:"
+msgid "Link to forum"
+msgstr "Länk till inlägg"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:9
-#, fuzzy
-#| msgid ""
-#| "If you don't want to recive notifications on new messages in this topic "
-#| "visit following link:"
 msgid ""
 "If you don't want to receive notifications on new topics in this forum visit "
-"following link:"
+"following link"
 msgstr ""
 "Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då "
-"följande länk:"
+"följande länk"
 
 #: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
 #, fuzzy
@@ -672,26 +680,23 @@ msgstr ""
 #| "visit following link:"
 msgid ""
 "If you don't want to receive notifications on new posts in this topic visit "
-"following %(link_start)s this link%(link_end)s."
+"%(link_start)sthis link%(link_end)s."
 msgstr ""
 "Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då "
 "följande länk:"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "Link to post:"
-msgstr "Länk till inlägg:"
+msgid "Link to post"
+msgstr "Länk till inlägg"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:8
-#, fuzzy
-#| msgid ""
-#| "If you don't want to recive notifications on new messages in this topic "
-#| "visit following link:"
+#, python-format
 msgid ""
 "If you don't want to receive notifications on new messages in this topic "
-"visit following link:"
+"visit following link: %(delete_url_full)s"
 msgstr ""
 "Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då "
-"följande länk:"
+"följande länk: %(delete_url_full)s"
 
 #: templates/pybb/mail_templates/subscription_email_subject.html:2
 msgid "New answer in topic that you subscribed."
@@ -832,10 +837,6 @@ msgstr "Stäng ämne"
 msgid "Unsubscribe"
 msgstr "Avprenumerera"
 
-#: templates/pybb/topic.html:88
-msgid "Subscribers:"
-msgstr "Prenumeranter:"
-
 #: templates/pybb/topic_list.html:13
 msgid "Views"
 msgstr "Visningar"
@@ -849,8 +850,8 @@ msgid "Go to first unread post"
 msgstr "Gå till första olästa inlägg"
 
 #: templates/pybb/topic_list.html:32
-msgid "pages:"
-msgstr "sidor:"
+msgid "pages"
+msgstr "sidor"
 
 #: templates/pybb/user.html:16
 msgid "Statistics"
@@ -968,6 +969,9 @@ msgstr "Användaren avblockerad"
 #: views.py:939
 msgid "Privileges updated"
 msgstr ""
+
+#~ msgid "Subscribers:"
+#~ msgstr "Prenumeranter:"
 
 #~ msgid "Rank"
 #~ msgstr "Ordning"

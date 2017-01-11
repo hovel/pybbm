@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 11:22+0100\n"
-"PO-Revision-Date: 2017-01-03 12:06+0100\n"
+"POT-Creation-Date: 2017-01-11 14:06+0100\n"
+"PO-Revision-Date: 2017-01-11 14:18+0100\n"
 "Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -243,7 +243,7 @@ msgstr "置顶"
 msgid "Closed"
 msgstr "已关闭"
 
-#: models.py:191
+#: models.py:191 templates/pybb/topic.html:88
 msgid "Subscribers"
 msgstr "订阅者"
 
@@ -519,6 +519,20 @@ msgstr "删除"
 msgid "Reference to your file"
 msgstr ""
 
+#: templates/pybb/attachments_formset.html:20
+msgid "Ref"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#: templates/pybb/topic.html:88 templates/pybb/topic_list.html:32
+msgid ":"
+msgstr "："
+
 #: templates/pybb/attachments_formset.html:22
 msgid "link"
 msgstr ""
@@ -627,24 +641,22 @@ msgstr "你订阅的主题的回复"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:5
 #: templates/pybb/mail_templates/subscription_email_body.html:5
-msgid "Link to topic:"
+#, fuzzy
+#| msgid "Link to topic:"
+msgid "Link to topic"
 msgstr "主题链接"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:6
 #, fuzzy
 #| msgid "Link to post:"
-msgid "Link to forum:"
+msgid "Link to forum"
 msgstr "帖子链接"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:9
-#, fuzzy
-#| msgid ""
-#| "If you don't want to recive notifications on new messages in this topic "
-#| "visit following link:"
 msgid ""
 "If you don't want to receive notifications on new topics in this forum visit "
-"following link:"
-msgstr "如果您不想再次收到此主题的通知，请点击如下链接："
+"following link"
+msgstr "如果您不想再次收到此主题的通知，请点击如下链接"
 
 #: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
 #, fuzzy
@@ -667,28 +679,24 @@ msgid ""
 msgstr ""
 
 #: templates/pybb/mail_templates/subscription_email_body-html.html:14
-#, fuzzy, python-format
-#| msgid ""
-#| "If you don't want to recive notifications on new messages in this topic "
-#| "visit following link:"
+#, python-format
 msgid ""
 "If you don't want to receive notifications on new posts in this topic visit "
-"following %(link_start)s this link%(link_end)s."
-msgstr "如果您不想再次收到此主题的通知，请点击如下链接："
+"%(link_start)sthis link%(link_end)s."
+msgstr ""
 
 #: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "Link to post:"
+#, fuzzy
+#| msgid "Link to post:"
+msgid "Link to post"
 msgstr "帖子链接"
 
 #: templates/pybb/mail_templates/subscription_email_body.html:8
-#, fuzzy
-#| msgid ""
-#| "If you don't want to recive notifications on new messages in this topic "
-#| "visit following link:"
+#, python-format
 msgid ""
 "If you don't want to receive notifications on new messages in this topic "
-"visit following link:"
-msgstr "如果您不想再次收到此主题的通知，请点击如下链接："
+"visit following link: %(delete_url_full)s"
+msgstr "如果您不想再次收到此主题的通知，请点击如下链接：%(delete_url_full)s"
 
 #: templates/pybb/mail_templates/subscription_email_subject.html:2
 msgid "New answer in topic that you subscribed."
@@ -841,10 +849,6 @@ msgstr "关闭主题"
 msgid "Unsubscribe"
 msgstr "取消订阅"
 
-#: templates/pybb/topic.html:88
-msgid "Subscribers:"
-msgstr "订阅者："
-
 #: templates/pybb/topic_list.html:13
 msgid "Views"
 msgstr "浏览数"
@@ -858,8 +862,8 @@ msgid "Go to first unread post"
 msgstr "跳转到第一个未读帖子"
 
 #: templates/pybb/topic_list.html:32
-msgid "pages:"
-msgstr "页："
+msgid "pages"
+msgstr "页"
 
 #: templates/pybb/user.html:16
 msgid "Statistics"
@@ -981,6 +985,9 @@ msgstr "成功对用户取消屏蔽"
 #: views.py:939
 msgid "Privileges updated"
 msgstr ""
+
+#~ msgid "Subscribers:"
+#~ msgstr "订阅者："
 
 #~ msgid "Rank"
 #~ msgstr "等级"

@@ -29,8 +29,8 @@
             {% for hidden_field in form.hidden_fields %}
                 {{ hidden_field }}
             {% endfor %}
-            <a class="btn btn-link" href="{{ forum.get_absolute_url }}">{% trans "Cancel" %}</a>
-            <input type="submit" class="btn btn-primary" value="{% trans "Submit" %}" />
+            <a class="btn btn-link" href="{{ forum.get_absolute_url }}">{% trans 'Cancel' %}</a>
+            <input type="submit" class="btn btn-primary" value="{% trans 'Submit' %}" />
         </form>
     </div>
 {% endblock content %}

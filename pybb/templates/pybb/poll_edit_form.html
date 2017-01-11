@@ -4,7 +4,7 @@
   {% include "pybb/form_field.html" with field=form.poll_question %}
 </div>
 <div id="poll-answers-formset" style="display: none;">
-  <br>{% trans "Poll answers" %}
+  <br>{% trans 'Poll answers' %}
     {% include "pybb/form_errors.html" with form=pollformset %}
     {% for form_answer in pollformset %}
         <div class="poll-answer-form">

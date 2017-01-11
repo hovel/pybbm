@@ -1,7 +1,7 @@
 {% extends 'pybb/base.html' %}
 {% load pybb_tags i18n staticfiles %}
 
-{% block title %}{% trans "Editing the post" %}{% endblock title %}
+{% block title %}{% trans 'Editing the post' %}{% endblock title %}
 
 {% block extra_head %}
     {{ block.super }}
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{% trans "Editing the post" %}</h1>
+    <h1>{% trans 'Editing the post' %}</h1>
     {% include "pybb/post_form.html" %}
 {% endblock content %}
 

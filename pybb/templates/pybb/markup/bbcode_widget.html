@@ -19,7 +19,7 @@ if(!window.pybb.get_markitup_settings){
             {name:'{% trans "Stroke" as txt %}{{ txt|escapejs }}', key:'S', openWith:'[s]', closeWith:'[/s]'},
             {separator:'---------------' },
             {name:'{% trans "Picture" as txt %}{{ txt|escapejs }}', key:'P', replaceWith:'[img][![Url]!][/img]'},
-            {name:'{% trans "Link" as txt %}{{ txt|escapejs }}', key:'L', openWith:'[url=[![Url]!]]', closeWith:'[/url]', placeHolder:'{% trans "Your text to link here..." %}'},
+            {name:'{% trans "Link" as txt %}{{ txt|escapejs }}', key:'L', openWith:'[url=[![Url]!]]', closeWith:'[/url]', placeHolder:'{% trans 'Your text to link here...' %}'},
             {separator:'---------------' },
             {name:'{% trans "Bulleted list" as txt %}{{ txt|escapejs }}', openWith:'[list]\n', closeWith:'\n[/list]'},
             {name:'{% trans "Numeric list" as txt %}{{ txt|escapejs }}', openWith:'[list=[![Starting number]!]]\n', closeWith:'\n[/list]'},

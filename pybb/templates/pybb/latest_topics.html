@@ -2,7 +2,7 @@
 
 {% load pybb_tags i18n %}
 
-{% block title %}{% trans "Last updates in topics" %}{% endblock title %}
+{% block title %}{% trans 'Last updates in topics' %}{% endblock title %}
 
 {% block breadcrumb %}
     {% with extra_crumb=_("Last updates in topics") %}
@@ -12,7 +12,7 @@
 
 {% block content %}
     <div class="forum">
-        <h1>{% trans "Last updates in topics" %}</h1>
+        <h1>{% trans 'Last updates in topics' %}</h1>
         {% if forum.headline %}
             <div class="forum-headline alert alert-block">
                 {{ forum.headline|safe }}
@@ -28,7 +28,7 @@
         {% if user.is_authenticated %}
             <div id="mark-all-as-read">
                 <a href="{% url 'pybb:mark_all_as_read' %}">
-                    {% trans "Mark all topics as read" %}
+                    {% trans 'Mark all topics as read' %}
                 </a>
             </div>
         {% endif %}
