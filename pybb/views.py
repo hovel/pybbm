@@ -267,8 +267,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if defaults.PYBB_NICE_URL and 'pk' in kwargs:
             return redirect(self.topic, permanent=defaults.PYBB_NICE_URL_PERMANENT_REDIRECT)
         response = super(TopicView, self).get(request, *args, **kwargs)
-        if self.request.user.is_authenticated():
-            self.mark_read()
+        self.mark_read()
         return response
 
     def get_login_redirect_url(self):
@@ -355,7 +354,10 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
 
         return ctx
 
+    @method_decorator(get_atomic_func())
     def mark_read(self):
+        if not self.request.user.is_authenticated():
+            return
         try:
             forum_mark = ForumReadTracker.objects.get(forum=self.topic.forum, user=self.request.user)
         except ForumReadTracker.DoesNotExist:
