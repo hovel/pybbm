@@ -262,6 +262,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         post = Post.objects.get(id=post.id)
         self.assertTrue(self.forum.updated == post.created)
 
+    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_read_tracking(self):
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
