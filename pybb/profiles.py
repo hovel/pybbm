@@ -37,7 +37,7 @@ class PybbProfile(models.Model):
     time_zone = models.FloatField(_('Time zone'), choices=TZ_CHOICES, default=float(defaults.PYBB_DEFAULT_TIME_ZONE))
     language = models.CharField(_('Language'), max_length=10, blank=True, choices=settings.LANGUAGES,
                                 default=get_supported_language_variant(settings.LANGUAGE_CODE, strict=True))
-    show_signatures = models.BooleanField(_('Show signatures'), blank=True, default=True)
+    show_signatures = models.BooleanField(_('Show signatures'), default=True)
     post_count = models.IntegerField(_('Post count'), blank=True, default=0)
     avatar = get_image_field_class()(_('Avatar'), blank=True, null=True,
                                      upload_to=util.FilePathGenerator(to='pybb/avatar'))
