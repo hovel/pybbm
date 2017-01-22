@@ -181,8 +181,8 @@ class Topic(models.Model):
 
     forum = models.ForeignKey(Forum, related_name='topics', verbose_name=_('Forum'))
     name = models.CharField(_('Subject'), max_length=255)
-    created = models.DateTimeField(_('Created'), null=True)
-    updated = models.DateTimeField(_('Updated'), null=True)
+    created = models.DateTimeField(_('Created'), null=True, db_index=True)
+    updated = models.DateTimeField(_('Updated'), null=True, db_index=True)
     user = models.ForeignKey(get_user_model_path(), verbose_name=_('User'))
     views = models.IntegerField(_('Views count'), blank=True, default=0)
     sticky = models.BooleanField(_('Sticky'), default=False)
@@ -294,7 +294,7 @@ class Post(RenderableItem):
     topic = models.ForeignKey(Topic, related_name='posts', verbose_name=_('Topic'))
     user = models.ForeignKey(get_user_model_path(), related_name='posts', verbose_name=_('User'))
     created = models.DateTimeField(_('Created'), blank=True, db_index=True)
-    updated = models.DateTimeField(_('Updated'), blank=True, null=True)
+    updated = models.DateTimeField(_('Updated'), blank=True, null=True, db_index=True)
     user_ip = models.GenericIPAddressField(_('User IP'), blank=True, null=True, default='0.0.0.0')
     on_moderation = models.BooleanField(_('On moderation'), default=False)
 
