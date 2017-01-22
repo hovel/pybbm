@@ -5,7 +5,7 @@ python:
   - "3.5"
 env:
   - DJANGO="Django>=1.8,<1.9" DB=sqlite
-  - DJANGO="Django>=1.8,<1.9" DB=postgres
+  - DJANGO="Django>=1.8,<1.9" DB=postgres WITH_COVERALL=true
   - DJANGO="Django>=1.8,<1.9" DB=mysql
   - DJANGO="Django>=1.9,<1.10" DB=sqlite
   - DJANGO="Django>=1.9,<1.10" DB=postgres
@@ -20,6 +20,9 @@ install:
   - if [[ $DB == mysql ]]; then pip install -qU mysqlclient; fi
   - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
   - pip install -qU $DJANGO
+  - if [[ $WITH_COVERALL == true ]]; then pip install -qU coveralls ; fi
   - CFLAGS="-O0" pip install -qU -r test/test_project/requirements_test.txt
 script:
-  - python setup.py test
+  - if [[ $WITH_COVERALL == true ]]; then coverage run setup.py test; else python setup.py test ; fi
+after_success:
+  - if [[ $WITH_COVERALL == true ]]; then coveralls ; fi

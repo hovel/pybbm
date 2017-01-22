@@ -1,7 +1,10 @@
 PyBBM - Django forum solution
 =============================
 
-.. image:: https://travis-ci.org/hovel/pybbm.png?branch=master
+.. |travis| image:: https://travis-ci.org/hovel/pybbm.png?branch=master
+.. |coveralls| image:: https://coveralls.io/repos/github/hovel/pybbm/badge.svg?branch=master
+
+|travis| |coveralls|
 
 PyBBM is a full-featured django forum solution with these features:
 
@@ -17,7 +20,7 @@ PyBBM is a full-featured django forum solution with these features:
 
 All features is based on:
 
-* 95% tests covered code
+* +94% tests covered code
 * Twitter bootstrap compatible default theme
 * Ready to use example project
 

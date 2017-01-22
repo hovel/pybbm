@@ -37,6 +37,7 @@ Contents:
    filters
    markup
    javascript
+   contributing
    testing
    updates
    pybbmigrate

@@ -28,7 +28,7 @@ username_field = compat.get_username_field()
 
 try:
     from lxml import html
-except ImportError:
+except ImportError:  # pragma: no cover
     raise Exception('PyBB requires lxml for self testing')
 
 from pybb import defaults
@@ -1073,7 +1073,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertEqual(len(mail.outbox), 2)
         if mail.outbox[0].to[0] == user2.email:
             email_en, email_fr = mail.outbox[0], mail.outbox[1]
-        else:
+        else:  # pragma: no cover
             email_fr, email_en = mail.outbox[0], mail.outbox[1]
 
         subject_en = "New answer in topic that you subscribed."
