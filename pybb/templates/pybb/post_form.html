@@ -16,10 +16,10 @@
     {% if form.slug %} {% include "pybb/form_field.html" with field=form.slug %} {% endif %}
     {% if form.login %} {% include "pybb/form_field.html" with field=form.login %}  {% endif %}
     {% if form.body %} {% include "pybb/form_field.html" with field=form.body %}  {% endif %}
-    <div id='emoticons'>
+    <div id="emoticons">
     {% for smile, url in form.available_smiles.items %}
         {% with form.smiles_prefix|add:url as static_smiley %}
-            <a href='#' title='{{ smile|safe }}'><img src='{% static static_smiley %}'></a>
+            <a href="#" title="{{ smile|safe }}"><img src="{% static static_smiley %}"></a>
         {% endwith %}
     {% endfor %}
     </div>

@@ -3,7 +3,7 @@
 {% if request.user|pybb_may_attach_files %}
     {% load i18n %}
     <div class="attachments-form">
-        <a class='attachment-link' style="display:none;" href='#'>{% trans "Add attachments" %}</a>
+        <a class="attachment-link" style="display:none;" href="#">{% trans 'Add attachments' %}</a>
         {{ aformset.management_form }}
             <table class="attachment-list">
                 {% for form in aformset %}
@@ -11,13 +11,13 @@
                         <td>
                             {{ form.id }}{{ form.file }}
                             {% if attachment_max_size %}
-                                <span title="{% trans 'If you need to upload larger files, please use an external storage website.' %}" class="help">{% blocktrans with max_size=attachment_max_size|filesizeformat%}(max size : {{ max_size }}){% endblocktrans %}</span>
+                                <span title="{% trans 'If you need to upload larger files, please use an external storage website.' %}" class="help">{% blocktrans with max_size=attachment_max_size|filesizeformat%}(max size: {{ max_size }}){% endblocktrans %}</span>
                             {% endif %}
                         </td>
-                        <td>{% if form.instance.pk %}{{ form.DELETE }} {% trans "delete" %}{% endif %}</td>
+                        <td>{% if form.instance.pk %}{{ form.DELETE }} {% trans 'delete' %}{% endif %}</td>
                         <td>
                             <span class="attachment-ref">
-                                <abbr title="{% trans 'Reference to your file' %}">Ref</abbr> : 
+                                <abbr title="{% trans 'Reference to your file' %}">{% trans 'Ref' %}</abbr>{% trans ':' %} 
                                 <span class="attachment-ref-value">[file-{{ forloop.counter }}]</span>
                                 <img style="display:none;" class="attachment-ref-insert-link" src="{% static 'pybb/img/attachment.png' %}" alt="{% trans 'link' %}" title="{% trans 'Insert a link to your file inside your post.' %}" />
                                 <img style="display:none;" class="attachment-ref-insert-image" src="{% static 'pybb/img/image.png' %}" alt="{% trans 'image' %}" title="{% trans 'Insert your image inside your post.' %}" />

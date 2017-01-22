@@ -1,9 +1,9 @@
 {% load i18n pybb_tags %}
 {% pybb_get_profile user=topic.user as profile %}
 
-{% trans "User" %} {{ profile.get_display_name }} {% trans "post a new topic in forum to which you are subscribed." %} ({{ topic.forum.name }})
-{% trans "Link to topic:" %} http://{{site}}{{ topic.get_absolute_url }}
-{% trans "Link to forum:" %} http://{{site}}{{ topic.forum.get_absolute_url }}
+{% blocktrans with username=profile.get_display_name forum_name=topic.forum.name %}User {{ username }} post a new topic in forum to which you are subscribed ({{ forum_name }}).{% endblocktrans %}
+{% trans 'Link to topic' %}{% trans ':' %} http://{{site}}{{ topic.get_absolute_url }}
+{% trans 'Link to forum' %}{% trans ':' %} http://{{site}}{{ topic.forum.get_absolute_url }}
 
 -----
-{% trans "If you don't want to receive notifications on new topics in this forum visit following link:" %} http://{{site}}{{ manage_url }}
+{% blocktrans %}If you don't want to receive notifications on new topics in this forum visit following link{% endblocktrans %}{% trans ':' %} http://{{site}}{{ manage_url }}

@@ -2,7 +2,7 @@
 {% load i18n pybb_tags staticfiles %}
 
 {% block title %}
-{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}
+{% if forum %}{% trans 'New topic' %}{% else %}{% trans 'New reply' %}{% endif %}
 {% endblock %}
 
 {% block extra_head %}
@@ -29,7 +29,7 @@
 
 {% block content %}
 
-<h1>{% if forum %}{% trans "New topic" %}{% else %}{% trans "New reply" %}{% endif %}</h1>
+<h1>{% if forum %}{% trans 'New topic' %}{% else %}{% trans 'New reply' %}{% endif %}</h1>
 
 {% include "pybb/post_form.html" %}
 {% endblock content %}

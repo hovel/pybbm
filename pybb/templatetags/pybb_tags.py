@@ -35,6 +35,11 @@ def pybb_time(parser, token):
         return PybbTimeNode(context_time)
 
 
+@register.assignment_tag(takes_context=True)
+def pybb_get_time(context, context_time):
+    return pybb_user_time(context_time, context['user'])
+
+
 class PybbTimeNode(template.Node):
     def __init__(self, time):
     #noinspection PyRedeclaration
@@ -42,33 +47,36 @@ class PybbTimeNode(template.Node):
 
     def render(self, context):
         context_time = self.time.resolve(context)
+        return pybb_user_time(context_time, context['user'])
 
-        delta = tznow() - context_time
-        today = tznow().replace(hour=0, minute=0, second=0)
-        yesterday = today - timedelta(days=1)
-        tomorrow = today + timedelta(days=1)
 
-        if delta.days == 0:
-            if delta.seconds < 60:
-                msg = ungettext('%d second ago', '%d seconds ago', delta.seconds)
-                return msg % delta.seconds
-            elif delta.seconds < 3600:
-                minutes = int(delta.seconds / 60)
-                msg = ungettext('%d minute ago', '%d minutes ago', minutes)
-                return msg % minutes
-        if context['user'].is_authenticated():
-            if time.daylight:
-                tz1 = time.altzone
-            else:
-                tz1 = time.timezone
-            tz = tz1 + util.get_pybb_profile(context['user']).time_zone * 60 * 60
-            context_time = context_time + timedelta(seconds=tz)
-        if today < context_time < tomorrow:
-            return _('today, %s') % context_time.strftime('%H:%M')
-        elif yesterday < context_time < today:
-            return _('yesterday, %s') % context_time.strftime('%H:%M')
+def pybb_user_time(context_time, user):
+    delta = tznow() - context_time
+    today = tznow().replace(hour=0, minute=0, second=0)
+    yesterday = today - timedelta(days=1)
+    tomorrow = today + timedelta(days=1)
+
+    if delta.days == 0:
+        if delta.seconds < 60:
+            msg = ungettext('%d second ago', '%d seconds ago', delta.seconds)
+            return msg % delta.seconds
+        elif delta.seconds < 3600:
+            minutes = int(delta.seconds / 60)
+            msg = ungettext('%d minute ago', '%d minutes ago', minutes)
+            return msg % minutes
+    if context['user'].is_authenticated():
+        if time.daylight:
+            tz1 = time.altzone
         else:
-            return dateformat.format(context_time, 'd M, Y H:i')
+            tz1 = time.timezone
+        tz = tz1 + util.get_pybb_profile(context['user']).time_zone * 60 * 60
+        context_time = context_time + timedelta(seconds=tz)
+    if today < context_time < tomorrow:
+        return _('today, %s') % context_time.strftime('%H:%M')
+    elif yesterday < context_time < today:
+        return _('yesterday, %s') % context_time.strftime('%H:%M')
+    else:
+        return dateformat.format(context_time, 'd M, Y H:i')
 
 
 @register.simple_tag

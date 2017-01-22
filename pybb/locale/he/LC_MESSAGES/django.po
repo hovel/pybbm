@@ -7,567 +7,1124 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-29 21:12+0600\n"
+"POT-Creation-Date: 2017-01-11 14:06+0100\n"
 "PO-Revision-Date: 2009-04-04 18:14+0200\n"
 "Last-Translator: isoTop <isotop@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: admin.py:23 admin.py:42 admin.py:61 admin.py:88
+#: admin.py:45 admin.py:84 admin.py:112 admin.py:134
 msgid "Additional options"
 msgstr "אפשרויות נוספות"
 
-#: admin.py:66 models.py:193
+#: admin.py:117 models.py:280
 msgid "Message"
 msgstr "הודעה"
 
-#: admin.py:83
-msgid "IM"
-msgstr "IM"
-
-#: admin.py:93
+#: admin.py:148
 #, fuzzy
-msgid "Ban options"
-msgstr "אפשרויות נוספות"
+#| msgid "Views count"
+msgid "View post"
+msgstr "מס' קריאות"
 
-#: feeds.py:21 feeds.py:22 templates/pybb/base.html:13
+#: admin.py:153
+#, fuzzy
+#| msgid "Editing the post"
+msgid "Edit post"
+msgstr "עורך את ההודעה"
+
+#: apps.py:9
+msgid "Pybbm forum solution"
+msgstr ""
+
+#: feeds.py:27 feeds.py:28 templates/pybb/base.html:10
 msgid "Latest posts on forum"
 msgstr "הודעות אחרונות בפורום"
 
-#: feeds.py:31 feeds.py:32 templates/pybb/base.html:14
+#: feeds.py:41 feeds.py:42 templates/pybb/base.html:11
 msgid "Latest topics on forum"
 msgstr "אשכולות אחרונים בפורום"
 
-#: forms.py:14 forms.py:112 models.py:108
-msgid "Subject"
-msgstr "נושא"
-
-#: forms.py:15 templates/pybb/post_template.html:61
-msgid "Attachment"
-msgstr "קובץ מצורף"
-
-#: forms.py:42
+#: forms.py:30
 msgid "Attachment is too big"
 msgstr "הקובץ המצורף גדול מידי"
 
-#: models.py:39 models.py:67 models.py:327
-msgid "Name"
-msgstr "שם"
+#: forms.py:48
+#, python-format
+msgid "You cant add more than %s answers for poll"
+msgstr ""
 
-#: models.py:40 models.py:68
-msgid "Position"
+#: forms.py:50
+msgid "Add two or more answers for this poll"
+msgstr ""
+
+#: forms.py:58 models.py:183
+msgid "Subject"
+msgstr "נושא"
+
+#: forms.py:59 models.py:195
+msgid "Poll type"
+msgstr ""
+
+#: forms.py:61 models.py:196
+#, fuzzy
+#| msgid "Position"
+msgid "Poll question"
 msgstr "מיקום"
 
-#: models.py:44 models.py:66
-msgid "Category"
-msgstr "קטגוריה"
+#: forms.py:64
+#, fuzzy
+#| msgid "Topics"
+msgid "Topic slug"
+msgstr "אשכולות"
 
-#: models.py:45
-msgid "Categories"
-msgstr "קטגוריות"
+#: forms.py:123
+msgid "Polls question is required when adding a poll"
+msgstr ""
 
-#: models.py:69
-msgid "Description"
-msgstr "תיאור"
-
-#: models.py:70
-msgid "Moderators"
-msgstr "מנהלים"
-
-#: models.py:71 models.py:110 models.py:191
-msgid "Updated"
-msgstr "מעודכן"
-
-#: models.py:72 models.py:116
-msgid "Post count"
-msgstr "מס' הודעות"
-
-#: models.py:76 models.py:107
-msgid "Forum"
-msgstr "פורום"
-
-#: models.py:77
-msgid "Forums"
-msgstr "פורומים"
-
-#: models.py:109 models.py:190
-msgid "Created"
-msgstr "נוצר"
-
-#: models.py:111 models.py:189 models.py:251 models.py:303
+#: forms.py:176 models.py:186 models.py:295 models.py:368 models.py:507
 msgid "User"
 msgstr "משתמש"
 
-#: models.py:112
+#: forms.py:212
+#, python-format
+msgid "Avatar is too large, max size: %s bytes"
+msgstr ""
+
+#: forms.py:272
+msgid "be unsubscribe from this forum"
+msgstr ""
+
+#: forms.py:277
+msgid "You want to"
+msgstr ""
+
+#: forms.py:281
+#, fuzzy
+#| msgid "New topic"
+msgid "only new topics"
+msgstr "אשכול חדש"
+
+#: forms.py:282
+#, fuzzy
+#| msgid "Latest topics on forum"
+msgid "all topics of the forum"
+msgstr "אשכולות אחרונים בפורום"
+
+#: forms.py:285
+#, fuzzy
+msgid "Concerned topics"
+msgstr "אשכול חדש"
+
+#: models.py:23 models.py:59
+msgid "Name"
+msgstr "שם"
+
+#: models.py:24 models.py:60
+msgid "Position"
+msgstr "מיקום"
+
+#: models.py:25 models.py:66 templates/pybb/category.html:4
+#: templates/pybb/forum_list.html:26
+msgid "Hidden"
+msgstr ""
+
+#: models.py:26
+msgid "If checked, this category will be visible only for staff"
+msgstr ""
+
+#: models.py:27 models.py:69 models.py:197
+msgid "Slug"
+msgstr ""
+
+#: models.py:31 models.py:56
+msgid "Category"
+msgstr "קטגוריה"
+
+#: models.py:32
+msgid "Categories"
+msgstr "קטגוריות"
+
+#: models.py:57
+msgid "Parent forum"
+msgstr ""
+
+#: models.py:61
+msgid "Description"
+msgstr "תיאור"
+
+#: models.py:62
+msgid "Moderators"
+msgstr "מנהלים"
+
+#: models.py:63 models.py:185 models.py:297
+msgid "Updated"
+msgstr "מעודכן"
+
+#: models.py:64 models.py:192 profiles.py:41
+msgid "Post count"
+msgstr "מס' הודעות"
+
+#: models.py:65
+#, fuzzy
+#| msgid "Post count"
+msgid "Topic count"
+msgstr "מס' הודעות"
+
+#: models.py:68
+msgid "Headline"
+msgstr ""
+
+#: models.py:73 models.py:136 models.py:182 templates/pybb/forum_list.html:8
+msgid "Forum"
+msgstr "פורום"
+
+#: models.py:74
+msgid "Forums"
+msgstr "פורומים"
+
+#: models.py:129
+msgid "be notified only when a new topic is added"
+msgstr ""
+
+#: models.py:130
+msgid "be auto-subscribed to topics"
+msgstr ""
+
+#: models.py:134
+#, fuzzy
+#| msgid "Subscribers"
+msgid "Subscriber"
+msgstr "נרשמים"
+
+#: models.py:138
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscription type"
+msgstr "הרשמה לאשכולות"
+
+#: models.py:148
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscription to forum"
+msgstr "הרשמה לאשכולות"
+
+#: models.py:149
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscriptions to forums"
+msgstr "הרשמה לאשכולות"
+
+#: models.py:177
+msgid "None"
+msgstr ""
+
+#: models.py:178
+msgid "Single answer"
+msgstr ""
+
+#: models.py:179
+msgid "Multiple answers"
+msgstr ""
+
+#: models.py:184 models.py:296
+msgid "Created"
+msgstr "נוצר"
+
+#: models.py:187
 msgid "Views count"
 msgstr "מס' קריאות"
 
-#: models.py:113
+#: models.py:188 templates/pybb/topic_list.html:27
 msgid "Sticky"
 msgstr "דביק"
 
-#: models.py:114 templates/pybb/forum.html:24
+#: models.py:189 templates/pybb/topic_list.html:28
 msgid "Closed"
 msgstr "סגור"
 
-#: models.py:115
+#: models.py:191 templates/pybb/topic.html:88
 msgid "Subscribers"
 msgstr "נרשמים"
 
-#: models.py:120 models.py:188 models.py:304
+#: models.py:194 models.py:299
+#, fuzzy
+#| msgid "Moderators"
+msgid "On moderation"
+msgstr "מנהלים"
+
+#: models.py:201 models.py:294 models.py:483 templates/pybb/topic_list.html:7
 msgid "Topic"
 msgstr "אשכול"
 
-#: models.py:121 templates/pybb/forum.html:36
-#: templates/pybb/quick_access.html:47 templates/pybb/user_posts.html:19
-#: templates/pybb/user_topics.html:25
+#: models.py:202 templates/pybb/forum_list.html:11
+#: templates/pybb/user_topics.html:7
 msgid "Topics"
 msgstr "אשכולות"
 
-#: models.py:192
-msgid "Markup"
-msgstr "שפת סימון"
-
-#: models.py:194
+#: models.py:281
 msgid "HTML version"
 msgstr "גרסת HTML"
 
-#: models.py:195
+#: models.py:282
 msgid "Text version"
 msgstr "גרסת טקסט"
 
-#: models.py:196
+#: models.py:298
 msgid "User IP"
 msgstr "IP משתמש"
 
-#: models.py:201 models.py:323
+#: models.py:303 models.py:386
 msgid "Post"
 msgstr "הודעה"
 
-#: models.py:202 templates/pybb/quick_access.html:50
-#: templates/pybb/topic.html:29 templates/pybb/topic.html.py:42
+#: models.py:304 templates/pybb/forum_list.html:14
+#: templates/pybb/topic.html:42 templates/pybb/topic_list.html:10
+#: templates/pybb/user_posts.html:7
 msgid "Posts"
 msgstr "הודעות"
 
-#: models.py:246
-msgid "No"
-msgstr ""
+#: models.py:371
+msgid "Profile"
+msgstr "פרופיל"
 
-#: models.py:247
+#: models.py:372
+msgid "Profiles"
+msgstr "פרופילים"
+
+#: models.py:383
+msgid "Attachment"
+msgstr "קובץ מצורף"
+
+#: models.py:384
 #, fuzzy
-msgid "Caution"
-msgstr "מיקום"
+#| msgid "Attachment"
+msgid "Attachments"
+msgstr "קובץ מצורף"
 
-#: models.py:248
-msgid "Ban"
+#: models.py:387
+msgid "Size"
+msgstr "גודל"
+
+#: models.py:388
+msgid "File"
 msgstr ""
 
-#: models.py:252 templates/pybb/user.html:46
-msgid "Site"
-msgstr "אתר"
+#: models.py:438
+msgid "Topic read tracker"
+msgstr ""
 
-#: models.py:253
-msgid "Jabber"
-msgstr "Jabber"
+#: models.py:439
+msgid "Topic read trackers"
+msgstr ""
 
-#: models.py:254
-msgid "ICQ"
-msgstr "ICQ"
+#: models.py:476
+msgid "Forum read tracker"
+msgstr ""
 
-#: models.py:255
-msgid "MSN"
-msgstr "MSN"
+#: models.py:477
+msgid "Forum read trackers"
+msgstr ""
 
-#: models.py:256
-msgid "AIM"
-msgstr "AIM"
+#: models.py:484
+msgid "Text"
+msgstr ""
 
-#: models.py:257
-msgid "Yahoo"
-msgstr "Yahoo"
+#: models.py:487 models.py:506
+msgid "Poll answer"
+msgstr ""
 
-#: models.py:258 templates/pybb/user.html:43
-msgid "Location"
-msgstr "מיקום"
+#: models.py:488
+msgid "Polls answers"
+msgstr ""
 
-#: models.py:259
+#: models.py:511
+msgid "Poll answer user"
+msgstr ""
+
+#: models.py:512
+msgid "Polls answers users"
+msgstr ""
+
+#: models.py:535
+#, python-format
+msgid ""
+"After %(limit)s attemps, there is not any unique slug value for \"%(slug)s\""
+msgstr ""
+
+#: profiles.py:34
 msgid "Signature"
 msgstr "חתימה"
 
-#: models.py:260
+#: profiles.py:35
 #, fuzzy
 msgid "Signature HTML Version"
 msgstr "גרסת HTML"
 
-#: models.py:261
+#: profiles.py:37
 msgid "Time zone"
 msgstr "אזור זמן"
 
-#: models.py:262
+#: profiles.py:38
 msgid "Language"
 msgstr "שפה"
 
-#: models.py:264
-msgid "Avatar"
-msgstr "אוואטר"
-
-#: models.py:265
+#: profiles.py:40
 msgid "Show signatures"
 msgstr "הראה חתימות"
 
-#: models.py:266
-msgid "Default markup"
-msgstr "שפת סימון ברירת מחדל"
+#: profiles.py:42
+msgid "Avatar"
+msgstr "אוואטר"
 
-#: models.py:267
-msgid "Ban status"
+#: profiles.py:44
+msgid "Automatically subscribe"
 msgstr ""
 
-#: models.py:268
-msgid "Ban till"
+#: profiles.py:45
+msgid "Automatically subscribe to topics that you answer"
 msgstr ""
 
-#: models.py:271
-msgid "Profile"
-msgstr "פרופיל"
+#: templates/pybb/_button_forum_subscription.html:1
+#, fuzzy
+#| msgid "Description"
+msgid "Manage subscription"
+msgstr "תיאור"
 
-#: models.py:272
-msgid "Profiles"
-msgstr "פרופילים"
+#: templates/pybb/_button_forum_subscription.html:1
+#: templates/pybb/topic.html:72
+msgid "Subscribe"
+msgstr "הרשמה"
 
-#: models.py:305
-msgid "Time"
-msgstr "זמן"
-
-#: models.py:309
-msgid "Read"
-msgstr "קריאה"
-
-#: models.py:310
-msgid "Reads"
-msgstr "קריאות"
-
-#: models.py:324
-msgid "Size"
-msgstr "גודל"
-
-#: models.py:325
-msgid "Content type"
-msgstr "סוג התוכן"
-
-#: models.py:326
-msgid "Path"
-msgstr "כתובת"
-
-#: models.py:328
-msgid "Hash"
-msgstr "תצריף"
-
-#: subscription.py:11
-#, python-format
-msgid ""
-"New reply from %(username)s to topic that you have subscribed on.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"See topic: %(post_url)s\n"
-"Unsubscribe %(unsubscribe_url)s"
-msgstr ""
-"הודעה חדשה מ %(username)s באשכול שנרשמת אליו.\n"
-"---\n"
-"%(message)s\n"
-"---\n"
-"צפה באשכול: %(post_url)s\n"
-"בטל הרשמה %(unsubscribe_url)s"
-
-#: views.py:199
-#, python-format
-msgid "Added after %s minute"
-msgid_plural "Added after %s minutes"
-msgstr[0] ""
-msgstr[1] ""
-
-#: templates/pybb/add_post.html:23
-msgid "You banned"
-msgstr ""
-
-#: templates/pybb/add_post.html:27 templates/pybb/add_post.html.py:29
-#: templates/pybb/category.html:11 templates/pybb/create_pm.html:7
-#: templates/pybb/edit_post.html:21 templates/pybb/forum.html:12
-#: templates/pybb/topic.html:26
-msgid "Root"
-msgstr "בית"
-
-#: templates/pybb/add_post.html:33 templates/pybb/add_post_form.html:9
-#: templates/pybb/forum.html:40
+#: templates/pybb/_button_new_topic.html:1 templates/pybb/add_post.html:5
+#: templates/pybb/add_post.html.py:32
 msgid "New topic"
 msgstr "אשכול חדש"
 
-#: templates/pybb/add_post.html:33 templates/pybb/add_post_form.html:9
-msgid "New reply"
-msgstr "תגובה חדשה"
+#: templates/pybb/_button_save.html:1
+msgid "Save"
+msgstr "שמור"
 
-#: templates/pybb/add_post_form.html:5 templates/pybb/add_post_form.html:13
-#: templates/pybb/merge_topics.html:35
-msgid "Preview"
-msgstr "תצוגה מקדימה"
-
-#: templates/pybb/add_post_form.html:12 templates/pybb/create_pm.html:14
+#: templates/pybb/_button_submit.html:1
+#: templates/pybb/forum_subscription.html:33
 msgid "Submit"
 msgstr "שלח"
 
-#: templates/pybb/add_post_form.html:40
-msgid "Remove"
+#: templates/pybb/_markitup.html:25
+#: templates/pybb/markup/bbcode_widget.html:16
+#: templates/pybb/markup/markdown_widget.html:24
+msgid "Bold"
 msgstr ""
 
-#: templates/pybb/create_pm.html:7 templates/pybb/create_pm.html.py:12
-msgid "New private message"
-msgstr "הודעה פרטית חדשה"
+#: templates/pybb/_markitup.html:26
+#: templates/pybb/markup/bbcode_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:25
+msgid "Italic"
+msgstr ""
+
+#: templates/pybb/_markitup.html:27
+#: templates/pybb/markup/bbcode_widget.html:18
+msgid "Underline"
+msgstr ""
+
+#: templates/pybb/_markitup.html:28
+#: templates/pybb/markup/bbcode_widget.html:19
+msgid "Stroke"
+msgstr ""
+
+#: templates/pybb/_markitup.html:30
+#: templates/pybb/markup/bbcode_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:32
+#, fuzzy
+#| msgid "Signature"
+msgid "Picture"
+msgstr "חתימה"
+
+#: templates/pybb/_markitup.html:31
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
+msgid "Link"
+msgstr ""
+
+#: templates/pybb/_markitup.html:33
+#: templates/pybb/markup/bbcode_widget.html:24
+msgid "Bulleted list"
+msgstr ""
+
+#: templates/pybb/_markitup.html:34
+#: templates/pybb/markup/bbcode_widget.html:25
+msgid "Numeric list"
+msgstr ""
+
+#: templates/pybb/_markitup.html:35
+#: templates/pybb/markup/bbcode_widget.html:26
+msgid "List item"
+msgstr ""
+
+#: templates/pybb/_markitup.html:37
+#: templates/pybb/markup/bbcode_widget.html:28
+#: templates/pybb/markup/markdown_widget.html:35
+#, fuzzy
+#| msgid "quote"
+msgid "Quotes"
+msgstr "צטט"
+
+#: templates/pybb/_markitup.html:38
+#: templates/pybb/markup/bbcode_widget.html:29
+msgid "Code"
+msgstr ""
+
+#: templates/pybb/_markitup.html:40
+#: templates/pybb/markup/bbcode_widget.html:31
+msgid "Clean"
+msgstr ""
+
+#: templates/pybb/_markitup.html:41
+#: templates/pybb/markup/bbcode_widget.html:32
+#: templates/pybb/markup/markdown_widget.html:38
+msgid "Preview"
+msgstr "תצוגה מקדימה"
+
+#: templates/pybb/_need_to_login_message.html:2
+msgid "Register"
+msgstr ""
+
+#: templates/pybb/_need_to_login_message.html:2
+msgid "or"
+msgstr ""
+
+#: templates/pybb/_need_to_login_message.html:2
+msgid "login"
+msgstr ""
+
+#: templates/pybb/_need_to_login_message.html:2
+msgid "to create to post a reply"
+msgstr ""
+
+#: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:32
+msgid "New reply"
+msgstr "תגובה חדשה"
+
+#: templates/pybb/attachments_formset.html:6
+#, fuzzy
+#| msgid "Attachment"
+msgid "Add attachments"
+msgstr "קובץ מצורף"
+
+#: templates/pybb/attachments_formset.html:14
+msgid ""
+"If you need to upload larger files, please use an external storage website."
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:14
+#, python-format
+msgid "(max size: %(max_size)s)"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:17
+#: templates/pybb/edit_profile.html:25
+msgid "delete"
+msgstr "מחק"
+
+#: templates/pybb/attachments_formset.html:20
+msgid "Reference to your file"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+msgid "Ref"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#: templates/pybb/topic.html:88 templates/pybb/topic_list.html:32
+msgid ":"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:22
+msgid "link"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:22
+msgid "Insert a link to your file inside your post."
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:23
+msgid "image"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:23
+msgid "Insert your image inside your post."
+msgstr ""
+
+#: templates/pybb/breadcrumb.html:4
+msgid "Home"
+msgstr ""
 
 #: templates/pybb/delete_post.html:5
 msgid "Are you sure you want to delete this message?"
 msgstr "האם אתה בטוח שאתה רוצה למחוק את ההודעה?"
 
-#: templates/pybb/delete_post.html:10
-msgid "Yes, I am sure."
+#: templates/pybb/delete_post.html:12
+msgid "No, take me back"
+msgstr ""
+
+#: templates/pybb/delete_post.html:13
+#, fuzzy
+#| msgid "Yes, I am sure."
+msgid "Yes, I am sure"
 msgstr "כן, אני בטוח."
 
-#: templates/pybb/edit_post.html:24 templates/pybb/edit_post.html.py:28
+#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:17
 msgid "Editing the post"
 msgstr "עורך את ההודעה"
 
-#: templates/pybb/edit_post.html:30 templates/pybb/edit_profile.html:30
-msgid "Save"
-msgstr "שמור"
+#: templates/pybb/edit_privileges.html:5 templates/pybb/edit_privileges.html:8
+msgid "Grant moderator privileges"
+msgstr ""
 
-#: templates/pybb/edit_profile.html:20 templates/pybb/edit_profile.html:28
+#: templates/pybb/edit_profile.html:5 templates/pybb/edit_profile.html.py:8
+#: templates/pybb/edit_profile.html:13
 msgid "Profile editing"
 msgstr "עריכת פרופיל"
 
-#: templates/pybb/edit_profile.html:24
-msgid "Change the password"
-msgstr "שנה את הסיסמה"
-
-#: templates/pybb/edit_profile.html:33
+#: templates/pybb/edit_profile.html:18
 msgid "Subscriptions on topics"
 msgstr "הרשמה לאשכולות"
 
-#: templates/pybb/edit_profile.html:40
-msgid "delete"
-msgstr "מחק"
+#: templates/pybb/forum_list.html:17
+msgid "Last posts"
+msgstr "הודעות אחרונות"
 
-#: templates/pybb/footer.html:15
-msgid "PYBB - django forum engine"
-msgstr "PYBB - django forum engine"
-
-#: templates/pybb/forum.html:25
-msgid "Important"
-msgstr "חשוב"
-
-#: templates/pybb/head.html:10 templates/pybb/head.html.py:46
-#: templates/pybb/users.html:9
-msgid "Search"
-msgstr "חיפוש"
-
-#: templates/pybb/head.html:11 templates/pybb/quick_access.html:53
-#: templates/pybb/users.html:6 templates/pybb/users.html.py:20
-msgid "Users"
-msgstr "משתמשים"
-
-#: templates/pybb/head.html:13
-msgid "My profile"
-msgstr "הפרופיל שלי"
-
-#: templates/pybb/head.html:15
-msgid "Admincp"
-msgstr "פאנל ניהול"
-
-#: templates/pybb/head.html:17
-msgid "Log out"
-msgstr "התנתק"
-
-#: templates/pybb/head.html:18
-msgid "Logged in as "
-msgstr "מחובר בתור"
-
-#: templates/pybb/head.html:20
-msgid "Sign up"
-msgstr "הרשם"
-
-#: templates/pybb/head.html:21
-msgid "Log in"
-msgstr "התחבר"
-
-#: templates/pybb/head.html:47
-msgid "Search powered by Google"
-msgstr "Search powered by Google"
-
-#: templates/pybb/merge_topics.html:11
-msgid "Enter topic id for add to merged topics"
+#: templates/pybb/forum_list.html:43
+msgid "No forums created"
 msgstr ""
 
-#: templates/pybb/merge_topics.html:16
-msgid "Add"
+#: templates/pybb/forum_list.html:44
+msgid "Add forum now"
 msgstr ""
 
-#: templates/pybb/merge_topics.html:24
-msgid "Choose main topic to merge"
+#: templates/pybb/forum_subscription.html:4
+#, python-format
+msgctxt "page title"
+msgid "%(forum)s - Subscription"
 msgstr ""
 
-#: templates/pybb/merge_topics.html:31
+#: templates/pybb/forum_subscription.html:14
+#, python-format
+msgctxt "content heading"
+msgid "%(forum)s - Subscription"
+msgstr ""
+
+#: templates/pybb/forum_subscription.html:32
+msgid "Cancel"
+msgstr ""
+
+#: templates/pybb/index.html:17
+msgid "Forum categories are not created"
+msgstr ""
+
+#: templates/pybb/index.html:18
+msgid "Add a category now"
+msgstr ""
+
+#: templates/pybb/index.html:22 templates/pybb/latest_topics.html:5
+#: templates/pybb/latest_topics.html:8 templates/pybb/latest_topics.html:15
 #, fuzzy
-msgid "Merge"
-msgstr "הודעה"
+#| msgid "Last topics"
+msgid "Last updates in topics"
+msgstr "אשכולות אחרונות"
 
-#: templates/pybb/merge_topics.html:35
-msgid "Posts from changed topics"
+#: templates/pybb/index.html:23
+msgid "Mark all forums as read"
 msgstr ""
 
-#: templates/pybb/merge_topics.html:36 templates/pybb/user.html:26
-msgid "Number of posts"
-msgstr "מס' הודעות"
-
-#: templates/pybb/pagination.html:6
-msgid "Enter page number"
+#: templates/pybb/latest_topics.html:31
+msgid "Mark all topics as read"
 msgstr ""
 
-#: templates/pybb/pagination.html:15 templates/pybb/pagination.html.py:23
-msgid "of"
-msgstr "מתוך"
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:4
+#, python-format
+msgid ""
+"User %(username)s post a new topic in forum to which you are subscribed "
+"(%(forum_name)s)."
+msgstr ""
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#, fuzzy
+#| msgid "Stick topic"
+msgid "Link to topic"
+msgstr "דביק"
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+msgid "Link to forum"
+msgstr ""
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+msgid ""
+"If you don't want to receive notifications on new topics in this forum visit "
+"following link"
+msgstr ""
+
+#: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
+msgid "New topic in forum that you subscribed."
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:7
+#: templates/pybb/mail_templates/subscription_email_body.html:3
+#, python-format
+msgid "User %(username)s replied in topic to which you are subscribed."
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:10
+#, python-format
+msgid ""
+"Follow %(link_post_start)sthis link%(link_end)s to see the new post on the "
+"topic %(link_topic_start)s%(topic_name)s%(link_end)s."
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:14
+#, python-format
+msgid ""
+"If you don't want to receive notifications on new posts in this topic visit "
+"%(link_start)sthis link%(link_end)s."
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#, fuzzy
+#| msgid "Editing the post"
+msgid "Link to post"
+msgstr "עורך את ההודעה"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:8
+#, python-format
+msgid ""
+"If you don't want to receive notifications on new messages in this topic "
+"visit following link: %(delete_url_full)s"
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_subject.html:2
+msgid "New answer in topic that you subscribed."
+msgstr ""
+
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
+msgid "Your text to link here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:17
+msgid "First Level Heading"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:18
+#: templates/pybb/markup/markdown_widget.html:19
+#: templates/pybb/markup/markdown_widget.html:20
+#: templates/pybb/markup/markdown_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:22
+msgid "Your title here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:18
+msgid "Second Level Heading"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:19
+msgid "Heading 3"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:20
+msgid "Heading 4"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:21
+msgid "Heading 5"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:22
+msgid "Heading 6"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:27
+msgid "Bulleted List"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:28
+msgid "Numeric List"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:36
+msgid "Code Block / Code"
+msgstr ""
+
+#: templates/pybb/pagination.html:7
+msgid "previous page"
+msgstr ""
 
 #: templates/pybb/pagination.html:21
-msgid "Go to page..."
+msgid "next page"
 msgstr ""
 
-#: templates/pybb/pagination.html:22
-#: templates/pybb/topic_mini_pagination.html:3
-msgid "Page"
+#: templates/pybb/poll.html:4
+msgid "Poll"
 msgstr ""
 
-#: templates/pybb/post_template.html:26 templates/pybb/user.html:19
-msgid "Expire"
+#: templates/pybb/poll.html:36
+msgid "Cancel my poll vote"
 msgstr ""
 
-#: templates/pybb/post_template.html:34
+#: templates/pybb/poll_edit_form.html:7
+msgid "Poll answers"
+msgstr ""
+
+#: templates/pybb/poll_edit_form.html:20
+msgid "remove answer"
+msgstr ""
+
+#: templates/pybb/poll_edit_form.html:21
+msgid "add answer"
+msgstr ""
+
+#: templates/pybb/post_template.html:28
+#, python-format
+msgid "Rank: %(rank)s"
+msgstr ""
+
+#: templates/pybb/post_template.html:41 templates/pybb/user.html:51
 msgid "Edit"
 msgstr "ערוך"
 
-#: templates/pybb/post_template.html:39
+#: templates/pybb/post_template.html:45
 #, fuzzy
 msgid "Delete post?"
 msgstr "מחק"
 
-#: templates/pybb/post_template.html:40
+#: templates/pybb/post_template.html:46
 msgid "Delete"
 msgstr "מחק"
 
-#: templates/pybb/post_template.html:55
+#: templates/pybb/post_template.html:49
+msgid "Approve post"
+msgstr ""
+
+#: templates/pybb/post_template.html:53 templates/pybb/topic.html:62
+#, fuzzy
+#| msgid "Admincp"
+msgid "Admin"
+msgstr "פאנל ניהול"
+
+#: templates/pybb/post_template.html:69
 msgid "Edited"
 msgstr "נערך"
 
-#: templates/pybb/post_template.html:66
+#: templates/pybb/post_template.html:83
 msgid "quote"
 msgstr "צטט"
 
-#: templates/pybb/quick_access.html:16
-msgid "Last topics"
-msgstr "אשכולות אחרונות"
+#: templates/pybb/post_template.html:84
+msgid "quote selected"
+msgstr ""
 
-#: templates/pybb/quick_access.html:17
-msgid "Last posts"
-msgstr "הודעות אחרונות"
-
-#: templates/pybb/quick_access.html:18 templates/pybb/user.html:25
-msgid "Statistics"
-msgstr "סטטיסטיקה"
-
-#: templates/pybb/topic.html:48
+#: templates/pybb/topic.html:51
 msgid "Unstick topic"
 msgstr "בטל דביק"
 
-#: templates/pybb/topic.html:50
+#: templates/pybb/topic.html:53
 msgid "Stick topic"
 msgstr "דביק"
 
-#: templates/pybb/topic.html:54
+#: templates/pybb/topic.html:57
 msgid "Open topic"
 msgstr "פתח אשכול"
 
-#: templates/pybb/topic.html:56
+#: templates/pybb/topic.html:59
 msgid "Close topic"
 msgstr "סגור אשכול"
 
-#: templates/pybb/topic.html:59
-#, fuzzy
-msgid "Merge topics"
-msgstr "אשכול חדש"
-
-#: templates/pybb/topic.html:63
+#: templates/pybb/topic.html:70
 msgid "Unsubscribe"
 msgstr "ביטול הרשמה"
 
-#: templates/pybb/topic.html:65
-msgid "Subscribe"
-msgstr "הרשמה"
+#: templates/pybb/topic_list.html:13
+#, fuzzy
+#| msgid "Views count"
+msgid "Views"
+msgstr "מס' קריאות"
 
-#: templates/pybb/user.html:30
-msgid "Find all posts"
+#: templates/pybb/topic_list.html:16
+#, fuzzy
+#| msgid "Last posts"
+msgid "Last post"
+msgstr "הודעות אחרונות"
+
+#: templates/pybb/topic_list.html:26
+msgid "Go to first unread post"
 msgstr ""
 
-#: templates/pybb/user.html:34
-msgid "Number of topics"
+#: templates/pybb/topic_list.html:32
+#, fuzzy
+msgid "pages"
+msgstr "הודעה"
+
+#: templates/pybb/user.html:16
+msgid "Statistics"
+msgstr "סטטיסטיקה"
+
+#: templates/pybb/user.html:19
+#, fuzzy, python-format
+#| msgid "Number of topics"
+msgid "Number of topics: %(count)s"
 msgstr "מס' אשכולות"
 
-#: templates/pybb/user.html:37
-#, fuzzy
-msgid "Find all topics"
-msgstr "אשכולות אחרונות"
+#: templates/pybb/user.html:24
+#, fuzzy, python-format
+#| msgid "Number of posts"
+msgid "Number of posts: %(count)s"
+msgstr "מס' הודעות"
 
-#: templates/pybb/user.html:40
-msgid "Date of registration"
+#: templates/pybb/user.html:29
+#, fuzzy, python-format
+#| msgid "Date of registration"
+msgid "Date of registration: %(date_joined)s "
 msgstr "תאריך הרשמה"
 
-#: templates/pybb/user.html:41
-msgid "Contacts"
-msgstr "אנשי קשר"
+#: templates/pybb/user.html:36
+#, fuzzy
+#| msgid "Moderators"
+msgid "Moderator"
+msgstr "מנהלים"
 
-#: templates/pybb/user_topics.html:6 templates/pybb/user_topics.html.py:11
+#: templates/pybb/user.html:41
+msgid "Block"
+msgstr ""
+
+#: templates/pybb/user.html:42
+msgid "Block and delete all messages"
+msgstr ""
+
+#: templates/pybb/user.html:46
+msgid "Unblock"
+msgstr ""
+
+#: templates/pybb/user_posts.html:12 templates/pybb/user_posts.html.py:17
+msgid "All posts created by"
+msgstr ""
+
+#: templates/pybb/user_topics.html:12 templates/pybb/user_topics.html.py:17
 msgid "All topics created by"
 msgstr ""
 
-#: templatetags/pybb_tags.py:58
-msgid "seconds ago,seconds ago,seconds ago"
-msgstr "שניות,שניות,שניות"
+#: templates/pybb/users.html:8 templates/pybb/users.html.py:24
+msgid "Users"
+msgstr "משתמשים"
+
+#: templates/pybb/users.html:12
+msgid "Search"
+msgstr "חיפוש"
 
 #: templatetags/pybb_tags.py:61
-msgid "seconds ago"
-msgstr "שניות"
+#, fuzzy, python-format
+#| msgid "seconds ago"
+msgid "%d second ago"
+msgid_plural "%d seconds ago"
+msgstr[0] "שניות"
+msgstr[1] "שניות"
 
-#: templatetags/pybb_tags.py:67
-msgid "minutes ago,minutes ago,minutes ago"
-msgstr "דקות,דקות,דקות"
+#: templatetags/pybb_tags.py:65
+#, fuzzy, python-format
+#| msgid "minutes ago"
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "דקות"
+msgstr[1] "דקות"
 
-#: templatetags/pybb_tags.py:70
-msgid "minutes ago"
-msgstr "דקות"
-
-#: templatetags/pybb_tags.py:80
+#: templatetags/pybb_tags.py:75
 #, python-format
 msgid "today, %s"
 msgstr "היום, %s"
 
-#: templatetags/pybb_tags.py:82
+#: templatetags/pybb_tags.py:77
 #, python-format
 msgid "yesterday, %s"
 msgstr "אתמול, %s"
 
+#: util.py:140
+msgid "Can't get profile for anonymous user"
+msgstr ""
+
+#: views.py:156
+#, fuzzy
+#| msgid "User with login %s does not exist"
+msgid "Forum does not exist"
+msgstr "משתמש עם השם %s לא קיים"
+
+#: views.py:388
+#, fuzzy
+#| msgid "User with login %s does not exist"
+msgid "This topic does not exists"
+msgstr "משתמש עם השם %s לא קיים"
+
+#: views.py:826
+msgid ""
+"Subscription removed. You will not receive emails from this topic unless you "
+"subscribe or post again."
+msgstr ""
+
+#: views.py:837
+msgid ""
+"Subscription added. You will receive email notifications for replies to this "
+"topic."
+msgstr ""
+
+#: views.py:855
+msgid "All forums marked as read"
+msgstr ""
+
+#: views.py:888
+msgid "User successfuly blocked"
+msgstr ""
+
+#: views.py:901
+msgid "User successfuly unblocked"
+msgstr ""
+
+#: views.py:939
+msgid "Privileges updated"
+msgstr ""
+
+#~ msgid "IM"
+#~ msgstr "IM"
+
+#, fuzzy
+#~ msgid "Ban options"
+#~ msgstr "אפשרויות נוספות"
+
+#~ msgid "Markup"
+#~ msgstr "שפת סימון"
+
+#, fuzzy
+#~ msgid "Caution"
+#~ msgstr "מיקום"
+
+#~ msgid "Site"
+#~ msgstr "אתר"
+
+#~ msgid "Jabber"
+#~ msgstr "Jabber"
+
+#~ msgid "ICQ"
+#~ msgstr "ICQ"
+
+#~ msgid "MSN"
+#~ msgstr "MSN"
+
+#~ msgid "AIM"
+#~ msgstr "AIM"
+
+#~ msgid "Yahoo"
+#~ msgstr "Yahoo"
+
+#~ msgid "Location"
+#~ msgstr "מיקום"
+
+#~ msgid "Default markup"
+#~ msgstr "שפת סימון ברירת מחדל"
+
+#~ msgid "Time"
+#~ msgstr "זמן"
+
+#~ msgid "Read"
+#~ msgstr "קריאה"
+
+#~ msgid "Reads"
+#~ msgstr "קריאות"
+
+#~ msgid "Content type"
+#~ msgstr "סוג התוכן"
+
+#~ msgid "Path"
+#~ msgstr "כתובת"
+
+#~ msgid "Hash"
+#~ msgstr "תצריף"
+
+#~ msgid ""
+#~ "New reply from %(username)s to topic that you have subscribed on.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "See topic: %(post_url)s\n"
+#~ "Unsubscribe %(unsubscribe_url)s"
+#~ msgstr ""
+#~ "הודעה חדשה מ %(username)s באשכול שנרשמת אליו.\n"
+#~ "---\n"
+#~ "%(message)s\n"
+#~ "---\n"
+#~ "צפה באשכול: %(post_url)s\n"
+#~ "בטל הרשמה %(unsubscribe_url)s"
+
+#~ msgid "Root"
+#~ msgstr "בית"
+
+#~ msgid "New private message"
+#~ msgstr "הודעה פרטית חדשה"
+
+#~ msgid "Change the password"
+#~ msgstr "שנה את הסיסמה"
+
+#~ msgid "PYBB - django forum engine"
+#~ msgstr "PYBB - django forum engine"
+
+#~ msgid "Important"
+#~ msgstr "חשוב"
+
+#~ msgid "My profile"
+#~ msgstr "הפרופיל שלי"
+
+#~ msgid "Log out"
+#~ msgstr "התנתק"
+
+#~ msgid "Logged in as "
+#~ msgstr "מחובר בתור"
+
+#~ msgid "Sign up"
+#~ msgstr "הרשם"
+
+#~ msgid "Log in"
+#~ msgstr "התחבר"
+
+#~ msgid "Search powered by Google"
+#~ msgstr "Search powered by Google"
+
+#, fuzzy
+#~ msgid "Merge"
+#~ msgstr "הודעה"
+
+#~ msgid "of"
+#~ msgstr "מתוך"
+
+#, fuzzy
+#~ msgid "Find all topics"
+#~ msgstr "אשכולות אחרונות"
+
+#~ msgid "Contacts"
+#~ msgstr "אנשי קשר"
+
+#~ msgid "seconds ago,seconds ago,seconds ago"
+#~ msgstr "שניות,שניות,שניות"
+
+#~ msgid "minutes ago,minutes ago,minutes ago"
+#~ msgstr "דקות,דקות,דקות"
+
 #~ msgid "Recipient"
 #~ msgstr "נמען"
-
-#~ msgid "User with login %s does not exist"
-#~ msgstr "משתמש עם השם %s לא קיים"
 
 #~ msgid "Inbox"
 #~ msgstr "דואר נכנס"
@@ -641,10 +1198,6 @@ msgstr "אתמול, %s"
 #, fuzzy
 #~ msgid "Are you sure you want to delete these messages?"
 #~ msgstr "האם אתה בטוח שאתה רוצה למחוק את ההודעה?"
-
-#, fuzzy
-#~ msgid "Messages"
-#~ msgstr "הודעה"
 
 #, fuzzy
 #~ msgid "From"

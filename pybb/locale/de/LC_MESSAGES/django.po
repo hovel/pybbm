@@ -3,308 +3,397 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-11 13:19+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2017-01-11 14:06+0100\n"
+"PO-Revision-Date: 2017-01-11 14:11+0100\n"
+"Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
+"Language-Team: \n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.6.10\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: ../../..\n"
 
-#: admin.py:38 admin.py:64 admin.py:92 admin.py:114
+#: admin.py:45 admin.py:84 admin.py:112 admin.py:134
 msgid "Additional options"
 msgstr "Zusätzliche Einstellungen"
 
-#: admin.py:97 models.py:231
+#: admin.py:117 models.py:280
 msgid "Message"
 msgstr "Nachricht"
 
-#: admin.py:128
+#: admin.py:148
 msgid "View post"
 msgstr "Beitrag anzeigen"
 
-#: admin.py:133
+#: admin.py:153
 msgid "Edit post"
 msgstr "Beitrag bearbeiten"
 
-#: feeds.py:25 feeds.py:26 templates/pybb/base.html:9
+#: apps.py:9
+msgid "Pybbm forum solution"
+msgstr ""
+
+#: feeds.py:27 feeds.py:28 templates/pybb/base.html:10
 msgid "Latest posts on forum"
 msgstr "Neueste Antworten in Forum"
 
-#: feeds.py:35 feeds.py:36 templates/pybb/base.html:10
+#: feeds.py:41 feeds.py:42 templates/pybb/base.html:11
 msgid "Latest topics on forum"
 msgstr "Neueste Beiträge in Forum"
 
-#: forms.py:31
+#: forms.py:30
 msgid "Attachment is too big"
 msgstr "Anhang ist zu groß"
 
-#: forms.py:51
+#: forms.py:48
 #, python-format
 msgid "You cant add more than %s answers for poll"
 msgstr "Sie können nicht mehr als %s Antworten pro Umfrage hinzufügen"
 
-#: forms.py:53
+#: forms.py:50
 msgid "Add two or more answers for this poll"
 msgstr "Fügen Sie eine oder mehrere Antworten zu dieser Umfrage hinzu"
 
-#: forms.py:61 models.py:156
+#: forms.py:58 models.py:183
 msgid "Subject"
 msgstr "Betreff"
 
-#: forms.py:62 models.py:168
+#: forms.py:59 models.py:195
 msgid "Poll type"
 msgstr "Umfrage Typ"
 
-#: forms.py:64 models.py:169
+#: forms.py:61 models.py:196
 msgid "Poll question"
 msgstr "Frage"
 
-#: forms.py:113
+#: forms.py:64
+#, fuzzy
+#| msgid "Topics"
+msgid "Topic slug"
+msgstr "Themen"
+
+#: forms.py:123
 msgid "Polls question is required when adding a poll"
 msgstr "Zu jeder Umfrage muss eine Frage eingegeben werden"
 
-#: forms.py:159 models.py:159 models.py:245 models.py:350 models.py:433
-#: templates/pybb/mail_templates/subscription_email_body.html:3
+#: forms.py:176 models.py:186 models.py:295 models.py:368 models.py:507
 msgid "User"
 msgstr "Benutzer"
 
-#: forms.py:192
+#: forms.py:212
 #, python-format
 msgid "Avatar is too large, max size: %s bytes"
 msgstr "Avatar ist zu groß (maximal %s Byte)"
 
-#: models.py:62 models.py:93
+#: forms.py:272
+msgid "be unsubscribe from this forum"
+msgstr "sich von diesem Forum abmelden."
+
+#: forms.py:277
+msgid "You want to"
+msgstr "Sie möchten"
+
+#: forms.py:281
+#, fuzzy
+#| msgid "New topic"
+msgid "only new topics"
+msgstr "Neuer Beitrag"
+
+#: forms.py:282
+#, fuzzy
+#| msgid "Latest topics on forum"
+msgid "all topics of the forum"
+msgstr "Neueste Beiträge in Forum"
+
+#: forms.py:285
+#, fuzzy
+#| msgid "Close topic"
+msgid "Concerned topics"
+msgstr "Thema schließen"
+
+#: models.py:23 models.py:59
 msgid "Name"
 msgstr "Name"
 
-#: models.py:63 models.py:94
+#: models.py:24 models.py:60
 msgid "Position"
 msgstr "Position"
 
-#: models.py:64 models.py:100 templates/pybb/category.html:4
-#: templates/pybb/category.html.py:27
+#: models.py:25 models.py:66 templates/pybb/category.html:4
+#: templates/pybb/forum_list.html:26
 msgid "Hidden"
 msgstr "Versteckt"
 
-#: models.py:65
+#: models.py:26
 msgid "If checked, this category will be visible only for staff"
-msgstr "Versteckte Kategorien sind nur für Administratoren und Redakteure sichtbar"
+msgstr ""
+"Versteckte Kategorien sind nur für Administratoren und Redakteure sichtbar"
 
-#: models.py:70 models.py:92
+#: models.py:27 models.py:69 models.py:197
+msgid "Slug"
+msgstr ""
+
+#: models.py:31 models.py:56
 msgid "Category"
 msgstr "Kategorie"
 
-#: models.py:71
+#: models.py:32
 msgid "Categories"
 msgstr "Kategorien"
 
-#: models.py:95
+#: models.py:57
+msgid "Parent forum"
+msgstr ""
+
+#: models.py:61
 msgid "Description"
 msgstr "Beschreibung"
 
-#: models.py:96
+#: models.py:62
 msgid "Moderators"
 msgstr "Moderatoren"
 
-#: models.py:97 models.py:158 models.py:247
+#: models.py:63 models.py:185 models.py:297
 msgid "Updated"
 msgstr "Aktualisiert"
 
-#: models.py:98 models.py:165 models.py:326
+#: models.py:64 models.py:192 profiles.py:41
 msgid "Post count"
 msgstr "Anzahl Antworten"
 
-#: models.py:99
+#: models.py:65
 msgid "Topic count"
 msgstr "Anzahl Beiträge"
 
-#: models.py:102
+#: models.py:68
 msgid "Headline"
 msgstr "Titel"
 
-#: models.py:106 models.py:155 templates/pybb/category.html:9
+#: models.py:73 models.py:136 models.py:182 templates/pybb/forum_list.html:8
 msgid "Forum"
 msgstr "Forum"
 
-#: models.py:107
+#: models.py:74
 msgid "Forums"
 msgstr "Foren"
 
-#: models.py:150
+#: models.py:129
+msgid "be notified only when a new topic is added"
+msgstr "nur benachrichtigt werden, wenn ein neues Thema hinzugefügt wird"
+
+#: models.py:130
+msgid "be auto-subscribed to topics"
+msgstr "Themen automatisch abonnieren"
+
+#: models.py:134
+#, fuzzy
+#| msgid "Subscribers"
+msgid "Subscriber"
+msgstr "Abonnenten"
+
+#: models.py:138
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscription type"
+msgstr "Themen-Abonnements"
+
+#: models.py:148
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscription to forum"
+msgstr "Themen-Abonnements"
+
+#: models.py:149
+#, fuzzy
+#| msgid "Subscriptions on topics"
+msgid "Subscriptions to forums"
+msgstr "Themen-Abonnements"
+
+#: models.py:177
 msgid "None"
 msgstr "Nichts"
 
-#: models.py:151
+#: models.py:178
 msgid "Single answer"
 msgstr "Eine Antwort"
 
-#: models.py:152
+#: models.py:179
 msgid "Multiple answers"
 msgstr "Mehrere Antworten"
 
-#: models.py:157 models.py:246
+#: models.py:184 models.py:296
 msgid "Created"
 msgstr "Angelegt"
 
-#: models.py:160
+#: models.py:187
 msgid "Views count"
 msgstr "angezeigt"
 
-#: models.py:161 templates/pybb/forum.html:44
+#: models.py:188 templates/pybb/topic_list.html:27
 msgid "Sticky"
 msgstr "Sticky"
 
-#: models.py:162 templates/pybb/forum.html:45
+#: models.py:189 templates/pybb/topic_list.html:28
 msgid "Closed"
 msgstr "Geschlossen"
 
-#: models.py:163 templates/pybb/topic.html:88
+#: models.py:191 templates/pybb/topic.html:88
 msgid "Subscribers"
 msgstr "Abonnenten"
 
-#: models.py:167 models.py:249
+#: models.py:194 models.py:299
 msgid "On moderation"
 msgstr "wird moderiert"
 
-#: models.py:173 models.py:244 models.py:412 templates/pybb/forum.html:25
+#: models.py:201 models.py:294 models.py:483 templates/pybb/topic_list.html:7
 msgid "Topic"
 msgstr "Thema"
 
-#: models.py:174 templates/pybb/category.html:12
-#: templates/pybb/user_posts.html:19 templates/pybb/user_topics.html:22
+#: models.py:202 templates/pybb/forum_list.html:11
+#: templates/pybb/user_topics.html:7
 msgid "Topics"
 msgstr "Themen"
 
-#: models.py:232
+#: models.py:281
 msgid "HTML version"
 msgstr "HTML Version"
 
-#: models.py:233
+#: models.py:282
 msgid "Text version"
 msgstr "Text Version"
 
-#: models.py:248
+#: models.py:298
 msgid "User IP"
 msgstr "Benutzer IP"
 
-#: models.py:253 models.py:366
+#: models.py:303 models.py:386
 msgid "Post"
 msgstr "Beitrag"
 
-#: models.py:254 templates/pybb/category.html:15 templates/pybb/forum.html:28
-#: templates/pybb/topic.html:21 templates/pybb/topic.html.py:41
+#: models.py:304 templates/pybb/forum_list.html:14
+#: templates/pybb/topic.html:42 templates/pybb/topic_list.html:10
+#: templates/pybb/user_posts.html:7
 msgid "Posts"
 msgstr "Beiträge"
 
-#: models.py:315
-msgid "Signature"
-msgstr "Signatur"
-
-#: models.py:317
-msgid "Signature HTML Version"
-msgstr "Signatur HTML Version"
-
-#: models.py:319
-msgid "Time zone"
-msgstr "Zeitzone"
-
-#: models.py:321
-msgid "Language"
-msgstr "Sprache"
-
-#: models.py:324
-msgid "Show signatures"
-msgstr "Signatur anzeigen"
-
-#: models.py:327
-msgid "Avatar"
-msgstr "Avatar"
-
-#: models.py:329
-msgid "Automatically subscribe"
-msgstr "Automatisch abonnieren"
-
-#: models.py:330
-msgid "Automatically subscribe to topics that you answer"
-msgstr "Themen, auf die geantwortet wurde, automatisch abonnieren"
-
-#: models.py:353
+#: models.py:371
 msgid "Profile"
 msgstr "Profil"
 
-#: models.py:354
+#: models.py:372
 msgid "Profiles"
 msgstr "Profile"
 
-#: models.py:363
+#: models.py:383
 msgid "Attachment"
 msgstr "Anhang"
 
-#: models.py:364
+#: models.py:384
 msgid "Attachments"
 msgstr "Anhänge"
 
-#: models.py:367
+#: models.py:387
 msgid "Size"
 msgstr "Größe"
 
-#: models.py:368
+#: models.py:388
 msgid "File"
 msgstr "Datei"
 
-#: models.py:390
+#: models.py:438
 msgid "Topic read tracker"
 msgstr "'Beitrag gelesen' Tracker"
 
-#: models.py:391
+#: models.py:439
 msgid "Topic read trackers"
 msgstr "'Beitrag gelesen' Tracker"
 
-#: models.py:403
+#: models.py:476
 msgid "Forum read tracker"
 msgstr "'Forum gelesen' Tracker"
 
-#: models.py:404
+#: models.py:477
 msgid "Forum read trackers"
 msgstr "'Beitrag gelesen' Tracker"
 
-#: models.py:413
+#: models.py:484
 msgid "Text"
 msgstr "Text"
 
-#: models.py:416 models.py:432
+#: models.py:487 models.py:506
 msgid "Poll answer"
 msgstr "Umfrageantwort"
 
-#: models.py:417
+#: models.py:488
 msgid "Polls answers"
 msgstr "Umfrageantworten"
 
-#: models.py:437
+#: models.py:511
 msgid "Poll answer user"
 msgstr "Umfrageantwort Benutzer"
 
-#: models.py:438
+#: models.py:512
 msgid "Polls answers users"
 msgstr "Umfrageantworten Benutzer"
 
-#: views.py:488
-msgid "All forums marked as read"
-msgstr "Alle Foren wurden als gelesen markiert"
+#: models.py:535
+#, python-format
+msgid ""
+"After %(limit)s attemps, there is not any unique slug value for \"%(slug)s\""
+msgstr ""
 
-#: views.py:498
-msgid "User successfuly blocked"
-msgstr "Benutzer wurde erfolgreich gesperrt"
+#: profiles.py:34
+msgid "Signature"
+msgstr "Signatur"
 
-#: templates/pybb/_button_new_topic.html:1 templates/pybb/add_post.html:24
+#: profiles.py:35
+msgid "Signature HTML Version"
+msgstr "Signatur HTML Version"
+
+#: profiles.py:37
+msgid "Time zone"
+msgstr "Zeitzone"
+
+#: profiles.py:38
+msgid "Language"
+msgstr "Sprache"
+
+#: profiles.py:40
+msgid "Show signatures"
+msgstr "Signatur anzeigen"
+
+#: profiles.py:42
+msgid "Avatar"
+msgstr "Avatar"
+
+#: profiles.py:44
+msgid "Automatically subscribe"
+msgstr "Automatisch abonnieren"
+
+#: profiles.py:45
+msgid "Automatically subscribe to topics that you answer"
+msgstr "Themen, auf die geantwortet wurde, automatisch abonnieren"
+
+#: templates/pybb/_button_forum_subscription.html:1
+#, fuzzy
+#| msgid "Description"
+msgid "Manage subscription"
+msgstr "Beschreibung"
+
+#: templates/pybb/_button_forum_subscription.html:1
+#: templates/pybb/topic.html:72
+msgid "Subscribe"
+msgstr "Abonnieren"
+
+#: templates/pybb/_button_new_topic.html:1 templates/pybb/add_post.html:5
+#: templates/pybb/add_post.html.py:32
 msgid "New topic"
 msgstr "Neuer Beitrag"
 
@@ -313,8 +402,84 @@ msgid "Save"
 msgstr "Speichern"
 
 #: templates/pybb/_button_submit.html:1
+#: templates/pybb/forum_subscription.html:33
 msgid "Submit"
 msgstr "Absenden"
+
+#: templates/pybb/_markitup.html:25
+#: templates/pybb/markup/bbcode_widget.html:16
+#: templates/pybb/markup/markdown_widget.html:24
+msgid "Bold"
+msgstr ""
+
+#: templates/pybb/_markitup.html:26
+#: templates/pybb/markup/bbcode_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:25
+msgid "Italic"
+msgstr ""
+
+#: templates/pybb/_markitup.html:27
+#: templates/pybb/markup/bbcode_widget.html:18
+msgid "Underline"
+msgstr ""
+
+#: templates/pybb/_markitup.html:28
+#: templates/pybb/markup/bbcode_widget.html:19
+msgid "Stroke"
+msgstr ""
+
+#: templates/pybb/_markitup.html:30
+#: templates/pybb/markup/bbcode_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:32
+#, fuzzy
+#| msgid "Signature"
+msgid "Picture"
+msgstr "Signatur"
+
+#: templates/pybb/_markitup.html:31
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
+msgid "Link"
+msgstr ""
+
+#: templates/pybb/_markitup.html:33
+#: templates/pybb/markup/bbcode_widget.html:24
+msgid "Bulleted list"
+msgstr ""
+
+#: templates/pybb/_markitup.html:34
+#: templates/pybb/markup/bbcode_widget.html:25
+msgid "Numeric list"
+msgstr ""
+
+#: templates/pybb/_markitup.html:35
+#: templates/pybb/markup/bbcode_widget.html:26
+msgid "List item"
+msgstr ""
+
+#: templates/pybb/_markitup.html:37
+#: templates/pybb/markup/bbcode_widget.html:28
+#: templates/pybb/markup/markdown_widget.html:35
+#, fuzzy
+#| msgid "quote"
+msgid "Quotes"
+msgstr "zitieren"
+
+#: templates/pybb/_markitup.html:38
+#: templates/pybb/markup/bbcode_widget.html:29
+msgid "Code"
+msgstr ""
+
+#: templates/pybb/_markitup.html:40
+#: templates/pybb/markup/bbcode_widget.html:31
+msgid "Clean"
+msgstr ""
+
+#: templates/pybb/_markitup.html:41
+#: templates/pybb/markup/bbcode_widget.html:32
+#: templates/pybb/markup/markdown_widget.html:38
+msgid "Preview"
+msgstr ""
 
 #: templates/pybb/_need_to_login_message.html:2
 msgid "Register"
@@ -332,34 +497,66 @@ msgstr "Einloggen"
 msgid "to create to post a reply"
 msgstr "Um einen Beitrag oder eine Antwort zu schreiben"
 
-#: templates/pybb/add_post.html:24
+#: templates/pybb/add_post.html:5 templates/pybb/add_post.html.py:32
 msgid "New reply"
 msgstr "Neue Antwort"
 
-#: templates/pybb/attachments_formset.html:4
+#: templates/pybb/attachments_formset.html:6
 msgid "Add attachments"
 msgstr "Anhang hinzufügen"
 
-#: templates/pybb/attachments_formset.html:10
-#: templates/pybb/edit_profile.html:31
+#: templates/pybb/attachments_formset.html:14
+msgid ""
+"If you need to upload larger files, please use an external storage website."
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:14
+#, python-format
+msgid "(max size: %(max_size)s)"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:17
+#: templates/pybb/edit_profile.html:25
 msgid "delete"
 msgstr "löschen"
+
+#: templates/pybb/attachments_formset.html:20
+msgid "Reference to your file"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+msgid "Ref"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:20
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#: templates/pybb/mail_templates/subscription_email_body.html:5
+#: templates/pybb/topic.html:88 templates/pybb/topic_list.html:32
+msgid ":"
+msgstr ""
+
+#: templates/pybb/attachments_formset.html:22
+msgid "link"
+msgstr "Link"
+
+#: templates/pybb/attachments_formset.html:22
+msgid "Insert a link to your file inside your post."
+msgstr "Fügen Sie einen Link zu Ihrer Datei in Ihrem Beitrag."
+
+#: templates/pybb/attachments_formset.html:23
+msgid "image"
+msgstr "Image"
+
+#: templates/pybb/attachments_formset.html:23
+msgid "Insert your image inside your post."
+msgstr "Fügen Sie Ihr Bild in Ihrem Beitrag."
 
 #: templates/pybb/breadcrumb.html:4
 msgid "Home"
 msgstr "Home"
-
-#: templates/pybb/category.html:18
-msgid "Last posts"
-msgstr "Letzte Beiträge"
-
-#: templates/pybb/category.html:45
-msgid "No forums created"
-msgstr "Keine Foren angelegt"
-
-#: templates/pybb/category.html:46
-msgid "Add forum now"
-msgstr "Forum anlegen"
 
 #: templates/pybb/delete_post.html:5
 msgid "Are you sure you want to delete this message?"
@@ -373,175 +570,154 @@ msgstr "Nein, Abbruch"
 msgid "Yes, I am sure"
 msgstr "Ja, ich bin sicher"
 
-#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:13
+#: templates/pybb/edit_post.html:4 templates/pybb/edit_post.html.py:17
 msgid "Editing the post"
 msgstr "Beitrag bearbeiten"
 
-#: templates/pybb/edit_profile.html:4 templates/pybb/edit_profile.html.py:7
-#: templates/pybb/edit_profile.html:19
+#: templates/pybb/edit_privileges.html:5 templates/pybb/edit_privileges.html:8
+msgid "Grant moderator privileges"
+msgstr "Moderatorrechte gewähren"
+
+#: templates/pybb/edit_profile.html:5 templates/pybb/edit_profile.html.py:8
+#: templates/pybb/edit_profile.html:13
 msgid "Profile editing"
 msgstr "Profil bearbeiten"
 
-#: templates/pybb/edit_profile.html:15
-msgid "Change the password"
-msgstr "Passwort ändern"
-
-#: templates/pybb/edit_profile.html:24
+#: templates/pybb/edit_profile.html:18
 msgid "Subscriptions on topics"
 msgstr "Themen-Abonnements"
 
-#: templates/pybb/forum.html:31
-msgid "Views"
-msgstr "Ansichten"
+#: templates/pybb/forum_list.html:17
+msgid "Last posts"
+msgstr "Letzte Beiträge"
 
-#: templates/pybb/forum.html:34
-msgid "Last post"
-msgstr "Letzter Beitrag"
+#: templates/pybb/forum_list.html:43
+msgid "No forums created"
+msgstr "Keine Foren angelegt"
 
-#: templates/pybb/forum.html:49
-msgid "pages"
-msgstr "Seiten"
+#: templates/pybb/forum_list.html:44
+msgid "Add forum now"
+msgstr "Forum anlegen"
 
-#: templates/pybb/index.html:16
+#: templates/pybb/forum_subscription.html:4
+#, python-format
+msgctxt "page title"
+msgid "%(forum)s - Subscription"
+msgstr "%(forum)s - Abonnement"
+
+#: templates/pybb/forum_subscription.html:14
+#, python-format
+msgctxt "content heading"
+msgid "%(forum)s - Subscription"
+msgstr "%(forum)s - Abonnement"
+
+#: templates/pybb/forum_subscription.html:32
+msgid "Cancel"
+msgstr "Stornieren"
+
+#: templates/pybb/index.html:17
 msgid "Forum categories are not created"
 msgstr "Keine Kategorien angelegt"
 
-#: templates/pybb/index.html:17
+#: templates/pybb/index.html:18
 msgid "Add a category now"
 msgstr "Jetzt Kategorie anlegen"
 
-#: templates/pybb/index.html:22
+#: templates/pybb/index.html:22 templates/pybb/latest_topics.html:5
+#: templates/pybb/latest_topics.html:8 templates/pybb/latest_topics.html:15
+msgid "Last updates in topics"
+msgstr "Letzte Updates in den Themen"
+
+#: templates/pybb/index.html:23
 msgid "Mark all forums as read"
 msgstr "Alles als gelesen markieren"
 
-#: templates/pybb/pagination.html:8
-msgid "previous page"
-msgstr "vorherige Seite"
+#: templates/pybb/latest_topics.html:31
+#, fuzzy
+#| msgid "Mark all forums as read"
+msgid "Mark all topics as read"
+msgstr "Alles als gelesen markieren"
 
-#: templates/pybb/pagination.html:22
-msgid "next page"
-msgstr "nächste Seite"
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:4
+#, python-format
+msgid ""
+"User %(username)s post a new topic in forum to which you are subscribed "
+"(%(forum_name)s)."
+msgstr ""
+"Benutzer %(username)s hat in einem Thema geantwortet, das Sie abonniert "
+"haben (%(forum_name)s)."
 
-#: templates/pybb/poll.html:4
-msgid "Poll"
-msgstr "Umfrage"
-
-#: templates/pybb/poll_edit_form.html:5
-msgid "Poll answers"
-msgstr "Antworten zu Umfrage"
-
-#: templates/pybb/poll_edit_form.html:21
-msgid "remove answer"
-msgstr "Antwort löschen"
-
-#: templates/pybb/poll_edit_form.html:22
-msgid "add answer"
-msgstr "Antwort hinzufügen"
-
-#: templates/pybb/post_template.html:21
-msgid "Rank"
-msgstr "Rang"
-
-#: templates/pybb/post_template.html:35 templates/pybb/user.html:38
-msgid "Edit"
-msgstr "bearbeiten"
-
-#: templates/pybb/post_template.html:39
-msgid "Delete post?"
-msgstr "Beitrag löschen?"
-
-#: templates/pybb/post_template.html:40
-msgid "Delete"
-msgstr "löschen"
-
-#: templates/pybb/post_template.html:42
-msgid "Approve post"
-msgstr "Beitrag genehmigen"
-
-#: templates/pybb/post_template.html:47 templates/pybb/topic.html:60
-msgid "Admin"
-msgstr "Administrator"
-
-#: templates/pybb/post_template.html:62
-msgid "Edited"
-msgstr "Bearbeitet"
-
-#: templates/pybb/post_template.html:75
-msgid "quote"
-msgstr "zitieren"
-
-#: templates/pybb/topic.html:49
-msgid "Unstick topic"
-msgstr "'Sticky' aufheben"
-
-#: templates/pybb/topic.html:51
-msgid "Stick topic"
-msgstr "'Sticky' setzen"
-
-#: templates/pybb/topic.html:55
-msgid "Open topic"
-msgstr "Thema öffnen"
-
-#: templates/pybb/topic.html:57
-msgid "Close topic"
-msgstr "Thema schließen"
-
-#: templates/pybb/topic.html:69
-msgid "Unsubscribe"
-msgstr "Abbestellen"
-
-#: templates/pybb/topic.html:71
-msgid "Subscribe"
-msgstr "Abonnieren"
-
-#: templates/pybb/user.html:17
-msgid "Statistics"
-msgstr "Statistik"
-
-#: templates/pybb/user.html:18
-msgid "Number of posts"
-msgstr "Anzahl Beiträge"
-
-#: templates/pybb/user.html:20
-msgid "Number of topics"
-msgstr "Anzahl Themen"
-
-#: templates/pybb/user.html:29
-msgid "Date of registration"
-msgstr "Registrierungsdatum"
-
-#: templates/pybb/user.html:35
-msgid "Block"
-msgstr "Block"
-
-#: templates/pybb/user_topics.html:4 templates/pybb/user_topics.html.py:7
-msgid "All topics created by"
-msgstr "Alle Beiträge von"
-
-#: templates/pybb/users.html:5 templates/pybb/users.html.py:21
-msgid "Users"
-msgstr "Benutzer"
-
-#: templates/pybb/users.html:9
-msgid "Search"
-msgstr "Suche"
-
-#: templates/pybb/mail_templates/subscription_email_body.html:3
-msgid "replied in topic to which you are subscribed."
-msgstr "hat in einem Thema geantwortet, das Sie abonniert haben"
-
-#: templates/pybb/mail_templates/subscription_email_body.html:4
-msgid "Link to post:"
-msgstr "Link zum Beitrag"
-
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:5
 #: templates/pybb/mail_templates/subscription_email_body.html:5
-msgid "Link to topic:"
+#, fuzzy
+#| msgid "Link to topic:"
+msgid "Link to topic"
 msgstr "Link zum Thema"
 
-#: templates/pybb/mail_templates/subscription_email_body.html:8
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:6
+#, fuzzy
+#| msgid "Link to forum:"
+msgid "Link to forum"
+msgstr "Link zum Forum:"
+
+#: templates/pybb/mail_templates/forum_subscription_email_body.html:9
+#, fuzzy
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
 msgid ""
-"If you don't want to recive notifications on new messages in this topic "
-"visit following link:"
+"If you don't want to receive notifications on new topics in this forum visit "
+"following link"
+msgstr ""
+"Wenn Sie keine E-Mails zu diesem Thema mehr erhalten möchten,klicken Sie den "
+"folgenden Link"
+
+#: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
+#, fuzzy
+#| msgid "New answer in topic that you subscribed."
+msgid "New topic in forum that you subscribed."
+msgstr "Neue Antwort im Forum"
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:7
+#: templates/pybb/mail_templates/subscription_email_body.html:3
+#, python-format
+msgid "User %(username)s replied in topic to which you are subscribed."
+msgstr ""
+"Benutzer %(username)s hat in einem Thema geantwortet, das Sie abonniert haben"
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:10
+#, python-format
+msgid ""
+"Follow %(link_post_start)sthis link%(link_end)s to see the new post on the "
+"topic %(link_topic_start)s%(topic_name)s%(link_end)s."
+msgstr ""
+
+#: templates/pybb/mail_templates/subscription_email_body-html.html:14
+#, fuzzy, python-format
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
+msgid ""
+"If you don't want to receive notifications on new posts in this topic visit "
+"%(link_start)sthis link%(link_end)s."
+msgstr ""
+"Wenn Sie keine E-Mails zu diesem Thema mehr erhalten möchten,klicken Sie den "
+"folgenden Link"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:4
+#, fuzzy
+#| msgid "Link to post:"
+msgid "Link to post"
+msgstr "Link zum Beitrag"
+
+#: templates/pybb/mail_templates/subscription_email_body.html:8
+#, fuzzy, python-format
+#| msgid ""
+#| "If you don't want to recive notifications on new messages in this topic "
+#| "visit following link:"
+msgid ""
+"If you don't want to receive notifications on new messages in this topic "
+"visit following link: %(delete_url_full)s"
 msgstr ""
 "Wenn Sie keine E-Mails zu diesem Thema mehr erhalten möchten,klicken Sie den "
 "folgenden Link"
@@ -550,28 +726,293 @@ msgstr ""
 msgid "New answer in topic that you subscribed."
 msgstr "Neue Antwort im Forum"
 
+#: templates/pybb/markup/bbcode_widget.html:22
+#: templates/pybb/markup/markdown_widget.html:33
+msgid "Your text to link here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:17
+msgid "First Level Heading"
+msgstr "Titel 1"
+
+#: templates/pybb/markup/markdown_widget.html:17
+#: templates/pybb/markup/markdown_widget.html:18
+#: templates/pybb/markup/markdown_widget.html:19
+#: templates/pybb/markup/markdown_widget.html:20
+#: templates/pybb/markup/markdown_widget.html:21
+#: templates/pybb/markup/markdown_widget.html:22
+msgid "Your title here..."
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:18
+msgid "Second Level Heading"
+msgstr "Titel 2"
+
+#: templates/pybb/markup/markdown_widget.html:19
+msgid "Heading 3"
+msgstr "Titel 3"
+
+#: templates/pybb/markup/markdown_widget.html:20
+msgid "Heading 4"
+msgstr "Titel 4"
+
+#: templates/pybb/markup/markdown_widget.html:21
+msgid "Heading 5"
+msgstr "Titel 5"
+
+#: templates/pybb/markup/markdown_widget.html:22
+msgid "Heading 6"
+msgstr "Titel 6"
+
+#: templates/pybb/markup/markdown_widget.html:27
+msgid "Bulleted List"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:28
+msgid "Numeric List"
+msgstr ""
+
+#: templates/pybb/markup/markdown_widget.html:36
+msgid "Code Block / Code"
+msgstr ""
+
+#: templates/pybb/pagination.html:7
+msgid "previous page"
+msgstr "vorherige Seite"
+
+#: templates/pybb/pagination.html:21
+msgid "next page"
+msgstr "nächste Seite"
+
+#: templates/pybb/poll.html:4
+msgid "Poll"
+msgstr "Umfrage"
+
+#: templates/pybb/poll.html:36
+msgid "Cancel my poll vote"
+msgstr ""
+
+#: templates/pybb/poll_edit_form.html:7
+msgid "Poll answers"
+msgstr "Antworten zu Umfrage"
+
+#: templates/pybb/poll_edit_form.html:20
+msgid "remove answer"
+msgstr "Antwort löschen"
+
+#: templates/pybb/poll_edit_form.html:21
+msgid "add answer"
+msgstr "Antwort hinzufügen"
+
+#: templates/pybb/post_template.html:28
+#, python-format
+msgid "Rank: %(rank)s"
+msgstr "Rang: %(rank)s"
+
+#: templates/pybb/post_template.html:41 templates/pybb/user.html:51
+msgid "Edit"
+msgstr "bearbeiten"
+
+#: templates/pybb/post_template.html:45
+msgid "Delete post?"
+msgstr "Beitrag löschen?"
+
+#: templates/pybb/post_template.html:46
+msgid "Delete"
+msgstr "löschen"
+
+#: templates/pybb/post_template.html:49
+msgid "Approve post"
+msgstr "Beitrag genehmigen"
+
+#: templates/pybb/post_template.html:53 templates/pybb/topic.html:62
+msgid "Admin"
+msgstr "Administrator"
+
+#: templates/pybb/post_template.html:69
+msgid "Edited"
+msgstr "Bearbeitet"
+
+#: templates/pybb/post_template.html:83
+msgid "quote"
+msgstr "zitieren"
+
+#: templates/pybb/post_template.html:84
+msgid "quote selected"
+msgstr ""
+
+#: templates/pybb/topic.html:51
+msgid "Unstick topic"
+msgstr "'Sticky' aufheben"
+
+#: templates/pybb/topic.html:53
+msgid "Stick topic"
+msgstr "'Sticky' setzen"
+
+#: templates/pybb/topic.html:57
+msgid "Open topic"
+msgstr "Thema öffnen"
+
+#: templates/pybb/topic.html:59
+msgid "Close topic"
+msgstr "Thema schließen"
+
+#: templates/pybb/topic.html:70
+msgid "Unsubscribe"
+msgstr "Abbestellen"
+
+#: templates/pybb/topic_list.html:13
+msgid "Views"
+msgstr "Ansichten"
+
+#: templates/pybb/topic_list.html:16
+msgid "Last post"
+msgstr "Letzter Beitrag"
+
+#: templates/pybb/topic_list.html:26
+msgid "Go to first unread post"
+msgstr ""
+
+#: templates/pybb/topic_list.html:32
+msgid "pages"
+msgstr "Seiten"
+
+#: templates/pybb/user.html:16
+msgid "Statistics"
+msgstr "Statistik"
+
+#: templates/pybb/user.html:19
+#, python-format
+msgid "Number of topics: %(count)s"
+msgstr "Anzahl Themen: %(count)s"
+
+#: templates/pybb/user.html:24
+#, python-format
+msgid "Number of posts: %(count)s"
+msgstr "Anzahl Beiträge: %(count)s"
+
+#: templates/pybb/user.html:29
+#, python-format
+msgid "Date of registration: %(date_joined)s "
+msgstr "Registrierungsdatum: %(date_joined)s "
+
+#: templates/pybb/user.html:36
+msgid "Moderator"
+msgstr "Moderator"
+
+#: templates/pybb/user.html:41
+msgid "Block"
+msgstr "Block"
+
+#: templates/pybb/user.html:42
+msgid "Block and delete all messages"
+msgstr ""
+
+#: templates/pybb/user.html:46
+#, fuzzy
+#| msgid "Block"
+msgid "Unblock"
+msgstr "Block"
+
+#: templates/pybb/user_posts.html:12 templates/pybb/user_posts.html.py:17
+#, fuzzy
+#| msgid "All topics created by"
+msgid "All posts created by"
+msgstr "Alle Beiträge von"
+
+#: templates/pybb/user_topics.html:12 templates/pybb/user_topics.html.py:17
+msgid "All topics created by"
+msgstr "Alle Beiträge von"
+
+#: templates/pybb/users.html:8 templates/pybb/users.html.py:24
+msgid "Users"
+msgstr "Benutzer"
+
+#: templates/pybb/users.html:12
+msgid "Search"
+msgstr "Suche"
+
 #: templatetags/pybb_tags.py:61
-msgid "seconds ago,seconds ago,seconds ago"
-msgstr "vor Sekunden, vor Sekunden, vor Sekunden"
+#, fuzzy, python-format
+#| msgid "seconds ago"
+msgid "%d second ago"
+msgid_plural "%d seconds ago"
+msgstr[0] "vor Sekunden"
+msgstr[1] "vor Sekunden"
 
-#: templatetags/pybb_tags.py:64
-msgid "seconds ago"
-msgstr "vor Sekunden"
+#: templatetags/pybb_tags.py:65
+#, fuzzy, python-format
+#| msgid "minutes ago"
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "vor Minuten"
+msgstr[1] "vor Minuten"
 
-#: templatetags/pybb_tags.py:70
-msgid "minutes ago,minutes ago,minutes ago"
-msgstr "vor Minuten, vor Minuten, vor Minuten"
-
-#: templatetags/pybb_tags.py:73
-msgid "minutes ago"
-msgstr "vor Minuten"
-
-#: templatetags/pybb_tags.py:83
+#: templatetags/pybb_tags.py:75
 #, python-format
 msgid "today, %s"
 msgstr "Heute, %s"
 
-#: templatetags/pybb_tags.py:85
+#: templatetags/pybb_tags.py:77
 #, python-format
 msgid "yesterday, %s"
 msgstr "Gestern, %s"
+
+#: util.py:140
+msgid "Can't get profile for anonymous user"
+msgstr ""
+
+#: views.py:156
+#, fuzzy
+#| msgid "Forum categories are not created"
+msgid "Forum does not exist"
+msgstr "Keine Kategorien angelegt"
+
+#: views.py:388
+msgid "This topic does not exists"
+msgstr ""
+
+#: views.py:826
+msgid ""
+"Subscription removed. You will not receive emails from this topic unless you "
+"subscribe or post again."
+msgstr ""
+
+#: views.py:837
+msgid ""
+"Subscription added. You will receive email notifications for replies to this "
+"topic."
+msgstr ""
+
+#: views.py:855
+msgid "All forums marked as read"
+msgstr "Alle Foren wurden als gelesen markiert"
+
+#: views.py:888
+msgid "User successfuly blocked"
+msgstr "Benutzer wurde erfolgreich gesperrt"
+
+#: views.py:901
+#, fuzzy
+#| msgid "User successfuly blocked"
+msgid "User successfuly unblocked"
+msgstr "Benutzer wurde erfolgreich gesperrt"
+
+#: views.py:939
+msgid "Privileges updated"
+msgstr ""
+
+#~ msgid "Subscribers:"
+#~ msgstr "Abonnenten:"
+
+#~ msgid "Change the password"
+#~ msgstr "Passwort ändern"
+
+#~ msgid "Rank"
+#~ msgstr "Rang"
+
+#~ msgid "seconds ago,seconds ago,seconds ago"
+#~ msgstr "vor Sekunden, vor Sekunden, vor Sekunden"
+
+#~ msgid "minutes ago,minutes ago,minutes ago"
+#~ msgstr "vor Minuten, vor Minuten, vor Minuten"

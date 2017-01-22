@@ -14,13 +14,13 @@
             {% include 'pybb/category.html' %}
         {% endfor %}
     {% else %}
-        <h2>{% trans "Forum categories are not created" %}</h2>
-        <a href="{% url 'admin:pybb_category_add' %}">{% trans "Add a category now" %}</a>
+        <h2>{% trans 'Forum categories are not created' %}</h2>
+        <a href="{% url 'admin:pybb_category_add' %}">{% trans 'Add a category now' %}</a>
     {% endif %}
     {% if user.is_authenticated %}
-        <div id='mark-all-as-read'>
-            <a href='{% url 'pybb:topic_latest' %}'>{% trans "Last updates in topics" %}</a> /
-            <a href='{% url 'pybb:mark_all_as_read' %}'>{% trans "Mark all forums as read" %}</a>
+        <div id="mark-all-as-read">
+            <a href="{% url 'pybb:topic_latest' %}">{% trans 'Last updates in topics' %}</a> /
+            <a href="{% url 'pybb:mark_all_as_read' %}">{% trans 'Mark all forums as read' %}</a>
         </div>
     {% endif %}
 {% endblock content %}

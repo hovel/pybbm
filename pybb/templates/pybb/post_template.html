@@ -24,11 +24,11 @@
                 </a>
             </div>
             {% if post_user_profile.rank %}
-                <div class='rank'>
-                    {% trans "Rank" %}: {{ post_user_profile.rank }}
+                <div class="rank">
+                    {% blocktrans with rank=post_user_profile.rank %}Rank: {{ rank }}{% endblocktrans %}
                     {% if user.is_authenticated and user != post.user %}
-                        <a href='#' class='vote' rel='{{ post_user_profile.get_vote_up_url }}'>+</a>
-                        <a href='#' class='vote' rel='{{ post_user_profile.get_vote_down_url }}'>-</a>
+                        <a href="#" class="vote" rel="{{ post_user_profile.get_vote_up_url }}">+</a>
+                        <a href="#" class="vote" rel="{{ post_user_profile.get_vote_down_url }}">-</a>
                     {% endif %}
                 </div>
             {% endif %}
@@ -38,15 +38,15 @@
 
             <div class="post-controls">
                 {% if user|pybb_may_edit_post:post %}
-                    <a href="{% url 'pybb:edit_post' pk=post.id %}">{% trans "Edit" %}</a>
+                    <a href="{% url 'pybb:edit_post' pk=post.id %}">{% trans 'Edit' %}</a>
                 {% endif %}
                 {% if user|pybb_may_delete_post:post %}
                     <a onclick="pybb_delete_post('{% url 'pybb:delete_post' post.id %}',
-                            'post-{{ post.id }}', '{% trans 'Delete post?' %}'); return false;"
-                       href="{% url 'pybb:delete_post' post.id %}">{% trans "Delete" %}</a>
+                            'post-{{ post.id }}', '{% trans 'Delete post?' as txt %}{{ txt|escapejs }}'); return false;"
+                       href="{% url 'pybb:delete_post' post.id %}">{% trans 'Delete' %}</a>
                 {% endif %}
                 {% if post.on_moderation and user.is_moderator %}
-                    <a href="{% url 'pybb:moderate_post' pk=post.id %}">{% trans "Approve post" %}</a>
+                    <a href="{% url 'pybb:moderate_post' pk=post.id %}">{% trans 'Approve post' %}</a>
                 {% endif %}
 
                 {% if perms.pybb.change_post and user.is_staff %}
@@ -66,23 +66,23 @@
                 {% endif %}
             {% endif %}
             {% if post.updated %}
-                <div class="updated-message">{% trans "Edited" %} {% pybb_time post.updated %}</div>
+                <div class="updated-message">{% trans 'Edited' %} {% pybb_time post.updated %}</div>
             {% endif %}
 
             {% comment %}
                     {% if post.attachment_cache %}
                     {% for attach in post.attachment_cache %}
                     <br/>
-                    {% trans "Attachment" %}: <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
+                    {% trans 'Attachment' %}{% trans ':' %} <a href="{{ attach.get_absolute_url }}">{{ attach.name }}</a> ({{ attach.size_display }})
                     {% endfor %}
                     {% endif %}
             {% endcomment %}
             <div class="post-related">
                 {% if user|pybb_may_create_post:post.topic %}
-                    <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}" class="quote-link">{% trans "quote" %}</a>
-                    <a href="#" class="quote-selected-link">{% trans "quote selected" %}</a>
+                    <a href="{% url 'pybb:add_post' topic.id %}?quote_id={{ post.id }}" class="quote-link">{% trans 'quote' %}</a>
+                    <a href="#" class="quote-selected-link">{% trans 'quote selected' %}</a>
                 {% endif %}
-                <div class='attachments'>
+                <div class="attachments">
                     {% for attachment in post.attachments.all %}
                         <a href="{{ attachment.file.url }}"><img src="{% static 'pybb/img/attachment.png' %}"> {{ attachment.size_display }}</a>
                     {% endfor %}

@@ -17,8 +17,8 @@
 <script type="text/javascript">
   window.onload = function () {
     $('div#poll-answers-formset div.poll-answer-form').formset({
-      deleteText:'{% trans 'remove answer' %}',
-      addText:'{% trans 'add answer' %}',
+      deleteText:'{% trans "remove answer" as txt %}{{ txt|escapejs }}',
+      addText:'{% trans "add answer" as txt %}{{ txt|escapejs }}',
       prefix: 'poll_answers'
     });
 
