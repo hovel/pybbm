@@ -265,7 +265,7 @@ class FeaturesTest(TestCase, SharedTestModule):
     def test_read_tracking(self):
         topic = Topic(name='xtopic', forum=self.forum, user=self.user)
         topic.save()
-        post = self.create_post(topic=topic, user=self.user, body='one')
+        post = self.create_post(topic=topic, user=self.user, body='one', _sleep=True)
         client = Client()
         client.login(username='zeus', password='zeus')
         # Topic status
@@ -288,7 +288,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.assertFalse(
             tree.xpath('//a[@href="%s"]/parent::td[contains(@class,"unread")]' % topic.forum.get_absolute_url()))
         # Post message
-        response = self.create_post_via_http(client, topic_id=topic.id, body='test tracking')
+        response = self.create_post_via_http(client, topic_id=topic.id, body='test tracking', _sleep=True)
         self.assertContains(response, 'test tracking')
         # Topic status - readed
         tree = html.fromstring(client.get(topic.forum.get_absolute_url()).content)
