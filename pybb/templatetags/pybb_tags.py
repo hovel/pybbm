@@ -200,6 +200,8 @@ def pybb_topic_inline_pagination(topic):
 
 @register.filter
 def pybb_topic_poll_not_voted(topic, user):
+    if user.is_anonymous():
+        return True
     return not PollAnswerUser.objects.filter(poll_answer__topic=topic, user=user).exists()
 
 
