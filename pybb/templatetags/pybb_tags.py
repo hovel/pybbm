@@ -238,8 +238,8 @@ def pybb_get_latest_posts(context, cnt=5, user=None):
 
 def load_perms_filters():
     def partial(func_name, perms_obj):
-        def newfunc(user, obj):
-            return getattr(perms_obj, func_name)(user, obj)
+        def newfunc(user, obj_or_qs):
+            return getattr(perms_obj, func_name)(user, obj_or_qs)
         return newfunc
 
     def partial_no_param(func_name, perms_obj):
@@ -247,13 +247,21 @@ def load_perms_filters():
             return getattr(perms_obj, func_name)(user)
         return newfunc
 
-    for method in inspect.getmembers(perms):
-        if inspect.ismethod(method[1]) and inspect.getargspec(method[1]).args[0] == 'self' and\
-                (method[0].startswith('may') or method[0].startswith('filter')):
-            if len(inspect.getargspec(method[1]).args) == 3:
-                register.filter('%s%s' % ('pybb_', method[0]), partial(method[0], perms))
-            elif len(inspect.getargspec(method[1]).args) == 2: # only user should be passed to permission method
-                register.filter('%s%s' % ('pybb_', method[0]), partial_no_param(method[0], perms))
+    for method_name, method in inspect.getmembers(perms):
+        if not inspect.ismethod(method):
+            continue  # only methods are used to dynamically build templatetags
+        if not method_name.startswith('may') and not method_name.startswith('filter'):
+            continue  # only (may|filter)* methods are used to dynamically build templatetags
+        method_args = inspect.getargspec(method).args
+        args_count = len(method_args)
+        if args_count not in (2, 3):
+            continue  # only methods with 2 or 3 params
+        if method_args[0] != 'self' or method_args[1] != 'user':
+            continue  # only methods with self and user as first args
+        if len(inspect.getargspec(method).args) == 3:
+            register.filter('%s%s' % ('pybb_', method_name), partial(method_name, perms))
+        elif len(inspect.getargspec(method).args) == 2:
+            register.filter('%s%s' % ('pybb_', method_name), partial_no_param(method_name, perms))
 load_perms_filters()
 
 
