@@ -64,12 +64,12 @@ def pybb_user_time(context_time, user):
             minutes = int(delta.seconds / 60)
             msg = ungettext('%d minute ago', '%d minutes ago', minutes)
             return msg % minutes
-    if context['user'].is_authenticated():
+    if user.is_authenticated():
         if time.daylight:
             tz1 = time.altzone
         else:
             tz1 = time.timezone
-        tz = tz1 + util.get_pybb_profile(context['user']).time_zone * 60 * 60
+        tz = tz1 + util.get_pybb_profile(user).time_zone * 60 * 60
         context_time = context_time + timedelta(seconds=tz)
     if today < context_time < tomorrow:
         return _('today, %s') % context_time.strftime('%H:%M')
