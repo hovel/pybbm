@@ -215,7 +215,7 @@ def pybb_get_profile(*args, **kwargs):
     try:
         return util.get_pybb_profile(kwargs.get('user') or args[0])
     except:
-        return util.get_pybb_profile_model().objects.none()
+        return None
 
 
 @register.assignment_tag(takes_context=True)
