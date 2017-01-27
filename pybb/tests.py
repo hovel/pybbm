@@ -11,6 +11,7 @@ from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.models import Q
 from django.template import Context, Template
@@ -2944,3 +2945,29 @@ def build_dynamic_test_for_templatetags_perms():
             test_method.__name__ = str('test_%s' % templatetag_name)
             setattr(TestTemplateTags, test_method.__name__, test_method)
 build_dynamic_test_for_templatetags_perms()
+
+
+class MiscTest(TestCase, SharedTestModule):
+
+    def test_profile_avatar_url_property(self):
+        self.create_user()
+        profile = util.get_pybb_profile(self.user)
+        # test the default avatar
+        self.assertEqual(profile.avatar_url, defaults.PYBB_DEFAULT_AVATAR_URL)
+
+        # test if user has a valid avatar
+        path = os.path.join(os.path.dirname(__file__), 'static', 'pybb', 'img', 'image.png')
+        profile.avatar = SimpleUploadedFile(name='image.png',
+                                            content=open(path, 'rb').read(),
+                                            content_type='image/png')
+        profile.save()
+        self.assertNotEqual(profile.avatar_url, defaults.PYBB_DEFAULT_AVATAR_URL)
+        self.assertTrue(profile.avatar_url.startswith(settings.MEDIA_URL + 'pybb/avatar/'))
+        self.assertTrue(profile.avatar_url.endswith('.png'))
+
+
+    def test_profile_get_display_name(self):
+        self.create_user()
+        profile = util.get_pybb_profile(self.user)
+        self.assertEqual(profile.get_display_name(), self.user.get_username())
+        
