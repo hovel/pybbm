@@ -29,7 +29,7 @@ register = template.Library()
 def pybb_time(parser, token):
     try:
         tag, context_time = token.split_contents()
-    except ValueError:
+    except ValueError: # pragma: no cover
         raise template.TemplateSyntaxError('pybb_time requires single argument')
     else:
         return PybbTimeNode(context_time)
@@ -65,9 +65,9 @@ def pybb_user_time(context_time, user):
             msg = ungettext('%d minute ago', '%d minutes ago', minutes)
             return msg % minutes
     if user.is_authenticated():
-        if time.daylight:
+        if time.daylight: # pragma: no cover
             tz1 = time.altzone
-        else:
+        else: # pragma: no cover
             tz1 = time.timezone
         tz = tz1 + util.get_pybb_profile(user).time_zone * 60 * 60
         context_time = context_time + timedelta(seconds=tz)
@@ -249,15 +249,15 @@ def load_perms_filters():
 
     for method_name, method in inspect.getmembers(perms):
         if not inspect.ismethod(method):
-            continue  # only methods are used to dynamically build templatetags
+            continue  # pragma: no cover - only methods are used to dynamically build templatetags
         if not method_name.startswith('may') and not method_name.startswith('filter'):
-            continue  # only (may|filter)* methods are used to dynamically build templatetags
+            continue  # pragma: no cover - only (may|filter)* methods are used to dynamically build templatetags
         method_args = inspect.getargspec(method).args
         args_count = len(method_args)
         if args_count not in (2, 3):
-            continue  # only methods with 2 or 3 params
+            continue  # pragma: no cover - only methods with 2 or 3 params
         if method_args[0] != 'self' or method_args[1] != 'user':
-            continue  # only methods with self and user as first args
+            continue  # pragma: no cover - only methods with self and user as first args
         if len(inspect.getargspec(method).args) == 3:
             register.filter('%s%s' % ('pybb_', method_name), partial(method_name, perms))
         elif len(inspect.getargspec(method).args) == 2:
