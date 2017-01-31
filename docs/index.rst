@@ -31,6 +31,7 @@ Contents:
    settings
    customuser
    premoderation
+   permissions
    anonymous
    templatetags
    example

@@ -932,13 +932,11 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         response = self.client.get(reverse('pybb:close_topic', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)
-        response = self.create_post_via_http(self.client, topic_id=self.topic.id,
-                                             body='test closed')
+        response = self.create_post_via_http(client, topic_id=self.topic.id, body='test closed')
         self.assertEqual(response.status_code, 403)
         response = self.client.get(reverse('pybb:open_topic', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)
-        response = self.create_post_via_http(self.client, topic_id=self.topic.id,
-                                             body='test closed')
+        response = self.create_post_via_http(client, topic_id=self.topic.id, body='test closed')
         self.assertEqual(response.status_code, 200)
 
     def test_subscription(self):
@@ -1462,7 +1460,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.forum_1.topic_count, 1)
         self.assertEqual(self.forum_1.post_count, 6)
-        
+
         # check form values
         form_values = self.get_form_values(response, 'move-post-form')
         move_to_choices = response.context['form'].fields['move_to'].choices
@@ -1494,7 +1492,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
         self.login_client('moderator', 'moderator')
         response = self.client.get(split_posts_url)
         self.assertEqual(response.status_code, 200)
-        
+
         # check form values
         form_values = self.get_form_values(response, 'move-post-form')
         move_to_choices = response.context['form'].fields['move_to'].choices
@@ -1557,7 +1555,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
         self.login_client('moderator', 'moderator')
         response = self.client.get(split_posts_url)
         self.assertEqual(response.status_code, 200)
-        
+
         form_values = self.get_form_values(response, 'move-post-form')
 
         # move last post in forum_2
@@ -1582,7 +1580,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
         self.login_client('moderator', 'moderator')
         response = self.client.get(split_posts_url)
         self.assertEqual(response.status_code, 200)
-        
+
         form_values = self.get_form_values(response, 'move-post-form')
 
         # post stay in same forum but are splited in a new topic
@@ -1615,10 +1613,10 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
         self.login_client('moderator', 'moderator')
         response = self.client.get(split_posts_url)
         self.assertEqual(response.status_code, 200)
-        
+
         form_values = self.get_form_values(response, 'move-post-form')
 
-        # posts splited in forum 2 
+        # posts splited in forum 2
         form_values['move_to'] = self.forum_2.pk
         form_values['number'] = 2
         response = self.client.post(split_posts_url, form_values, follow=True)
@@ -2792,7 +2790,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         # redactor is a staff member (he can access to admin for SOME models, eg: News app models)
         # but he has NO rights on pybb models
         topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
-        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@exemple.com')
+        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@localhost')
         redactor.is_staff = True
         redactor.save()
         topics = Topic.objects.values_list('name', flat=True)
@@ -2820,7 +2818,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
 
     def test_filter_posts_staff_without_perms(self):
         topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
-        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@exemple.com')
+        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@localhost')
         redactor.is_staff = True
         redactor.save()
         posts = Post.objects.values_list('body', flat=True)
@@ -2868,7 +2866,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
         change_topic_perm = Permission.objects.get_by_natural_key('change_topic', 'pybb', 'topic')
         change_post_perm = Permission.objects.get_by_natural_key('change_post', 'pybb', 'post')
-        manager = User.objects.create_user('manager', 'manager', 'manager@exemple.com')
+        manager = User.objects.create_user('manager', 'manager', 'manager@localhost')
         manager.is_staff = True
         manager.save()
         manager.user_permissions.add(change_topic_perm, change_post_perm)
@@ -2888,7 +2886,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
         change_topic_perm = Permission.objects.get_by_natural_key('change_topic', 'pybb', 'topic')
         change_post_perm = Permission.objects.get_by_natural_key('change_post', 'pybb', 'post')
-        manager = User.objects.create_user('manager', 'manager', 'manager@exemple.com')
+        manager = User.objects.create_user('manager', 'manager', 'manager@localhost')
         manager.is_manager = True
         manager.save()
         manager.user_permissions.add(change_topic_perm, change_post_perm)
@@ -2919,7 +2917,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
     def test_filter_topics_superuser(self):
         # superuser see everything
         topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
-        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@exemple.com')
+        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@localhost')
         superuser.is_superuser = True
         superuser.save()
         topics = Topic.objects.values_list('name', flat=True)
@@ -2936,7 +2934,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
 
     def test_filter_posts_superuser(self):
         topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
-        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@exemple.com')
+        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@localhost')
         superuser.is_superuser = True
         superuser.save()
         posts = Post.objects.values_list('body', flat=True)
@@ -3047,6 +3045,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
 
         topic_url = topic2.get_absolute_url()
         edit_url = reverse('pybb:edit_post', kwargs={'pk': post.pk})
+        move_url = reverse('pybb:move_post', kwargs={'pk': post.pk})
         delete_url = reverse('pybb:delete_post', kwargs={'pk': post.pk})
         moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post.pk})
         admin_url = reverse('admin:pybb_post_change', args=[post.pk, ])
@@ -3059,8 +3058,9 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
                             '/descendant::a/@href') % post.pk)
         self.assertIn(edit_url, hrefs)
         self.assertIn(moderate_url, hrefs)
+        self.assertIn(move_url, hrefs)
         self.assertIn(admin_url, hrefs)
-        self.assertEqual(len(hrefs), 3)
+        self.assertEqual(len(hrefs), 4)
 
         staff.user_permissions.add(delete_topic_perm)
         staff.user_permissions.add(delete_post_perm)
@@ -3074,7 +3074,8 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         self.assertIn(moderate_url, hrefs)
         self.assertIn(admin_url, hrefs)
         self.assertIn(delete_url, hrefs)
-        self.assertEqual(len(hrefs), 4)
+        self.assertIn(move_url, hrefs)
+        self.assertEqual(len(hrefs), 5)
 
     def test_post_actions_superuser(self):
         superuser = User.objects.create_user('superuser', 'superuser@localhost', 'superuser')
@@ -3086,6 +3087,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         topic_url = topic2.get_absolute_url()
         edit_url = reverse('pybb:edit_post', kwargs={'pk': post.pk})
         delete_url = reverse('pybb:delete_post', kwargs={'pk': post.pk})
+        move_url = reverse('pybb:move_post', kwargs={'pk': post.pk})
         moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post.pk})
         admin_url = reverse('admin:pybb_post_change', args=[post.pk, ])
 
@@ -3098,8 +3100,9 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         self.assertIn(edit_url, hrefs)
         self.assertIn(moderate_url, hrefs)
         self.assertIn(admin_url, hrefs)
+        self.assertIn(move_url, hrefs)
         self.assertIn(delete_url, hrefs)
-        self.assertEqual(len(hrefs), 4)
+        self.assertEqual(len(hrefs), 5)
 
 
     def test_post_actions_moderator(self):
@@ -3116,6 +3119,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         topic_url = topic1.get_absolute_url()
         edit_url = reverse('pybb:edit_post', kwargs={'pk': post1_1_1.pk})
         delete_url = reverse('pybb:delete_post', kwargs={'pk': post1_1_1.pk})
+        move_url = reverse('pybb:move_post', kwargs={'pk': post1_1_1.pk})
         moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post1_1_1.pk})
         admin_url = reverse('admin:pybb_post_change', args=[post1_1_1.pk, ])
 
@@ -3128,7 +3132,8 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
                             '/descendant::a/@href') % post1_1_1.pk)
         self.assertIn(edit_url, hrefs)
         self.assertIn(delete_url, hrefs)
-        self.assertEqual(len(hrefs), 2)
+        self.assertIn(move_url, hrefs)
+        self.assertEqual(len(hrefs), 3)
 
         # moderator2 has not perms on alice's post because he is not moderator of this forum
         response = self.get_with_user(topic_url, 'moderator2', 'moderator2')
@@ -3144,6 +3149,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
         topic_url = topic2.get_absolute_url()
         edit_url = reverse('pybb:edit_post', kwargs={'pk': post1_2_1.pk})
         delete_url = reverse('pybb:delete_post', kwargs={'pk': post1_2_1.pk})
+        move_url = reverse('pybb:move_post', kwargs={'pk': post1_2_1.pk})
         moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post1_2_1.pk})
         admin_url = reverse('admin:pybb_post_change', args=[post1_2_1.pk, ])
 
@@ -3156,8 +3162,9 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
                             '/descendant::a/@href') % post1_2_1.pk)
         self.assertIn(edit_url, hrefs)
         self.assertIn(delete_url, hrefs)
+        self.assertIn(move_url, hrefs)
         self.assertIn(moderate_url, hrefs)
-        self.assertEqual(len(hrefs), 3)
+        self.assertEqual(len(hrefs), 4)
 
         # moderator2 can not view this post because it require moderation and moderator2 is
         # not moderator of this forum
@@ -3564,7 +3571,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         self.create_user()
         template = Template('{% load pybb_tags %}{% pybb_time a_time %}')
         context = Context({'user': self.user})
-        context['a_time'] = timezone.now() - timezone.timedelta(days=2)
+        context['a_time'] = timezone.now() - timezone.timedelta(days=4)
         output = template.render(context)
         tz = util.get_pybb_profile(self.user).time_zone * 60 * 60
         tz += time.altzone if time.daylight else time.timezone
