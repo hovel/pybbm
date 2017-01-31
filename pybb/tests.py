@@ -5,6 +5,7 @@ import datetime, time
 import inspect
 import math
 import os
+from unittest import skip
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.conf import settings
 from django.core import mail
@@ -91,7 +92,7 @@ class SharedTestModule(object):
             if response.status_code < 400 and _sleep:
                 sleep_only_if_required(1)
         return response
-        
+
     def create_initial(self, post=True):
         self.category = Category.objects.create(name='foo')
         self.forum = Forum.objects.create(name='xfoo', description='bar', category=self.category)
@@ -925,7 +926,10 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.user.is_superuser = True
         self.user.save()
         self.login_client()
-        
+        user2 = User.objects.create_user('user2', 'user2@someserver.com', 'user2')
+        client = Client()
+        client.login(username='user2', password='user2')
+
         response = self.client.get(reverse('pybb:close_topic', args=[self.topic.id]), follow=True)
         self.assertEqual(response.status_code, 200)
         response = self.create_post_via_http(self.client, topic_id=self.topic.id,
@@ -956,7 +960,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         # create a new reply (with another user)
         self.client.login(username='zeus', password='zeus')
-        
+
         response = self.create_post_via_http(self.client, topic_id=self.topic.id,
                                              body='test subscribtion юникод')
         self.assertEqual(response.status_code, 200)
@@ -987,7 +991,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = client.get(self.topic.get_absolute_url())
         subscribe_links = html.fromstring(response.content).xpath('//a[@href="%s"]' % subscribe_url)
         self.assertEqual(len(subscribe_links), 0)
-        
+
         response = client.get(subscribe_url, follow=True)
         self.assertEqual(response.status_code, 403)
 
@@ -1111,7 +1115,7 @@ class FeaturesTest(TestCase, SharedTestModule):
 
         # there should be no email in the outbox
         self.assertEqual(len(mail.outbox), 0)
-        
+
         defaults.PYBB_DISABLE_NOTIFICATIONS = orig_conf
 
     def test_forum_subscription(self):
@@ -1705,7 +1709,7 @@ class PreModerationTest(TestCase, SharedTestModule):
 
     def test_premoderation(self):
         self.client.login(username='zeus', password='zeus')
-        
+
         response = self.create_post_via_http(self.client, topic_id=self.topic.id,
                                              body='test premoderation')
         self.assertEqual(response.status_code, 200)
@@ -2070,9 +2074,9 @@ class FiltersTest(TestCase, SharedTestModule):
 
 
 class CustomPermissionHandler(permissions.DefaultPermissionHandler):
-    """ 
+    """
     a custom permission handler which changes the meaning of "hidden" forum:
-    "hidden" forum or category is visible for all logged on users, not only staff 
+    "hidden" forum or category is visible for all logged on users, not only staff
     """
 
     def filter_categories(self, user, qs):
@@ -2285,6 +2289,882 @@ def _detach_perms_class():
     pybb_views.perms = permissions.perms = util.resolve_class('pybb.permissions.DefaultPermissionHandler')
 
 
+class ControlsAndPermissionsTest(TestCase, SharedTestModule):
+
+    def create_initial(self, on_moderation=False, closed=False, sticky=False, hidden=False):
+        """
+        * forum1: normal
+            * topic1_1: normal
+                * post1_1_1: alice
+                * post1_1_2: bob
+                * post1_1_3: alice + on_moderation
+            * topic1_2: on_moderation
+                * post1_2_1: alice + on_moderation
+            * topic1_3: on_moderation (topic has been marked as waiting for a global moderation)
+                * post1_3_1: alice
+                * post1_3_2: bob + on_moderation
+            * topic1_4: closed
+                * post1_4_1: alice
+                * post1_4_2: bob
+            * topic1_5: sticky
+                * post1_5_1: alice
+                * post1_5_2: bob
+        * forum2: hidden
+            * topic2_1: normal
+                * post2_1_1: alice
+                * post2_1_2: bob
+        """
+        topics = []
+        alice = User.objects.create_user('alice', 'alice@localhost', 'alice')
+        bob = User.objects.create_user('bob', 'bob@localhost', 'bob')
+        category = Category.objects.create(name='test')
+        forum1 = Forum.objects.create(name='forum 1', description='bar 1', category=category)
+        topic1_1 = Topic.objects.create(name='topic 1_1', forum=forum1, user=alice)
+        topics.append(topic1_1)
+        self.create_post(topic=topic1_1, user=alice, body='post 1_1 1')
+        self.create_post(topic=topic1_1, user=bob, body='post 1_1_2')
+
+        if on_moderation:
+            self.create_post(topic=topic1_1, user=alice, body='post 1_1_3', on_moderation=True)
+            topic1_2 = Topic.objects.create(name='topic 1_2', forum=forum1, user=alice,
+                                            on_moderation=True)
+            topics.append(topic1_2)
+            self.create_post(topic=topic1_2, user=alice, body='post 1_2_1', on_moderation=True)
+            topic1_3 = Topic.objects.create(name='topic 1_3', forum=forum1, user=alice, )
+            topics.append(topic1_3)
+            self.create_post(topic=topic1_3, user=alice, body='post 1_3_1')
+            self.create_post(topic=topic1_3, user=bob, body='post 1_3_2', on_moderation=True)
+            topic1_3.on_moderation = True
+            topic1_3.save()
+
+        if closed:
+            topic1_4 = Topic.objects.create(name='topic 1_4', forum=forum1, user=alice, closed=True)
+            topics.append(topic1_4)
+            self.create_post(topic=topic1_4, user=alice, body='post 1_4_1')
+            self.create_post(topic=topic1_4, user=bob, body='post 1_4_2')
+
+        if sticky:
+            topic1_5 = Topic.objects.create(name='topic 1_5', forum=forum1, user=alice, sticky=True)
+            topics.append(topic1_5)
+            self.create_post(topic=topic1_5, user=alice, body='post 1_5_1')
+            self.create_post(topic=topic1_5, user=bob, body='post 1_5_2')
+
+        if hidden:
+            forum2 = Forum.objects.create(name='forum 2', description='bar 2', category=category,
+                                          hidden=True)
+            topic2_1 = Topic.objects.create(name='topic 2_1', forum=forum2, user=alice)
+            topics.append(topic2_1)
+            self.create_post(topic=topic2_1, user=alice, body='post 2_1_1')
+            self.create_post(topic=topic2_1, user=bob, body='post 2_1_2')
+        return topics
+
+    @skip("Run this test manually")
+    def test_permission_documentation(self):
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        forum = topics[0].forum
+        hidden_forum = topics[-1].forum
+        closed_topic = Topic.objects.get(name='topic 1_4')
+        author_topic = topics[0]
+        author_post = topics[0].head
+        other_post = topics[0].posts.exclude(user=author_post.user).first()
+        author = author_post.user
+        other = other_post.user
+        author_on_moderation_post = topics[0].last_post
+        author_on_moderation_topic = topics[1]
+        other_on_moderation_post = Post.objects.get(body='post 1_3_2')
+        other_on_moderation_topic = Topic.objects.create(name='topic 1_6', forum=forum, user=other,
+                                                         on_moderation=True)
+        self.create_post(topic=other_on_moderation_topic, user=other, body='post 1_6_1',
+                         on_moderation=True)
+        other_topic = Topic.objects.create(name='topic 1_7', forum=forum, user=other, )
+        self.create_post(topic=other_topic, user=other, body='post 1_7_1')
+
+        def _view_normal_forum(user):
+            return permissions.perms.may_view_forum(user, forum)
+
+        def _view_hidden_forum(user):
+            return permissions.perms.may_view_forum(user, hidden_forum)
+
+        def _view_other_topic(user):
+            return permissions.perms.may_view_topic(user, other_topic)
+
+        def _view_other_post(user):
+            return permissions.perms.may_view_post(user, other_post)
+
+        def _view_own_on_moderation_topic(user):
+            if not user.is_anonymous() and author_on_moderation_topic.user.pk == user.pk:
+                return permissions.perms.may_view_topic(user, author_on_moderation_topic)
+
+        def _view_own_on_moderation_post(user):
+            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+                return permissions.perms.may_view_post(user, author_on_moderation_post)
+
+        def _view_other_on_moderation_topic(user):
+            return permissions.perms.may_view_topic(user, other_on_moderation_topic)
+
+        def _view_other_on_moderation_post(user):
+            return permissions.perms.may_view_post(user, other_on_moderation_post)
+
+        def _add_post_in_normal_topic(user):
+            return permissions.perms.may_create_post(user, other_topic)
+
+        def _add_post_in_on_moderation_topic(user):
+            return permissions.perms.may_create_post(user, author_on_moderation_topic)
+
+        def _add_post_in_closed_topic(user):
+            return permissions.perms.may_create_post(user, closed_topic)
+
+        def _edit_own_normal_post(user):
+            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+                return permissions.perms.may_edit_post(user, author_post)
+
+        def _edit_own_on_moderation_post(user):
+            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+                return permissions.perms.may_edit_post(user, author_on_moderation_post)
+
+        def _edit_other_post(user):
+            return permissions.perms.may_edit_post(user, other_post)
+
+        def _delete_own_normal_post(user):
+            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+                return permissions.perms.may_delete_post(user, author_post)
+
+        def _delete_own_on_moderation_post(user):
+            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+                return permissions.perms.may_delete_post(user, author_on_moderation_post)
+
+        def _delete_other_post(user):
+            return permissions.perms.may_delete_post(user, other_post)
+
+        def _moderate_topic(user):
+            return permissions.perms.may_moderate_topic(user, author_topic)
+
+        def _close_and_unclose_topic(user):
+            return permissions.perms.may_close_topic(user, author_topic)
+
+        def _stick_and_unstick_topic(user):
+            return permissions.perms.may_stick_topic(user, author_topic)
+
+        def _manage_moderators(user):
+            return permissions.perms.may_manage_moderators(user)
+
+        tests = [
+            _view_normal_forum,
+            _view_hidden_forum,
+            _view_other_topic,
+            _view_other_post,
+            _view_own_on_moderation_topic,
+            _view_own_on_moderation_post,
+            _view_other_on_moderation_topic,
+            _view_other_on_moderation_post,
+            _add_post_in_normal_topic,
+            _add_post_in_on_moderation_topic,
+            _add_post_in_closed_topic,
+            _edit_own_normal_post,
+            _edit_own_on_moderation_post,
+            _edit_other_post,
+            _delete_own_normal_post,
+            _delete_own_on_moderation_post,
+            _delete_other_post,
+            _close_and_unclose_topic,
+            _stick_and_unstick_topic,
+            _manage_moderators,
+        ]
+
+        # get permissions
+        change_topic_perm = Permission.objects.get_by_natural_key('change_topic', 'pybb', 'topic')
+        delete_topic_perm = Permission.objects.get_by_natural_key('delete_topic', 'pybb', 'topic')
+        change_post_perm = Permission.objects.get_by_natural_key('change_post', 'pybb', 'post')
+        delete_post_perm = Permission.objects.get_by_natural_key('delete_post', 'pybb', 'post')
+
+        # init all users
+        anonymous = AnonymousUser()
+        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@localhost')
+        redactor.is_staff = True
+        redactor.save()
+        moderator = User.objects.create_user('moderator', 'moderator', 'moderator@localhost')
+        moderator.save()
+        forum.moderators.add(moderator)
+        hidden_forum.moderators.add(moderator)
+        manager = User.objects.create_user('manager', 'manager', 'manager@localhost')
+        manager.is_staff = True
+        manager.save()
+        manager.user_permissions.add(change_topic_perm, change_post_perm,
+                                     delete_topic_perm, delete_post_perm)
+        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@localhost')
+        superuser.is_superuser = True
+        superuser.save()
+
+        users = [
+            (anonymous, 'Permissions for anonymous'),
+            (author, 'Permissions for an logged-in user'),
+            (moderator, 'Permissions for a moderator of the current forum'),
+            (redactor, 'Permissions for a "is_staff" user without pybb permissions'),
+            (manager, 'Permissions for a "is_staff" user with pybb permissions'),
+            (superuser, 'Permissions for superuser'),
+        ]
+
+        # get the current documentation for permissions
+        path = os.path.join(os.path.dirname(__file__), '..', 'docs', 'permissions.rst')
+        permission_doc = open(path, 'r').read()
+        wrong_parts = []
+        sep = '+----------------------------------+---------------------+---------------------+'
+        intro = [
+            '%(title)s:', '',
+            sep,
+            '|              action              |     can do with     |     can do with     |',
+            '|                                  | PREMODERATION False | PREMODERATION True  |',
+            '+==================================+=====================+=====================+',]
+
+        ORIG = defaults.PYBB_PREMODERATION
+        def fake_premoderation(user, body):
+            return True
+
+        for user, title in users:
+            lines = ['\n'.join(intro) % {'title': title}]
+            for test in tests:
+                name = test.__name__.replace('_', ' ').strip()
+                name += ' ' * (32 - len(name))
+                results = []
+                for value in (None, fake_premoderation):
+                    defaults.PYBB_PREMODERATION = value
+                    result = test(user)
+                    if result is None:
+                        result = 'see logged-in user'
+                    else:
+                        result = 'yes' if result else 'no'
+                    result += ' ' * (19 - len(result))
+                    results.append(result)
+                lines.append('| %s | %s | %s |' % (name, results[0], results[1]))
+                lines.append(sep)
+
+            permission_doc_part = '\n'.join(lines)
+            # Check that documentation is correct with reality
+            # (maybe reality is not good, but it's not the purpose of this test)
+            if permission_doc_part not in permission_doc:
+                wrong_parts.append(permission_doc_part)
+
+        if wrong_parts:
+            self.fail('Permission document does not reflect what default Permission handler do. '
+                      'If other permission tests success, please update the documentation with '
+                      'those parts:\n\n%s' % '\n\n\n'.join(wrong_parts))
+
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_may_create_post(self):
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        anonymous = AnonymousUser()
+        alice = topics[0].user
+        other = User.objects.create_user('other', 'other@localhost', 'other',)
+        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@localhost')
+        redactor.is_staff = True
+        redactor.save()
+        moderator = User.objects.create_user('moderator', 'moderator', 'moderator@localhost')
+        moderator.save()
+        topics[0].forum.moderators.add(moderator)
+        manager = User.objects.create_user('manager', 'manager', 'manager@localhost')
+        manager.is_staff = True
+        manager.save()
+        change_topic_perm = Permission.objects.get_by_natural_key('change_topic', 'pybb', 'topic')
+        change_post_perm = Permission.objects.get_by_natural_key('change_post', 'pybb', 'post')
+        manager.user_permissions.add(change_topic_perm, change_post_perm)
+        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@localhost')
+        superuser.is_superuser = True
+        superuser.save()
+
+        forum1, forum2 = topics[0].forum,  topics[-1].forum
+        normal_topics = Topic.objects.filter(forum__hidden=False, forum__category__hidden=False,
+                                             on_moderation=False, closed=False)
+        on_moderation_topics = Topic.objects.filter(on_moderation=True)
+        closed_topics = Topic.objects.filter(closed=True)
+        hidden_topics = Topic.objects.filter(forum__hidden=True, forum__category__hidden=True)
+
+        for topic in topics:
+            if not permissions.perms.may_create_post(superuser, topic):
+                self.fail('%s may create post in topic %s' % (superuser, topic))
+            if not permissions.perms.may_create_post(manager, topic):
+                self.fail('%s may create post in topic %s' % (manager, topic))
+            if permissions.perms.may_create_post(anonymous, topic):
+                self.fail('%s may NOT create post in topic %s' % (anonymous, topic))
+            if topic.forum.pk != forum1.pk:
+                if permissions.perms.may_create_post(moderator, topic):
+                    self.fail('%s may NOT create post in topic %s' % (moderator, topic))
+            else:
+                if not permissions.perms.may_create_post(moderator, topic):
+                    self.fail('%s may create post in topic %s' % (moderator, topic))
+
+        for topic in normal_topics:
+            if not permissions.perms.may_create_post(redactor, topic):
+                self.fail('%s may create post in topic %s' % (redactor, topic))
+            if not permissions.perms.may_create_post(other, topic):
+                self.fail('%s may create post in topic %s' % (other, topic))
+
+        for topic in on_moderation_topics:
+            if permissions.perms.may_create_post(other, topic):
+                self.fail('%s may NOT create post in topic %s' % (other, topic))
+            if permissions.perms.may_create_post(alice, topic):
+                self.fail('%s may NOT create post in topic %s' % (alice, topic))
+            if permissions.perms.may_create_post(redactor, topic):
+                self.fail('%s may NOT create post in topic %s' % (redactor, topic))
+
+        for topic in closed_topics:
+            if permissions.perms.may_create_post(anonymous, topic):
+                self.fail('%s may NOT create post in topic %s' % (anonymous, topic))
+            if permissions.perms.may_create_post(alice, topic):
+                self.fail('%s may NOT create post in topic %s' % (alice, topic))
+            if permissions.perms.may_create_post(redactor, topic):
+                self.fail('%s may NOT create post in topic %s' % (redactor, topic))
+
+        for topic in hidden_topics:
+            if topic.on_moderation or topic.closed:
+                if permissions.perms.may_create_post(redactor, topic):
+                    self.fail('%s may NOT create post in topic %s' % (redactor, topic))
+            else:
+                if not permissions.perms.may_create_post(redactor, topic):
+                    self.fail('%s may create post in topic %s' % (redactor, topic))
+            if permissions.perms.may_create_post(alice, topic):
+                self.fail('%s may NOT create post in topic %s' % (alice, topic))
+
+
+    def test_filter_topics_anonymous_and_other(self):
+        self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        topics = Topic.objects.values_list('name', flat=True)
+        anonymous = AnonymousUser()
+        other = User.objects.create_user('other', 'other@localhost', 'other',)
+
+        # even without premoderation, on_moderation mark must be significative on topics
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+
+        excluded_topics = ['topic 1_2', 'topic 1_3', 'topic 2_1']
+        expected_topics = topics.exclude(name__in=excluded_topics)
+
+        anonymous_filtered_topics = permissions.perms.filter_topics(anonymous, topics)
+        self.assertEqual(set(expected_topics), set(anonymous_filtered_topics))
+
+        other_filtered_topics = permissions.perms.filter_topics(other, topics)
+        self.assertEqual(set(expected_topics), set(other_filtered_topics))
+
+        for topic in Topic.objects.filter(name__in=expected_topics):
+            if not permissions.perms.may_view_topic(anonymous, topic):
+                self.fail('%s may view topic %s' % (anonymous, topic))
+            if not permissions.perms.may_view_topic(other, topic):
+                self.fail('%s may view topic %s' % (other, topic))
+
+        for topic in Topic.objects.exclude(name__in=expected_topics):
+            if permissions.perms.may_view_topic(anonymous, topic):
+                self.fail('%s may NOT view topic %s' % (anonymous, topic))
+            if permissions.perms.may_view_topic(other, topic):
+                self.fail('%s may NOT view topic %s' % (other, topic))
+        defaults.PYBB_PREMODERATION = ORIG
+
+    def test_filter_posts_anonymous_and_other(self):
+        self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        posts = Post.objects.values_list('body', flat=True)
+        anonymous = AnonymousUser()
+        other = User.objects.create_user('other', 'other@localhost', 'other',)
+
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+        # "post 1_1_3" is not excluded because PYBB_PREMODERATION is not set, so on_moderation on
+        # posts are ignored
+        # same reason for "post 1_2_1", 1_3_1 and 1_3_2
+        excluded_posts = ['post 2_1_1', 'post 2_1_2']  # exclude hidden forum posts
+        expected_posts = posts.exclude(body__in=excluded_posts)
+
+        anonymous_filtered_posts = permissions.perms.filter_posts(anonymous, posts)
+        self.assertEqual(set(expected_posts), set(anonymous_filtered_posts))
+
+        other_filtered_posts = permissions.perms.filter_posts(other, posts)
+        self.assertEqual(set(expected_posts), set(other_filtered_posts))
+
+        for post in Post.objects.filter(body__in=expected_posts):
+            if not permissions.perms.may_view_post(anonymous, post):
+                self.fail('%s may view post %s' % (anonymous, post))
+            if not permissions.perms.may_view_post(other, post):
+                self.fail('%s may view post %s' % (other, post))
+
+        for post in Post.objects.exclude(body__in=expected_posts):
+            if permissions.perms.may_view_post(anonymous, post):
+                self.fail('%s may NOT view post %s' % (anonymous, post))
+            if permissions.perms.may_view_post(other, post):
+                self.fail('%s may NOT view post %s' % (other, post))
+
+        # now, test with PREMODERATION
+        def fake_premoderation(user, body):
+            return True
+        defaults.PYBB_PREMODERATION = fake_premoderation
+
+        # also exclude on_moderation posts or on_moderation topic
+        excluded_posts += ['post 1_1_3', 'post 1_2_1', 'post 1_3_1', 'post 1_3_2']
+        expected_posts = posts.exclude(body__in=excluded_posts)
+
+        anonymous_filtered_posts = permissions.perms.filter_posts(anonymous, posts)
+        self.assertEqual(set(expected_posts), set(anonymous_filtered_posts))
+
+        other_filtered_posts = permissions.perms.filter_posts(other, posts)
+        self.assertEqual(set(expected_posts), set(other_filtered_posts))
+
+        for post in Post.objects.filter(body__in=expected_posts):
+            if not permissions.perms.may_view_post(anonymous, post):
+                self.fail('%s may view post %s' % (anonymous, post))
+            if not permissions.perms.may_view_post(other, post):
+                self.fail('%s may view post %s' % (other, post))
+
+        for post in Post.objects.exclude(body__in=expected_posts):
+            if permissions.perms.may_view_post(anonymous, post):
+                self.fail('%s may NOT view post %s' % (anonymous, post))
+            if permissions.perms.may_view_post(other, post):
+                self.fail('%s may NOT view post %s' % (other, post))
+
+        defaults.PYBB_PREMODERATION = ORIG
+
+    def test_filter_topics_author(self):
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        alice = topics[0].user
+        topics = Topic.objects.values_list('name', flat=True)
+        # even without premoderation, on_moderation mark must be significative on topics
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+
+        # "topic 1_2"is not excluded even if on_moderation because it's my own topic
+        # topic 1_3 is excluded because it's a "general" moderation (ùy post is not on_moderation,
+        # but the whole topic is)
+        excluded_topics = ['topic 2_1', 'topic 1_3']
+        expected_topics = topics.exclude(name__in=excluded_topics)
+
+        filtered_topics = permissions.perms.filter_topics(alice, topics)
+        self.assertEqual(set(expected_topics), set(filtered_topics))
+
+        for topic in Topic.objects.filter(name__in=expected_topics):
+            if not permissions.perms.may_view_topic(alice, topic):
+                self.fail('%s may view topic %s' % (alice, topic))
+
+        for topic in Topic.objects.exclude(name__in=expected_topics):
+            if permissions.perms.may_view_topic(alice, topic):
+                self.fail('%s may NOT view topic %s' % (alice, topic))
+
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_filter_posts_author(self):
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        alice = topics[0].user
+        posts = Post.objects.values_list('body', flat=True)
+
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+        # "post 1_1_3" is not excluded because PYBB_PREMODERATION is not set, so on_moderation on
+        # posts is ignored
+        # same reason for "post 1_2_1", 1_3_1 and 1_3_2
+        excluded_posts = ['post 2_1_2', ]  # exclude hidden forum posts I didn't create
+        expected_posts = posts.exclude(body__in=excluded_posts)
+        filtered_posts = permissions.perms.filter_posts(alice, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        # now, test with PREMODERATION
+        def fake_premoderation(user, body):
+            return True
+        defaults.PYBB_PREMODERATION = fake_premoderation
+
+        # on_moderation posts I created are not excluded ('1_1_3' and '1_2_1')
+        # My posts must not be excluded even if those are in a topic which need moderation (1_3_1)
+        # 1_3_2 is excluded because topic (I created) is now on_moderation. So I can't see others
+        # post in this topic even if those posts are not on_moderation.
+        excluded_posts += ['post 1_3_2', ]
+        expected_posts = posts.exclude(body__in=excluded_posts)
+        filtered_posts = permissions.perms.filter_posts(alice, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        for post in Post.objects.filter(body__in=expected_posts):
+            if not permissions.perms.may_view_post(alice, post):
+                self.fail('%s may view post %s' % (alice, post))
+
+        for post in Post.objects.exclude(body__in=expected_posts):
+            if permissions.perms.may_view_post(alice, post):
+                self.fail('%s may NOT view post %s' % (alice, post))
+
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_filter_topics_staff_without_perms(self):
+        # redactor is a staff member (he can access to admin for SOME models, eg: News app models)
+        # but he has NO rights on pybb models
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@exemple.com')
+        redactor.is_staff = True
+        redactor.save()
+        topics = Topic.objects.values_list('name', flat=True)
+        # even without premoderation, on_moderation mark must be significative on topics
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+
+        # same exclusions as if redactor was a "other" user except that  staff user may see
+        # hidden forum/cats
+        excluded_topics = ['topic 1_2', 'topic 1_3']
+        expected_topics = topics.exclude(name__in=excluded_topics)
+
+        filtered_topics = permissions.perms.filter_topics(redactor, topics)
+        self.assertEqual(set(expected_topics), set(filtered_topics))
+
+        for topic in Topic.objects.filter(name__in=expected_topics):
+            if not permissions.perms.may_view_topic(redactor, topic):
+                self.fail('%s may view topic %s' % (redactor, topic))
+
+        for topic in Topic.objects.exclude(name__in=expected_topics):
+            if permissions.perms.may_view_topic(redactor, topic):
+                self.fail('%s may NOT view topic %s' % (redactor, topic))
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_filter_posts_staff_without_perms(self):
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        redactor = User.objects.create_user('redactor', 'redactor', 'redactor@exemple.com')
+        redactor.is_staff = True
+        redactor.save()
+        posts = Post.objects.values_list('body', flat=True)
+
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+        # staff user may see hidden forum/cats
+        excluded_posts = []
+        expected_posts = posts.exclude(body__in=excluded_posts)
+        filtered_posts = permissions.perms.filter_posts(redactor, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        for post in Post.objects.filter(body__in=expected_posts):
+            if not permissions.perms.may_view_post(redactor, post):
+                self.fail('%s may view post %s' % (redactor, post))
+
+        for post in Post.objects.exclude(body__in=expected_posts):
+            if permissions.perms.may_view_post(redactor, post):
+                self.fail('%s may NOT view post %s' % (redactor, post))
+
+        # now, test with PREMODERATION
+        def fake_premoderation(user, body):
+            return True
+        defaults.PYBB_PREMODERATION = fake_premoderation
+
+        # same exclusions as if redactor was a "other" user
+        excluded_posts += ['post 1_1_3', 'post 1_2_1', 'post 1_3_1', 'post 1_3_2',]
+        expected_posts = posts.exclude(body__in=excluded_posts)
+        filtered_posts = permissions.perms.filter_posts(redactor, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        for post in Post.objects.filter(body__in=expected_posts):
+            if not permissions.perms.may_view_post(redactor, post):
+                self.fail('%s may view post %s' % (redactor, post))
+
+        for post in Post.objects.exclude(body__in=expected_posts):
+            if permissions.perms.may_view_post(redactor, post):
+                self.fail('%s may NOT view post %s' % (redactor, post))
+
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_filter_topics_staff_with_perms(self):
+        # manager see everything
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        change_topic_perm = Permission.objects.get_by_natural_key('change_topic', 'pybb', 'topic')
+        change_post_perm = Permission.objects.get_by_natural_key('change_post', 'pybb', 'post')
+        manager = User.objects.create_user('manager', 'manager', 'manager@exemple.com')
+        manager.is_staff = True
+        manager.save()
+        manager.user_permissions.add(change_topic_perm, change_post_perm)
+        topics = Topic.objects.values_list('name', flat=True)
+
+        expected_topics = topics
+        filtered_topics = permissions.perms.filter_topics(manager, topics)
+        self.assertEqual(set(expected_topics), set(filtered_topics))
+
+        for topic in Topic.objects.filter(name__in=expected_topics):
+            if not permissions.perms.may_view_topic(manager, topic):
+                self.fail('%s may view topic %s' % (manager, topic))
+        self.assertEqual(Topic.objects.exclude(name__in=expected_topics).count(), 0)
+
+
+    def test_filter_posts_staff_with_perms(self):
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        change_topic_perm = Permission.objects.get_by_natural_key('change_topic', 'pybb', 'topic')
+        change_post_perm = Permission.objects.get_by_natural_key('change_post', 'pybb', 'post')
+        manager = User.objects.create_user('manager', 'manager', 'manager@exemple.com')
+        manager.is_manager = True
+        manager.save()
+        manager.user_permissions.add(change_topic_perm, change_post_perm)
+        posts = Post.objects.values_list('body', flat=True)
+
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+        expected_posts = posts
+        filtered_posts = permissions.perms.filter_posts(manager, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        # now, test with PREMODERATION
+        def fake_premoderation(user, body):
+            return True
+        defaults.PYBB_PREMODERATION = fake_premoderation
+
+        filtered_posts = permissions.perms.filter_posts(manager, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        for post in Post.objects.filter(body__in=expected_posts):
+            if not permissions.perms.may_view_post(manager, post):
+                self.fail('%s may view post %s' % (manager, post))
+        self.assertEqual(Post.objects.exclude(body__in=expected_posts).count(), 0)
+
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_filter_topics_superuser(self):
+        # superuser see everything
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@exemple.com')
+        superuser.is_superuser = True
+        superuser.save()
+        topics = Topic.objects.values_list('name', flat=True)
+
+        expected_topics = topics
+        filtered_topics = permissions.perms.filter_topics(superuser, topics)
+        self.assertEqual(set(expected_topics), set(filtered_topics))
+
+        for topic in Topic.objects.filter(name__in=expected_topics):
+            if not permissions.perms.may_view_topic(superuser, topic):
+                self.fail('%s may view topic %s' % (superuser, topic))
+        self.assertEqual(Topic.objects.exclude(name__in=expected_topics).count(), 0)
+
+
+    def test_filter_posts_superuser(self):
+        topics = self.create_initial(on_moderation=True, closed=True, sticky=True, hidden=True)
+        superuser = User.objects.create_user('superuser', 'superuser', 'superuser@exemple.com')
+        superuser.is_superuser = True
+        superuser.save()
+        posts = Post.objects.values_list('body', flat=True)
+
+        ORIG = defaults.PYBB_PREMODERATION
+        defaults.PYBB_PREMODERATION = None
+        expected_posts = posts
+        filtered_posts = permissions.perms.filter_posts(superuser, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        # now, test with PREMODERATION
+        def fake_premoderation(user, body):
+            return True
+        defaults.PYBB_PREMODERATION = fake_premoderation
+
+        filtered_posts = permissions.perms.filter_posts(superuser, posts)
+        self.assertEqual(set(expected_posts), set(filtered_posts))
+
+        for post in Post.objects.filter(body__in=expected_posts):
+            if not permissions.perms.may_view_post(superuser, post):
+                self.fail('%s may view post %s' % (superuser, post))
+        self.assertEqual(Post.objects.exclude(body__in=expected_posts).count(), 0)
+
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_post_actions_anonymous(self):
+        topic1 = self.create_initial()[0]
+        post1 = topic1.head
+        response = self.client.get(topic1.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post1.pk)
+        self.assertEqual(len(hrefs), 0)
+
+    def test_post_actions_own_post(self):
+        topic1, topic2 = self.create_initial(on_moderation=True)[0:2]
+        post1_1 = topic1.head  # alice's post
+        response = self.get_with_user(topic1.get_absolute_url(), 'alice', 'alice')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post1_1.pk)
+        edit_url = reverse('pybb:edit_post', kwargs={'pk': post1_1.pk})
+        self.assertIn(edit_url, hrefs)
+        if defaults.PYBB_ALLOW_DELETE_OWN_POST:
+            delete_url = reverse('pybb:delete_post', kwargs={'pk': post1_1.pk})
+            self.assertIn(delete_url, hrefs)
+        self.assertTrue(len(hrefs), 1 + defaults.PYBB_ALLOW_DELETE_OWN_POST)
+
+        # post on moderation should stay editable / deletable for it's author
+        post2_1 = topic2.head  # alice's post
+        response =self.get_with_user(topic2.get_absolute_url(), 'alice', 'alice')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post2_1.pk)
+        edit_url = reverse('pybb:edit_post', kwargs={'pk': post2_1.pk})
+        self.assertIn(edit_url, hrefs)
+        if defaults.PYBB_ALLOW_DELETE_OWN_POST:
+            delete_url = reverse('pybb:delete_post', kwargs={'pk': post2_1.pk})
+            self.assertIn(delete_url, hrefs)
+        self.assertEqual(len(hrefs), 1 + defaults.PYBB_ALLOW_DELETE_OWN_POST)
+
+    def test_post_actions_other_post(self):
+        topic1 = self.create_initial()[0]
+        post2 = topic1.last_post  # bob's post
+        url = topic1.get_absolute_url()
+        response = self.get_with_user(url, 'alice', 'alice')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post2.pk)
+        self.assertEqual(len(hrefs), 0)
+
+    def test_post_actions_staff_no_perms(self):
+        staff = User.objects.create_user('staff', 'staff@localhost', 'staff')
+        staff.is_staff = True
+        staff.save()
+        topic1 = self.create_initial()[0]
+        post1 = topic1.head
+        response = self.get_with_user(topic1.get_absolute_url(), 'staff', 'staff')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post1.pk)
+        self.assertEqual(len(hrefs), 0)
+
+    def test_post_actions_staff_with_perms(self):
+        staff = User.objects.create_user('staff', 'staff@localhost', 'staff')
+        staff.is_staff = True
+        staff.save()
+        change_topic_perm = Permission.objects.get_by_natural_key('change_topic', 'pybb', 'topic')
+        delete_topic_perm = Permission.objects.get_by_natural_key('delete_topic', 'pybb', 'topic')
+        change_post_perm = Permission.objects.get_by_natural_key('change_post', 'pybb', 'post')
+        delete_post_perm = Permission.objects.get_by_natural_key('delete_post', 'pybb', 'post')
+
+        staff.user_permissions.add(change_topic_perm)
+        staff.user_permissions.add(change_post_perm)
+        topic1, topic2 = self.create_initial(on_moderation=True)[0:2]
+        post = topic2.head  # alice's post which need moderation
+
+        topic_url = topic2.get_absolute_url()
+        edit_url = reverse('pybb:edit_post', kwargs={'pk': post.pk})
+        delete_url = reverse('pybb:delete_post', kwargs={'pk': post.pk})
+        moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post.pk})
+        admin_url = reverse('admin:pybb_post_change', args=[post.pk, ])
+
+        response = self.get_with_user(topic_url, 'staff', 'staff')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post.pk)
+        self.assertIn(edit_url, hrefs)
+        self.assertIn(moderate_url, hrefs)
+        self.assertIn(admin_url, hrefs)
+        self.assertEqual(len(hrefs), 3)
+
+        staff.user_permissions.add(delete_topic_perm)
+        staff.user_permissions.add(delete_post_perm)
+        response = self.get_with_user(topic_url, 'staff', 'staff')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post.pk)
+        self.assertIn(edit_url, hrefs)
+        self.assertIn(moderate_url, hrefs)
+        self.assertIn(admin_url, hrefs)
+        self.assertIn(delete_url, hrefs)
+        self.assertEqual(len(hrefs), 4)
+
+    def test_post_actions_superuser(self):
+        superuser = User.objects.create_user('superuser', 'superuser@localhost', 'superuser')
+        superuser.is_superuser = True
+        superuser.save()
+        topic1, topic2 = self.create_initial(on_moderation=True)[0:2]
+        post = topic2.head
+
+        topic_url = topic2.get_absolute_url()
+        edit_url = reverse('pybb:edit_post', kwargs={'pk': post.pk})
+        delete_url = reverse('pybb:delete_post', kwargs={'pk': post.pk})
+        moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post.pk})
+        admin_url = reverse('admin:pybb_post_change', args=[post.pk, ])
+
+        response = self.get_with_user(topic2.get_absolute_url(), 'superuser', 'superuser')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post.pk)
+        self.assertIn(edit_url, hrefs)
+        self.assertIn(moderate_url, hrefs)
+        self.assertIn(admin_url, hrefs)
+        self.assertIn(delete_url, hrefs)
+        self.assertEqual(len(hrefs), 4)
+
+
+    def test_post_actions_moderator(self):
+        topic1, topic2 = self.create_initial(on_moderation=True)[0:2]
+        forum1, post1_1_1, post1_2_1 = topic1.forum, topic1.head, topic2.head
+        forum2 = Forum.objects.create(name='test 2', description='bar 2', category=forum1.category)
+
+        moderator1 = User.objects.create_user('moderator1', 'moderator1@localhost', 'moderator1')
+        moderator2 = User.objects.create_user('moderator2', 'moderator2@localhost', 'moderator2')
+        forum1.moderators.add(moderator1)
+        forum2.moderators.add(moderator2)
+
+        # Alice's topic/post which does not need moderation
+        topic_url = topic1.get_absolute_url()
+        edit_url = reverse('pybb:edit_post', kwargs={'pk': post1_1_1.pk})
+        delete_url = reverse('pybb:delete_post', kwargs={'pk': post1_1_1.pk})
+        moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post1_1_1.pk})
+        admin_url = reverse('admin:pybb_post_change', args=[post1_1_1.pk, ])
+
+        # moderator1 can edit or delete alice's post which does not need moderation
+        response = self.get_with_user(topic_url, 'moderator1', 'moderator1')
+        tree = html.fromstring(response.content)
+        self.assertEqual(response.status_code, 200)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post1_1_1.pk)
+        self.assertIn(edit_url, hrefs)
+        self.assertIn(delete_url, hrefs)
+        self.assertEqual(len(hrefs), 2)
+
+        # moderator2 has not perms on alice's post because he is not moderator of this forum
+        response = self.get_with_user(topic_url, 'moderator2', 'moderator2')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post1_1_1.pk)
+        self.assertEqual(len(hrefs), 0)
+
+
+        # Alice's topic/post which need moderation
+        topic_url = topic2.get_absolute_url()
+        edit_url = reverse('pybb:edit_post', kwargs={'pk': post1_2_1.pk})
+        delete_url = reverse('pybb:delete_post', kwargs={'pk': post1_2_1.pk})
+        moderate_url = reverse('pybb:moderate_post', kwargs={'pk': post1_2_1.pk})
+        admin_url = reverse('admin:pybb_post_change', args=[post1_2_1.pk, ])
+
+        # moderator1 can edit, approve or delete alice's post which need moderation
+        response = self.get_with_user(topic_url, 'moderator1', 'moderator1')
+        self.assertEqual(response.status_code, 200)
+        tree = html.fromstring(response.content)
+        hrefs = tree.xpath(('//table[@id="post-%d"]'
+                            '/descendant::div[@class="post-controls"]'
+                            '/descendant::a/@href') % post1_2_1.pk)
+        self.assertIn(edit_url, hrefs)
+        self.assertIn(delete_url, hrefs)
+        self.assertIn(moderate_url, hrefs)
+        self.assertEqual(len(hrefs), 3)
+
+        # moderator2 can not view this post because it require moderation and moderator2 is
+        # not moderator of this forum
+        response = self.get_with_user(topic_url, 'moderator2', 'moderator2')
+        self.assertEqual(response.status_code, 403)
+
+
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
     """ test custom permission handler """
 
@@ -2384,7 +3264,7 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         nostaff.is_staff = False
         nostaff.save()
 
-        # create topic, post in hidden category 
+        # create topic, post in hidden category
         self.category = Category(name='private', hidden=True)
         self.category.save()
         self.forum = Forum(name='priv1', category=self.category)
@@ -2473,7 +3353,7 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         # allowed user is allowed
         r = self.get_with_user(edit_post_url, 'staff', 'staff')
         self.assertEquals(r.status_code, 200)
-        
+
     def test_profile_autocreation_signal_on(self):
         user = User.objects.create_user('cronos', 'cronos@localhost', 'cronos')
         profile = getattr(user, defaults.PYBB_PROFILE_RELATED_NAME, None)
@@ -2655,7 +3535,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
     # def setUp(self):
         # self.create_user()
         # self.create_initial()
-    
+
     def test_pybb_time_anonymous(self):
         template = Template('{% load pybb_tags %}{% pybb_time a_time %}')
         context = Context({'user': AnonymousUser()})
@@ -2663,19 +3543,19 @@ class TestTemplateTags(TestCase, SharedTestModule):
         context['a_time'] = timezone.now() - timezone.timedelta(days=2)
         output = template.render(context)
         self.assertEqual(output, dateformat.format(context['a_time'], 'd M, Y H:i'))
-        
+
         context['a_time'] = timezone.now() - timezone.timedelta(days=1)
         output = template.render(context)
         self.assertEqual(output, 'yesterday, %s' % context['a_time'].strftime('%H:%M'))
-        
+
         context['a_time'] = timezone.now() - timezone.timedelta(hours=1)
         output = template.render(context)
         self.assertEqual(output, 'today, %s' % context['a_time'].strftime('%H:%M'))
-        
+
         context['a_time'] = timezone.now() - timezone.timedelta(minutes=30)
         output = template.render(context)
         self.assertEqual(output, '30 minutes ago')
-        
+
         context['a_time'] = timezone.now() - timezone.timedelta(seconds=30)
         output = template.render(context)
         self.assertEqual(output, '30 seconds ago')
@@ -2690,7 +3570,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         tz += time.altzone if time.daylight else time.timezone
         user_datetime = context['a_time'] + timezone.timedelta(seconds=tz)
         self.assertEqual(output, dateformat.format(user_datetime, 'd M, Y H:i'))
-        
+
         context['a_time'] = timezone.now() - timezone.timedelta(seconds=30)
         output = template.render(context)
         self.assertEqual(output, '30 seconds ago')
@@ -2702,7 +3582,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
                            'a_time': timezone.now() - timezone.timedelta(seconds=30)})
         output = template.render(context)
         self.assertEqual(output, '30 SECONDS AGO')
-    
+
     def test_pybb_link(self):
         self.create_user()
         self.create_initial()
@@ -2733,7 +3613,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         output = template.render(context)
         self.assertEqual(output, 'YES:NO')
 
-    
+
     def test_pybb_is_topic_unread(self):
         self.create_user()
         self.create_initial()
@@ -2750,7 +3630,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         output = template.render(context)
         self.assertEqual(output, 'NO:NO:YES')
 
-    
+
     def test_pybb_topic_unread(self):
         self.create_user()
         self.login_client()
@@ -2786,7 +3666,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         topic = Topic.objects.create(name='C3', forum=forums[2], user=bob)
         self.create_post(topic=topic, user=bob, body='test')
         topics.append(topic)
-        
+
         template = Template(('{% load pybb_tags %}'
                              '{% for topic in topics|pybb_topic_unread:user %}'
                              '{{ topic.name }}: {{ topic.unread }}\n'
@@ -2862,7 +3742,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         topic = Topic.objects.create(name='C3', forum=forums[2], user=bob)
         self.create_post(topic=topic, user=bob, body='test')
         topics.append(topic)
-        
+
         template = Template(('{% load pybb_tags %}'
                              '{% for forum in forums|pybb_forum_unread:user %}'
                              '{{ forum.name }}: {{ forum.unread }}\n'
@@ -2895,13 +3775,13 @@ class TestTemplateTags(TestCase, SharedTestModule):
         expected = '\n'.join(('A: False', 'B: False', 'C: False', ''))
         self.assertEqual(output, expected)
 
-    
+
     def test_pybb_topic_inline_pagination(self):
         self.create_user()
         self.create_initial()
         self.topic.post_count = defaults.PYBB_TOPIC_PAGE_SIZE * 13
         nb_pages = int(math.ceil(float(self.topic.post_count) / defaults.PYBB_TOPIC_PAGE_SIZE))
-        
+
         template = Template(('{% load pybb_tags %}'
                              '{% for page in topic|pybb_topic_inline_pagination %}'
                              '{{ page }} '
@@ -2916,7 +3796,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         expected = '1 2 3 '
         self.assertEqual(output, expected)
 
-    
+
     def test_pybb_topic_poll_not_voted(self):
         self.create_user()
         self.create_initial()
@@ -2925,7 +3805,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         self.topic.save()
         kitchen = PollAnswer.objects.create(topic=self.topic, text='in the kitchen')
         bathroom = PollAnswer.objects.create(topic=self.topic, text='in the bathroom')
-        
+
         template = Template((
             '{% load pybb_tags %}'
             '{% if topic|pybb_topic_poll_not_voted:user %}NOTVOTED{% else %}VOTED{% endif %}:'
@@ -2940,7 +3820,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         # bob answers
         PollAnswerUser.objects.create(poll_answer=kitchen, user=context['bob'])
         self.assertEqual(template.render(context), 'NOTVOTED:NOTVOTED:VOTED')
-    
+
     def test_endswith(self):
         template = Template(('{% load pybb_tags %}'
                              '{{ test|endswith:"the end..." }}:'
@@ -2948,7 +3828,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
         context = Context({'test': 'This is the end...'})
         self.assertEqual(template.render(context), 'True:False')
 
-    
+
     def test_pybb_get_profile(self):
         template = Template(('{% load pybb_tags %}'
                              '{% pybb_get_profile bob as user_profile_via_args %}'
@@ -2970,13 +3850,14 @@ class TestTemplateTags(TestCase, SharedTestModule):
         self.topic.name = '0'
         self.topic.save()
         for i in range(1, 10):
-            Topic.objects.create(name='%d' % i,
-                                 user=self.user, forum=self.forum,
-                                 on_moderation = bool(i % 2))
-        
+            topic = Topic.objects.create(name='%d' % i,
+                                         user=self.user, forum=self.forum,
+                                         on_moderation = bool(i % 2))
+            self.create_post(topic=topic, user=self.user, body='foo', on_moderation=bool(i % 2))
+
         context = Context({'anonymous': AnonymousUser(), 'user': self.user})
-        
-        
+
+
         # user can view all it's 5 last topic (default slice is 5)
         template = Template(('{% load pybb_tags %}'
                              '{% pybb_get_latest_topics as topics %}'
@@ -2994,8 +3875,8 @@ class TestTemplateTags(TestCase, SharedTestModule):
                              '{% pybb_get_latest_topics 20 anonymous as topics %}'
                              '{% for topic in topics %}{{ topic.name }},{% endfor %}'))
         self.assertEqual(template.render(context), '8,6,4,2,0,')
-        
-    
+
+
     def test_pybb_get_latest_posts(self):
         self.create_user()
         self.create_initial()
@@ -3008,7 +3889,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
             topic = Topic.objects.create(name='%d' % i, user=self.user, forum=self.forum, )
             self.create_post(topic=topic, body='A%d' % i, user=self.user)
             self.create_post(topic=topic, body='B%d' % i, user=self.user, on_moderation = True)
-        
+
         context = Context({'anonymous': AnonymousUser(), 'user': self.user})
 
         ORIG = defaults.PYBB_PREMODERATION
@@ -3058,7 +3939,7 @@ class TestTemplateTags(TestCase, SharedTestModule):
                              '{{ "fairy"|check_app_installed }}:{{ "pybb"|check_app_installed }}'))
         self.assertEqual(template.render(Context()), 'False:True')
 
-    
+
     def test_pybbm_calc_topic_views(self):
         self.create_user()
         self.create_initial()
@@ -3183,4 +4064,3 @@ class MiscTest(TestCase, SharedTestModule):
         self.create_user()
         profile = util.get_pybb_profile(self.user)
         self.assertEqual(profile.get_display_name(), self.user.get_username())
-        
