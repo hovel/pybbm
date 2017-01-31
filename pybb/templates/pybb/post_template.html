@@ -51,7 +51,8 @@
                 {% if user.is_moderator %}
                     <a href="{% url 'pybb:move_post' pk=post.id %}">{% if post.is_topic_head %}{% trans 'Move' %}{% else %}{% trans "Split" %}{% endif %}</a>
                 {% endif %}
-                {% if perms.pybb.change_post and user.is_staff %}
+
+                {% if user|pybb_may_admin_post:post %}
                     <a href="{% url 'admin:pybb_post_change' post.id %}">{% trans 'Admin' %}</a>
                 {% endif %}
 
