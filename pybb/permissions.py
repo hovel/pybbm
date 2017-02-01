@@ -79,23 +79,37 @@ class DefaultPermissionHandler(object):
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
             qs = qs.filter(Q(forum__hidden=False) & Q(forum__category__hidden=False))
-        if not user.is_superuser:
-            if user.is_authenticated():
-                qs = qs.filter(Q(forum__moderators=user) | Q(user=user) | Q(on_moderation=False)).distinct()
-            else:
-                qs = qs.filter(on_moderation=False)
-        return qs
+        if user.is_authenticated():
+            qs = qs.filter(
+                # moderator can view on_moderation
+                Q(forum__moderators=user) |
+                # author can view on_moderation only if there is one post in the topic
+                # (mean that post is owned by author)
+                Q(user=user, post_count=1) |
+                # posts not on_moderation are accessible
+                Q(on_moderation=False)
+            )
+        else:
+            qs = qs.filter(on_moderation=False)
+        return qs.distinct()
 
     def may_view_topic(self, user, topic):
         """ return True if user may view this topic, False otherwise """
         if self.may_moderate_topic(user, topic):
             # If i can moderate, it means I can view.
             return True
-        if not user.is_staff and (topic.forum.hidden or topic.forum.category.hidden):
-            return False  # only staff may see hidden forum / category
         if topic.on_moderation:
-            return user.is_authenticated() and (user == topic.user or user in topic.forum.moderators.all())
-        return True
+            if not topic.head.on_moderation:
+                # topic is in general moderation waiting (it has been marked as on_moderation
+                # but my post is not on_moderation. So it's a manual action we MUST respect)
+                return False
+            if topic.head.on_moderation and topic.head.user != user:
+                # topic is on moderation because of the first post but this is not my post
+                # User must not access to it, only it's author can do in moderation mode
+                return False
+        # FIXME: is_staff only allow user to access /admin but does not mean user has extra
+        # permissions on pybb models. We should add pybb perm test
+        return user.is_staff or (not topic.forum.hidden and not topic.forum.category.hidden)
 
     def may_moderate_topic(self, user, topic):
         if user.is_superuser:
