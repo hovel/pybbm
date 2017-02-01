@@ -171,7 +171,7 @@ class DefaultPermissionHandler(object):
 
     def may_subscribe_topic(self, user, topic):
         """ return True if `user` is allowed to subscribe to a `topic` """
-        return not defaults.PYBB_DISABLE_SUBSCRIPTIONS
+        return not defaults.PYBB_DISABLE_SUBSCRIPTIONS and user.is_authenticated()
 
     #
     # permission checks on posts
@@ -227,6 +227,8 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may delete `post` """
         if user.is_superuser:
             return True
+        if not user.is_authenticated():
+            return False
         return (defaults.PYBB_ALLOW_DELETE_OWN_POST and post.user == user) or \
                user.has_perm('pybb.delete_post') or \
                user in post.topic.forum.moderators.all()
@@ -259,7 +261,7 @@ class DefaultPermissionHandler(object):
 
     def may_create_poll(self, user):
         """
-        return True if `user` may attach files to posts, False otherwise.
+        return True if `user` may add poll to posts, False otherwise.
         By default always True
         """
         return True
