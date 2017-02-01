@@ -149,17 +149,16 @@ class DefaultPermissionHandler(object):
 
         if user.is_superuser:
             return True
-
-        if topic.forum.hidden and (not user.is_staff):
-            # if topic is hidden, only staff may post
+        if not defaults.PYBB_ENABLE_ANONYMOUS_POST and not user.is_authenticated():
             return False
-
-        if topic.closed and (not user.is_staff):
-            # if topic is closed, only staff may post
+        if not self.may_view_topic(user, topic):
             return False
+        if not user.has_perm('pybb.add_post'):
+            return False
+        if topic.closed or topic.on_moderation:
+            return self.may_moderate_topic(user, topic)
+        return True
 
-        # only user which have 'pybb.add_post' permission may post
-        return defaults.PYBB_ENABLE_ANONYMOUS_POST or user.has_perm('pybb.add_post')
 
     def may_post_as_admin(self, user):
         """ return True if `user` may post as admin """
