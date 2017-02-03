@@ -1421,6 +1421,220 @@ class FeaturesTest(TestCase, SharedTestModule):
         self.user.user_permissions.remove(add_change_forum_permission)
         _detach_perms_class()
 
+class MoveAndSplitPostTest(TestCase, SharedTestModule):
+
+    def create_initial(self):
+        if not getattr(self, 'user', None):
+            self.create_user()
+        self.category = Category.objects.create(name='foo', position=1)
+        self.forum_1 = Forum.objects.create(name='forum_1', category=self.category, position=1)
+        self.topic = Topic.objects.create(name='abc', forum=self.forum_1, user=self.user, views=7)
+        self.posts = []
+        self.posts.append(self.create_post(topic=self.topic, user=self.user, body='zero'))
+        self.posts.append(self.create_post(topic=self.topic, user=self.user, body='one'))
+        self.posts.append(self.create_post(topic=self.topic, user=self.user, body='two'))
+        self.posts.append(self.create_post(topic=self.topic, user=self.user, body='three'))
+        self.posts.append(self.create_post(topic=self.topic, user=self.user, body='four'))
+        self.posts.append(self.create_post(topic=self.topic, user=self.user, body='five'))
+
+        self.forum_2 = Forum.objects.create(name='forum_2', category=self.category, position=2)
+        self.forum_3 = Forum.objects.create(name='forum_3', category=self.category, hidden=True)
+
+        self.moderator = User.objects.create_user('moderator', 'moderator@localhost', 'moderator')
+        self.forum_1.moderators.add(self.moderator)
+        self.forum_2.moderators.add(self.moderator)
+
+    def test_move_topic(self):
+        self.create_initial()
+        move_topic_url = reverse('pybb:move_post', kwargs={'pk': self.topic.head.pk})
+
+        # user can not move posts, even if he is the author
+        response = self.get_with_user(move_topic_url, 'zeus', 'zeus')
+        self.assertEqual(response.status_code, 403)
+
+        # moderator can
+        self.login_client('moderator', 'moderator')
+        response = self.client.get(move_topic_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.forum_1.topic_count, 1)
+        self.assertEqual(self.forum_1.post_count, 6)
+        
+        # check form values
+        form_values = self.get_form_values(response, 'move-post-form')
+        move_to_choices = response.context['form'].fields['move_to'].choices
+        self.assertTrue('name' in response.context['form'].fields)
+        self.assertTrue('number' not in response.context['form'].fields)
+        self.assertEqual(len(move_to_choices), 1)
+        self.assertEqual(move_to_choices[0][0], '%s' % self.category)
+        self.assertEqual(len(move_to_choices[0][1]), 1)
+        # moderator has no access to forum 3 (hidden), so he can't move the topic in this forum
+        self.assertEqual(move_to_choices[0][1][0][0], self.forum_2.pk)
+
+        # move in forum_2
+        form_values['move_to'] = self.forum_2.pk
+        response = self.client.post(move_topic_url, form_values, follow=True)
+        forum_1 = Forum.objects.get(pk=self.forum_1.pk)
+        forum_2 = Forum.objects.get(pk=self.forum_2.pk)
+        topic = Topic.objects.get(pk=self.topic.pk)
+        self.assertEqual(topic.forum.pk, forum_2.pk)
+        self.assertEqual(forum_1.topic_count, 0)
+        self.assertEqual(forum_1.post_count, 0)
+        self.assertEqual(forum_2.topic_count, 1)
+        self.assertEqual(forum_2.post_count, 6)
+        self.assertEqual(topic.views, 8)  # +1 because topic is currently viewed by moderator
+
+    def test_split_posts_all(self):
+        self.create_initial()
+        split_posts_url = reverse('pybb:move_post', kwargs={'pk': self.posts[2].pk})
+
+        self.login_client('moderator', 'moderator')
+        response = self.client.get(split_posts_url)
+        self.assertEqual(response.status_code, 200)
+        
+        # check form values
+        form_values = self.get_form_values(response, 'move-post-form')
+        move_to_choices = response.context['form'].fields['move_to'].choices
+        self.assertTrue('name' in response.context['form'].fields)
+        self.assertTrue('number' in response.context['form'].fields)
+        self.assertEqual(len(move_to_choices), 1)
+        self.assertEqual(move_to_choices[0][0], '%s' % self.category)
+        self.assertEqual(len(move_to_choices[0][1]), 2)
+        # moderator has no access to forum 3 (hidden), so he can't move the topic in this forum
+        # but forum_1 is in choices because we can split in the same forum
+        self.assertEqual(move_to_choices[0][1][0][0], self.forum_1.pk)
+        self.assertEqual(move_to_choices[0][1][1][0], self.forum_2.pk)
+
+        # move 4 last posts in forum_2
+        form_values['move_to'] = self.forum_2.pk
+        form_values['number'] = -1
+        form_values['name'] = 'new topic'
+        response = self.client.post(split_posts_url, form_values, follow=True)
+        forum_1 = Forum.objects.get(pk=self.forum_1.pk)
+        forum_2 = Forum.objects.get(pk=self.forum_2.pk)
+        topic_1 = Topic.objects.get(pk=self.topic.pk)
+        # initial topic is still in the forum 1
+        self.assertEqual(topic_1.forum.pk, forum_1.pk)
+        # it has now only 2 posts
+        self.assertEqual(topic_1.posts.count(), 2)
+        # head post of the topic is post "zero"
+        self.assertEqual(topic_1.head.pk, self.posts[0].pk)
+        # last post of the topic is post "one"
+        self.assertEqual(topic_1.last_post.pk, self.posts[1].pk)
+
+        try:
+            # new topic exists
+            topic_2 = Topic.objects.get(forum=forum_2)
+        except:
+            self.fail('A new topic in forum 2 should have been created by spliting posts')
+
+        # it has new name
+        self.assertEqual(topic_2.name, 'new topic')
+        # it has 4 posts
+        self.assertEqual(topic_2.posts.count(), 4)
+        # head post of the topic is post "two"
+        self.assertEqual(topic_2.head.pk, self.posts[2].pk)
+        # last post of the topic is post "five"
+        self.assertEqual(topic_2.last_post.pk, self.posts[5].pk)
+
+        # check topic and forum counters
+        self.assertEqual(topic_1.post_count, 2)
+        self.assertEqual(topic_1.views, 7)
+        self.assertEqual(forum_1.topic_count, 1)
+        self.assertEqual(forum_1.post_count, 2)
+        self.assertEqual(topic_2.post_count, 4)
+        self.assertEqual(forum_2.topic_count, 1)
+        self.assertEqual(forum_2.post_count, 4)
+        self.assertEqual(topic_2.views, 1)  # +1 because topic is currently viewed by moderator
+
+    def test_split_posts_last(self):
+        self.create_initial()
+        split_posts_url = reverse('pybb:move_post', kwargs={'pk': self.posts[5].pk})
+
+        self.login_client('moderator', 'moderator')
+        response = self.client.get(split_posts_url)
+        self.assertEqual(response.status_code, 200)
+        
+        form_values = self.get_form_values(response, 'move-post-form')
+
+        # move last post in forum_2
+        form_values['move_to'] = self.forum_2.pk
+        form_values['number'] = -1
+        response = self.client.post(split_posts_url, form_values, follow=True)
+        forum_1 = Forum.objects.get(pk=self.forum_1.pk)
+        forum_2 = Forum.objects.get(pk=self.forum_2.pk)
+        self.assertEqual(forum_1.topic_count, 1)
+        self.assertEqual(forum_1.post_count, 5)
+        self.assertEqual(forum_2.topic_count, 1)
+        self.assertEqual(forum_2.post_count, 1)
+        topic_2 = Post.objects.get(pk=self.posts[5].pk).topic
+        self.assertNotEqual(self.topic.pk, topic_2.pk)
+        self.assertEqual(self.topic.name, topic_2.name)
+        self.assertEqual(self.topic.slug, topic_2.slug)  # same slug because not in same forum
+
+    def test_split_posts_some_same_forum(self):
+        self.create_initial()
+        split_posts_url = reverse('pybb:move_post', kwargs={'pk': self.posts[1].pk})
+
+        self.login_client('moderator', 'moderator')
+        response = self.client.get(split_posts_url)
+        self.assertEqual(response.status_code, 200)
+        
+        form_values = self.get_form_values(response, 'move-post-form')
+
+        # post stay in same forum but are splited in a new topic
+        form_values['move_to'] = self.forum_1.pk
+        form_values['number'] = 2
+        response = self.client.post(split_posts_url, form_values, follow=True)
+        forum_1 = Forum.objects.get(pk=self.forum_1.pk)
+        forum_2 = Forum.objects.get(pk=self.forum_2.pk)
+        topic_1 = Topic.objects.get(pk=self.topic.pk)
+        topic_2 = Post.objects.get(pk=self.posts[1].pk).topic
+        # splited in 2 topics
+        self.assertNotEqual(topic_1.pk, topic_2.pk)
+        self.assertEqual(topic_1.name, topic_2.name)
+        self.assertNotEqual(topic_1.slug, topic_2.slug)  # can't keep same slug in same forum
+        self.assertEqual(topic_1.posts.count(), 3)
+        self.assertEqual(topic_2.posts.count(), 3)
+        # stay in same forum
+        self.assertEqual(topic_1.forum.pk, topic_2.forum.pk)
+        # posts 0 4 5 are still in topic 1
+        self.assertEqual(topic_1.head.pk, self.posts[0].pk)
+        self.assertEqual(topic_1.last_post.pk, self.posts[5].pk)
+        # posts 1 2 3 are now in topic 2
+        self.assertEqual(topic_2.head.pk, self.posts[1].pk)
+        self.assertEqual(topic_2.last_post.pk, self.posts[3].pk)
+
+    def test_split_posts_some_other_forum(self):
+        self.create_initial()
+        split_posts_url = reverse('pybb:move_post', kwargs={'pk': self.posts[1].pk})
+
+        self.login_client('moderator', 'moderator')
+        response = self.client.get(split_posts_url)
+        self.assertEqual(response.status_code, 200)
+        
+        form_values = self.get_form_values(response, 'move-post-form')
+
+        # posts splited in forum 2 
+        form_values['move_to'] = self.forum_2.pk
+        form_values['number'] = 2
+        response = self.client.post(split_posts_url, form_values, follow=True)
+        forum_1 = Forum.objects.get(pk=self.forum_1.pk)
+        forum_2 = Forum.objects.get(pk=self.forum_2.pk)
+        topic_1 = Topic.objects.get(pk=self.topic.pk)
+        topic_2 = Post.objects.get(pk=self.posts[1].pk).topic
+        # splited in 2 topics
+        self.assertNotEqual(topic_1.pk, topic_2.pk)
+        self.assertEqual(topic_1.posts.count(), 3)
+        self.assertEqual(topic_2.posts.count(), 3)
+        # not anymore in same forum
+        self.assertNotEqual(topic_1.forum.pk, topic_2.forum.pk)
+        # posts 0 4 5 are still in topic 1
+        self.assertEqual(topic_1.head.pk, self.posts[0].pk)
+        self.assertEqual(topic_1.last_post.pk, self.posts[5].pk)
+        # posts 1 2 3 are now in topic 2
+        self.assertEqual(topic_2.head.pk, self.posts[1].pk)
+        self.assertEqual(topic_2.last_post.pk, self.posts[3].pk)
+
 
 class AnonymousTest(TestCase, SharedTestModule):
     def setUp(self):
@@ -1470,7 +1684,6 @@ class AnonymousTest(TestCase, SharedTestModule):
         self.client.get(url)
         self.assertEqual(Topic.objects.get(id=self.topic.id).views, views + 1)
         self.assertEqual(cache.get(util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)), 0)
-
 
 def premoderate_test(user, post):
     """
