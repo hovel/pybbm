@@ -86,6 +86,6 @@ MEDIA_URL = '/media/'
 AUTH_USER_MODEL = 'test_app.CustomUser'
 
 LOGIN_URL = '/'
-
+USE_TZ = True
 PYBB_ATTACHMENT_ENABLE = True
 PYBB_PROFILE_RELATED_NAME = 'pybb_customprofile'
