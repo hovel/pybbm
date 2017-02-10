@@ -1,21 +1,26 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-import datetime
+import datetime, time
+import inspect
+import math
 import os
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.conf import settings
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.models import Q
+from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
-from django.utils import timezone
+from django.utils import dateformat, timezone
 from django.utils.translation.trans_real import get_supported_language_variant
+
 
 from pybb import permissions, views as pybb_views
 from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread, pybb_forum_unread, \
@@ -32,8 +37,8 @@ except ImportError:  # pragma: no cover
     raise Exception('PyBB requires lxml for self testing')
 
 from pybb import defaults
-from pybb.models import Category, Forum, Topic, Post, PollAnswer, TopicReadTracker, \
-    ForumReadTracker, ForumSubscription
+from pybb.models import Category, Forum, Topic, Post, PollAnswer, PollAnswerUser, \
+    TopicReadTracker, ForumReadTracker, ForumSubscription
 
 if getattr(connection.features, 'supports_microsecond_precision', False):
     def sleep_only_if_required(s):
@@ -2429,3 +2434,540 @@ class NiceUrlsTest(TestCase, SharedTestModule):
 
     def tearDown(self):
         defaults.PYBB_NICE_URL = self.ORIGINAL_PYBB_NICE_URL
+
+
+class TestTemplateTags(TestCase, SharedTestModule):
+    """Tests all templatetags and filter defined by pybb"""
+
+    # def setUp(self):
+        # self.create_user()
+        # self.create_initial()
+    
+    def test_pybb_time_anonymous(self):
+        template = Template('{% load pybb_tags %}{% pybb_time a_time %}')
+        context = Context({'user': AnonymousUser()})
+
+        context['a_time'] = timezone.now() - timezone.timedelta(days=2)
+        output = template.render(context)
+        self.assertEqual(output, dateformat.format(context['a_time'], 'd M, Y H:i'))
+        
+        context['a_time'] = timezone.now() - timezone.timedelta(days=1)
+        output = template.render(context)
+        self.assertEqual(output, 'yesterday, %s' % context['a_time'].strftime('%H:%M'))
+        
+        context['a_time'] = timezone.now() - timezone.timedelta(hours=1)
+        output = template.render(context)
+        self.assertEqual(output, 'today, %s' % context['a_time'].strftime('%H:%M'))
+        
+        context['a_time'] = timezone.now() - timezone.timedelta(minutes=30)
+        output = template.render(context)
+        self.assertEqual(output, '30 minutes ago')
+        
+        context['a_time'] = timezone.now() - timezone.timedelta(seconds=30)
+        output = template.render(context)
+        self.assertEqual(output, '30 seconds ago')
+
+    def test_pybb_time_authenticated(self):
+        self.create_user()
+        template = Template('{% load pybb_tags %}{% pybb_time a_time %}')
+        context = Context({'user': self.user})
+        context['a_time'] = timezone.now() - timezone.timedelta(days=2)
+        output = template.render(context)
+        tz = util.get_pybb_profile(self.user).time_zone * 60 * 60
+        tz += time.altzone if time.daylight else time.timezone
+        user_datetime = context['a_time'] + timezone.timedelta(seconds=tz)
+        self.assertEqual(output, dateformat.format(user_datetime, 'd M, Y H:i'))
+        
+        context['a_time'] = timezone.now() - timezone.timedelta(seconds=30)
+        output = template.render(context)
+        self.assertEqual(output, '30 seconds ago')
+
+    def test_pybb_get_time(self):
+        template = Template(('{% load pybb_tags %}{% pybb_get_time a_time as time_output %}'
+                             '{{ time_output|upper }}'))
+        context = Context({'user': AnonymousUser(),
+                           'a_time': timezone.now() - timezone.timedelta(seconds=30)})
+        output = template.render(context)
+        self.assertEqual(output, '30 SECONDS AGO')
+    
+    def test_pybb_link(self):
+        self.create_user()
+        self.create_initial()
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_link topic %}, '
+                             '{% pybb_link forum %}, '
+                             '{% pybb_link post "Hello <World>" %}'))
+        context = Context({'user': AnonymousUser(),
+                           'post': self.post,
+                           'topic': self.topic,
+                           'forum': self.forum})
+        expected = ('<a href="%s">%s</a>' % (self.topic.get_absolute_url(), self.topic),
+                    '<a href="%s">%s</a>' % (self.forum.get_absolute_url(), self.forum),
+                    '<a href="%s">%s</a>' % (self.post.get_absolute_url(), 'Hello &lt;World&gt;'))
+        expected = ', '.join(expected)
+        output = template.render(context)
+        self.assertEqual(output, expected)
+
+    def test_pybb_posted_by(self):
+        self.create_user()
+        self.create_initial()
+        template = Template(('{% load pybb_tags %}'
+                             '{% if post|pybb_posted_by:user %}YES{% else %}NO{% endif %}:'
+                             '{% if post|pybb_posted_by:anonymous %}YES{% else %}NO{% endif %}'))
+        context = Context({'user': self.user,
+                           'anonymous': AnonymousUser(),
+                           'post': self.post})
+        output = template.render(context)
+        self.assertEqual(output, 'YES:NO')
+
+    
+    def test_pybb_is_topic_unread(self):
+        self.create_user()
+        self.create_initial()
+        self.login_client()
+        self.client.get(self.topic.get_absolute_url())
+        template = Template(('{% load pybb_tags %}'
+                             '{% if topic|pybb_is_topic_unread:user %}YES{% else %}NO{% endif %}:'
+                             '{% if topic|pybb_is_topic_unread:anonymous %}YES{% else %}NO{% endif %}:'
+                             '{% if topic|pybb_is_topic_unread:bob %}YES{% else %}NO{% endif %}'))
+        context = Context({'user': self.user,
+                           'anonymous': AnonymousUser(),
+                           'bob': User.objects.create_user('bob', 'bob@localhost', 'bob'),
+                           'topic': self.topic})
+        output = template.render(context)
+        self.assertEqual(output, 'NO:NO:YES')
+
+    
+    def test_pybb_topic_unread(self):
+        self.create_user()
+        self.login_client()
+        bob = User.objects.create_user('bob', 'bob@localhost', 'bob')
+
+        """
+        creates a total of 6 topics in 3 forums.
+            * Forum A
+                * Topic A1
+            * Forum B
+                * Topic B1
+                * Topic B2
+            * Forum C
+                * Topic C1
+                * Topic C2
+                * Topic C3
+        """
+        forums = []
+        topics = []
+        category = Category.objects.create(name='foo')
+        for letter in 'ABC':
+            forum = Forum.objects.create(name=letter, description=letter, category=category)
+            forums.append(forum)
+            topic = Topic.objects.create(name='%s1' % letter, forum=forum, user=bob)
+            self.create_post(topic=topic, user=bob, body='test')
+            topics.append(topic)
+        topic = Topic.objects.create(name='B2', forum=forums[1], user=bob)
+        self.create_post(topic=topic, user=bob, body='test')
+        topics.append(topic)
+        topic = Topic.objects.create(name='C2', forum=forums[2], user=bob)
+        self.create_post(topic=topic, user=bob, body='test')
+        topics.append(topic)
+        topic = Topic.objects.create(name='C3', forum=forums[2], user=bob)
+        self.create_post(topic=topic, user=bob, body='test')
+        topics.append(topic)
+        
+        template = Template(('{% load pybb_tags %}'
+                             '{% for topic in topics|pybb_topic_unread:user %}'
+                             '{{ topic.name }}: {{ topic.unread }}\n'
+                             '{% endfor %}'))
+
+        # test with anonymous: unread should be empty (neither True, neither False)
+        context = Context({'user': AnonymousUser(), 'topics': topics})
+        output = template.render(context)
+        expected = '\n'.join(('A1: ', 'B1: ', 'C1: ',
+                              'B2: ', 'C2: ',
+                              'C3: ', ''))
+        self.assertEqual(output, expected)
+
+        # User should have everything marked as unread
+        context['user'] = self.user
+        output = template.render(context)
+        expected = '\n'.join(('A1: True', 'B1: True', 'C1: True',
+                              'B2: True', 'C2: True',
+                              'C3: True', ''))
+        self.assertEqual(output, expected)
+
+        # mark A1, B1 and C1 as read for user
+        self.client.get(topics[0].get_absolute_url())
+        self.client.get(topics[1].get_absolute_url())
+        self.client.get(topics[2].get_absolute_url())
+        output = template.render(context)
+        expected = '\n'.join(('A1: False', 'B1: False', 'C1: False',
+                              'B2: True', 'C2: True',
+                              'C3: True', ''))
+        self.assertEqual(output, expected)
+
+        # mark all as read for user
+        self.client.get(reverse('pybb:mark_all_as_read'))
+        output = template.render(context)
+        expected = '\n'.join(('A1: False', 'B1: False', 'C1: False',
+                              'B2: False', 'C2: False',
+                              'C3: False', ''))
+        self.assertEqual(output, expected)
+
+
+    def test_pybb_forum_unread(self):
+        self.create_user()
+        self.login_client()
+        bob = User.objects.create_user('bob', 'bob@localhost', 'bob')
+
+        """
+        creates a total of 6 topics in 3 forums.
+            * Forum A
+                * Topic A1
+            * Forum B
+                * Topic B1
+                * Topic B2
+            * Forum C
+                * Topic C1
+                * Topic C2
+                * Topic C3
+        """
+        forums = []
+        topics = []
+        category = Category.objects.create(name='foo')
+        for letter in 'ABC':
+            forum = Forum.objects.create(name=letter, description=letter, category=category)
+            forums.append(forum)
+            topic = Topic.objects.create(name='%s1' % letter, forum=forum, user=bob)
+            self.create_post(topic=topic, user=bob, body='test')
+            topics.append(topic)
+        topic = Topic.objects.create(name='B2', forum=forums[1], user=bob)
+        self.create_post(topic=topic, user=bob, body='test')
+        topics.append(topic)
+        topic = Topic.objects.create(name='C2', forum=forums[2], user=bob)
+        self.create_post(topic=topic, user=bob, body='test')
+        topics.append(topic)
+        topic = Topic.objects.create(name='C3', forum=forums[2], user=bob)
+        self.create_post(topic=topic, user=bob, body='test')
+        topics.append(topic)
+        
+        template = Template(('{% load pybb_tags %}'
+                             '{% for forum in forums|pybb_forum_unread:user %}'
+                             '{{ forum.name }}: {{ forum.unread }}\n'
+                             '{% endfor %}'))
+
+        context = Context({'forums': forums})
+        # test for anonymous user: unread is empty (neither True, neither False)
+        context['user'] = AnonymousUser()
+        output = template.render(context)
+        expected = '\n'.join(('A: ', 'B: ', 'C: ', ''))
+        self.assertEqual(output, expected)
+
+        # User should have everything marked as unread
+        context['user'] = self.user
+        output = template.render(context)
+        expected = '\n'.join(('A: True', 'B: True', 'C: True', ''))
+        self.assertEqual(output, expected)
+
+        # mark A1, B1 and C1 as read for user (so forum A is not unread now)
+        self.client.get(topics[0].get_absolute_url())
+        self.client.get(topics[1].get_absolute_url())
+        self.client.get(topics[2].get_absolute_url())
+        output = template.render(context)
+        expected = '\n'.join(('A: False', 'B: True', 'C: True', ''))
+        self.assertEqual(output, expected)
+
+        # mark all as read for user
+        self.client.get(reverse('pybb:mark_all_as_read'))
+        output = template.render(context)
+        expected = '\n'.join(('A: False', 'B: False', 'C: False', ''))
+        self.assertEqual(output, expected)
+
+    
+    def test_pybb_topic_inline_pagination(self):
+        self.create_user()
+        self.create_initial()
+        self.topic.post_count = defaults.PYBB_TOPIC_PAGE_SIZE * 13
+        nb_pages = int(math.ceil(float(self.topic.post_count) / defaults.PYBB_TOPIC_PAGE_SIZE))
+        
+        template = Template(('{% load pybb_tags %}'
+                             '{% for page in topic|pybb_topic_inline_pagination %}'
+                             '{{ page }} '
+                             '{% endfor %}'))
+        context = Context({'user': AnonymousUser(), 'topic': self.topic})
+        output = template.render(context)
+        expected = '1 2 3 4 ... %d ' % nb_pages
+        self.assertEqual(output, expected)
+
+        self.topic.post_count = defaults.PYBB_TOPIC_PAGE_SIZE * 3
+        output = template.render(context)
+        expected = '1 2 3 '
+        self.assertEqual(output, expected)
+
+    
+    def test_pybb_topic_poll_not_voted(self):
+        self.create_user()
+        self.create_initial()
+        self.topic.poll_type = Topic.POLL_TYPE_SINGLE
+        self.topic.poll_question = 'Where is Brian?'
+        self.topic.save()
+        kitchen = PollAnswer.objects.create(topic=self.topic, text='in the kitchen')
+        bathroom = PollAnswer.objects.create(topic=self.topic, text='in the bathroom')
+        
+        template = Template((
+            '{% load pybb_tags %}'
+            '{% if topic|pybb_topic_poll_not_voted:user %}NOTVOTED{% else %}VOTED{% endif %}:'
+            '{% if topic|pybb_topic_poll_not_voted:anonymous %}NOTVOTED{% else %}VOTED{% endif %}:'
+            '{% if topic|pybb_topic_poll_not_voted:bob %}NOTVOTED{% else %}VOTED{% endif %}'))
+        context = Context({'user': self.user,
+                           'anonymous': AnonymousUser(),
+                           'bob': User.objects.create_user('bob', 'bob@localhost', 'bob'),
+                           'topic': self.topic})
+        self.assertEqual(template.render(context), 'NOTVOTED:NOTVOTED:NOTVOTED')
+
+        # bob answers
+        PollAnswerUser.objects.create(poll_answer=kitchen, user=context['bob'])
+        self.assertEqual(template.render(context), 'NOTVOTED:NOTVOTED:VOTED')
+    
+    def test_endswith(self):
+        template = Template(('{% load pybb_tags %}'
+                             '{{ test|endswith:"the end..." }}:'
+                             '{{ test|endswith:"big bang" }}'))
+        context = Context({'test': 'This is the end...'})
+        self.assertEqual(template.render(context), 'True:False')
+
+    
+    def test_pybb_get_profile(self):
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_profile bob as user_profile_via_args %}'
+                             '{% pybb_get_profile user=bob as user_profile_via_kwargs %}'
+                             '{% pybb_get_profile anonymous as no_profile %}'
+                             '{{ user_profile_via_args.pk }}:'
+                             '{{ user_profile_via_kwargs.pk }}:'
+                             '{{ no_profile }}'))
+        context = Context({'anonymous': AnonymousUser(),
+                           'bob': User.objects.create_user('bob', 'bob@localhost', 'bob')})
+
+        bob_profile_pk = util.get_pybb_profile(context['bob']).pk
+        self.assertEqual(template.render(context), '%(pk)d:%(pk)d:None' % {'pk': bob_profile_pk})
+
+
+    def test_pybb_get_latest_topics(self):
+        self.create_user()
+        self.create_initial()
+        self.topic.name = '0'
+        self.topic.save()
+        for i in range(1, 10):
+            Topic.objects.create(name='%d' % i,
+                                 user=self.user, forum=self.forum,
+                                 on_moderation = bool(i % 2))
+        
+        context = Context({'anonymous': AnonymousUser(), 'user': self.user})
+        
+        
+        # user can view all it's 5 last topic (default slice is 5)
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_topics as topics %}'
+                             '{% for topic in topics %}{{ topic.name }},{% endfor %}'))
+        self.assertEqual(template.render(context), '9,8,7,6,5,')
+
+        # user can view all it's topics
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_topics 20 as topics %}'
+                             '{% for topic in topics %}{{ topic.name }},{% endfor %}'))
+        self.assertEqual(template.render(context), '9,8,7,6,5,4,3,2,1,0,')
+
+        # anonymous can view topics which do not require moderation (the odd ones)
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_topics 20 anonymous as topics %}'
+                             '{% for topic in topics %}{{ topic.name }},{% endfor %}'))
+        self.assertEqual(template.render(context), '8,6,4,2,0,')
+        
+    
+    def test_pybb_get_latest_posts(self):
+        self.create_user()
+        self.create_initial()
+        self.topic.name = '0'
+        self.topic.save()
+        self.post.body = 'A0'
+        self.post.save()
+        self.create_post(topic=self.topic, body='B0', user=self.user, on_moderation = True)
+        for i in range(1, 10):
+            topic = Topic.objects.create(name='%d' % i, user=self.user, forum=self.forum, )
+            self.create_post(topic=topic, body='A%d' % i, user=self.user)
+            self.create_post(topic=topic, body='B%d' % i, user=self.user, on_moderation = True)
+        
+        context = Context({'anonymous': AnonymousUser(), 'user': self.user})
+
+        ORIG = defaults.PYBB_PREMODERATION
+        # test without PREMODERATION
+        defaults.PYBB_PREMODERATION = False
+        # user can view all it's 5 last post (default slice is 5)
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_posts as posts %}'
+                             '{% for post in posts %}{{ post.body }},{% endfor %}'))
+        self.assertEqual(template.render(context), 'B9,A9,B8,A8,B7,')
+
+        # user can view all it's posts
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_posts 20 as posts %}'
+                             '{% for post in posts %}{{ post.body }},{% endfor %}'))
+        self.assertEqual(template.render(context),
+                         'B9,A9,B8,A8,B7,A7,B6,A6,B5,A5,B4,A4,B3,A3,B2,A2,B1,A1,B0,A0,')
+
+        # anonymous can view all posts when PYBB_PREMODERATION is disabled
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_posts 20 anonymous as posts %}'
+                             '{% for post in posts %}{{ post.body }},{% endfor %}'))
+        self.assertEqual(template.render(context),
+                         'B9,A9,B8,A8,B7,A7,B6,A6,B5,A5,B4,A4,B3,A3,B2,A2,B1,A1,B0,A0,')
+
+        # now, test with PREMODERATION
+        def fake_premoderation(user, body):
+            return True
+        defaults.PYBB_PREMODERATION = fake_premoderation
+        # user can always view all it's posts even if those need moderation
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_posts 20 as posts %}'
+                             '{% for post in posts %}{{ post.body }},{% endfor %}'))
+        self.assertEqual(template.render(context),
+                         'B9,A9,B8,A8,B7,A7,B6,A6,B5,A5,B4,A4,B3,A3,B2,A2,B1,A1,B0,A0,')
+
+        # anonymous can view posts which do not require moderation (all "A" posts)
+        template = Template(('{% load pybb_tags %}'
+                             '{% pybb_get_latest_posts 20 anonymous as posts %}'
+                             '{% for post in posts %}{{ post.body }},{% endfor %}'))
+        self.assertEqual(template.render(context), 'A9,A8,A7,A6,A5,A4,A3,A2,A1,A0,')
+        defaults.PYBB_PREMODERATION = ORIG
+
+
+    def test_perms_check_app_installed(self):
+        template = Template(('{% load pybb_tags %}'
+                             '{{ "fairy"|check_app_installed }}:{{ "pybb"|check_app_installed }}'))
+        self.assertEqual(template.render(Context()), 'False:True')
+
+    
+    def test_pybbm_calc_topic_views(self):
+        self.create_user()
+        self.create_initial()
+        cache.delete(util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id))
+        context = Context({'topic': self.topic})
+        template = Template(('{% load pybb_tags %}{{ topic|pybbm_calc_topic_views }}'))
+        self.assertEqual(template.render(context), '0')
+
+        self.client.get(self.topic.get_absolute_url())
+        self.assertEqual(template.render(context), '1')
+
+        bob = User.objects.create_user('bob', 'bob@localhost', 'bob')
+        self.get_with_user(self.topic.get_absolute_url(), username='bob', password='bob')
+        context['topic'] = Topic.objects.get(pk=self.topic.pk)
+        self.assertEqual(template.render(context), '2')
+
+        self.client.get(self.topic.get_absolute_url())
+        self.assertEqual(template.render(context), '3')
+
+
+def build_dynamic_test_for_templatetags_perms():
+    """
+    Dynamically creates test method for templatetags which are dynamically created via
+    methods from PermissionHandler (pybb.permissions)
+    """
+    arg_mapping = {
+        'categories': Category.objects.all(),
+        'forums': Forum.objects.all(),
+        'topics': Topic.objects.all(),
+        'posts': Post.objects.all(),
+        'category': Category.objects.first,
+        'forum': Forum.objects.first,
+        'topic': Topic.objects.first,
+        'post': Post.objects.first,
+        'user': User.objects.first,
+    }
+
+    def build_test_method(method_name, method, required_arg, templatetag_name):
+        if method_name.startswith('filter') and len(method_args) == 3:
+            # Method should have 2 args: user and queryset. else we can not test it
+            def test(self):
+                self.create_user()
+                self.create_initial()
+                context = Context({'user': self.user, 'qs': arg_mapping[required_arg]})
+                template = Template(('{%% load pybb_tags %%}'
+                                     '{%% for o in user|%s:qs %%}'
+                                     '{{ o }}'
+                                     '{%% endfor %%}') % templatetag_name)
+                expected = ''.join(['%s' % obj for obj in method(self.user, context['qs'])])
+                self.assertEqual(template.render(context), expected)
+        elif method_name.startswith('may'):
+            def test(self):
+                self.create_user()
+                self.create_initial()
+                context = Context({'user': self.user})
+                if required_arg:
+                    context['obj'] = arg_mapping[required_arg]
+                    if callable(context['obj']):
+                        # because .first() is run when called, we need to call it now, not before
+                        context['obj'] = context['obj']()
+                    expected = '%s' % method(self.user, context['obj'])
+                    tpl = '{%% load pybb_tags %%}{{ user|%s:obj }}' % templatetag_name
+                else:
+                    expected = '%s' % method(self.user)
+                    tpl = '{%% load pybb_tags %%}{{ user|%s }}' % templatetag_name
+                template = Template(tpl)
+                self.assertEqual(template.render(context), expected)
+        else:
+            test = None
+        return test
+
+    for method_name, method in inspect.getmembers(permissions.perms):
+        if not inspect.ismethod(method):
+            continue  # only methods are used to dynamically build templatetags
+        if not method_name.startswith('may') and not method_name.startswith('filter'):
+            continue  # only (may|filter)* methods are used to dynamically build templatetags
+        method_args = inspect.getargspec(method).args
+        args_count = len(method_args)
+        if args_count not in (2, 3):
+            continue  # only methods with 2 or 3 params
+        if method_args[0] != 'self' or method_args[1] != 'user':
+            continue  # only methods with self and user as first args
+
+        templatetag_name = 'pybb_%s' % method_name
+
+        required_arg = None
+        if len(method_args) == 3:
+            # this is a filter which require a queryset or an obj
+            required_arg = method_args[2]
+            if required_arg not in arg_mapping:
+                required_arg = method_name.split('_')[-1]
+            if required_arg not in arg_mapping:
+                # Method or its args are not well named. We can not dynamically test it
+                continue
+        test_method = build_test_method(method_name, method, required_arg, templatetag_name)
+        if test_method:
+            test_method.__name__ = str('test_%s' % templatetag_name)
+            setattr(TestTemplateTags, test_method.__name__, test_method)
+build_dynamic_test_for_templatetags_perms()
+
+
+class MiscTest(TestCase, SharedTestModule):
+
+    def test_profile_avatar_url_property(self):
+        self.create_user()
+        profile = util.get_pybb_profile(self.user)
+        # test the default avatar
+        self.assertEqual(profile.avatar_url, defaults.PYBB_DEFAULT_AVATAR_URL)
+
+        # test if user has a valid avatar
+        path = os.path.join(os.path.dirname(__file__), 'static', 'pybb', 'img', 'image.png')
+        profile.avatar = SimpleUploadedFile(name='image.png',
+                                            content=open(path, 'rb').read(),
+                                            content_type='image/png')
+        profile.save()
+        self.assertNotEqual(profile.avatar_url, defaults.PYBB_DEFAULT_AVATAR_URL)
+        self.assertTrue(profile.avatar_url.startswith(settings.MEDIA_URL + 'pybb/avatar/'))
+        self.assertTrue(profile.avatar_url.endswith('.png'))
+
+
+    def test_profile_get_display_name(self):
+        self.create_user()
+        profile = util.get_pybb_profile(self.user)
+        self.assertEqual(profile.get_display_name(), self.user.get_username())
+        

@@ -80,6 +80,8 @@ ROOT_URLCONF = 'test_project.urls'
 SITE_ID = 1
 
 STATIC_URL = '/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '..', '..', 'pybb_upload')
+MEDIA_URL = '/media/'
 
 AUTH_USER_MODEL = 'test_app.CustomUser'
 
