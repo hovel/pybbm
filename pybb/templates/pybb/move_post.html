@@ -2,7 +2,7 @@
 {% load i18n pybb_tags %}
 
 {% block content %}
-    
+
     {% if post.is_topic_head %}
         <h1>{% blocktrans with topic=post.topic %}Move topic "{{ topic }}"{% endblocktrans %}</h1>
     {% else %}
@@ -14,9 +14,9 @@
             {% if not post.is_topic_head %}
             {% pybb_get_profile post.user as author %}
             <div>
-                <label>{% blocktrans %}Starting post by {{ author }}{% endblocktrans %}</label>
+                <label>{% blocktrans with author.get_display_name as author_name %}Starting post by {{ author_name }}{% endblocktrans %}</label>
                 <div class="post-preview well form-control">
-                    <blockquote>{{ post.body_html|safe|truncatewords_html:20 }}</blockquote>
+                    {{ post.body_html|safe|truncatewords_html:20 }}
                 </div>
             </div>
             {% endif %}
