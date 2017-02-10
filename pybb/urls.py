@@ -7,7 +7,7 @@ from django.conf.urls import url
 from pybb.defaults import PYBB_NICE_URL
 from pybb.feeds import LastPosts, LastTopics
 from pybb.views import IndexView, CategoryView, ForumView, TopicView, \
-    AddPostView, EditPostView, UserView, PostView, ProfileEditView, \
+    AddPostView, EditPostView, MovePostView, UserView, PostView, ProfileEditView, \
     DeletePostView, StickTopicView, UnstickTopicView, CloseTopicView, \
     OpenTopicView, ModeratePost, TopicPollVoteView, LatestTopicsView, \
     UserTopics, UserPosts, topic_cancel_poll_vote, block_user, unblock_user, \
@@ -65,6 +65,7 @@ urlpatterns += [
     # Post
     url('^post/(?P<pk>\d+)/$', PostView.as_view(), name='post'),
     url('^post/(?P<pk>\d+)/edit/$', EditPostView.as_view(), name='edit_post'),
+    url('^post/(?P<pk>\d+)/move/$', MovePostView.as_view(), name='move_post'),
     url('^post/(?P<pk>\d+)/delete/$', DeletePostView.as_view(),
         name='delete_post'),
     url('^post/(?P<pk>\d+)/moderate/$', ModeratePost.as_view(),

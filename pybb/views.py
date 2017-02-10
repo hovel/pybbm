@@ -21,7 +21,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 from pybb import compat, defaults, util
 from pybb.compat import get_atomic_func
-from pybb.forms import PostForm, AdminPostForm, AttachmentFormSet, \
+from pybb.forms import PostForm, MovePostForm, AdminPostForm, AttachmentFormSet, \
     PollAnswerFormSet, PollForm, ForumSubscriptionForm, ModeratorForm
 from pybb.models import Category, Forum, ForumSubscription, Topic, Post, TopicReadTracker, \
     ForumReadTracker, PollAnswerUser
@@ -575,6 +575,43 @@ class EditPostView(PostEditMixin, generic.UpdateView):
         if not perms.may_edit_post(self.request.user, post):
             raise PermissionDenied
         return post
+
+
+class MovePostView(RedirectToLoginMixin, generic.UpdateView):
+
+    model = Post
+    form_class = MovePostForm
+    context_object_name = 'post'
+    template_name = 'pybb/move_post.html'
+
+    @method_decorator(login_required)
+    @method_decorator(csrf_protect)
+    def dispatch(self, request, *args, **kwargs):
+        return super(MovePostView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        form_kwargs = super(MovePostView, self).get_form_kwargs()
+        form_kwargs['user'] = self.request.user
+        return form_kwargs
+
+    def get_object(self, queryset=None):
+        post = super(MovePostView, self).get_object(queryset)
+        if not perms.may_moderate_topic(self.request.user, post.topic):
+            raise PermissionDenied
+        return post
+
+    def form_valid(self, *args, **kwargs):
+        from django.db.models.signals import post_save
+        from pybb.signals import topic_saved
+        # FIXME: we should have specific signals to send notifications to topic/forum subscribers
+        # but for now, we must connect / disconnect the callback
+        post_save.disconnect(topic_saved, sender=Topic)
+        response = super(MovePostView, self).form_valid(*args, **kwargs)
+        post_save.connect(topic_saved, sender=Topic)
+        return response
+
+    def get_success_url(self):
+        return self.object.topic.get_absolute_url()
 
 
 class UserView(generic.DetailView):

@@ -311,6 +311,10 @@ class Post(RenderableItem):
     def __str__(self):
         return self.summary()
 
+    @cached_property
+    def is_topic_head(self):
+        return self.pk and self.topic.head.pk == self.pk
+
     def save(self, *args, **kwargs):
         created_at = tznow()
         if self.created is None:
