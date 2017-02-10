@@ -4,24 +4,25 @@ python:
   - "3.4"
   - "3.5"
 env:
-  - DJANGO="Django>=1.8,<1.9" DB=sqlite
-  - DJANGO="Django>=1.8,<1.9" DB=postgres WITH_COVERALL=true
-  - DJANGO="Django>=1.8,<1.9" DB=mysql
+  - DJANGO="Django>=1.8,<1.9" DB=sqlite DJANGO_LTS=true
+  - DJANGO="Django>=1.8,<1.9" DB=postgres DJANGO_LTS=true
+  - DJANGO="Django>=1.8,<1.9" DB=mysql DJANGO_LTS=true
   - DJANGO="Django>=1.9,<1.10" DB=sqlite
   - DJANGO="Django>=1.9,<1.10" DB=postgres
   - DJANGO="Django>=1.9,<1.10" DB=mysql
   - DJANGO="Django>=1.10,<1.11" DB=sqlite
   - DJANGO="Django>=1.10,<1.11" DB=postgres
   - DJANGO="Django>=1.10,<1.11" DB=mysql
-before_script:
-  - if [[ $DB == mysql ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000 ; create database pybbm;'; fi
-  - if [[ $DB == postgres ]]; then psql -c 'create database pybbm;' -U postgres; fi
 install:
   - if [[ $DB == mysql ]]; then pip install -qU mysqlclient; fi
   - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
   - pip install -qU $DJANGO
+  - if [[ $DB == postgres && $TRAVIS_PYTHON_VERSION == '2.7' && $DJANGO_LTS == true ]] ; then export WITH_COVERALL=true ; fi
   - if [[ $WITH_COVERALL == true ]]; then pip install -qU coveralls ; fi
   - CFLAGS="-O0" pip install -qU -r test/test_project/requirements_test.txt
+before_script:
+  - if [[ $DB == mysql ]]; then mysql -e 'SET GLOBAL wait_timeout = 36000 ; create database pybbm;'; fi
+  - if [[ $DB == postgres ]]; then psql -c 'create database pybbm;' -U postgres; fi
 script:
   - if [[ $WITH_COVERALL == true ]]; then coverage run setup.py test; else python setup.py test ; fi
 after_success:
