@@ -28,7 +28,7 @@ Permissions for anonymous:
 +----------------------------------+---------------------+---------------------+
 | view other on moderation topic   | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
-| view other on moderation post    | no                  | no                  |
+| view other on moderation post    | yes                 | no                  |
 +----------------------------------+---------------------+---------------------+
 | add post in normal topic         | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
@@ -76,11 +76,11 @@ Permissions for a logged-in user:
 +----------------------------------+---------------------+---------------------+
 | view other on moderation topic   | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
-| view other on moderation post    | no                  | no                  |
+| view other on moderation post    | yes                 | no                  |
 +----------------------------------+---------------------+---------------------+
 | add post in normal topic         | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| add post in on moderation topic  | yes                 | yes                 |
+| add post in on moderation topic  | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
 | add post in closed topic         | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
@@ -130,7 +130,7 @@ Permissions for a moderator of the current forum:
 +----------------------------------+---------------------+---------------------+
 | add post in on moderation topic  | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| add post in closed topic         | no                  | no                  |
+| add post in closed topic         | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
 | edit own normal post             | see logged-in user  | see logged-in user  |
 +----------------------------------+---------------------+---------------------+
@@ -172,13 +172,13 @@ Permissions for a "is_staff" user without pybb permissions:
 +----------------------------------+---------------------+---------------------+
 | view other on moderation topic   | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
-| view other on moderation post    | no                  | no                  |
+| view other on moderation post    | yes                 | no                  |
 +----------------------------------+---------------------+---------------------+
 | add post in normal topic         | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| add post in on moderation topic  | yes                 | yes                 |
+| add post in on moderation topic  | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
-| add post in closed topic         | yes                 | yes                 |
+| add post in closed topic         | no                  | no                  |
 +----------------------------------+---------------------+---------------------+
 | edit own normal post             | see logged-in user  | see logged-in user  |
 +----------------------------------+---------------------+---------------------+
@@ -218,9 +218,9 @@ Permissions for a "is_staff" user with pybb permissions:
 +----------------------------------+---------------------+---------------------+
 | view own on moderation post      | see logged-in user  | see logged-in user  |
 +----------------------------------+---------------------+---------------------+
-| view other on moderation topic   | no                  | no                  |
+| view other on moderation topic   | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| view other on moderation post    | no                  | no                  |
+| view other on moderation post    | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
 | add post in normal topic         | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
@@ -232,17 +232,17 @@ Permissions for a "is_staff" user with pybb permissions:
 +----------------------------------+---------------------+---------------------+
 | edit own on moderation post      | see logged-in user  | see logged-in user  |
 +----------------------------------+---------------------+---------------------+
-| edit other post                  | no                  | no                  |
+| edit other post                  | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
 | delete own normal post           | see logged-in user  | see logged-in user  |
 +----------------------------------+---------------------+---------------------+
 | delete own on moderation post    | see logged-in user  | see logged-in user  |
 +----------------------------------+---------------------+---------------------+
-| delete other post                | no                  | no                  |
+| delete other post                | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| close and unclose topic          | no                  | no                  |
+| close and unclose topic          | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| stick and unstick topic          | no                  | no                  |
+| stick and unstick topic          | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
 | manage moderators                | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
@@ -256,7 +256,7 @@ Permissions for superuser:
 +==================================+=====================+=====================+
 | view normal forum                | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| view hidden forum                | no                  | no                  |
+| view hidden forum                | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
 | view other topic                 | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
@@ -274,7 +274,7 @@ Permissions for superuser:
 +----------------------------------+---------------------+---------------------+
 | add post in on moderation topic  | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
-| add post in closed topic         | no                  | no                  |
+| add post in closed topic         | yes                 | yes                 |
 +----------------------------------+---------------------+---------------------+
 | edit own normal post             | see logged-in user  | see logged-in user  |
 +----------------------------------+---------------------+---------------------+
