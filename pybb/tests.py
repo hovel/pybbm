@@ -2268,7 +2268,7 @@ class MarkupParserTest(TestCase, SharedTestModule):
         ]
         for cleaner, source, dest in cleaners_map:
             self.assertEqual(util.get_body_cleaner(cleaner)(user, source), dest)
-            self.assertEqual(util.get_body_cleaner(cleaner)(staff, source), source)
+            self.assertEqual(util.get_body_cleaner(cleaner)(staff, source), dest)
 
 
 def _attach_perms_class(class_name):

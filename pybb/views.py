@@ -924,8 +924,6 @@ def block_user(request, username):
                 Forum.objects.get(id=f['topic__forum_id']).update_counters()
             except Forum.DoesNotExist:
                 pass
-
-
     msg = _('User successfuly blocked')
     messages.success(request, msg, fail_silently=True)
     return redirect('pybb:index')
