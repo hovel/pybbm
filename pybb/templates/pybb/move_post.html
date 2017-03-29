@@ -15,7 +15,7 @@
             {% pybb_get_profile post.user as author %}
             <div>
                 <label>{% blocktrans with author.get_display_name as author_name %}Starting post by {{ author_name }}{% endblocktrans %}</label>
-                <div class="post-preview well form-control">
+                <div class="post-preview well">
                     {{ post.body_html|safe|truncatewords_html:20 }}
                 </div>
             </div>
