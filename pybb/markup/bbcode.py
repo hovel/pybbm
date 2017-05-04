@@ -25,7 +25,7 @@ class BBCodeWidget(Textarea):
 
     def render(self, *args, **kwargs):
         tpl = get_template('pybb/markup/bbcode_widget.html')
-        ctx = Context({'widget_output': super(BBCodeWidget, self).render(*args, **kwargs)})
+        ctx = {'widget_output': super(BBCodeWidget, self).render(*args, **kwargs)}
         return tpl.render(ctx)
 
 
