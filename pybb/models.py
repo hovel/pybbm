@@ -7,7 +7,7 @@ from django.db import models, transaction, DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import strip_tags
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettexmodt_lazy as _
 from django.utils.timezone import now as tznow
 
 from pybb.compat import get_user_model_path, get_username_field, get_atomic_func, slugify
