@@ -161,6 +161,17 @@ def build_cache_key(key_name, **kwargs):
         raise ValueError('Wrong key_name parameter passed: %s' % key_name)
 
 
+def get_ip(request, default=None):
+    """Returns the IP of the request, accounting for the possibility of being behind a proxy."""
+    ip = request.META.get("HTTP_X_FORWARDED_FOR", None)
+    if ip:
+        # X_FORWARDED_FOR returns client1, proxy1, proxy2,...
+        ip = ip.split(", ")[0]
+    else:
+        ip = request.META.get("REMOTE_ADDR", None)
+    return default if not ip else ip
+
+
 class FilePathGenerator(object):
     """
     Special class for generating random filenames
