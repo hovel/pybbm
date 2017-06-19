@@ -1,14 +1,14 @@
 # Swedish messages for Django pybbm app.
-# Copyright © 2016 Göran Uddeborg
+# Copyright © 2016, 2017 Göran Uddeborg
 # This file is distributed under the same license as the pybbm package.
-# Göran Uddeborg <goeran@uddeborg.se>, 2016.
+# Göran Uddeborg <goeran@uddeborg.se>, 2016, 2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: pybbm\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-11 14:06+0100\n"
-"PO-Revision-Date: 2017-01-11 14:17+0100\n"
+"PO-Revision-Date: 2017-06-12 21:41+0200\n"
 "Last-Translator: DylannCordel <d.cordel@webu.coop>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -54,7 +54,7 @@ msgstr "Bilagan är för stor"
 #: forms.py:48
 #, python-format
 msgid "You cant add more than %s answers for poll"
-msgstr "Du kan inte lägga till mer an %s svar till en omrästning"
+msgstr "Du kan inte lägga till mer än %s svar till en omröstning"
 
 #: forms.py:50
 msgid "Add two or more answers for this poll"
@@ -78,7 +78,7 @@ msgstr "Typrad för ämnet"
 
 #: forms.py:123
 msgid "Polls question is required when adding a poll"
-msgstr "En fråga för krävs när en omröstning läggs till"
+msgstr "En fråga krävs när en omröstning läggs till"
 
 #: forms.py:176 models.py:186 models.py:295 models.py:368 models.py:507
 msgid "User"
@@ -91,29 +91,23 @@ msgstr "Avataren är för stor, maxstorlek: %s byte"
 
 #: forms.py:272
 msgid "be unsubscribe from this forum"
-msgstr ""
+msgstr "sluta prenumerera på detta forum"
 
 #: forms.py:277
 msgid "You want to"
-msgstr ""
+msgstr "Du vill"
 
 #: forms.py:281
-#, fuzzy
-#| msgid "New topic"
 msgid "only new topics"
-msgstr "Nytt ämne"
+msgstr "endast nya ämnen"
 
 #: forms.py:282
-#, fuzzy
-#| msgid "Latest topics on forum"
 msgid "all topics of the forum"
-msgstr "Senaste ämnen i forumet"
+msgstr "alla ämnen i forumet"
 
 #: forms.py:285
-#, fuzzy
-#| msgid "Close topic"
 msgid "Concerned topics"
-msgstr "Stäng ämne"
+msgstr "Avseende ämnen"
 
 #: models.py:23 models.py:59
 msgid "Name"
@@ -182,35 +176,27 @@ msgstr "Forum"
 
 #: models.py:129
 msgid "be notified only when a new topic is added"
-msgstr ""
+msgstr "endast bli underrättad när ett nytt ämne läggs till"
 
 #: models.py:130
 msgid "be auto-subscribed to topics"
-msgstr ""
+msgstr "automatiskt prenumerera på ämnen"
 
 #: models.py:134
-#, fuzzy
-#| msgid "Subscribers"
 msgid "Subscriber"
-msgstr "Prenumeranter"
+msgstr "Prenumerant"
 
 #: models.py:138
-#, fuzzy
-#| msgid "Subscriptions on topics"
 msgid "Subscription type"
-msgstr "Prenumerationer på ämnen"
+msgstr "Prenumerationstyp"
 
 #: models.py:148
-#, fuzzy
-#| msgid "Subscriptions on topics"
 msgid "Subscription to forum"
-msgstr "Prenumerationer på ämnen"
+msgstr "Prenumeration på forum"
 
 #: models.py:149
-#, fuzzy
-#| msgid "Subscriptions on topics"
 msgid "Subscriptions to forums"
-msgstr "Prenumerationer på ämnen"
+msgstr "Prenumerationer på forum"
 
 #: models.py:177
 msgid "None"
@@ -379,10 +365,8 @@ msgid "Automatically subscribe to topics that you answer"
 msgstr "Prenumerera automatiskt på ämnen du besvarar"
 
 #: templates/pybb/_button_forum_subscription.html:1
-#, fuzzy
-#| msgid "Description"
 msgid "Manage subscription"
-msgstr "Beskrivning"
+msgstr "Hantera prenumerationen"
 
 #: templates/pybb/_button_forum_subscription.html:1
 #: templates/pybb/topic.html:72
@@ -476,7 +460,7 @@ msgstr "Förhandsvisning"
 
 #: templates/pybb/_need_to_login_message.html:2
 msgid "Register"
-msgstr "Registrera"
+msgstr "Registrera dig"
 
 #: templates/pybb/_need_to_login_message.html:2
 msgid "or"
@@ -501,12 +485,12 @@ msgstr "Lägg till bilagor"
 #: templates/pybb/attachments_formset.html:14
 msgid ""
 "If you need to upload larger files, please use an external storage website."
-msgstr ""
+msgstr "Om du behöver skicka upp större filer, var god och använd en extern webbplats för lagring."
 
 #: templates/pybb/attachments_formset.html:14
 #, python-format
 msgid "(max size: %(max_size)s)"
-msgstr ""
+msgstr "(max storlek: %(max_size)s)"
 
 #: templates/pybb/attachments_formset.html:17
 #: templates/pybb/edit_profile.html:25
@@ -515,11 +499,11 @@ msgstr "radera"
 
 #: templates/pybb/attachments_formset.html:20
 msgid "Reference to your file"
-msgstr ""
+msgstr "Referens till din fil"
 
 #: templates/pybb/attachments_formset.html:20
 msgid "Ref"
-msgstr ""
+msgstr "Ref"
 
 #: templates/pybb/attachments_formset.html:20
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:5
@@ -529,23 +513,23 @@ msgstr ""
 #: templates/pybb/mail_templates/subscription_email_body.html:5
 #: templates/pybb/topic.html:88 templates/pybb/topic_list.html:32
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #: templates/pybb/attachments_formset.html:22
 msgid "link"
-msgstr ""
+msgstr "länk"
 
 #: templates/pybb/attachments_formset.html:22
 msgid "Insert a link to your file inside your post."
-msgstr ""
+msgstr "Infoga en länk till din fil i ditt inlägg."
 
 #: templates/pybb/attachments_formset.html:23
 msgid "image"
-msgstr ""
+msgstr "bild"
 
 #: templates/pybb/attachments_formset.html:23
 msgid "Insert your image inside your post."
-msgstr ""
+msgstr "Infoga din bild i ditt inlägg."
 
 #: templates/pybb/breadcrumb.html:4
 msgid "Home"
@@ -569,7 +553,7 @@ msgstr "Redigera inlägget"
 
 #: templates/pybb/edit_privileges.html:5 templates/pybb/edit_privileges.html:8
 msgid "Grant moderator privileges"
-msgstr ""
+msgstr "Bevilja moderatorrättigheter"
 
 #: templates/pybb/edit_profile.html:5 templates/pybb/edit_profile.html.py:8
 #: templates/pybb/edit_profile.html:13
@@ -606,7 +590,7 @@ msgstr "%(forum)s - Prenumerationer"
 
 #: templates/pybb/forum_subscription.html:32
 msgid "Cancel"
-msgstr ""
+msgstr "Avbryt"
 
 #: templates/pybb/index.html:17
 msgid "Forum categories are not created"
@@ -630,12 +614,11 @@ msgid "Mark all topics as read"
 msgstr "Markera alla ämnen som lästa"
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:4
-#, fuzzy, python-format
-#| msgid "replied in topic to which you are subscribed."
+#, python-format
 msgid ""
 "User %(username)s post a new topic in forum to which you are subscribed "
 "(%(forum_name)s)."
-msgstr "svarade i ett ämne som du prenumererar på."
+msgstr "Användaren %(username)s skapade ett nytt ämne i ett forum du prenumererar på (%(forum_name)s)."
 
 #: templates/pybb/mail_templates/forum_subscription_email_body.html:5
 #: templates/pybb/mail_templates/subscription_email_body.html:5
@@ -650,15 +633,11 @@ msgstr "Länk till inlägg"
 msgid ""
 "If you don't want to receive notifications on new topics in this forum visit "
 "following link"
-msgstr ""
-"Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då "
-"följande länk"
+msgstr "Om du inte vill få aviseringar vid nya meddelanden i detta ämne, besök då följande länk"
 
 #: templates/pybb/mail_templates/forum_subscription_email_subject.html:2
-#, fuzzy
-#| msgid "New answer in topic that you subscribed."
 msgid "New topic in forum that you subscribed."
-msgstr "Nytt svar i ämne som du prenumererar på."
+msgstr "Nytt ämne i ett forum som du prenumererar på."
 
 #: templates/pybb/mail_templates/subscription_email_body-html.html:7
 #: templates/pybb/mail_templates/subscription_email_body.html:3
@@ -671,19 +650,14 @@ msgstr "Användare %(username)s svarade i ett ämne som du prenumererar på."
 msgid ""
 "Follow %(link_post_start)sthis link%(link_end)s to see the new post on the "
 "topic %(link_topic_start)s%(topic_name)s%(link_end)s."
-msgstr ""
+msgstr "Följ %(link_post_start)sdenna länk%(link_end)s för att se det nya inlägget i ämnet %(link_topic_start)s%(topic_name)s%(link_end)s."
 
 #: templates/pybb/mail_templates/subscription_email_body-html.html:14
-#, fuzzy, python-format
-#| msgid ""
-#| "If you don't want to recive notifications on new messages in this topic "
-#| "visit following link:"
+#, python-format
 msgid ""
 "If you don't want to receive notifications on new posts in this topic visit "
 "%(link_start)sthis link%(link_end)s."
-msgstr ""
-"Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då "
-"följande länk:"
+msgstr "Om du inte vill få aviseringar vid nya inlägg i detta ämne, besök då %(link_start)sdenna länk%(link_end)s."
 
 #: templates/pybb/mail_templates/subscription_email_body.html:4
 msgid "Link to post"
@@ -694,9 +668,7 @@ msgstr "Länk till inlägg"
 msgid ""
 "If you don't want to receive notifications on new messages in this topic "
 "visit following link: %(delete_url_full)s"
-msgstr ""
-"Om du inte vill få notifieringar vid nya meddelanden i detta ämne, besök då "
-"följande länk: %(delete_url_full)s"
+msgstr "Om du inte vill få aviseringar vid nya meddelanden i detta ämne, besök då följande länk: %(delete_url_full)s"
 
 #: templates/pybb/mail_templates/subscription_email_subject.html:2
 msgid "New answer in topic that you subscribed."
@@ -705,7 +677,7 @@ msgstr "Nytt svar i ämne som du prenumererar på."
 #: templates/pybb/markup/bbcode_widget.html:22
 #: templates/pybb/markup/markdown_widget.html:33
 msgid "Your text to link here..."
-msgstr "Din tex till länken här …"
+msgstr "Din text till länken här …"
 
 #: templates/pybb/markup/markdown_widget.html:17
 msgid "First Level Heading"
@@ -766,7 +738,7 @@ msgstr "Omröstning"
 
 #: templates/pybb/poll.html:36
 msgid "Cancel my poll vote"
-msgstr "Annulera mitt omröstningsval"
+msgstr "Annullera mitt omröstningsval"
 
 #: templates/pybb/poll_edit_form.html:7
 msgid "Poll answers"
@@ -873,10 +845,8 @@ msgid "Date of registration: %(date_joined)s "
 msgstr "Registreringsdatum: %(date_joined)s "
 
 #: templates/pybb/user.html:36
-#, fuzzy
-#| msgid "Moderators"
 msgid "Moderator"
-msgstr "Moderatorer"
+msgstr "Moderator"
 
 #: templates/pybb/user.html:41
 msgid "Block"
@@ -946,13 +916,13 @@ msgstr "Detta ämne finns inte"
 msgid ""
 "Subscription removed. You will not receive emails from this topic unless you "
 "subscribe or post again."
-msgstr ""
+msgstr "Prenumerationen borttagen.  Du kommer inte få e-post från detta ämne om du inte prenumererar eller gör inlägg igen."
 
 #: views.py:837
 msgid ""
 "Subscription added. You will receive email notifications for replies to this "
 "topic."
-msgstr ""
+msgstr "Prenumerationen tillagd.  Du kommer få e-postaviseringar om svar i detta ämne."
 
 #: views.py:855
 msgid "All forums marked as read"
@@ -968,10 +938,4 @@ msgstr "Användaren avblockerad"
 
 #: views.py:939
 msgid "Privileges updated"
-msgstr ""
-
-#~ msgid "Subscribers:"
-#~ msgstr "Prenumeranter:"
-
-#~ msgid "Rank"
-#~ msgstr "Ordning"
+msgstr "Rättigheter uppdaterade"
