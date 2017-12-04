@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import re
 import inspect
 
+import django
 from django import forms
 from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
@@ -468,4 +469,7 @@ class ModeratorForm(forms.Form):
         checked_forums = [forum for queryset in cleaned_forums for forum in queryset]
         # keep all the forums, the request user does't have the permisssion to change
         untouchable_forums = [forum for forum in initial_forum_set if forum.pk not in self.authorized_forums]
-        target_user.forum_set = checked_forums + untouchable_forums
+        if django.VERSION < (1, 9):
+            target_user.forum_set = checked_forums + untouchable_forums
+        else:
+            target_user.forum_set.set(checked_forums + untouchable_forums)

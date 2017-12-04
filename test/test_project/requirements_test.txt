@@ -1,4 +1,4 @@
 lxml
 Pillow
 bbcode
-markdown<2.6.7
+markdown

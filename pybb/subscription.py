@@ -2,7 +2,10 @@
 
 from __future__ import unicode_literals
 from django.conf import settings
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from django.core.validators import validate_email
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string

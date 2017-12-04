@@ -1,5 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
+
+import django
 from django.conf import settings
 from django.utils.encoding import force_text
 from unidecode import unidecode
@@ -115,3 +117,17 @@ def slugify(text):
     from django.utils.text import slugify as django_slugify
 
     return django_slugify(force_text(unidecode(text)))
+
+
+def is_authenticated(user):
+    if django.VERSION > (1, 9):
+        return user.is_authenticated
+
+    return user.is_authenticated()
+
+
+def is_anonymous(user):
+    if django.VERSION > (1, 9):
+        return user.is_anonymous
+
+    return user.is_anonymous()

@@ -55,9 +55,9 @@ class Migration(migrations.Migration):
                 ('topic_count', models.IntegerField(default=0, verbose_name='Topic count', blank=True)),
                 ('hidden', models.BooleanField(default=False, verbose_name='Hidden')),
                 ('headline', models.TextField(null=True, verbose_name='Headline', blank=True)),
-                ('category', models.ForeignKey(related_name='forums', verbose_name='Category', to='pybb.Category')),
+                ('category', models.ForeignKey(related_name='forums', on_delete=models.CASCADE, verbose_name='Category', to='pybb.Category')),
                 ('moderators', models.ManyToManyField(to=settings.AUTH_USER_MODEL, verbose_name='Moderators', blank=True)),
-                ('parent', models.ForeignKey(related_name='child_forums', verbose_name='Parent forum', blank=True, to='pybb.Forum', null=True)),
+                ('parent', models.ForeignKey(related_name='child_forums', on_delete=models.CASCADE, verbose_name='Parent forum', blank=True, to='pybb.Forum', null=True)),
             ],
             options={
                 'ordering': ['position'],
@@ -71,8 +71,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('time_stamp', models.DateTimeField(auto_now=True)),
-                ('forum', models.ForeignKey(blank=True, to='pybb.Forum', null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('forum', models.ForeignKey(blank=True, on_delete=models.CASCADE, to='pybb.Forum', null=True)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Forum read tracker',
@@ -97,8 +97,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('poll_answer', models.ForeignKey(related_name='users', verbose_name='Poll answer', to='pybb.PollAnswer')),
-                ('user', models.ForeignKey(related_name='poll_answers', verbose_name='User', to=settings.AUTH_USER_MODEL)),
+                ('poll_answer', models.ForeignKey(related_name='users', on_delete=models.CASCADE, verbose_name='Poll answer', to='pybb.PollAnswer')),
+                ('user', models.ForeignKey(related_name='poll_answers', on_delete=models.CASCADE, verbose_name='User', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Poll answer user',
@@ -137,7 +137,7 @@ class Migration(migrations.Migration):
                 ('post_count', models.IntegerField(default=0, verbose_name='Post count', blank=True)),
                 ('avatar', get_image_field_class()(upload_to=pybb.util.FilePathGenerator(to=b'pybb/avatar'), null=True, verbose_name='Avatar', blank=True)),
                 ('autosubscribe', models.BooleanField(default=True, help_text='Automatically subscribe to topics that you answer', verbose_name='Automatically subscribe')),
-                ('user', annoying.fields.AutoOneToOneField(related_name='pybb_profile', verbose_name='User', to=settings.AUTH_USER_MODEL)),
+                ('user', annoying.fields.AutoOneToOneField(related_name='pybb_profile', on_delete=models.CASCADE, verbose_name='User', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Profile',
@@ -159,7 +159,7 @@ class Migration(migrations.Migration):
                 ('on_moderation', models.BooleanField(default=False, verbose_name='On moderation')),
                 ('poll_type', models.IntegerField(default=0, verbose_name='Poll type', choices=[(0, 'None'), (1, 'Single answer'), (2, 'Multiple answers')])),
                 ('poll_question', models.TextField(null=True, verbose_name='Poll question', blank=True)),
-                ('forum', models.ForeignKey(related_name='topics', verbose_name='Forum', to='pybb.Forum')),
+                ('forum', models.ForeignKey(related_name='topics', on_delete=models.CASCADE, verbose_name='Forum', to='pybb.Forum')),
             ],
             options={
                 'ordering': ['-created'],
@@ -173,8 +173,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('time_stamp', models.DateTimeField(auto_now=True)),
-                ('topic', models.ForeignKey(blank=True, to='pybb.Topic', null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('topic', models.ForeignKey(blank=True, on_delete=models.CASCADE, to='pybb.Topic', null=True)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Topic read tracker',
@@ -201,19 +201,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='topic',
             name='user',
-            field=models.ForeignKey(verbose_name='User', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(verbose_name='User', on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='post',
             name='topic',
-            field=models.ForeignKey(related_name='posts', verbose_name='Topic', to='pybb.Topic'),
+            field=models.ForeignKey(related_name='posts', on_delete=models.CASCADE, verbose_name='Topic', to='pybb.Topic'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='post',
             name='user',
-            field=models.ForeignKey(related_name='posts', verbose_name='User', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='posts', on_delete=models.CASCADE, verbose_name='User', to=settings.AUTH_USER_MODEL),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -223,7 +223,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pollanswer',
             name='topic',
-            field=models.ForeignKey(related_name='poll_answers', verbose_name='Topic', to='pybb.Topic'),
+            field=models.ForeignKey(related_name='poll_answers', on_delete=models.CASCADE, verbose_name='Topic', to='pybb.Topic'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -239,7 +239,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='attachment',
             name='post',
-            field=models.ForeignKey(related_name='attachments', verbose_name='Post', to='pybb.Post'),
+            field=models.ForeignKey(related_name='attachments', on_delete=models.CASCADE, verbose_name='Post', to='pybb.Post'),
             preserve_default=True,
         ),
     ]

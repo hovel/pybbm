@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                               'you won\'t be notified for the answers.',
                     verbose_name='Subscription type', choices=[(1, 'be notified only when a new topic is added'), (2, 'be auto-subscribed to topics')])),
                 ('forum', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscriptions+', verbose_name='Forum', to='pybb.Forum')),
-                ('user', models.ForeignKey(related_name='forum_subscriptions+', verbose_name='Subscriber', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(related_name='forum_subscriptions+', on_delete=models.CASCADE, verbose_name='Subscriber', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Subscription to forum',

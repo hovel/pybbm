@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from django.db import models
 
 from pybb.compat import get_user_model_path, get_username_field
@@ -39,6 +42,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class CustomProfile(PybbProfile):
     user = models.OneToOneField(
         get_user_model_path(),
+        on_delete=models.CASCADE,
         verbose_name='linked account',
         related_name='pybb_customprofile',
         blank=False, null=False,

@@ -3,7 +3,10 @@ from __future__ import unicode_literals
 from copy import deepcopy
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 
 from pybb import permissions
 from pybb.models import Category, Forum, Topic, Post, Profile, Attachment, PollAnswer

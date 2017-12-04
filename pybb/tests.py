@@ -10,7 +10,13 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.conf import settings
 from django.core import mail
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+
+from pybb.compat import is_authenticated, is_anonymous
+
+try:
+    from django.core.urlresolvers import reverse
+except ImportError:
+    from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
@@ -2078,21 +2084,21 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     """
 
     def filter_categories(self, user, qs):
-        return qs.filter(hidden=False) if user.is_anonymous() else qs
+        return qs.filter(hidden=False) if is_anonymous(user) else qs
 
     def may_view_category(self, user, category):
-        return user.is_authenticated() if category.hidden else True
+        return is_authenticated(user) if category.hidden else True
 
     def filter_forums(self, user, qs):
-        if user.is_anonymous():
+        if is_anonymous(user):
             qs = qs.filter(Q(hidden=False) & Q(category__hidden=False))
         return qs
 
     def may_view_forum(self, user, forum):
-        return user.is_authenticated() if forum.hidden or forum.category.hidden else True
+        return is_authenticated(user) if forum.hidden or forum.category.hidden else True
 
     def filter_topics(self, user, qs):
-        if user.is_anonymous():
+        if is_anonymous(user):
             qs = qs.filter(Q(forum__hidden=False) & Q(forum__category__hidden=False))
         qs = qs.filter(closed=False)  # filter out closed topics for test
         return qs
@@ -2101,7 +2107,7 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
         return self.may_view_forum(user, topic.forum)
 
     def filter_posts(self, user, qs):
-        if user.is_anonymous():
+        if is_anonymous(user):
             qs = qs.filter(Q(topic__forum__hidden=False) & Q(topic__forum__category__hidden=False))
         return qs
 
@@ -2208,7 +2214,7 @@ class MarkupParserTest(TestCase, SharedTestModule):
             ['**bold**', '<p><strong>bold</strong></p>'],
             ['*italic*', '<p><em>italic</em></p>'],
             [
-                '![alt text](http://domain.com/image.png title)',
+                '![alt text](http://domain.com/image.png "title")',
                 '<p><img alt="alt text" src="http://domain.com/image.png" title="title" /></p>'
             ],
             [
@@ -2390,11 +2396,11 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
             return permissions.perms.may_view_post(user, other_post)
 
         def _view_own_on_moderation_topic(user):
-            if not user.is_anonymous() and author_on_moderation_topic.user.pk == user.pk:
+            if not is_anonymous(user) and author_on_moderation_topic.user.pk == user.pk:
                 return permissions.perms.may_view_topic(user, author_on_moderation_topic)
 
         def _view_own_on_moderation_post(user):
-            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_view_post(user, author_on_moderation_post)
 
         def _view_other_on_moderation_topic(user):
@@ -2413,22 +2419,22 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
             return permissions.perms.may_create_post(user, closed_topic)
 
         def _edit_own_normal_post(user):
-            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_edit_post(user, author_post)
 
         def _edit_own_on_moderation_post(user):
-            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_edit_post(user, author_on_moderation_post)
 
         def _edit_other_post(user):
             return permissions.perms.may_edit_post(user, other_post)
 
         def _delete_own_normal_post(user):
-            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_delete_post(user, author_post)
 
         def _delete_own_on_moderation_post(user):
-            if not user.is_anonymous() and author_on_moderation_post.user.pk == user.pk:
+            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_delete_post(user, author_on_moderation_post)
 
         def _delete_other_post(user):

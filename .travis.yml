@@ -4,20 +4,28 @@ python:
   - "3.4"
   - "3.5"
 env:
-  - DJANGO="Django>=1.8,<1.9" DB=sqlite DJANGO_LTS=true
-  - DJANGO="Django>=1.8,<1.9" DB=postgres DJANGO_LTS=true
-  - DJANGO="Django>=1.8,<1.9" DB=mysql DJANGO_LTS=true
-  - DJANGO="Django>=1.9,<1.10" DB=sqlite
-  - DJANGO="Django>=1.9,<1.10" DB=postgres
-  - DJANGO="Django>=1.9,<1.10" DB=mysql
-  - DJANGO="Django>=1.10,<1.11" DB=sqlite
-  - DJANGO="Django>=1.10,<1.11" DB=postgres
-  - DJANGO="Django>=1.10,<1.11" DB=mysql
+  - DJANGO="Django>=1.8,<1.9" DB=sqlite
+  - DJANGO="Django>=1.8,<1.9" DB=postgres
+  - DJANGO="Django>=1.8,<1.9" DB=mysql
+  - DJANGO="Django>=1.11,<2.0" DB=sqlite DJANGO_LTS=true
+  - DJANGO="Django>=1.11,<2.0" DB=postgres DJANGO_LTS=true
+  - DJANGO="Django>=1.11,<2.0" DB=mysql DJANGO_LTS=true
+  - DJANGO="Django>=2.0,<2.1" DB=sqlite
+  - DJANGO="Django>=2.0,<2.1" DB=postgres
+  - DJANGO="Django>=2.0,<2.1" DB=mysql
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DJANGO="Django>=2.0,<2.1" DB=sqlite
+    - python: "2.7"
+      env: DJANGO="Django>=2.0,<2.1" DB=postgres
+    - python: "2.7"
+      env: DJANGO="Django>=2.0,<2.1" DB=mysql
 install:
   - if [[ $DB == mysql ]]; then pip install -qU mysqlclient; fi
   - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
   - pip install -qU $DJANGO
-  - if [[ $DB == postgres && $TRAVIS_PYTHON_VERSION == '2.7' && $DJANGO_LTS == true ]] ; then export WITH_COVERALL=true ; fi
+  - if [[ $DB == postgres && $TRAVIS_PYTHON_VERSION == '3.5' && $DJANGO_LTS == true ]] ; then export WITH_COVERALL=true ; fi
   - if [[ $WITH_COVERALL == true ]]; then pip install -qU coveralls ; fi
   - CFLAGS="-O0" pip install -qU -r test/test_project/requirements_test.txt
 before_script:
@@ -26,4 +34,5 @@ before_script:
 script:
   - if [[ $WITH_COVERALL == true ]]; then coverage run setup.py test; else python setup.py test ; fi
 after_success:
+
   - if [[ $WITH_COVERALL == true ]]; then coveralls ; fi

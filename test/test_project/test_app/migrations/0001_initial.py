@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('post_count', models.IntegerField(default=0, verbose_name='Post count', blank=True)),
                 ('avatar', get_image_field_class()(upload_to=pybb.util.FilePathGenerator(to=b'pybb/avatar'), null=True, verbose_name='Avatar', blank=True)),
                 ('autosubscribe', models.BooleanField(default=True, help_text='Automatically subscribe to topics that you answer', verbose_name='Automatically subscribe')),
-                ('user', models.OneToOneField(related_name='pybb_customprofile', verbose_name='linked account', to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(related_name='pybb_customprofile', on_delete=models.CASCADE, verbose_name='linked account', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'verbose_name': 'Profile',

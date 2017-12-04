@@ -10,7 +10,7 @@ from django.utils.six import string_types
 from django.utils.translation import ugettext as _
 from pybb import compat
 
-from pybb.compat import get_username_field, get_user_model
+from pybb.compat import get_username_field, get_user_model, is_authenticated
 from pybb.defaults import (
     PYBB_MARKUP, PYBB_MARKUP_ENGINES_PATHS,
     PYBB_MARKUP_ENGINES, PYBB_QUOTE_ENGINES
@@ -133,7 +133,7 @@ def unescape(text):
 def get_pybb_profile(user):
     from pybb import defaults
 
-    if not user.is_authenticated():
+    if not is_authenticated(user):
         if defaults.PYBB_ENABLE_ANONYMOUS_POST:
             user = get_user_model().objects.get(**{get_username_field(): defaults.PYBB_ANONYMOUS_USERNAME})
         else:

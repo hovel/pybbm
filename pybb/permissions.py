@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 from django.db.models import Q
 
 from pybb import defaults, util
+from pybb.compat import is_authenticated
 
 
 class DefaultPermissionHandler(object):
@@ -79,7 +80,7 @@ class DefaultPermissionHandler(object):
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
             qs = qs.filter(Q(forum__hidden=False) & Q(forum__category__hidden=False))
-        if user.is_authenticated():
+        if is_authenticated(user):
             qs = qs.filter(
                 # moderator can view on_moderation
                 Q(forum__moderators=user) |
@@ -114,7 +115,7 @@ class DefaultPermissionHandler(object):
     def may_moderate_topic(self, user, topic):
         if user.is_superuser:
             return True
-        if not user.is_authenticated():
+        if not is_authenticated(user):
             return False
         return user.has_perm('pybb.change_topic') or user in topic.forum.moderators.all()
 
@@ -136,7 +137,7 @@ class DefaultPermissionHandler(object):
 
     def may_vote_in_topic(self, user, topic):
         """ return True if `user` may unstick `topic` """
-        if topic.poll_type == topic.POLL_TYPE_NONE or not user.is_authenticated():
+        if topic.poll_type == topic.POLL_TYPE_NONE or not is_authenticated(user):
             return False
         elif user.is_superuser:
             return True
@@ -149,7 +150,7 @@ class DefaultPermissionHandler(object):
 
         if user.is_superuser:
             return True
-        if not defaults.PYBB_ENABLE_ANONYMOUS_POST and not user.is_authenticated():
+        if not defaults.PYBB_ENABLE_ANONYMOUS_POST and not is_authenticated(user):
             return False
         if not self.may_view_topic(user, topic):
             return False
@@ -170,7 +171,7 @@ class DefaultPermissionHandler(object):
 
     def may_subscribe_topic(self, user, topic):
         """ return True if `user` is allowed to subscribe to a `topic` """
-        return not defaults.PYBB_DISABLE_SUBSCRIPTIONS and user.is_authenticated()
+        return not defaults.PYBB_DISABLE_SUBSCRIPTIONS and is_authenticated(user)
 
     #
     # permission checks on posts
@@ -192,7 +193,7 @@ class DefaultPermissionHandler(object):
         if defaults.PYBB_PREMODERATION:
             # remove moderated posts
             query = query & Q(on_moderation=False, topic__on_moderation=False)
-        if user.is_authenticated():
+        if is_authenticated(user):
             # cancel previous remove if it's my post, or if I'm moderator of the forum
             query = query | Q(user=user) | Q(topic__forum__moderators=user)
         return qs.filter(query).distinct()
@@ -226,7 +227,7 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may delete `post` """
         if user.is_superuser:
             return True
-        if not user.is_authenticated():
+        if not is_authenticated(user):
             return False
         return (defaults.PYBB_ALLOW_DELETE_OWN_POST and post.user == user) or \
                user.has_perm('pybb.delete_post') or \
