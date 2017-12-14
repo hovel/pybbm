@@ -367,9 +367,11 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
             forum_mark = None
         if (forum_mark is None) or (forum_mark.time_stamp <= self.topic.updated):
             topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=self.topic, user=self.request.user)
-            if not new and topic_mark.time_stamp > self.topic.updated:
-                # Bail early if we already read this thread.
-                return
+            if not new:
+                if topic_mark.time_stamp >= self.topic.updated:
+                    # Bail early if we already read this thread.
+                    return
+                topic_mark.save()  # update read time
 
             # Check, if there are any unread topics in forum
             readed_trackers = TopicReadTracker.objects.filter(
