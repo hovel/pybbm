@@ -368,8 +368,8 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         if (forum_mark is None) or (forum_mark.time_stamp <= self.topic.updated):
             topic_mark, new = TopicReadTracker.objects.get_or_create_tracker(topic=self.topic, user=self.request.user)
             if not new:
+                # Bail early if we already read this thread.
                 if topic_mark.time_stamp >= self.topic.updated:
-                    # Bail early if we already read this thread.
                     return
                 topic_mark.save()  # update read time
 
@@ -385,7 +385,8 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
                 TopicReadTracker.objects.filter(user=self.request.user, topic__forum=self.topic.forum).delete()
                 forum_mark, new = ForumReadTracker.objects.get_or_create_tracker(
                     forum=self.topic.forum, user=self.request.user)
-                forum_mark.save()
+                if not new:
+                    forum_mark.save()  # update read time
 
     def get_topic(self, **kwargs):
         if 'pk' in kwargs:
