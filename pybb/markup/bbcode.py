@@ -37,7 +37,7 @@ class BBCodeParser(BaseParser):
         self._parser.add_simple_formatter('img', '<img src="%(value)s">', replace_links=False)
         self._parser.add_simple_formatter('code', '<pre><code>%(value)s</code></pre>',
                                           render_embedded=False, transform_newlines=False,
-                                          swallow_trailing_newline=True)
+                                          swallow_trailing_newline=True, replace_cosmetic=False)
         self._parser.add_formatter('quote', self._render_quote, strip=True, swallow_trailing_newline=True)
 
     def _render_quote(self, name, value, options, parent, context):
