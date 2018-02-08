@@ -14,6 +14,9 @@ def topic_saved(instance, **kwargs):
         notify_forum_subscribers(instance)
 
 def post_saved(instance, **kwargs):
+    # signal triggered by loaddata command, ignore
+    if kwargs.get('raw', False):
+        return
 
     if getattr(instance, '_post_saved_done', False):
         #Do not spam users when post is saved more than once in a same request.
@@ -48,6 +51,10 @@ def post_deleted(instance, **kwargs):
 
 
 def user_saved(instance, created, **kwargs):
+    # signal triggered by loaddata command, ignore
+    if kwargs.get('raw', False):
+        return
+
     if not created:
         return
 
