@@ -13,7 +13,7 @@ See those settings:
 When notifications are sent
 ---------------------------
 
-Each time a post is saved (created or updated), subcribers will receive an email.
+Each time a post is saved (created or updated), subscribers will receive an email.
 If you configure PYBB to use django-mailer (see :ref:`PYBB_USE_DJANGO_MAILER`), emails
 will be sent when your cron job will run. Else, emails will be sent when post is saved.
 
@@ -30,4 +30,4 @@ You can overwrite three templates:
 My test user is not receiving emails ?!
 ---------------------------------------
 
-Emails matching this rules are not sent: <username>@exemple.com
+Emails matching this rules are not sent: <username>@example.com

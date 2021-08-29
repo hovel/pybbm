@@ -16,7 +16,7 @@ There are many ways to contribute to pybbm and you do not need to be a developpe
 2) Improve documentation
 
 * you can correct typos or "bad english"
-* add a new documentation part (for exemple, a "how to" than could help people when using pybb in
+* add a new documentation part (for example, a "how to" than could help people when using pybb in
 some use-case. eg: how to add news fields to `Topic` model).
 
 3) Fix a bug. You should:

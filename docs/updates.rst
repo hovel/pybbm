@@ -49,7 +49,7 @@ PyBBM Changelog
 0.16.1 -> 0.17
 --------------
 * Topic and post creation wrapped in transaction
-* All topic/post/poll related forms can be overrided when custom view inherites pybbm view
+* All topic/post/poll related forms can be overridden when custom view inherites pybbm view
 * Demo data for example projects
 * Using active markup engine when quoting posts via javascript
 * Functionality to support disabling default pybbm subscriptions and notifications and
@@ -144,7 +144,7 @@ PyBBM Changelog
   This value can be changed by setting :ref:`PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER`. Also added custom filter
   `pybbm_calc_topic_views` that calc actual views count for topic
 * Fix for migration that may fails on clean mysql installation
-* Fixed perfomance issue with feed views
+* Fixed performance issue with feed views
 * Using custom permissions handler in feed views
 
 0.14.4 -> 0.14.5
@@ -218,7 +218,7 @@ PyBBM Changelog
 0.11 -> 0.12
 ------------
 
-* Fixed bug when the answers to poll unexpectedly deleted. Strongly recommendet to update to this version, if using
+* Fixed bug when the answers to poll unexpectedly deleted. Strongly recommended to update to this version, if using
   polls subsystem
 
 * Polish translation
