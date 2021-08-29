@@ -416,7 +416,7 @@ class TopicReadTrackerManager(models.Manager):
         """
         Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
 
-        It's known problem when standrard get_or_create method return can raise exception
+        It's known problem when standard get_or_create method return can raise exception
         with correct data in mysql database.
         See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
         """
@@ -454,7 +454,7 @@ class ForumReadTrackerManager(models.Manager):
         """
         Correctly create tracker in mysql db on default REPEATABLE READ transaction mode
 
-        It's known problem when standrard get_or_create method return can raise exception
+        It's known problem when standard get_or_create method return can raise exception
         with correct data in mysql database.
         See http://stackoverflow.com/questions/2235318/how-do-i-deal-with-this-race-condition-in-django/2235624
         """

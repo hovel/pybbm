@@ -1231,7 +1231,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         values['topics'] = 'all'
         response = client.post(url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        # user2 shoud now be subscribed to all self.forum's topics
+        # user2 should now be subscribed to all self.forum's topics
         subscribed_topics = list(user2.subscriptions.all().order_by('name').values_list('name', flat=True))
         expected_topics = list(self.forum.topics.all().order_by('name').values_list('name', flat=True))
         self.assertEqual(subscribed_topics, expected_topics)
@@ -1246,7 +1246,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         values['topics'] = 'all'
         response = client.post(url, values, follow=True)
         self.assertEqual(response.status_code, 200)
-        # user2 shoud now be subscribed to zero topic
+        # user2 should now be subscribed to zero topic
         topics = list(user2.subscriptions.all().values_list('name', flat=True))
         self.assertEqual(topics, [])
 
@@ -1589,7 +1589,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
 
         form_values = self.get_form_values(response, 'move-post-form')
 
-        # post stay in same forum but are splited in a new topic
+        # post stay in same forum but are splitted in a new topic
         form_values['move_to'] = self.forum_1.pk
         form_values['number'] = 2
         response = self.client.post(split_posts_url, form_values, follow=True)
@@ -1597,7 +1597,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
         forum_2 = Forum.objects.get(pk=self.forum_2.pk)
         topic_1 = Topic.objects.get(pk=self.topic.pk)
         topic_2 = Post.objects.get(pk=self.posts[1].pk).topic
-        # splited in 2 topics
+        # splitted in 2 topics
         self.assertNotEqual(topic_1.pk, topic_2.pk)
         self.assertEqual(topic_1.name, topic_2.name)
         self.assertNotEqual(topic_1.slug, topic_2.slug)  # can't keep same slug in same forum
@@ -1622,7 +1622,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
 
         form_values = self.get_form_values(response, 'move-post-form')
 
-        # posts splited in forum 2
+        # posts splitted in forum 2
         form_values['move_to'] = self.forum_2.pk
         form_values['number'] = 2
         response = self.client.post(split_posts_url, form_values, follow=True)
@@ -1630,7 +1630,7 @@ class MoveAndSplitPostTest(TestCase, SharedTestModule):
         forum_2 = Forum.objects.get(pk=self.forum_2.pk)
         topic_1 = Topic.objects.get(pk=self.topic.pk)
         topic_2 = Post.objects.get(pk=self.posts[1].pk).topic
-        # splited in 2 topics
+        # splitted in 2 topics
         self.assertNotEqual(topic_1.pk, topic_2.pk)
         self.assertEqual(topic_1.posts.count(), 3)
         self.assertEqual(topic_2.posts.count(), 3)
@@ -2132,14 +2132,14 @@ class MarkupParserTest(TestCase, SharedTestModule):
         self.ORIG_PYBB_QUOTE_ENGINES = util.PYBB_QUOTE_ENGINES
         util.PYBB_MARKUP_ENGINES = {
             'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
-            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overridden default parser
             'liberator': 'test_project.markup_parsers.LiberatorParser',  # completely new parser
             'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': defaults.markdown  # old-style callable parser,
         }
         util.PYBB_QUOTE_ENGINES = {
             'bbcode': 'pybb.markup.bbcode.BBCodeParser',  # default parser
-            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overrided default parser
+            'bbcode_custom': 'test_project.markup_parsers.CustomBBCodeParser',  # overridden default parser
             'liberator': 'test_project.markup_parsers.LiberatorParser',  # completely new parser
             'fake': 'pybb.markup.base.BaseParser',  # base parser
             'markdown': lambda text, username="": '>' + text.replace('\n', '\n>').replace('\r', '\n>') + '\n'  # old-style callable parser

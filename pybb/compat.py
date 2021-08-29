@@ -27,7 +27,7 @@ else:
 def send_mass_html_mail(emails, *args, **kwargs):
     """
     Sends emails with html alternative if email item has html content.
-    Email item is a tuple with an optionnal html message version :
+    Email item is a tuple with an optional html message version :
         (subject, text_msg, sender, recipient, [html_msg])
     """
     for email in emails:

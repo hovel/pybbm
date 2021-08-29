@@ -278,7 +278,7 @@ class MovePostForm(forms.Form):
             # update posts
             # we can not update with subqueries on same table with mysql 5.5
             # it raises: You can't specify target table 'pybb_post' for update in FROM clause
-            # so we need to get all pks... It's bad for perfs, but posts are not often splited...
+            # so we need to get all pks... It's bad for perfs, but posts are not often splitted...
             posts_pks = [p.pk for p in posts]
             Post.objects.filter(pk__in=posts_pks).update(topic_id=topic.pk)
 
@@ -458,7 +458,7 @@ class ModeratorForm(forms.Form):
 
     def process(self, target_user):
         """
-        Updates the target user moderator privilesges
+        Updates the target user moderator privileges
 
         :param target_user: user to update
         """
@@ -467,7 +467,7 @@ class ModeratorForm(forms.Form):
         initial_forum_set = target_user.forum_set.all()
         # concatenation of the lists into one
         checked_forums = [forum for queryset in cleaned_forums for forum in queryset]
-        # keep all the forums, the request user does't have the permisssion to change
+        # keep all the forums, the request user does't have the permission to change
         untouchable_forums = [forum for forum in initial_forum_set if forum.pk not in self.authorized_forums]
         if django.VERSION < (1, 9):
             target_user.forum_set = checked_forums + untouchable_forums

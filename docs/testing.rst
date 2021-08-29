@@ -9,7 +9,7 @@ version of python and locally installed python packages.
 Testing with tox (recommended)
 ------------------------------
 
-This is the recommanded way to test pybbm if you want to contribute.
+This is the recommended way to test pybbm if you want to contribute.
 You must have tox installed on your system. (eg: `sudo pip install tox`)
 
 1) Clone your github pybbm fork and go in its directory::
@@ -22,8 +22,8 @@ You must have tox installed on your system. (eg: `sudo pip install tox`)
     tox
 
 That's all ;-). Tox will tests pybbm in multiple environnements configured in the pybbm's tox.ini.
-If you want to test only a specific environnement from that list, you can run tox with the "-e"
-option. For exemple, this command will test pybbm only with python 2.7 and Django 1.8::
+If you want to test only a specific environment from that list, you can run tox with the "-e"
+option. For example, this command will test pybbm only with python 2.7 and Django 1.8::
 
     tox -e py27-django18
 
@@ -39,17 +39,17 @@ Testing in your local environment
 
 If you want to contribute, you should use the "tox way" to test your contributions before
 creating a pull-request ! This testing way will allow you to test pybbm in your current local
-environnement. It is usefull if you have a specific environment which is not covered by tox.ini.
+environment. It is usefull if you have a specific environment which is not covered by tox.ini.
 
-If you already have a working pybb in your environnement, you can go to the step 4.
-Else, steps 1-3 will allow you to have a minimal environnement to run pybb test project.
+If you already have a working pybb in your environment, you can go to the step 4.
+Else, steps 1-3 will allow you to have a minimal environment to run pybb test project.
 
-1) Your environnement must be ready to use pip and install Pillow and lxml python packages.
+1) Your environment must be ready to use pip and install Pillow and lxml python packages.
    For Debian, the simplest way is to install debian python packages with their dependencies::
 
     sudo apt-get install python-pip python-lxml python-pillow
 
-2) Now, your environnement is ready to install python packages via pip. Install pybbm from your
+2) Now, your environment is ready to install python packages via pip. Install pybbm from your
    github fork with the "-e" option to be able to contribute, and install the test requirements::
 
     mkdir -p ~/tests/ && cd ~/tests/

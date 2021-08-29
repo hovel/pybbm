@@ -143,7 +143,7 @@ PYBB_PROFILE_RELATED_NAME
 .........................
 
 Related name from profile's OneToOne relationship to User model. If profile model is User
-model itselt then set it to `None`.
+model itself then set it to `None`.
 
 Default: 'pybb_profile'
 
@@ -192,7 +192,7 @@ Default: 3 (Moscow)
 PYBB_SIGNATURE_MAX_LENGTH
 .........................
 
-Limit of sybmols in user signature
+Limit of symbols in user signature
 
 Default: 1024
 
