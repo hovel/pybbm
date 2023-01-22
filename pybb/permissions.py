@@ -1,26 +1,23 @@
-# -*- coding: utf-8 -*-
 """
 Extensible permission system for pybbm
 """
 
-from __future__ import unicode_literals
 from django.db.models import Q
 
 from pybb import defaults, util
-from pybb.compat import is_authenticated
 
 
 class DefaultPermissionHandler(object):
-    """ 
+    """
     Default Permission handler. If you want to implement custom permissions (for example,
     private forums based on some application-specific settings), you can inherit from this
     class and override any of the `filter_*` and `may_*` methods. Methods starting with
     `may` are expected to return `True` or `False`, whereas methods starting with `filter_*`
     should filter the queryset they receive, and return a new queryset containing only the
     objects the user is allowed to see.
-    
+
     To activate your custom permission handler, set `settings.PYBB_PERMISSION_HANDLER` to
-    the full qualified name of your class, e.g. "`myapp.pybb_adapter.MyPermissionHandler`".    
+    the full qualified name of your class, e.g. "`myapp.pybb_adapter.MyPermissionHandler`".
     """
     #
     # permission checks on categories
@@ -41,9 +38,9 @@ class DefaultPermissionHandler(object):
             return True
         return not category.hidden
 
-    # 
+    #
     # permission checks on forums
-    # 
+    #
     def filter_forums(self, user, qs):
         """ return a queryset with forums `user` is allowed to see """
         if user.is_superuser or user.is_staff:
@@ -58,7 +55,7 @@ class DefaultPermissionHandler(object):
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
             return True
-        return forum.hidden == False and forum.category.hidden == False 
+        return forum.hidden == False and forum.category.hidden == False
 
     def may_create_topic(self, user, forum):
         """ return True if `user` is allowed to create a new topic in `forum` """
@@ -68,7 +65,7 @@ class DefaultPermissionHandler(object):
 
     #
     # permission checks on topics
-    # 
+    #
     def filter_topics(self, user, qs):
         """ return a queryset with topics `user` is allowed to see """
         if user.is_superuser:
@@ -80,7 +77,7 @@ class DefaultPermissionHandler(object):
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
             qs = qs.filter(Q(forum__hidden=False) & Q(forum__category__hidden=False))
-        if is_authenticated(user):
+        if user.is_authenticated:
             qs = qs.filter(
                 # moderator can view on_moderation
                 Q(forum__moderators=user) |
@@ -115,7 +112,7 @@ class DefaultPermissionHandler(object):
     def may_moderate_topic(self, user, topic):
         if user.is_superuser:
             return True
-        if not is_authenticated(user):
+        if not user.is_authenticated:
             return False
         return user.has_perm('pybb.change_topic') or user in topic.forum.moderators.all()
 
@@ -137,7 +134,7 @@ class DefaultPermissionHandler(object):
 
     def may_vote_in_topic(self, user, topic):
         """ return True if `user` may unstick `topic` """
-        if topic.poll_type == topic.POLL_TYPE_NONE or not is_authenticated(user):
+        if topic.poll_type == topic.POLL_TYPE_NONE or not user.is_authenticated:
             return False
         elif user.is_superuser:
             return True
@@ -150,7 +147,7 @@ class DefaultPermissionHandler(object):
 
         if user.is_superuser:
             return True
-        if not defaults.PYBB_ENABLE_ANONYMOUS_POST and not is_authenticated(user):
+        if not defaults.PYBB_ENABLE_ANONYMOUS_POST and not user.is_authenticated:
             return False
         if not self.may_view_topic(user, topic):
             return False
@@ -167,15 +164,15 @@ class DefaultPermissionHandler(object):
             return True
         # FIXME: is_staff only allow user to access /admin but does not mean user has extra
         # permissions on pybb models. We should add pybb perm test
-        return user.is_staff  
+        return user.is_staff
 
     def may_subscribe_topic(self, user, topic):
         """ return True if `user` is allowed to subscribe to a `topic` """
-        return not defaults.PYBB_DISABLE_SUBSCRIPTIONS and is_authenticated(user)
+        return not defaults.PYBB_DISABLE_SUBSCRIPTIONS and user.is_authenticated
 
     #
     # permission checks on posts
-    #    
+    #
     def filter_posts(self, user, qs):
         """ return a queryset with posts `user` is allowed to see """
 
@@ -193,7 +190,7 @@ class DefaultPermissionHandler(object):
         if defaults.PYBB_PREMODERATION:
             # remove moderated posts
             query = query & Q(on_moderation=False, topic__on_moderation=False)
-        if is_authenticated(user):
+        if user.is_authenticated:
             # cancel previous remove if it's my post, or if I'm moderator of the forum
             query = query | Q(user=user) | Q(topic__forum__moderators=user)
         return qs.filter(query).distinct()
@@ -216,7 +213,7 @@ class DefaultPermissionHandler(object):
         if user.is_superuser:
             return True
         return user.has_perm('pybb.change_post') or self.may_moderate_topic(user, post.topic)
-        
+
     def may_edit_post(self, user, post):
         """ return True if `user` may edit `post` """
         if user.is_superuser:
@@ -227,7 +224,7 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may delete `post` """
         if user.is_superuser:
             return True
-        if not is_authenticated(user):
+        if not user.is_authenticated:
             return False
         return (defaults.PYBB_ALLOW_DELETE_OWN_POST and post.user == user) or \
                user.has_perm('pybb.delete_post') or \

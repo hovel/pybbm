@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import os.path
 import warnings
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.six import string_types
 
 PYBB_TOPIC_PAGE_SIZE = getattr(settings, 'PYBB_TOPIC_PAGE_SIZE', 10)
 PYBB_FORUM_PAGE_SIZE = getattr(settings, 'PYBB_FORUM_PAGE_SIZE', 20)
@@ -62,7 +59,7 @@ def getsetting_with_deprecation_check(all_settings, setting_name):  # pragma: no
     setting_value = getattr(all_settings, setting_name)
     values = setting_value if type(setting_value) is not dict else setting_value.values()
     for value in values:
-        if isinstance(value, string_types):
+        if isinstance(value, str):
             continue
         warnings.warn(
             callable_warning % {'setting_name': setting_name, },
@@ -104,11 +101,11 @@ if not PYBB_MARKUP or PYBB_MARKUP not in PYBB_MARKUP_ENGINES:
                                    'PYBB_MARKUP_ENGINES_PATHS')
 
 PYBB_TEMPLATE = getattr(settings, 'PYBB_TEMPLATE', "base.html")
-PYBB_TEMPLATE_MAIL_TXT = getattr(settings, 
-                                 'PYBB_TEMPLATE_MAIL_TXT', 
+PYBB_TEMPLATE_MAIL_TXT = getattr(settings,
+                                 'PYBB_TEMPLATE_MAIL_TXT',
                                  'pybb/mail_templates/base.html')
-PYBB_TEMPLATE_MAIL_HTML = getattr(settings, 
-                                  'PYBB_TEMPLATE_MAIL_HTML', 
+PYBB_TEMPLATE_MAIL_HTML = getattr(settings,
+                                  'PYBB_TEMPLATE_MAIL_HTML',
                                   'pybb/mail_templates/base-html.html')
 PYBB_DEFAULT_AUTOSUBSCRIBE = getattr(settings, 'PYBB_DEFAULT_AUTOSUBSCRIBE', True)
 PYBB_ENABLE_ANONYMOUS_POST = getattr(settings, 'PYBB_ENABLE_ANONYMOUS_POST', False)

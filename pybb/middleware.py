@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 
 import django
 from django.utils import translation
 from django.db.models import ObjectDoesNotExist
 from pybb import util
-from pybb.compat import is_authenticated
 
 if django.VERSION < (1, 10):  # pragma: no cover
     MiddlewareParentClass = object
@@ -17,7 +14,7 @@ else:  # pragma: no cover
 
 class PybbMiddleware(MiddlewareParentClass):
     def process_request(self, request):
-        if is_authenticated(request.user):
+        if request.user.is_authenticated:
             try:
                 # Here we try to load profile, but can get error
                 # if user created during syncdb but profile model

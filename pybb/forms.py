@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 import re
 import inspect
 
@@ -232,7 +230,7 @@ class MovePostForm(forms.Form):
             else:
                 name = '%s' % forum
             choices[-1][1].append((forum.pk, name))
-        
+
         self.fields['move_to'] = forms.ChoiceField(label=ugettext_lazy('Move to forum'),
                                                    initial=self.forum.pk,
                                                    choices=choices, required=True,)

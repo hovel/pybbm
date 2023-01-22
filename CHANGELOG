@@ -1,3 +1,6 @@
+1.0.0
+    * PyBBM is now compatible with Django 3.2 (older versions not supported anymore)
+    * PyBBM is now compatible with Python 3.7+ (older versions not supported anymore)
 0.19.0
     * PyBBM is now compatible with Django 1.8, 1.11, 2.0
     * Fix permissions and add documentation for default permissions

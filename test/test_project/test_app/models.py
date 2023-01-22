@@ -1,9 +1,5 @@
-from __future__ import unicode_literals
 
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
+from django.urls import reverse
 from django.db import models
 
 from pybb.compat import get_user_model_path, get_username_field

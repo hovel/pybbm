@@ -67,9 +67,9 @@ Enable applications and edit settings
         ...
         )
 
-* Add ``pybb.middleware.PybbMiddleware`` to your ``settings.MIDDLEWARE_CLASSES``::
+* Add ``pybb.middleware.PybbMiddleware`` to your ``settings.MIDDLEWARE``::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE = (
         ...
         'pybb.middleware.PybbMiddleware',
         ...
@@ -122,4 +122,3 @@ Check that:
 * Your templates directory contains the "base.html" template. Otherwise, set a custom base template with :ref:`PYBB_TEMPLATE`.
 
 * Basic template contains at least a ``content`` block.
-

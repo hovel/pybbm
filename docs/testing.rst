@@ -58,7 +58,7 @@ Else, steps 1-3 will allow you to have a minimal environment to run pybb test pr
 
 3) Now, add your user-local pip install directory and the pybbm directory to your PYTHONPATH::
 
-    export PYTHONPATH=$PYTHONPATH:~/.local/lib/python2.7/site-packages/:~/tests/src/pybbm
+    export PYTHONPATH=$PYTHONPATH:~/.local/lib/python3.7/site-packages/:~/tests/src/pybbm
 
 4) Now, you have an editable version of pybbm and you can run tests from the "test_project"::
 

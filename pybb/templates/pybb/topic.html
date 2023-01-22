@@ -1,6 +1,6 @@
 {% extends 'pybb/base.html' %}
 
-{% load pybb_tags i18n staticfiles %}
+{% load pybb_tags i18n static %}
 
 {% block title %}{{ topic }}{% endblock %}
 
@@ -43,7 +43,7 @@
             {% include "pybb/pagination.html" %}
         {% endwith %}
 
-        {% if user.is_authenticated %}
+        {% if  user.is_authenticated %}
             {% if user.is_moderator or user.is_subscribed or user|pybb_may_subscribe_topic:topic %}
                 <div class="controls">
                     {% if user.is_moderator %}
@@ -77,7 +77,7 @@
         {% if user|pybb_may_create_post:topic %}
             {% include "pybb/post_form.html" %}
         {% else %}
-            {% if not user.is_authenticated %}
+            {% if not  user.is_authenticated %}
                 {% include 'pybb/_need_to_login_message.html' %}
             {% endif %}
         {% endif %}

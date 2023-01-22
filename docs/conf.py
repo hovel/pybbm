@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # PyBBM documentation build configuration file, created by
 # sphinx-quickstart on Mon Aug 22 16:28:25 2011.

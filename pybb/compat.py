@@ -1,9 +1,7 @@
-# coding=utf-8
-from __future__ import unicode_literals
-
 import django
 from django.conf import settings
 from django.utils.encoding import force_text
+from django.utils.text import slugify as django_slugify
 from unidecode import unidecode
 from pybb import defaults
 
@@ -13,7 +11,7 @@ else:
     from django.core.mail import send_mail, get_connection
     from django.core.mail.message import EmailMultiAlternatives
 
-    def send_html_mail(subject, text_msg, html_msg, sender, recipient, 
+    def send_html_mail(subject, text_msg, html_msg, sender, recipient,
             fail_silently=False, auth_user=None, auth_password=None, connection=None):
         """Sends an email with HTML alternative."""
         connection = connection or get_connection(username=auth_user,
@@ -114,20 +112,4 @@ def slugify(text):
     :param text: any unicode text
     :return: slugified version of passed text
     """
-    from django.utils.text import slugify as django_slugify
-
     return django_slugify(force_text(unidecode(text)))
-
-
-def is_authenticated(user):
-    if django.VERSION > (1, 9):
-        return user.is_authenticated
-
-    return user.is_authenticated()
-
-
-def is_anonymous(user):
-    if django.VERSION > (1, 9):
-        return user.is_anonymous
-
-    return user.is_anonymous()

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import inspect
 
 import math
@@ -17,7 +15,6 @@ from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
 
-from pybb.compat import is_authenticated, is_anonymous
 from pybb.models import TopicReadTracker, ForumReadTracker, PollAnswerUser, Topic, Post
 from pybb.permissions import perms
 from pybb import defaults, util, compat
@@ -68,7 +65,7 @@ def pybb_user_time(context_time, user):
             minutes = int(delta.seconds / 60)
             msg = ungettext('%d minute ago', '%d minutes ago', minutes)
             return msg % minutes
-    if is_authenticated(user):
+    if user.is_authenticated:
         if time.daylight: # pragma: no cover
             tz1 = time.altzone
         else: # pragma: no cover
@@ -126,7 +123,7 @@ def pybb_posted_by(post, user):
 
 @register.filter
 def pybb_is_topic_unread(topic, user):
-    if not is_authenticated(user):
+    if not user.is_authenticated:
         return False
 
     last_topic_update = topic.updated or topic.created
@@ -149,7 +146,7 @@ def pybb_topic_unread(topics, user):
     """
     topic_list = list(topics)
 
-    if is_authenticated(user):
+    if user.is_authenticated:
         for topic in topic_list:
             topic.unread = True
 
@@ -178,7 +175,7 @@ def pybb_forum_unread(forums, user):
     Check if forum has unread messages.
     """
     forum_list = list(forums)
-    if is_authenticated(user):
+    if user.is_authenticated:
         for forum in forum_list:
             forum.unread = forum.topic_count > 0
         forum_marks = ForumReadTracker.objects.filter(
@@ -204,7 +201,7 @@ def pybb_topic_inline_pagination(topic):
 
 @register.filter
 def pybb_topic_poll_not_voted(topic, user):
-    if is_anonymous(user):
+    if user.is_anonymous:
         return True
     return not PollAnswerUser.objects.filter(poll_answer__topic=topic, user=user).exists()
 

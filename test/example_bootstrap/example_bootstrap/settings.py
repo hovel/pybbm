@@ -1,5 +1,4 @@
 # Django settings for example_bootstrap project.
-from __future__ import unicode_literals
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -60,7 +59,7 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE_CLASSES = MIDDLEWARE = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
 from django.db import models, migrations
 from pybb.models import create_or_check_slug
