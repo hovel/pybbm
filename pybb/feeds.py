@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 from django.contrib.syndication.views import Feed
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
+from django.urls import reverse
 from django.utils.feedgenerator import Atom1Feed
 from django.utils.translation import ugettext_lazy as _
 

@@ -1,4 +1,4 @@
-{% load i18n pybb_tags staticfiles %}
+{% load i18n pybb_tags static %}
 
 {% pybb_get_profile user=post.user as post_user_profile %}
 {% pybb_get_profile user=user as user_profile %}
@@ -26,7 +26,7 @@
             {% if post_user_profile.rank %}
                 <div class="rank">
                     {% blocktrans with rank=post_user_profile.rank %}Rank: {{ rank }}{% endblocktrans %}
-                    {% if user.is_authenticated and user != post.user %}
+                    {% if  user.is_authenticated and user != post.user %}
                         <a href="#" class="vote" rel="{{ post_user_profile.get_vote_up_url }}">+</a>
                         <a href="#" class="vote" rel="{{ post_user_profile.get_vote_down_url }}">-</a>
                     {% endif %}
@@ -61,7 +61,7 @@
         <td class="post-content">
             {{ post.body_html|safe }}
 
-            {% if not user.is_authenticated or user_profile.show_signatures %}
+            {% if not  user.is_authenticated or user_profile.show_signatures %}
                 {% if post_user_profile.signature %}
                     <div class="post-signature">
                         {{ post_user_profile.signature_html|safe }}

@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.db.models import F
 from django.forms.utils import ErrorList
@@ -23,7 +18,7 @@ from django.views.generic.edit import ModelFormMixin
 from django.views.decorators.csrf import csrf_protect
 from django.views import generic
 from pybb import compat, defaults, util
-from pybb.compat import get_atomic_func, is_authenticated
+from pybb.compat import get_atomic_func
 from pybb.forms import PostForm, MovePostForm, AdminPostForm, AttachmentFormSet, \
     PollAnswerFormSet, PollForm, ForumSubscriptionForm, ModeratorForm
 from pybb.models import Category, Forum, ForumSubscription, Topic, Post, TopicReadTracker, \
@@ -54,7 +49,7 @@ class RedirectToLoginMixin(object):
         try:
             return super(RedirectToLoginMixin, self).dispatch(request, *args, **kwargs)
         except PermissionDenied:
-            if not is_authenticated(request.user):
+            if not request.user.is_authenticated:
                 from django.contrib.auth.views import redirect_to_login
                 return redirect_to_login(self.get_login_redirect_url())
             else:
@@ -129,7 +124,7 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         ctx = super(ForumView, self).get_context_data(**kwargs)
         ctx['forum'] = self.forum
-        if is_authenticated(self.request.user):
+        if self.request.user.is_authenticated:
             try:
                 ctx['subscription'] = ForumSubscription.objects.get(
                     user=self.request.user,
@@ -214,7 +209,7 @@ class ForumSubscriptionView(RedirectToLoginMixin, generic.FormView):
         return super(ForumSubscriptionView, self).form_valid(form)
 
     def get_objects(self):
-        if not is_authenticated(self.request.user):
+        if not self.request.user.is_authenticated:
             raise PermissionDenied
         self.forum = get_object_or_404(Forum.objects.all(), pk=self.kwargs['pk'])
         try:
@@ -281,7 +276,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
         self.topic = self.get_topic(**kwargs)
 
         if request.GET.get('first-unread'):
-            if is_authenticated(request.user):
+            if request.user.is_authenticated:
                 read_dates = []
                 try:
                     read_dates.append(TopicReadTracker.objects.get(user=request.user, topic=self.topic).time_stamp)
@@ -307,7 +302,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
     def get_queryset(self):
         if not perms.may_view_topic(self.request.user, self.topic):
             raise PermissionDenied
-        if is_authenticated(self.request.user) or not defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER:
+        if self.request.user.is_authenticated or not defaults.PYBB_ANONYMOUS_VIEWS_CACHE_BUFFER:
             Topic.objects.filter(id=self.topic.id).update(views=F('views') + 1)
         else:
             cache_key = util.build_cache_key('anonymous_topic_views', topic_id=self.topic.id)
@@ -326,7 +321,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
     def get_context_data(self, **kwargs):
         ctx = super(TopicView, self).get_context_data(**kwargs)
 
-        if is_authenticated(self.request.user):
+        if self.request.user.is_authenticated:
             self.request.user.is_moderator = perms.may_moderate_topic(self.request.user, self.topic)
             self.request.user.is_subscribed = self.request.user in self.topic.subscribers.all()
             if defaults.PYBB_ENABLE_ADMIN_POST_FORM and \
@@ -359,7 +354,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
 
     @method_decorator(get_atomic_func())
     def mark_read(self):
-        if not is_authenticated(self.request.user):
+        if not self.request.user.is_authenticated:
             return
         try:
             forum_mark = ForumReadTracker.objects.get(forum=self.topic.forum, user=self.request.user)
@@ -496,7 +491,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
 
     @method_decorator(csrf_protect)
     def dispatch(self, request, *args, **kwargs):
-        if is_authenticated(request.user):
+        if request.user.is_authenticated:
             self.user = request.user
         else:
             if defaults.PYBB_ENABLE_ANONYMOUS_POST:
@@ -554,7 +549,7 @@ class AddPostView(PostEditMixin, generic.CreateView):
         return ctx
 
     def get_success_url(self):
-        if (not is_authenticated(self.request.user)) and defaults.PYBB_PREMODERATION:
+        if (not self.request.user.is_authenticated) and defaults.PYBB_PREMODERATION:
             return reverse('pybb:index')
         return self.object.get_absolute_url()
 

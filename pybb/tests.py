@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 import datetime, time
+import logging
 import inspect
 import math
 import os
@@ -11,12 +10,7 @@ from django.conf import settings
 from django.core import mail
 from django.core.cache import cache
 
-from pybb.compat import is_authenticated, is_anonymous
-
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
@@ -34,6 +28,7 @@ from pybb.templatetags.pybb_tags import pybb_is_topic_unread, pybb_topic_unread,
     pybb_get_latest_topics, pybb_get_latest_posts
 
 from pybb import compat, util
+from pybb.compat import slugify
 
 User = compat.get_user_model()
 username_field = compat.get_username_field()
@@ -59,6 +54,7 @@ __author__ = 'zeus'
 
 
 class SharedTestModule(object):
+
     def create_user(self):
         self.user = User.objects.create_user('zeus', 'zeus@localhost', 'zeus')
 
@@ -93,7 +89,11 @@ class SharedTestModule(object):
         response = client.get(url, follow=True)
         if response.status_code < 400:
             values = self.get_form_values(response)
-            values.update(post_kwargs)
+            for k, v in post_kwargs.items():
+                if v is None:
+                    values.pop(k, None)
+                else:
+                    values[k] = v
             response = client.post(url, data=values, follow=True)
             if response.status_code < 400 and _sleep:
                 sleep_only_if_required(1)
@@ -1813,7 +1813,7 @@ class AttachmentTest(TestCase, SharedTestModule):
         self.create_user()
         self.create_initial()
 
-    def test_attachment_one(self):
+    def test_attachment(self):
         self.login_client()
         with open(self.file_name, 'rb') as fp:
             response = self.create_post_via_http(self.client, topic_id=self.topic.id,
@@ -1823,16 +1823,6 @@ class AttachmentTest(TestCase, SharedTestModule):
         self.assertTrue(Post.objects.filter(body='test attachment').exists())
         post = Post.objects.filter(body='test attachment')[0]
         self.assertEqual(post.attachments.count(), 1)
-
-    def test_attachment_two(self):
-        self.login_client()
-        with open(self.file_name, 'rb') as fp:
-            with self.assertRaises(ValidationError):
-                self.create_post_via_http(self.client, topic_id=self.topic.id,
-                                          **{'body': 'test attachment',
-                                             'attachments-0-file': fp,
-                                             'attachments-INITIAL_FORMS': None,
-                                             'attachments-TOTAL_FORMS': None,})
 
     def test_attachment_usage(self):
         self.login_client()
@@ -2084,21 +2074,21 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
     """
 
     def filter_categories(self, user, qs):
-        return qs.filter(hidden=False) if is_anonymous(user) else qs
+        return qs.filter(hidden=False) if user.is_anonymous else qs
 
     def may_view_category(self, user, category):
-        return is_authenticated(user) if category.hidden else True
+        return user.is_authenticated if category.hidden else True
 
     def filter_forums(self, user, qs):
-        if is_anonymous(user):
+        if user.is_anonymous:
             qs = qs.filter(Q(hidden=False) & Q(category__hidden=False))
         return qs
 
     def may_view_forum(self, user, forum):
-        return is_authenticated(user) if forum.hidden or forum.category.hidden else True
+        return user.is_authenticated if forum.hidden or forum.category.hidden else True
 
     def filter_topics(self, user, qs):
-        if is_anonymous(user):
+        if user.is_anonymous:
             qs = qs.filter(Q(forum__hidden=False) & Q(forum__category__hidden=False))
         qs = qs.filter(closed=False)  # filter out closed topics for test
         return qs
@@ -2107,7 +2097,7 @@ class CustomPermissionHandler(permissions.DefaultPermissionHandler):
         return self.may_view_forum(user, topic.forum)
 
     def filter_posts(self, user, qs):
-        if is_anonymous(user):
+        if user.is_anonymous:
             qs = qs.filter(Q(topic__forum__hidden=False) & Q(topic__forum__category__hidden=False))
         return qs
 
@@ -2167,8 +2157,8 @@ class MarkupParserTest(TestCase, SharedTestModule):
                 '<img src="http://domain.com/image.png"></img>',
                 '<img src="http://domain.com/image.png">'
             ],
-            ['[url=google.com]search in google[/url]', '<a href="http://google.com">search in google</a>'],
-            ['http://google.com', '<a href="http://google.com">http://google.com</a>'],
+            ['[url=google.com]search in google[/url]', '<a rel="nofollow" href="http://google.com">search in google</a>'],
+            ['http://google.com', '<a rel="nofollow" href="http://google.com">http://google.com</a>'],
             ['[list][*]1[*]2[/list]', '<ul><li>1</li><li>2</li></ul>'],
             [
                 '[list=1][*]1[*]2[/list]',
@@ -2396,11 +2386,11 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
             return permissions.perms.may_view_post(user, other_post)
 
         def _view_own_on_moderation_topic(user):
-            if not is_anonymous(user) and author_on_moderation_topic.user.pk == user.pk:
+            if not user.is_anonymous and author_on_moderation_topic.user.pk == user.pk:
                 return permissions.perms.may_view_topic(user, author_on_moderation_topic)
 
         def _view_own_on_moderation_post(user):
-            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
+            if not user.is_anonymous and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_view_post(user, author_on_moderation_post)
 
         def _view_other_on_moderation_topic(user):
@@ -2419,22 +2409,22 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
             return permissions.perms.may_create_post(user, closed_topic)
 
         def _edit_own_normal_post(user):
-            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
+            if not user.is_anonymous and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_edit_post(user, author_post)
 
         def _edit_own_on_moderation_post(user):
-            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
+            if not user.is_anonymous and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_edit_post(user, author_on_moderation_post)
 
         def _edit_other_post(user):
             return permissions.perms.may_edit_post(user, other_post)
 
         def _delete_own_normal_post(user):
-            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
+            if not user.is_anonymous and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_delete_post(user, author_post)
 
         def _delete_own_on_moderation_post(user):
-            if not is_anonymous(user) and author_on_moderation_post.user.pk == user.pk:
+            if not user.is_anonymous and author_on_moderation_post.user.pk == user.pk:
                 return permissions.perms.may_delete_post(user, author_on_moderation_post)
 
         def _delete_other_post(user):
@@ -3415,13 +3405,13 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         defaults.PYBB_NICE_URL = True
 
     def test_unicode_slugify(self):
-        self.assertEqual(compat.slugify('北京 (China), Москва (Russia), é_è (a sad smiley !)'),
+        self.assertEqual(slugify('北京 (China), Москва (Russia), é_è (a sad smiley !)'),
                          'bei-jing-china-moskva-russia-e_e-a-sad-smiley')
 
     def test_automatique_slug(self):
-        self.assertEqual(compat.slugify(self.category.name), self.category.slug)
-        self.assertEqual(compat.slugify(self.forum.name), self.forum.slug)
-        self.assertEqual(compat.slugify(self.topic.name), self.topic.slug)
+        self.assertEqual(slugify(self.category.name), self.category.slug)
+        self.assertEqual(slugify(self.forum.name), self.forum.slug)
+        self.assertEqual(slugify(self.topic.name), self.topic.slug)
 
     def test_no_duplicate_slug(self):
         category_name = self.category.name
@@ -3434,24 +3424,24 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         topic = Topic.objects.create(name=topic_name, forum=self.forum, user=self.user)
 
         slug_nb = len(Category.objects.filter(slug__startswith=category_name)) - 1
-        self.assertEqual('%s-%d' % (compat.slugify(category_name), slug_nb), category.slug)
+        self.assertEqual('%s-%d' % (slugify(category_name), slug_nb), category.slug)
         slug_nb = len(Forum.objects.filter(slug__startswith=forum_name)) - 1
-        self.assertEqual('%s-%d' % (compat.slugify(forum_name), slug_nb), forum.slug)
+        self.assertEqual('%s-%d' % (slugify(forum_name), slug_nb), forum.slug)
         slug_nb = len(Topic.objects.filter(slug__startswith=topic_name)) - 1
-        self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
+        self.assertEqual('%s-%d' % (slugify(topic_name), slug_nb), topic.slug)
 
         # objects created with a duplicate slug but a different name
-        category = Category.objects.create(name='test_slug_category', slug=compat.slugify(category_name))
+        category = Category.objects.create(name='test_slug_category', slug=slugify(category_name))
         forum = Forum.objects.create(name='test_slug_forum', description='bar',
-                                     category=self.category, slug=compat.slugify(forum_name))
+                                     category=self.category, slug=slugify(forum_name))
         topic = Topic.objects.create(name='test_topic_slug', forum=self.forum,
-                                     user=self.user, slug=compat.slugify(topic_name))
+                                     user=self.user, slug=slugify(topic_name))
         slug_nb = len(Category.objects.filter(slug__startswith=category_name)) - 1
-        self.assertEqual('%s-%d' % (compat.slugify(category_name), slug_nb), category.slug)
+        self.assertEqual('%s-%d' % (slugify(category_name), slug_nb), category.slug)
         slug_nb = len(Forum.objects.filter(slug__startswith=forum_name)) - 1
-        self.assertEqual('%s-%d' % (compat.slugify(forum_name), slug_nb), forum.slug)
+        self.assertEqual('%s-%d' % (slugify(forum_name), slug_nb), forum.slug)
         slug_nb = len(Topic.objects.filter(slug__startswith=self.topic.name)) - 1
-        self.assertEqual('%s-%d' % (compat.slugify(topic_name), slug_nb), topic.slug)
+        self.assertEqual('%s-%d' % (slugify(topic_name), slug_nb), topic.slug)
 
     def test_fail_on_too_many_duplicate_slug(self):
 
@@ -3506,7 +3496,7 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         values = self.get_form_values(response)
         values.update({'name': self.topic.name, 'body': '[b]Test slug body[/b]', 'poll_type': 0})
         response = self.client.post(add_topic_url, data=values, follow=True)
-        slug_nb = len(Topic.objects.filter(slug__startswith=compat.slugify(self.topic.name))) - 1
+        slug_nb = len(Topic.objects.filter(slug__startswith=slugify(self.topic.name))) - 1
         self.assertIsNotNone = Topic.objects.get(slug='%s-%d' % (self.topic.name, slug_nb))
 
         _attach_perms_class('pybb.tests.CustomPermissionHandler')

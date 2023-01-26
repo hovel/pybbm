@@ -1,5 +1,3 @@
-# coding=utf-8
-from __future__ import unicode_literals
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -36,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'django.contrib.messages',
     'test_app',
     'pybb.apps.PybbConfig',
 ]
@@ -54,7 +53,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                # 'django.contrib.messages.context_processors.messages',
+                'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
@@ -65,7 +64,7 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE_CLASSES = MIDDLEWARE = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -89,3 +88,9 @@ LOGIN_URL = '/'
 USE_TZ = True
 PYBB_ATTACHMENT_ENABLE = True
 PYBB_PROFILE_RELATED_NAME = 'pybb_customprofile'
+LOGGING = {}
+import sys
+import logging
+
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    logging.disable(logging.CRITICAL)
