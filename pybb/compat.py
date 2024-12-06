@@ -1,6 +1,6 @@
 import django
 from django.conf import settings
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import slugify as django_slugify
 from unidecode import unidecode
 from pybb import defaults
@@ -112,4 +112,4 @@ def slugify(text):
     :param text: any unicode text
     :return: slugified version of passed text
     """
-    return django_slugify(force_text(unidecode(text)))
+    return django_slugify(force_str(unidecode(text)))
