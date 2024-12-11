@@ -10,7 +10,7 @@ from django.core.cache import cache
 from django.utils.safestring import mark_safe
 from django.utils.encoding import smart_str
 from django.utils.html import escape
-from django.utils.translation import gettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext
 from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
@@ -59,11 +59,11 @@ def pybb_user_time(context_time, user):
 
     if delta.days == 0:
         if delta.seconds < 60:
-            msg = ungettext('%d second ago', '%d seconds ago', delta.seconds)
+            msg = ngettext('%d second ago', '%d seconds ago', delta.seconds)
             return msg % delta.seconds
         elif delta.seconds < 3600:
             minutes = int(delta.seconds / 60)
-            msg = ungettext('%d minute ago', '%d minutes ago', minutes)
+            msg = ngettext('%d minute ago', '%d minutes ago', minutes)
             return msg % minutes
     if user.is_authenticated:
         if time.daylight: # pragma: no cover
