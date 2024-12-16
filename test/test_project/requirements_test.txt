@@ -1,4 +1,7 @@
-lxml
-Pillow
 bbcode
+django
+django-annoying
+lxml
 markdown
+Pillow
+unidecode

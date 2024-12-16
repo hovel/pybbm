@@ -911,13 +911,21 @@ class FeaturesTest(TestCase, SharedTestModule):
             self.client.get(reverse('pybb:unstick_topic', kwargs={'pk': self.topic.id}), follow=True).status_code, 200)
 
     def test_delete_view(self):
-        post = self.create_post(topic=self.topic, user=self.user, body='test to delete')
         self.user.is_superuser = True
         self.user.save()
         self.login_client()
+
+        post = self.create_post(topic=self.topic, user=self.user, body='test to delete')
+
+        self.assertEqual(Post.objects.filter(id=post.id).count(), 1)
+        self.assertEqual(Post.objects.filter(id=self.post.id).count(), 1)
+        self.assertEqual(Post.objects.filter(topic=self.topic.id).count(), 2)
+
         response = self.client.post(reverse('pybb:delete_post', args=[post.id]), follow=True)
         self.assertEqual(response.status_code, 200)
         # Check that topic and forum exists ;)
+        self.assertEqual(Post.objects.filter(id=post.id).count(), 0)
+        self.assertEqual(Post.objects.filter(topic=self.topic.id).count(), 1)
         self.assertEqual(Topic.objects.filter(id=self.topic.id).count(), 1)
         self.assertEqual(Forum.objects.filter(id=self.forum.id).count(), 1)
 
@@ -925,6 +933,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         response = self.client.post(reverse('pybb:delete_post', args=[self.post.id]), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Post.objects.filter(id=self.post.id).count(), 0)
+        self.assertEqual(Post.objects.filter(topic=self.topic.id).count(), 0)
         self.assertEqual(Topic.objects.filter(id=self.topic.id).count(), 0)
         self.assertEqual(Forum.objects.filter(id=self.forum.id).count(), 1)
 
