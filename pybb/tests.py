@@ -3291,10 +3291,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.category.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.category.get_absolute_url(), 'nostaff', 'nostaff')
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.category.get_absolute_url(), 'staff', 'staff')
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_forum(self):
         # access without user should be redirected
@@ -3302,10 +3302,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.forum.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.forum.get_absolute_url(), 'nostaff', 'nostaff')
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.forum.get_absolute_url(), 'staff', 'staff')
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_topic(self):
         # access without user should be redirected
@@ -3313,10 +3313,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.topic.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.topic.get_absolute_url(), 'nostaff', 'nostaff')
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.topic.get_absolute_url(), 'staff', 'staff')
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_post(self):
         # access without user should be redirected
@@ -3324,10 +3324,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         self.assertRedirects(r, settings.LOGIN_URL + '?next=%s' % self.post.get_absolute_url())
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.post.get_absolute_url(), 'nostaff', 'nostaff')
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.post.get_absolute_url(), 'staff', 'staff')
-        self.assertEquals(r.status_code, 302)
+        self.assertEqual(r.status_code, 302)
 
     @override_settings(PYBB_ENABLE_ANONYMOUS_POST=False)
     def test_redirect_topic_add(self):
@@ -3340,13 +3340,13 @@ class LogonRedirectTest(TestCase, SharedTestModule):
 
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(add_topic_url, 'staff', 'staff')
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
 
         _detach_perms_class()
 
         # allowed user is allowed
         r = self.get_with_user(add_topic_url, 'staff', 'staff')
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_post_edit(self):
         _attach_perms_class('pybb.tests.RestrictEditingHandler')
@@ -3358,13 +3358,13 @@ class LogonRedirectTest(TestCase, SharedTestModule):
 
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(edit_post_url, 'staff', 'staff')
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
 
         _detach_perms_class()
 
         # allowed user is allowed
         r = self.get_with_user(edit_post_url, 'staff', 'staff')
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_profile_autocreation_signal_on(self):
         user = User.objects.create_user('cronos', 'cronos@localhost', 'cronos')
@@ -4028,7 +4028,7 @@ def build_dynamic_test_for_templatetags_perms():
             continue  # only methods are used to dynamically build templatetags
         if not method_name.startswith('may') and not method_name.startswith('filter'):
             continue  # only (may|filter)* methods are used to dynamically build templatetags
-        method_args = inspect.getargspec(method).args
+        method_args = inspect.getfullargspec(method).args
         args_count = len(method_args)
         if args_count not in (2, 3):
             continue  # only methods with 2 or 3 params
