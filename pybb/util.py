@@ -6,8 +6,8 @@ import warnings
 import uuid
 
 from importlib import import_module
-from django.utils.six import string_types
-from django.utils.translation import ugettext as _
+string_types = (str,)
+from django.utils.translation import gettext as _
 from pybb import compat
 
 from pybb.compat import get_username_field, get_user_model, is_authenticated

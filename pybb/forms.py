@@ -10,9 +10,8 @@ from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.decorators import method_decorator
 from django.utils.text import Truncator
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import gettext, gettext_lazy
 from django.utils.timezone import now as tznow
-from django.utils.translation import ugettext as _
 
 from pybb import compat, defaults, util, permissions
 from pybb.models import Topic, Post, Attachment, PollAnswer, \
@@ -30,7 +29,7 @@ class AttachmentForm(forms.ModelForm):
 
     def clean_file(self):
         if self.cleaned_data['file'].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
-            raise forms.ValidationError(ugettext('Attachment is too big'))
+            raise forms.ValidationError(gettext('Attachment is too big'))
         return self.cleaned_data['file']
 
 AttachmentFormSet = inlineformset_factory(Post, Attachment, extra=1, form=AttachmentForm)
@@ -48,9 +47,9 @@ class BasePollAnswerFormset(BaseInlineFormSet):
                      len(self.deleted_forms))
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
             raise forms.ValidationError(
-                ugettext('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
+                gettext('You can''t add more than %s answers for poll' % defaults.PYBB_POLL_MAX_ANSWERS))
         if forms_cnt < 2:
-            raise forms.ValidationError(ugettext('Add two or more answers for this poll'))
+            raise forms.ValidationError(gettext('Add two or more answers for this poll'))
 
 
 PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=defaults.PYBB_POLL_MAX_ANSWERS,
@@ -58,13 +57,13 @@ PollAnswerFormSet = inlineformset_factory(Topic, PollAnswer, extra=2, max_num=de
 
 
 class PostForm(forms.ModelForm):
-    name = forms.CharField(label=ugettext_lazy('Subject'))
-    poll_type = forms.TypedChoiceField(label=ugettext_lazy('Poll type'), choices=Topic.POLL_TYPE_CHOICES, coerce=int)
+    name = forms.CharField(label=gettext_lazy('Subject'))
+    poll_type = forms.TypedChoiceField(label=gettext_lazy('Poll type'), choices=Topic.POLL_TYPE_CHOICES, coerce=int)
     poll_question = forms.CharField(
-        label=ugettext_lazy('Poll question'),
+        label=gettext_lazy('Poll question'),
         required=False,
         widget=forms.Textarea(attrs={'class': 'no-markitup'}))
-    slug = forms.CharField(label=ugettext_lazy('Topic slug'), required=False)
+    slug = forms.CharField(label=gettext_lazy('Topic slug'), required=False)
 
     class Meta(object):
         model = Post
@@ -123,7 +122,7 @@ class PostForm(forms.ModelForm):
         poll_type = self.cleaned_data.get('poll_type', None)
         poll_question = self.cleaned_data.get('poll_question', None)
         if poll_type is not None and poll_type != Topic.POLL_TYPE_NONE and not poll_question:
-            raise forms.ValidationError(ugettext('Poll''s question is required when adding a poll'))
+            raise forms.ValidationError(gettext('Poll''s question is required when adding a poll'))
 
         return self.cleaned_data
 
@@ -202,12 +201,12 @@ class MovePostForm(forms.Form):
                 bvars = {'author': util.get_pybb_profile(post.user).get_display_name(),
                          'abstract': Truncator(post.body_text).words(8),
                          'i': i}
-                label = _('%(i)d (%(author)s: "%(abstract)s")') % bvars
+                label = gettext('%(i)d (%(author)s: "%(abstract)s")') % bvars
                 choices.append((i, label))
-            choices.insert(0, (0, _('None')))
-            choices.insert(0, (-1, _('All')))
+            choices.insert(0, (0, gettext('None')))
+            choices.insert(0, (-1, gettext('All')))
             self.fields['number'] = forms.TypedChoiceField(
-                label=ugettext_lazy('Number of following posts to move with'),
+                label=gettext_lazy('Number of following posts to move with'),
                 choices=choices, required=True, coerce=int,
             )
             # we move the entire topic, so we want to change it's forum.
@@ -233,14 +232,14 @@ class MovePostForm(forms.Form):
                 name = '%s' % forum
             choices[-1][1].append((forum.pk, name))
         
-        self.fields['move_to'] = forms.ChoiceField(label=ugettext_lazy('Move to forum'),
+        self.fields['move_to'] = forms.ChoiceField(label=gettext_lazy('Move to forum'),
                                                    initial=self.forum.pk,
                                                    choices=choices, required=True,)
-        self.fields['name'] = forms.CharField(label=_('New subject'),
+        self.fields['name'] = forms.CharField(label=gettext('New subject'),
                                               initial=self.topic.name,
                                               max_length=255, required=True)
         if permissions.perms.may_edit_topic_slug(self.user):
-            self.fields['slug'] = forms.CharField(label=_('New topic slug'),
+            self.fields['slug'] = forms.CharField(label=gettext('New topic slug'),
                                                   initial=self.topic.slug,
                                                   max_length=255, required=False)
 
@@ -298,7 +297,7 @@ class AdminPostForm(PostForm):
     Superusers can post messages from any user and from any time
     If no user with specified name - new user will be created
     """
-    login = forms.CharField(label=ugettext_lazy('User'))
+    login = forms.CharField(label=gettext_lazy('User'))
 
     def __init__(self, *args, **kwargs):
         if args:
@@ -334,7 +333,7 @@ try:
 
         def clean_avatar(self):
             if self.cleaned_data['avatar'] and (self.cleaned_data['avatar'].size > defaults.PYBB_MAX_AVATAR_SIZE):
-                forms.ValidationError(ugettext('Avatar is too large, max size: %s bytes' %
+                forms.ValidationError(gettext('Avatar is too large, max size: %s bytes' %
                                                defaults.PYBB_MAX_AVATAR_SIZE))
             return self.cleaned_data['avatar']
 
@@ -394,20 +393,20 @@ class ForumSubscriptionForm(forms.Form):
         type_choices = list(ForumSubscription.TYPE_CHOICES)
         if instance :
             type_choices.append(
-                ('unsubscribe', _('be unsubscribe from this forum')))
+                ('unsubscribe', gettext('be unsubscribe from this forum')))
             type_initial = instance.type
         else:
             type_initial = ForumSubscription.TYPE_NOTIFY
         self.fields['type'] = forms.ChoiceField(
-            label=_('You want to'), choices=type_choices, initial=type_initial,
+            label=gettext('You want to'), choices=type_choices, initial=type_initial,
             widget=forms.RadioSelect())
 
         topic_choices = (
-            ('new', _('only new topics')),
-            ('all', _('all topics of the forum')),
+            ('new', gettext('only new topics')),
+            ('all', gettext('all topics of the forum')),
         )
         self.fields['topics'] = forms.ChoiceField(
-            label=_('Concerned topics'), choices=topic_choices,
+            label=gettext('Concerned topics'), choices=topic_choices,
             initial=topic_choices[0][0], widget=forms.RadioSelect())
 
     def process(self):

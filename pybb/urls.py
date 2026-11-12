@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from django.conf.urls import url
+from django.urls import re_path as url
 
 from pybb.defaults import PYBB_NICE_URL
 from pybb.feeds import LastPosts, LastTopics

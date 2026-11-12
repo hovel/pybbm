@@ -89,3 +89,4 @@ LOGIN_URL = '/'
 USE_TZ = True
 PYBB_ATTACHMENT_ENABLE = True
 PYBB_PROFILE_RELATED_NAME = 'pybb_customprofile'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

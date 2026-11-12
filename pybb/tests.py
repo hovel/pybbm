@@ -4029,7 +4029,7 @@ def build_dynamic_test_for_templatetags_perms():
             continue  # only methods are used to dynamically build templatetags
         if not method_name.startswith('may') and not method_name.startswith('filter'):
             continue  # only (may|filter)* methods are used to dynamically build templatetags
-        method_args = inspect.getargspec(method).args
+        method_args = inspect.getfullargspec(method).args
         args_count = len(method_args)
         if args_count not in (2, 3):
             continue  # only methods with 2 or 3 params

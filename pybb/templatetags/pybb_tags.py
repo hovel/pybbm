@@ -10,9 +10,12 @@ import django
 from django import template
 from django.core.cache import cache
 from django.utils.safestring import mark_safe
-from django.utils.encoding import smart_text
+from pybb.compat import smart_str
 from django.utils.html import escape
-from django.utils.translation import ugettext as _, ungettext
+try:
+    from django.utils.translation import gettext as _, ngettext
+except ImportError:
+    from django.utils.translation import ugettext as _, ungettext as ngettext
 from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
@@ -62,11 +65,11 @@ def pybb_user_time(context_time, user):
 
     if delta.days == 0:
         if delta.seconds < 60:
-            msg = ungettext('%d second ago', '%d seconds ago', delta.seconds)
+            msg = ngettext('%d second ago', '%d seconds ago', delta.seconds)
             return msg % delta.seconds
         elif delta.seconds < 3600:
             minutes = int(delta.seconds / 60)
-            msg = ungettext('%d minute ago', '%d minutes ago', minutes)
+            msg = ngettext('%d minute ago', '%d minutes ago', minutes)
             return msg % minutes
     if is_authenticated(user):
         if time.daylight: # pragma: no cover
@@ -91,7 +94,7 @@ def pybb_link(object, anchor=''):
 
     url = hasattr(object, 'get_absolute_url') and object.get_absolute_url() or None
     #noinspection PyRedeclaration
-    anchor = anchor or smart_text(object)
+    anchor = anchor or smart_str(object)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
 
 
@@ -214,7 +217,7 @@ def endswith(str, substr):
     return str.endswith(substr)
 
 
-@register.assignment_tag
+@register.simple_tag
 def pybb_get_profile(*args, **kwargs):
     try:
         return util.get_pybb_profile(kwargs.get('user') or args[0])
@@ -222,7 +225,7 @@ def pybb_get_profile(*args, **kwargs):
         return None
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def pybb_get_latest_topics(context, cnt=5, user=None):
     qs = Topic.objects.all().order_by('-updated', '-created', '-id')
     if not user:
@@ -231,7 +234,7 @@ def pybb_get_latest_topics(context, cnt=5, user=None):
     return qs[:cnt]
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def pybb_get_latest_posts(context, cnt=5, user=None):
     qs = Post.objects.all().order_by('-created', '-id')
     if not user:
@@ -256,15 +259,15 @@ def load_perms_filters():
             continue  # pragma: no cover - only methods are used to dynamically build templatetags
         if not method_name.startswith('may') and not method_name.startswith('filter'):
             continue  # pragma: no cover - only (may|filter)* methods are used to dynamically build templatetags
-        method_args = inspect.getargspec(method).args
+        method_args = inspect.getfullargspec(method).args
         args_count = len(method_args)
         if args_count not in (2, 3):
             continue  # pragma: no cover - only methods with 2 or 3 params
         if method_args[0] != 'self' or method_args[1] != 'user':
             continue  # pragma: no cover - only methods with self and user as first args
-        if len(inspect.getargspec(method).args) == 3:
+        if len(inspect.getfullargspec(method).args) == 3:
             register.filter('%s%s' % ('pybb_', method_name), partial(method_name, perms))
-        elif len(inspect.getargspec(method).args) == 2:
+        elif len(inspect.getfullargspec(method).args) == 2:
             register.filter('%s%s' % ('pybb_', method_name), partial_no_param(method_name, perms))
 load_perms_filters()
 

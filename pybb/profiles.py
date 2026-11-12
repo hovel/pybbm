@@ -1,8 +1,8 @@
 # coding=utf-8
 from django.conf import settings
 from django.db import models
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation.trans_real import get_supported_language_variant
 
 from pybb import defaults, util
@@ -63,4 +63,4 @@ class PybbProfile(models.Model):
             if not defaults.PYBB_PROFILE_RELATED_NAME:  # we now in user custom model itself
                 return self.get_username()
         except Exception:
-            return force_text(self)
+            return force_str(self)
