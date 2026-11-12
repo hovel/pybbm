@@ -10,12 +10,9 @@ import django
 from django import template
 from django.core.cache import cache
 from django.utils.safestring import mark_safe
-from pybb.compat import smart_str
+from django.utils.encoding import smart_str
 from django.utils.html import escape
-try:
-    from django.utils.translation import gettext as _, ngettext
-except ImportError:
-    from django.utils.translation import ugettext as _, ungettext as ngettext
+from django.utils.translation import gettext as _, ngettext
 from django.utils import dateformat
 from django.utils.timezone import timedelta
 from django.utils.timezone import now as tznow
